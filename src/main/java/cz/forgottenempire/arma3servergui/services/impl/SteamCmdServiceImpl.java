@@ -65,8 +65,6 @@ public class SteamCmdServiceImpl implements SteamCmdService {
                         mod.getName(), mod.getId(), e.toString());
             }
 
-            // TODO find mod version from bikey
-
             logger.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
                     executor.getQueue().size());
             mod.setInstalled(true);

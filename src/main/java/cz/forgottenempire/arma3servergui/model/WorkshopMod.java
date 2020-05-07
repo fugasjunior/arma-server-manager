@@ -6,8 +6,6 @@ import io.jsondb.annotation.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.regex.Pattern;
-
 @Data
 @NoArgsConstructor
 @Document(collection = "mods", schemaVersion = "1.0")
@@ -15,7 +13,6 @@ public class WorkshopMod {
     @Id
     private Long id;
     private String name;
-    private String version;
     private boolean installed;
 
     public WorkshopMod(Long id) {
