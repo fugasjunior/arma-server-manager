@@ -1,0 +1,14 @@
+# Paths
+steamcmd.path=<absolute path to a steamcmd EXECUTABLE (eg. C:\\SteamCMD\\steamcmd.exe)>
+installDir=<absolute path to a directory where the mods are installed>
+serverDir=<absolute path to Arma 3 server>
+config.path=<path to json config files>
+
+# Steam config
+steamAuth.username=<steam-acc-username>
+steamAuth.password=<steam-acc-password>
+steamAuth.token=<optional-steamguard-token>
+steam.api.key=<steam api key>
+
+# Misc settings
+jsonDb.key=<key used for json database encryption
