@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,23 +53,14 @@ public class SteamCmdServiceImpl implements SteamCmdService {
                 logger.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
             }
 
-            // create symlink to server
-            Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
-            Path targetPath = Path.of(getDownloadPath() + File.separatorChar + mod.getId());
+            copyBiKeys(mod.getId());
+            createSymlink(mod);
 
-            try {
-                if (!Files.isSymbolicLink(linkPath)) {
-                    Files.createSymbolicLink(linkPath, targetPath);
-                }
-            } catch (IOException e) {
-                logger.error("Failed to create symlink for mod {} ({}) due to {} ",
-                        mod.getName(), mod.getId(), e.toString());
-            }
+            mod.setInstalled(true);
+            modDb.save(mod, WorkshopMod.class);
 
             logger.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
                     executor.getQueue().size());
-            mod.setInstalled(true);
-            modDb.save(mod, WorkshopMod.class);
         });
 
         return true;
@@ -151,6 +143,37 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             return false;
         }
         return true;
+    }
+
+    private void createSymlink(WorkshopMod mod) {
+        // create symlink to server
+        Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
+        Path targetPath = Path.of(getDownloadPath() + File.separatorChar + mod.getId());
+
+        try {
+            if (!Files.isSymbolicLink(linkPath)) {
+                Files.createSymbolicLink(linkPath, targetPath);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create symlink for mod {} ({}) due to {} ",
+                    mod.getName(), mod.getId(), e.toString());
+        }
+    }
+
+    private void copyBiKeys(Long modId) {
+        File downloadedKeysPath = new File(getDownloadPath() + File.separatorChar + modId +
+                File.separatorChar + "keys");
+        String[] extensions = new String[]{"bikey"};
+
+        for (Iterator<File> it = FileUtils.iterateFiles(downloadedKeysPath, extensions, false); it.hasNext(); ) {
+            File key = it.next();
+            try {
+                logger.info("Copying bikey {} to server", key.getName());
+                FileUtils.copyFile(key, new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
+            } catch (IOException e) {
+                logger.error("Could not copy bikeys due to {}", e.toString());
+            }
+        }
     }
 
     private String getDownloadPath() {

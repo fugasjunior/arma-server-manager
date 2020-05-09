@@ -1,12 +1,12 @@
 # Arma 3 Server GUI
 
 ## Status to MVP
-- [ ] Steam Workshop integration for mods
+- [x] Steam Workshop integration for mods
   - [x] Mod download, update, installation, removal
-    - [ ] Copy bikeys into server folder
+    - [x] Copy bikeys into server folder
   - [x] Listing all installed mods
   - [x] Cronjob updating mods every day
-- [ ] Server configuration & launching
+- [x] Server configuration & launching
   - [x] Start, stop, restart server
   - [x] Select mods
   - [x] Status monitoring
