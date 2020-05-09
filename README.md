@@ -11,7 +11,7 @@
   - [x] Select mods
   - [x] Status monitoring
   - [x] Basic server config editor
-- [ ] Uploading custom scenarios from local machine
+- [x] Uploading custom scenarios from local machine
 - [ ] React web interface
   - [ ] Server config editor
   - [ ] Server status dashboard

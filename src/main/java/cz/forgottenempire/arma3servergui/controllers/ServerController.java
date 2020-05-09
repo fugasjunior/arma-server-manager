@@ -1,8 +1,8 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
 import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.dtos.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
-import cz.forgottenempire.arma3servergui.model.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;

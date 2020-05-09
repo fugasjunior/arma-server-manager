@@ -13,5 +13,9 @@ steamAuth.password=<steam-acc-password>
 steamAuth.token=<optional-steamguard-token>
 steam.api.key=<steam api key>
 
+# File upload limits
+spring.servlet.multipart.max-file-size=100MB
+spring.servlet.multipart.max-request-size=100MB
+
 # Misc settings
 jsonDb.key=<key used for json database encryption

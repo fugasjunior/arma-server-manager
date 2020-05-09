@@ -1,9 +1,13 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.dtos;
 
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ServerStatus {
     private boolean isServerUp;
     private int playersOnline;
