@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
-@RestController()
+@RestController
+@RequestMapping("/mods")
 public class WorkshopModsController {
     private SteamWorkshopService steamWorkshopService;
     private SteamCmdService steamCmdService;
@@ -20,12 +21,12 @@ public class WorkshopModsController {
 
     private JsonDbService<WorkshopMod> modsDb;
 
-    @GetMapping("/mods")
+    @GetMapping
     public ResponseEntity<Collection<WorkshopMod>> getAllMods() {
         return new ResponseEntity<>(modsDb.findAll(WorkshopMod.class), HttpStatus.OK);
     }
 
-    @PostMapping("/mods/install/{id}")
+    @PostMapping("/install/{id}")
     public ResponseEntity<WorkshopMod> installOrUpdateMod(@PathVariable Long id) {
         WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
 
@@ -40,7 +41,7 @@ public class WorkshopModsController {
         return new ResponseEntity<>(mod, HttpStatus.OK);
     }
 
-    @DeleteMapping("/mods/uninstall/{id}")
+    @DeleteMapping("/uninstall/{id}")
     public ResponseEntity<WorkshopMod> uninstallMod(@PathVariable Long id) {
         WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
         if(mod != null) {
@@ -50,7 +51,7 @@ public class WorkshopModsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/mods/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<WorkshopMod> refreshMods() {
         if(!steamCmdService.refreshMods(steamCredentialsService.getAuthAccount()))
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
