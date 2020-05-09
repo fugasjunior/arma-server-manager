@@ -4,6 +4,9 @@ installDir=<absolute path to a directory where the mods are installed>
 serverDir=<absolute path to Arma 3 server>
 config.path=<path to json config files>
 
+# Server config
+hostName=<server-hostname>
+
 # Steam config
 steamAuth.username=<steam-acc-username>
 steamAuth.password=<steam-acc-password>

@@ -28,6 +28,7 @@ dependencies {
 
 	compile group: 'io.jsondb', name: 'jsondb-core', version: '1.0.106'
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	compile group: 'com.ibasco.agql', name: 'agql-source-query', version: '0.1.7'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
