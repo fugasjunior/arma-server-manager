@@ -29,6 +29,8 @@ dependencies {
 	compile group: 'io.jsondb', name: 'jsondb-core', version: '1.0.106'
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'
 	compile group: 'com.ibasco.agql', name: 'agql-source-query', version: '0.1.7'
+	compile group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
+	compile group: 'org.springframework', name: 'spring-context-support', version: '5.2.6.RELEASE'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

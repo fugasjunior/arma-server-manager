@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -23,35 +24,35 @@ public class ServerController {
     private JsonDbService<WorkshopMod> modsDb;
 
     @PostMapping("/start")
-    public ResponseEntity startServer() {
-        ServerSettings serverSettings = getServerSettings();
+    public ResponseEntity<?> startServer() {
+        ServerSettings serverSettings = findServerSettings();
         serverService.startServer(serverSettings);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/stop")
-    public ResponseEntity stopServer() {
-        serverService.shutDownServer();
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<?> stopServer() {
+        serverService.shutDownServer(findServerSettings());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/restart")
-    public ResponseEntity restartServer() {
-        ServerSettings serverSettings = getServerSettings();
-        serverService.shutDownServer();
+    public ResponseEntity<?> restartServer() {
+        ServerSettings serverSettings = findServerSettings();
+        serverService.shutDownServer(findServerSettings());
         serverService.startServer(serverSettings);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/mods")
     public ResponseEntity<Collection<WorkshopMod>> getActiveMods() {
-        ServerSettings serverSettings = getServerSettings();
+        ServerSettings serverSettings = findServerSettings();
         return new ResponseEntity<>(serverSettings.getMods(), HttpStatus.OK);
     }
 
     @PostMapping("/mods")
     public ResponseEntity<Collection<WorkshopMod>> setActiveMods(@RequestParam(required = false) List<Long> mods) {
-        ServerSettings serverSettings = getServerSettings();
+        ServerSettings serverSettings = findServerSettings();
 
         Set<WorkshopMod> activeMods = serverSettings.getMods();
         activeMods.clear();
@@ -71,14 +72,30 @@ public class ServerController {
 
     @GetMapping("/status")
     public ResponseEntity<ServerStatus> getServerStatus() {
-        return new ResponseEntity<>(serverService.getServerStatus(), HttpStatus.OK);
+        return new ResponseEntity<>(serverService.getServerStatus(findServerSettings()), HttpStatus.OK);
     }
 
-    private ServerSettings getServerSettings() {
+    @GetMapping("/settings")
+    public ResponseEntity<ServerSettings> getServerSettings() {
+        return new ResponseEntity<>(findServerSettings(), HttpStatus.OK);
+    }
+
+    @PostMapping("/settings")
+    public ResponseEntity<ServerSettings> setServerSettings(@Valid ServerSettings settings) {
+        settingsDb.save(settings, ServerSettings.class);
+        return new ResponseEntity<>(findServerSettings(), HttpStatus.OK);
+    }
+
+    private ServerSettings findServerSettings() {
         ServerSettings serverSettings = settingsDb.find(Constants.SERVER_MAIN_ID, ServerSettings.class);
+
+        // DEBUG if server settings don't exist, generate default one
         if (serverSettings == null) {
             serverSettings = new ServerSettings();
             serverSettings.setId(Constants.SERVER_MAIN_ID);
+            serverSettings.setName("Test server - DEFAULT");
+            serverSettings.setMaxPlayers(10);
+            serverSettings.setPort(2302);
             settingsDb.save(serverSettings, ServerSettings.class);
         }
 

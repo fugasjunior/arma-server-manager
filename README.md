@@ -9,8 +9,8 @@
 - [ ] Server configuration & launching
   - [x] Start, stop, restart server
   - [x] Select mods
-  - [ ] Status monitoring
-  - [ ] Basic server config editor
+  - [x] Status monitoring
+  - [x] Basic server config editor
 - [ ] Uploading custom scenarios from local machine
 - [ ] React web interface
   - [ ] Server config editor

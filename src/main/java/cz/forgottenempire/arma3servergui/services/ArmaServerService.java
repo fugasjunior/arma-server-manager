@@ -6,7 +6,7 @@ import cz.forgottenempire.arma3servergui.model.ServerStatus;
 public interface ArmaServerService {
     boolean startServer(ServerSettings settings);
 
-    boolean shutDownServer();
+    boolean shutDownServer(ServerSettings settings);
 
-    ServerStatus getServerStatus();
+    ServerStatus getServerStatus(ServerSettings settings);
 }
