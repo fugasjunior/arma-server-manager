@@ -7,9 +7,8 @@ import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import cz.forgottenempire.arma3servergui.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,14 +25,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class SteamCmdServiceImpl implements SteamCmdService {
     @Value("${installDir}")
     private String downloadPath;
 
     @Value("${serverDir}")
     private String serverPath;
-
-    private final Logger logger = LoggerFactory.getLogger(SteamCmdServiceImpl.class);
 
     private JsonDbService<WorkshopMod> modDb;
     private SteamCmdWrapper steamCmd;
@@ -48,10 +46,10 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             mod.setInstalled(false);
             modDb.save(mod, WorkshopMod.class);
 
-            logger.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
+            log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
 
             if (!downloadMod(auth, mod.getId())) {
-                logger.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
+                log.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
             }
 
             copyBiKeys(mod.getId());
@@ -63,7 +61,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             mod.setFileSize(steamWorkshopService.getFileSize(mod.getId()));
             modDb.save(mod, WorkshopMod.class);
 
-            logger.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
+            log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
                     executor.getQueue().size());
         });
 
@@ -78,15 +76,15 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             deleteSymlink(mod);
             modDb.remove(mod, WorkshopMod.class);
         } catch (IOException e) {
-            logger.error("Could not delete directory {} due to {}", modDirectory, e.toString());
+            log.error("Could not delete directory {} due to {}", modDirectory, e.toString());
             return false;
         }
+        log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());
         return true;
     }
 
     @Override
     public boolean refreshMods(SteamAuth auth) {
-        // TODO probably move this logic to "updateMods"
         File modDirectory = new File(getDownloadPath());
 
         try {
@@ -123,7 +121,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
                 installOrUpdateMod(auth, mod);
             }
         } catch (IOException e) {
-            logger.error("Failed to refresh mods due to {}", e.toString());
+            log.error("Failed to refresh mods due to {}", e.toString());
             return false;
         }
 
@@ -148,7 +146,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         try {
             steamCmd.execute(args);
         } catch (IOException | InterruptedException e) {
-            logger.error(e.toString());
+            log.error("SteamCmd execution failed due to {}", e.toString());
             return false;
         }
         return true;
@@ -159,18 +157,21 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
         Path targetPath = Path.of(getDownloadPath() + File.separatorChar + mod.getId());
 
+        log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
+
         try {
             if (!Files.isSymbolicLink(linkPath)) {
                 Files.createSymbolicLink(linkPath, targetPath);
             }
         } catch (IOException e) {
-            logger.error("Failed to create symlink for mod {} ({}) due to {} ",
+            log.error("Failed to create symlink for mod {} ({}) due to {} ",
                     mod.getName(), mod.getId(), e.toString());
         }
     }
 
     private void deleteSymlink(WorkshopMod mod) throws IOException {
         Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
+        log.info("Deleting symlink {}", linkPath);
         Files.delete(linkPath);
     }
 
@@ -182,10 +183,10 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         for (Iterator<File> it = FileUtils.iterateFiles(downloadedKeysPath, extensions, false); it.hasNext(); ) {
             File key = it.next();
             try {
-                logger.info("Copying bikey {} to server", key.getName());
+                log.info("Copying bikey {} to server", key.getName());
                 FileUtils.copyFile(key, new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
             } catch (IOException e) {
-                logger.error("Could not copy bikeys due to {}", e.toString());
+                log.error("Could not copy bikeys due to {}", e.toString());
             }
         }
     }

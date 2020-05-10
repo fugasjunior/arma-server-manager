@@ -7,13 +7,13 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,19 +23,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 public class SteamWorkshopServiceImpl implements SteamWorkshopService {
-    @Value("${steam.api.key}")
-    private String steamApiKey;
 
     private final String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
 
-    private final Logger logger = LoggerFactory.getLogger(SteamWorkshopServiceImpl.class);
+    @Value("${steam.api.key}")
+    private String steamApiKey;
 
     private final LoadingCache<Long, JsonNode> cache = CacheBuilder.newBuilder()
             .expireAfterWrite(6, TimeUnit.HOURS)
             .build(new CacheLoader<>() {
                 @Override
-                public JsonNode load(Long key) {
+                public JsonNode load(@NonNull Long key) {
                     return getModInfo(key);
                 }
             });
@@ -85,6 +85,8 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
     }
 
     private JsonNode getModInfo(Long modId) {
+        log.info("Getting info for mod {} from Steam Workshop", modId);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -103,7 +105,7 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
             ObjectMapper objectMapper = new ObjectMapper();
             modInfo = objectMapper.readTree(test.getBody()).findValue("publishedfiledetails");
         } catch (JsonProcessingException e) {
-            logger.warn("Could not load info for mod id: " + modId);
+            log.warn("Could not load info for mod id: " + modId);
         }
 
         return modInfo;
@@ -113,7 +115,7 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
         try {
             return cache.get(modId);
         } catch (ExecutionException e) {
-            logger.error("Could not get mod info for mod id {} due to {}", modId, e.toString());
+            log.error("Could not get mod info for mod id {} due to {}", modId, e.toString());
             return null;
         }
     }

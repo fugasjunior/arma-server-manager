@@ -9,9 +9,8 @@ import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,9 +23,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ArmaServerServiceImpl implements ArmaServerService {
-
-    private final Logger logger = LoggerFactory.getLogger(ArmaServerServiceImpl.class);
 
     @Value("${serverDir}")
     private String serverDir;
@@ -56,6 +54,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Override
     public boolean shutDownServer(ServerSettings settings) {
+        log.info("Shutting down server process");
+
         if (serverProcess != null) {
             serverProcess.destroy();
             serverProcess = null;
@@ -94,8 +94,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
                     .command(parameters)
                     .inheritIO()
                     .start();
+
+            log.info("Server process started (pid {})", serverProcess.pid());
         } catch (IOException e) {
-            logger.error("Could not start server due to {}", e.toString());
+            log.error("Could not start server due to {}", e.toString());
         }
         return serverProcess;
     }
@@ -103,18 +105,20 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     private void writeConfig(ServerSettings settings) {
         // delete old config file
         try {
+            log.info("Deleting old server.conf");
             FileUtils.forceDelete(getConfigFile());
         } catch (FileNotFoundException ignored) {} catch (IOException e) {
-            logger.error("Could not delete old server config due to {}", e.toString());
+            log.error("Could not delete old server config due to {}", e.toString());
         }
 
         // write new config file
+        log.info("Writing new server.conf");
         Template configTemplate;
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(getConfigFile()))) {
             configTemplate = freeMarkerConfigurer.getConfiguration().getTemplate(Constants.TEMPLATE_SERVER_CONFIG);
             configTemplate.process(settings, writer);
         } catch (IOException | TemplateException e) {
-            logger.error("Could not write config template due to {}", e.toString());
+            log.error("Could not write config template due to {}", e.toString());
         }
     }
 

@@ -32,8 +32,9 @@ public class WorkshopModsController {
 
     @PostMapping("/install/{id}")
     public ResponseEntity<WorkshopMod> installOrUpdateMod(@PathVariable Long id) {
-        WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
+        log.info("Installing mod id {}", id);
 
+        WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
         if (mod == null) {
             Long consumerAppId = steamWorkshopService.getModAppId(id);
             if (!Constants.STEAM_ARMA3_ID.equals(consumerAppId)) {
@@ -53,6 +54,8 @@ public class WorkshopModsController {
 
     @DeleteMapping("/uninstall/{id}")
     public ResponseEntity<WorkshopMod> uninstallMod(@PathVariable Long id) {
+        log.info("Uninstalling mod {}", id);
+
         WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
         if (mod != null) {
             steamCmdService.deleteMod(mod);
@@ -63,6 +66,8 @@ public class WorkshopModsController {
 
     @PostMapping("/refresh")
     public ResponseEntity<WorkshopMod> refreshMods() {
+        log.info("Refreshing all mods");
+
         if (!steamCmdService.refreshMods(steamCredentialsService.getAuthAccount()))
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 

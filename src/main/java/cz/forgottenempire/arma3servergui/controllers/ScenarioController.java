@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.controllers;
 
 import cz.forgottenempire.arma3servergui.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.services.ScenarioService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin // TODO testing purposes
+@Slf4j
 @RequestMapping("/scenarios")
 public class ScenarioController {
 
@@ -24,6 +26,8 @@ public class ScenarioController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadScenario(@RequestParam MultipartFile file) {
+        log.info("Receiving file upload ({})", file.getOriginalFilename());
+
         if (file.getOriginalFilename() == null) {
             return new ResponseEntity<>("Error: Could not determine file name", HttpStatus.BAD_REQUEST);
         }
