@@ -3,6 +3,9 @@ package cz.forgottenempire.arma3servergui.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +19,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SteamWorkshopServiceImpl implements SteamWorkshopService {
@@ -27,29 +31,64 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
 
     private final Logger logger = LoggerFactory.getLogger(SteamWorkshopServiceImpl.class);
 
+    private final LoadingCache<Long, JsonNode> cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(6, TimeUnit.HOURS)
+            .build(new CacheLoader<>() {
+                @Override
+                public JsonNode load(Long key) {
+                    return getModInfo(key);
+                }
+            });
+
     @Override
     public String getModName(Long modId) {
-        Optional<JsonNode> modInfo = getModInfo(modId);
-        if(modInfo.isEmpty()) return null;
-
-        JsonNode titleNode = modInfo.get().findValue("title");
-        return titleNode == null ? null : titleNode.asText();
+        return getValueFromInfo(modId, "title");
     }
 
     @Override
     public String getModDescription(Long modId) {
-        Optional<JsonNode> modInfo = getModInfo(modId);
-        if(modInfo.isEmpty()) return null;
+        return getValueFromInfo(modId, "description");
+    }
 
-        JsonNode titleNode = modInfo.get().findValue("description");
+    @Override
+    public Long getModAppId(Long modId) {
+        String value = getValueFromInfo(modId, "consumer_app_id");
+        if (value == null) return null;
+
+        Long appId = null;
+        try {
+            appId = Long.parseLong(value);
+        } catch (NumberFormatException ignored) {}
+
+        return appId;
+    }
+
+    @Override
+    public Long getFileSize(Long modId) {
+        String value = getValueFromInfo(modId, "file_size");
+        if (value == null) return null;
+
+        Long size = null;
+        try {
+            size = Long.parseLong(value);
+        } catch (NumberFormatException ignored) {}
+
+        return size;
+    }
+
+    private String getValueFromInfo(Long modId, String key) {
+        JsonNode modInfo = loadModInfoFromCache(modId);
+        if (modInfo == null) return null;
+
+        JsonNode titleNode = modInfo.findValue(key);
         return titleNode == null ? null : titleNode.asText();
     }
 
-    private Optional<JsonNode> getModInfo(Long modId) {
+    private JsonNode getModInfo(Long modId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("key", steamApiKey);
         map.add("itemcount", "1");
         map.add("publishedfileids[0]", modId.toString());
@@ -67,6 +106,15 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
             logger.warn("Could not load info for mod id: " + modId);
         }
 
-        return modInfo == null ? Optional.empty() : Optional.of(modInfo);
+        return modInfo;
+    }
+
+    private JsonNode loadModInfoFromCache(Long modId) {
+        try {
+            return cache.get(modId);
+        } catch (ExecutionException e) {
+            logger.error("Could not get mod info for mod id {} due to {}", modId, e.toString());
+            return null;
+        }
     }
 }

@@ -18,10 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +45,9 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     @Override
     public boolean installOrUpdateMod(SteamAuth auth, WorkshopMod mod) {
         executor.submit(() -> {
+            mod.setInstalled(false);
+            modDb.save(mod, WorkshopMod.class);
+
             logger.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
 
             if (!downloadMod(auth, mod.getId())) {
@@ -57,6 +58,9 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             createSymlink(mod);
 
             mod.setInstalled(true);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            mod.setLastUpdated(formatter.format(new Date()));
+            mod.setFileSize(steamWorkshopService.getFileSize(mod.getId()));
             modDb.save(mod, WorkshopMod.class);
 
             logger.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
@@ -68,9 +72,10 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
     @Override
     public boolean deleteMod(WorkshopMod mod) {
-        File modDirectory = new File(getDownloadPath());
+        File modDirectory = new File(getDownloadPath() + File.separatorChar + mod.getId());
         try {
             FileUtils.deleteDirectory(modDirectory);
+            deleteSymlink(mod);
             modDb.remove(mod, WorkshopMod.class);
         } catch (IOException e) {
             logger.error("Could not delete directory {} due to {}", modDirectory, e.toString());
@@ -98,6 +103,10 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
             // add all missing mods from db
             modDb.findAll(WorkshopMod.class).stream()
+                    .peek(mod -> {
+                        mod.setInstalled(false);
+                        modDb.save(mod, WorkshopMod.class);
+                    })
                     .map(WorkshopMod::getId)
                     .forEach(modIds::add);
 
@@ -158,6 +167,11 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             logger.error("Failed to create symlink for mod {} ({}) due to {} ",
                     mod.getName(), mod.getId(), e.toString());
         }
+    }
+
+    private void deleteSymlink(WorkshopMod mod) throws IOException {
+        Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
+        Files.delete(linkPath);
     }
 
     private void copyBiKeys(Long modId) {

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
+@CrossOrigin // TODO testing purposes
 @RequestMapping("/server")
 public class ServerController {
     private ArmaServerService serverService;

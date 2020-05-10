@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
+@CrossOrigin // TODO testing purposes
 @RequestMapping("/scenarios")
 public class ScenarioController {
 
