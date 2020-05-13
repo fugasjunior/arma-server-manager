@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +54,18 @@ public class ScenarioServiceImpl implements ScenarioService {
         }
 
         return scenarios;
+    }
+
+    @Override
+    public boolean deleteScenario(String name) {
+        try {
+            Files.delete(Path.of(getMissionsFolder(), name));
+            log.info("Successfully deleted scenario {}", name);
+        } catch (IOException e) {
+            log.error("Could not delete scenario {} due to {}", name, e.toString());
+            return false;
+        }
+        return true;
     }
 
     private String getMissionsFolder() {

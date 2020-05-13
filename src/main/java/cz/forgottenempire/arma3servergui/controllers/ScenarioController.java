@@ -33,10 +33,21 @@ public class ScenarioController {
         }
 
         if (!file.getOriginalFilename().endsWith(".pbo")) {
+            log.warn("File {} is not a PBO file", file.getOriginalFilename());
             return new ResponseEntity<>("Error: PBO file required", HttpStatus.BAD_REQUEST);
         }
 
         scenarioService.uploadScenarioToServer(file);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{name}")
+    public ResponseEntity<?> deleteScenario(@PathVariable String name) {
+        log.info("Received request to delete scenario {}", name);
+
+        if (!scenarioService.deleteScenario(name)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
