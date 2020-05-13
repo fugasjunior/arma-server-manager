@@ -8,5 +8,7 @@ import java.util.List;
 public interface ScenarioService {
     boolean uploadScenarioToServer(MultipartFile file);
 
+    boolean deleteScenario(String name);
+
     List<Scenario> getAllScenarios();
 }

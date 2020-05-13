@@ -29,12 +29,4 @@ public class SteamCmdWrapper {
 
         return process.waitFor() == 0;
     }
-
-    public String getSteamCmdPath() {
-        return steamCmdPath;
-    }
-
-    public void setSteamCmdPath(String steamCmdPath) {
-        this.steamCmdPath = steamCmdPath;
-    }
 }

@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -29,12 +25,6 @@ public class ServerSettings {
 
     private String password;
     private String adminPassword;
-
-    private List<Long> adminSteamIds = new ArrayList<>();
-
-    private Set<WorkshopMod> mods = new HashSet<>();
-
-    private List<String> messageOfTheDay = new ArrayList<>();
 
     private boolean clientFilePatching;
     private boolean serverFilePatching;

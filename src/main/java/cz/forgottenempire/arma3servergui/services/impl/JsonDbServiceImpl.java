@@ -5,8 +5,7 @@ import io.jsondb.JsonDBTemplate;
 import io.jsondb.crypto.CryptoUtil;
 import io.jsondb.crypto.Default1Cipher;
 import io.jsondb.crypto.ICipher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
+@Slf4j
 public class JsonDbServiceImpl<T> implements JsonDbService<T> {
-
-    private final Logger logger = LoggerFactory.getLogger(JsonDbServiceImpl.class);
 
     private final JsonDBTemplate jsonDBTemplate;
 
@@ -30,7 +28,7 @@ public class JsonDbServiceImpl<T> implements JsonDbService<T> {
             String key = CryptoUtil.generate128BitKey(cryptoKey, "salt1234");
             cipher = new Default1Cipher(key);
         } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-            logger.error("Failed to set encryption for JSON DB!");
+            log.error("Failed to set encryption for JSON DB!");
         }
 
         jsonDBTemplate = new JsonDBTemplate(configPath, baseScanPackage, cipher);

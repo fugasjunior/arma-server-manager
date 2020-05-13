@@ -9,6 +9,7 @@ import lombok.Data;
 @Document(collection = "steamAuth", schemaVersion = "1.0")
 public class SteamAuth {
     @Id
+    private Long id;
     private String username;
     @Secret
     private String password;

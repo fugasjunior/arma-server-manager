@@ -13,7 +13,10 @@ public class WorkshopMod {
     @Id
     private Long id;
     private String name;
+    private String lastUpdated;
     private boolean installed;
+    private boolean active;
+    private Long fileSize;
 
     public WorkshopMod(Long id) {
         this.id = id;

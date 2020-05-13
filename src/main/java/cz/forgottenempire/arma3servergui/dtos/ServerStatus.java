@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 public class ServerStatus {
     private boolean isServerUp;
     private int playersOnline;
+    private int maxPlayers;
+    private String gameVersion;
     private String mapName;
     private String gameDescription;
 
@@ -25,7 +27,9 @@ public class ServerStatus {
 
         status.setServerUp(true);
         status.setPlayersOnline(sourceServer.getNumOfPlayers());
+        status.setMaxPlayers(sourceServer.getMaxPlayers());
         status.setMapName(sourceServer.getMapName());
+        status.setGameVersion(sourceServer.getGameVersion());
         status.setGameDescription(sourceServer.getGameDescription());
         return status;
     }

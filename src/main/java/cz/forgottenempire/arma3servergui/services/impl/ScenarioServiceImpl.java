@@ -2,23 +2,23 @@ package cz.forgottenempire.arma3servergui.services.impl;
 
 import cz.forgottenempire.arma3servergui.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.services.ScenarioService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ScenarioServiceImpl implements ScenarioService {
-
-    private final Logger logger = LoggerFactory.getLogger(ScenarioServiceImpl.class);
 
     @Value("${serverDir}")
     private String serverDir;
@@ -27,14 +27,14 @@ public class ScenarioServiceImpl implements ScenarioService {
     public boolean uploadScenarioToServer(MultipartFile file) {
         String scenarioName = file.getOriginalFilename();
 
-        logger.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
+        log.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
         try {
             System.out.println(file.getContentType());
             File scenarioFile = new File(getMissionsFolder() + File.separatorChar + scenarioName);
             file.transferTo(scenarioFile);
-            logger.info("Successfully downloaded scenario {}", scenarioName);
+            log.info("Successfully downloaded scenario {}", scenarioName);
         } catch (IOException e) {
-            logger.error("Could not download scenario {} due to {}", scenarioName, e.toString());
+            log.error("Could not download scenario {} due to {}", scenarioName, e.toString());
             return false;
         }
 
@@ -54,6 +54,18 @@ public class ScenarioServiceImpl implements ScenarioService {
         }
 
         return scenarios;
+    }
+
+    @Override
+    public boolean deleteScenario(String name) {
+        try {
+            Files.delete(Path.of(getMissionsFolder(), name));
+            log.info("Successfully deleted scenario {}", name);
+        } catch (IOException e) {
+            log.error("Could not delete scenario {} due to {}", name, e.toString());
+            return false;
+        }
+        return true;
     }
 
     private String getMissionsFolder() {

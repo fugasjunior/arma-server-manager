@@ -1,29 +1,34 @@
 package cz.forgottenempire.arma3servergui.cronjobs;
 
+import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.model.SteamAuth;
+import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import cz.forgottenempire.arma3servergui.services.SteamCmdService;
-import cz.forgottenempire.arma3servergui.services.SteamCredentialsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class UpdateModsCronJob {
-    private final Logger logger = LoggerFactory.getLogger(UpdateModsCronJob.class);
-
     private SteamCmdService steamCmdService;
-    private SteamCredentialsService credentialsService;
+    private JsonDbService<SteamAuth> steamAuthDb;
 
     public UpdateModsCronJob() {
-        logger.info("Scheduling mod update cronjob for 02:00 AM every day");
+        log.info("Scheduling mod update cronjob for 02:00 AM every day");
     }
 
     @Scheduled(cron = "0 0 2 * * *")
     public void refreshMods() {
-        logger.info("Running update job");
-        steamCmdService.refreshMods(credentialsService.getAuthAccount());
-        logger.info("Update job finished");
+        log.info("Running update job");
+        SteamAuth auth = steamAuthDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class);
+        if (auth != null && auth.getUsername() != null && auth.getPassword() != null) {
+            steamCmdService.refreshMods(auth);
+            log.info("Update job finished");
+        } else {
+            log.warn("Could not finish update job, no auth for steam workshop given");
+        }
     }
 
     @Autowired
@@ -32,7 +37,7 @@ public class UpdateModsCronJob {
     }
 
     @Autowired
-    public void setCredentialsService(SteamCredentialsService credentialsService) {
-        this.credentialsService = credentialsService;
+    public void setSteamAuthDb(JsonDbService<SteamAuth> steamAuthDb) {
+        this.steamAuthDb = steamAuthDb;
     }
 }

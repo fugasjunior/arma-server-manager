@@ -12,11 +12,11 @@
   - [x] Status monitoring
   - [x] Basic server config editor
 - [x] Uploading custom scenarios from local machine
-- [ ] React web interface
-  - [ ] Server config editor
-  - [ ] Server status dashboard
-  - [ ] Mod installation by giving steam ID / list of steam ids
-  - [ ] App config menu (for steam credentials, ...)
+- [x] React web interface
+  - [x] Server config editor
+  - [x] Server status dashboard
+  - [x] Mod installation by giving steam ID / list of steam ids
+  - [x] App config menu (for steam credentials, ...)
 
 ## Future roadmap
 - Server logs access
