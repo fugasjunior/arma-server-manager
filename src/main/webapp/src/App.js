@@ -1,26 +1,34 @@
 import React from 'react';
-import logo from './logo.svg';
+import {ToastContainer} from "react-toastify";
 import './App.css';
+import Navbar from "./components/navbar";
+import Mods from "./components/mods";
+import {Redirect, Route, Switch} from "react-router-dom";
+import NotFound from "./components/notFound";
+import ServerSettingsForm from "./components/serverSettingsForm";
+import ServerDashBoard from "./components/serverDashBoard";
+import Scenarios from "./components/scenarios";
+import AppConfig from "./components/appConfig";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <React.Fragment>
+            <ToastContainer/>
+            <Navbar/>
+            <main role="main" className="container">
+                <Switch>
+                    <Route path="/dashboard" component={ServerDashBoard}/>
+                    <Route path="/settings" component={ServerSettingsForm}/>
+                    <Route path="/scenarios" component={Scenarios}/>
+                    <Route path="/mods" component={Mods}/>
+                    <Route path="/config" component={AppConfig}/>
+                    <Route path="/not-found" component={NotFound}/>
+                    <Redirect from="/" exact to="/dashboard"/>
+                    <Redirect to="/not-found"/>
+                </Switch>
+            </main>
+        </React.Fragment>
+    );
 }
 
 export default App;
