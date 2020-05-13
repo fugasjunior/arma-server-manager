@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.services.impl;
 
+import com.google.common.base.Joiner;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.arma3servergui.Constants;
@@ -7,6 +8,7 @@ import cz.forgottenempire.arma3servergui.dtos.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
+import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +21,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +33,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Value("${hostName}")
     private String hostName;
+
+    private JsonDbService<WorkshopMod> modDb;
 
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
@@ -65,6 +69,12 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Override
     public ServerStatus getServerStatus(ServerSettings settings) {
+        if (serverProcess == null || !serverProcess.isAlive()) {
+            ServerStatus serverStatus = new ServerStatus();
+            serverStatus.setServerUp(false);
+            return serverStatus;
+        }
+
         SourceServer serverInfo = null;
         try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
             // default steam query port is (game server port + 1)
@@ -86,10 +96,12 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         parameters.add("-config=" + getConfigFile().getAbsolutePath());
         parameters.add("-port=" + settings.getPort());
 
-        String mods = getModsList(settings.getMods());
-        if (!mods.isEmpty()) parameters.add(mods);
+        List<String> mods = getModsList();
+        if (!mods.isEmpty()) parameters.addAll(mods);
 
         try {
+            log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
+
             serverProcess = new ProcessBuilder()
                     .command(parameters)
                     .inheritIO()
@@ -122,17 +134,20 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         }
     }
 
-    private String getModsList(Collection<WorkshopMod> mods) {
-        if (mods == null || mods.isEmpty()) return "";
-
-        StringBuilder ret = new StringBuilder("-mod=");
-        mods.forEach(mod -> ret.append(mod.getNormalizedName()).append(";"));
-        ret.deleteCharAt(ret.lastIndexOf(";"));
-        return ret.toString();
+    private List<String> getModsList() {
+        return modDb.findAll(WorkshopMod.class).stream()
+                .filter(WorkshopMod::isActive)
+                .map(mod -> "-mod=" + mod.getNormalizedName())
+                .collect(Collectors.toList());
     }
 
     private File getConfigFile() {
         return new File(serverDir + File.separatorChar + "server.cfg");
+    }
+
+    @Autowired
+    public void setModDb(JsonDbService<WorkshopMod> modDb) {
+        this.modDb = modDb;
     }
 
     @Autowired

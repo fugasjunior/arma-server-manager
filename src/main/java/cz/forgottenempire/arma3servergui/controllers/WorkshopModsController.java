@@ -64,6 +64,24 @@ public class WorkshopModsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/setActive/{id}")
+    public ResponseEntity<WorkshopMod> setActive(@PathVariable Long id, @RequestParam boolean active) {
+        log.info("Received request to {} mod {}", (active ? "activate" : "deactivate"), id);
+
+        WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
+        if (mod == null) {
+            log.info("Mod id {} not found", id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        mod.setActive(active);
+        modsDb.save(mod, WorkshopMod.class);
+
+        log.info("Mod {} successfully {}", id, (active ? "activated" : "deactivated"));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
     @PostMapping("/refresh")
     public ResponseEntity<WorkshopMod> refreshMods() {
         log.info("Refreshing all mods");

@@ -13,9 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @CrossOrigin // TODO testing purposes
@@ -50,32 +47,6 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/mods")
-    public ResponseEntity<Collection<WorkshopMod>> getActiveMods() {
-        ServerSettings serverSettings = findServerSettings();
-        return new ResponseEntity<>(serverSettings.getMods(), HttpStatus.OK);
-    }
-
-    @PostMapping("/mods")
-    public ResponseEntity<Collection<WorkshopMod>> setActiveMods(@RequestParam(required = false) List<Long> mods) {
-        ServerSettings serverSettings = findServerSettings();
-
-        Set<WorkshopMod> activeMods = serverSettings.getMods();
-        activeMods.clear();
-
-        if (mods != null && !mods.isEmpty()) {
-            mods.forEach(id -> {
-                WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
-                if (mod != null && mod.isInstalled()) {
-                    activeMods.add(mod);
-                }
-            });
-        }
-
-        settingsDb.save(serverSettings, ServerSettings.class);
-        return new ResponseEntity<>(activeMods, HttpStatus.OK);
-    }
-
     @GetMapping("/status")
     public ResponseEntity<ServerStatus> getServerStatus() {
         return new ResponseEntity<>(serverService.getServerStatus(findServerSettings()), HttpStatus.OK);
@@ -87,7 +58,9 @@ public class ServerController {
     }
 
     @PostMapping("/settings")
-    public ResponseEntity<ServerSettings> setServerSettings(@Valid ServerSettings settings) {
+    public ResponseEntity<ServerSettings> setServerSettings(@RequestBody @Valid ServerSettings settings) {
+        log.info("Setting new configuration: {}", settings.toString());
+
         settingsDb.save(settings, ServerSettings.class);
         return new ResponseEntity<>(findServerSettings(), HttpStatus.OK);
     }
