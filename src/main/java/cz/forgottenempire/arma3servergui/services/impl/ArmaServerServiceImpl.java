@@ -89,7 +89,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         Process serverProcess = null;
 
         List<String> parameters = new ArrayList<>();
-        parameters.add(serverDir + File.separatorChar + "arma3server.exe"); // TODO fix for linux
+        parameters.add(serverDir + File.separatorChar + "arma3server");
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
         parameters.add("-world=empty");
@@ -102,8 +102,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         try {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
 
-            serverProcess = new ProcessBuilder()
-                    .command(parameters)
+            serverProcess = new ProcessBuilder(parameters)
+                    .directory(new File(serverDir))
                     .inheritIO()
                     .start();
 
