@@ -1,10 +1,10 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
 import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import cz.forgottenempire.arma3servergui.services.SteamCmdService;
-import cz.forgottenempire.arma3servergui.services.SteamCredentialsService;
 import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,7 @@ import java.util.Collection;
 public class WorkshopModsController {
     private SteamWorkshopService steamWorkshopService;
     private SteamCmdService steamCmdService;
-    private SteamCredentialsService steamCredentialsService;
-
+    private JsonDbService<SteamAuth> steamAuthDb;
     private JsonDbService<WorkshopMod> modsDb;
 
     @GetMapping
@@ -47,7 +46,7 @@ public class WorkshopModsController {
             modsDb.save(mod, WorkshopMod.class);
         }
 
-        steamCmdService.installOrUpdateMod(steamCredentialsService.getAuthAccount(), mod);
+        steamCmdService.installOrUpdateMod(getAuth(), mod);
 
         return new ResponseEntity<>(mod, HttpStatus.OK);
     }
@@ -86,10 +85,14 @@ public class WorkshopModsController {
     public ResponseEntity<WorkshopMod> refreshMods() {
         log.info("Refreshing all mods");
 
-        if (!steamCmdService.refreshMods(steamCredentialsService.getAuthAccount()))
+        if (!steamCmdService.refreshMods(getAuth()))
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private SteamAuth getAuth() {
+        return steamAuthDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class);
     }
 
     @Autowired
@@ -108,7 +111,7 @@ public class WorkshopModsController {
     }
 
     @Autowired
-    public void setSteamCredentialsService(SteamCredentialsService steamCredentialsService) {
-        this.steamCredentialsService = steamCredentialsService;
+    public void setSteamAuthDb(JsonDbService<SteamAuth> steamAuthDb) {
+        this.steamAuthDb = steamAuthDb;
     }
 }

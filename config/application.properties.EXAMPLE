@@ -8,9 +8,6 @@ config.path=<path to json config files>
 hostName=<server-hostname>
 
 # Steam config
-steamAuth.username=<steam-acc-username>
-steamAuth.password=<steam-acc-password>
-steamAuth.token=<optional-steamguard-token>
 steam.api.key=<steam api key>
 
 # File upload limits
