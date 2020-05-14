@@ -18,5 +18,5 @@ spring.servlet.multipart.max-request-size=100MB
 jsonDb.key=<key used for json database encryption
 
 # App Login
-username=
-password=
+auth.username=
+auth.password=
