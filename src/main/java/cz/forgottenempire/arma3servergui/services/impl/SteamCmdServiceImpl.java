@@ -131,25 +131,36 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     private boolean downloadMod(SteamAuth auth, Long modId) {
         List<String> args = new ArrayList<>();
         args.add("+@NoPromptForPassword 1");
-        args.add("+@ShutdownOnFailedCommand 1");
+        args.add("+@ShutdownOnFailedCommand 0");
 
         String token = auth.getSteamGuardToken();
-        if(token != null && !token.isBlank()) {
+        if (token != null && !token.isBlank()) {
             args.add("+set_steam_guard_code " + token);
         }
 
         args.add("+login " + auth.getUsername() + " " + auth.getPassword());
         args.add("+force_install_dir " + downloadPath);
-        args.add("+workshop_download_item " + Constants.STEAM_ARMA3_ID + " " + modId);
+        args.add("+workshop_download_item " + Constants.STEAM_ARMA3_ID + " " + modId + " validate");
         args.add("+quit");
 
-        try {
-            steamCmd.execute(args);
-        } catch (IOException | InterruptedException e) {
-            log.error("SteamCmd execution failed due to {}", e.toString());
-            return false;
+        boolean success = false;
+        int attempts = 0;
+        while (!success && attempts++ <= 10) {
+            try {
+                log.info("Starting mod download, attempt {} / 10", attempts);
+                success = steamCmd.execute(args);
+            } catch (IOException | InterruptedException e) {
+                log.error("SteamCmd execution failed due to {}", e.toString());
+            }
         }
-        return true;
+
+        if (success) {
+            log.info("SteamCMD successfully returned");
+        } else {
+            log.error("SteamCMD failed");
+        }
+
+        return success;
     }
 
     private void createSymlink(WorkshopMod mod) {
@@ -169,18 +180,25 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         }
     }
 
-    private void deleteSymlink(WorkshopMod mod) throws IOException {
+    private void deleteSymlink(WorkshopMod mod) {
         Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
         log.info("Deleting symlink {}", linkPath);
-        Files.delete(linkPath);
+        try {
+            Files.delete(linkPath);
+        } catch (IOException e) {
+            log.warn("Could not delete symlink {} due to {}", linkPath, e.toString());
+        }
     }
 
     private void copyBiKeys(Long modId) {
-        File downloadedKeysPath = new File(getDownloadPath() + File.separatorChar + modId +
-                File.separatorChar + "keys");
         String[] extensions = new String[]{"bikey"};
+        File modDirectory = new File(getDownloadPath() + File.separatorChar + modId);
+        if (!modDirectory.isDirectory()) {
+            log.error("Can not access mod directory {}", modId);
+            return;
+        }
 
-        for (Iterator<File> it = FileUtils.iterateFiles(downloadedKeysPath, extensions, false); it.hasNext(); ) {
+        for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
             try {
                 log.info("Copying bikey {} to server", key.getName());

@@ -25,6 +25,8 @@ public class SteamCmdWrapper {
 
         Process process = new ProcessBuilder()
                 .command(commands)
+                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .start();
 
         return process.waitFor() == 0;
