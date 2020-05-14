@@ -10,9 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin // TODO debug purposes
 @Slf4j
-@RequestMapping("/config")
+@RequestMapping("/api/config")
 public class AppConfigController {
 
     JsonDbService<SteamAuth> steamAuthDb;

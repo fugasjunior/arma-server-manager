@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 
 @RestController
-@CrossOrigin // TODO testing purposes
 @Slf4j
-@RequestMapping("/mods")
+@RequestMapping("/api/mods")
 public class WorkshopModsController {
     private SteamWorkshopService steamWorkshopService;
     private SteamCmdService steamCmdService;

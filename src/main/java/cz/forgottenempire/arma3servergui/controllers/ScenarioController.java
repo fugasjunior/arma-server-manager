@@ -12,9 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin // TODO testing purposes
 @Slf4j
-@RequestMapping("/scenarios")
+@RequestMapping("/api/scenarios")
 public class ScenarioController {
 
     private ScenarioService scenarioService;

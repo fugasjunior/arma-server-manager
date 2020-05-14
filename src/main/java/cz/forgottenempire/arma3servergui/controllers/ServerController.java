@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin // TODO testing purposes
 @Slf4j
-@RequestMapping("/server")
+@RequestMapping("/api/server")
 public class ServerController {
     private ArmaServerService serverService;
     private JsonDbService<ServerSettings> settingsDb;
