@@ -34,7 +34,6 @@ class Mods extends Component {
         if (e) e.preventDefault();
         try {
             const {data: mod} = await installMod(modId);
-            await this.refreshModList();
 
             if (this.state.mods.filter(m => m.id === modId).length === 0) {
                 const mods = [mod, ...this.state.mods];
