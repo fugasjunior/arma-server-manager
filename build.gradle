@@ -55,6 +55,7 @@ compileJava.dependsOn copyWebApp
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	compile group: 'io.jsondb', name: 'jsondb-core', version: '1.0.106'
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'
