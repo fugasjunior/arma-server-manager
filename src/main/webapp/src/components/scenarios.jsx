@@ -7,7 +7,11 @@ class Scenarios extends Component {
 
     state = {
         scenarios: [],
-        file: null
+        file: null,
+        upload: {
+            inProgress: false,
+            status: 0,
+        }
     };
 
     async componentDidMount() {
@@ -25,6 +29,11 @@ class Scenarios extends Component {
         this.setState({file: e.target.files[0]});
     };
 
+    handleProgress = e => {
+        const percentCompleted = Math.round((e.loaded * 100) / e.total);
+        this.setState({upload: {inProgress: true, status: percentCompleted}});
+    }
+
     handleSubmit = async e => {
         e.preventDefault();
 
@@ -33,15 +42,22 @@ class Scenarios extends Component {
         try {
             const formData = new FormData();
             formData.append("file", file);
+            this.setState({upload: {inProgress: true}});
 
-            await uploadScenario(formData);
-
+            await uploadScenario(formData, {onUploadProgress: this.handleProgress});
             toast.success("Scenario successfully uploaded");
 
             const newScenarios = [...scenarios];
             newScenarios.push({name: file.name, fileSize: file.size});
 
-            this.setState({file: null, scenarios: newScenarios});
+            this.setState({
+                file: null,
+                scenarios: newScenarios,
+                upload: {
+                    inProgress: false,
+                    status: 0
+                }
+            });
         } catch (e) {
             toast.error("Error during scenario upload");
         }
@@ -117,6 +133,16 @@ class Scenarios extends Component {
                                 </button>
                             </div>
                         </form>
+                        {this.state.upload.inProgress &&
+                        <div className="progress">
+                            <div className="progress-bar"
+                                 role="progressbar"
+                                 style={{width: this.state.upload.status + "%"}}
+                                 aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"/>
+                        </div>
+                        }
                     </div>
                 </div>
             </React.Fragment>

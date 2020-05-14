@@ -7,8 +7,8 @@ export function getScenarios() {
     return http.get(apiEndpoint);
 }
 
-export function uploadScenario(formData) {
-    return http.post(apiEndpoint + "/upload", formData);
+export function uploadScenario(formData, config) {
+    return http.post(apiEndpoint + "/upload", formData, config);
 }
 
 export function deleteScenario(name) {
