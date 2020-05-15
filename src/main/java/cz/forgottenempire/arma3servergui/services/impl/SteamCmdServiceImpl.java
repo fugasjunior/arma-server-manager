@@ -107,6 +107,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             modDb.findAll(WorkshopMod.class).stream()
                     .peek(mod -> {
                         mod.setInstalled(false);
+                        mod.setFailed(false);
                         modDb.save(mod, WorkshopMod.class);
                     })
                     .map(WorkshopMod::getId)
