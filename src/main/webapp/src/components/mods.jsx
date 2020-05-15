@@ -3,11 +3,14 @@ import {getMods, installMod, refreshMods, setActive, uninstallMod} from "../serv
 import {toast} from "react-toastify";
 import ModInstallForm from "./modInstallForm";
 import ModsTable from "./modsTable";
+import {getFreeSpace} from "../services/systemService";
+import {humanFileSize} from "../util/util";
 
 class Mods extends Component {
 
     state = {
         mods: [],
+        freeSpace: 0
     };
 
     async componentDidMount() {
@@ -22,7 +25,8 @@ class Mods extends Component {
     refreshModList = async () => {
         try {
             const {data: mods} = await getMods();
-            this.setState({mods})
+            const {data: freeSpace} = await getFreeSpace();
+            this.setState({mods, freeSpace})
         } catch (e) {
             toast.error("Error during loading mods");
         }
@@ -63,7 +67,7 @@ class Mods extends Component {
         const active = input.checked;
 
         const newMods = [...this.state.mods];
-        const mod = newMods.find(mod => mod.id === modId).active = active;
+        newMods.find(mod => mod.id === modId).active = active;
         this.setState({newMods});
 
         try {
@@ -87,12 +91,19 @@ class Mods extends Component {
         return (
             <div>
                 <h2>Installed mods</h2>
-                <button className="btn btn-primary m-2"
-                        onClick={this.handleRefreshList}>Refresh
-                </button>
-                <button className="btn btn-secondary m-2"
-                        onClick={this.handleUpdateAll}>Update all
-                </button>
+                <div className="row">
+                    <div className="col-6">
+                        <button className="btn btn-primary m-2"
+                                onClick={this.handleRefreshList}>Refresh
+                        </button>
+                        <button className="btn btn-secondary m-2"
+                                onClick={this.handleUpdateAll}>Update all
+                        </button>
+                    </div>
+                    <div className="col-6">
+                        <span>Free space: {humanFileSize(this.state.freeSpace)}</span>
+                    </div>
+                </div>
                 <ModsTable mods={this.state.mods}
                            onUninstallClicked={this.handleUninstall}
                            onUpdateClicked={this.handleInstall}
