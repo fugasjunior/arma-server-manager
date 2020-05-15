@@ -20,6 +20,12 @@ public class AppConfigController {
     public ResponseEntity<?> setAuthAccount(@RequestBody SteamAuth auth) {
         log.info("Setting new Steam Auth account: username {}, token {}", auth.getUsername(), auth.getSteamGuardToken());
 
+        SteamAuth prevAuth = steamAuthDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class);
+        if (prevAuth != null && (auth.getPassword() == null || auth.getPassword().isBlank())) {
+            // if the user left the password blank, use an existing password if available
+            auth.setPassword(prevAuth.getPassword() == null ? "" : prevAuth.getPassword());
+        }
+
         steamAuthDb.save(auth, SteamAuth.class);
         return new ResponseEntity<>(HttpStatus.OK);
     }
