@@ -1,30 +1,29 @@
 import React from "react";
 
-const renderServerStatus = (serverUp) => {
-
-    if (serverUp === null || serverUp === undefined) {
-        return (
-            <span className="badge badge-secondary">
-                UNKNOWN
-            </span>
-        )
-    }
-
+const renderServerStatus = (alive) => {
     return (
-        <span className={"badge badge-" + (serverUp ? "success" : "danger")}>
-                {serverUp ? "ONLINE" : "OFFLINE"}
+        <span className={"badge badge-" + (alive ? "success" : "danger")}>
+                {alive ? "ONLINE" : "OFFLINE"}
             </span>
     );
 };
 
-const ServerStatus = ({status, maxPlayers}) => {
+const ServerStatus = ({status, maxPlayers, alive}) => {
     return (
         <React.Fragment>
             <h3>Server status</h3>
             <h4>
-                {renderServerStatus(status.serverUp)}
+                {renderServerStatus(alive)}
             </h4>
-            {status.serverUp &&
+            {alive && !status.serverUp &&
+            <React.Fragment>
+                <div className="spinner-border ml-5 mt-3" role="status">
+                    <span className="sr-only">Loading...</span>
+                </div>
+                <p>Loading server info...</p>
+            </React.Fragment>
+            }
+            {alive && status.serverUp &&
             <table className="table table-borderless">
                 <tr>
                     <th scope="row">Players</th>

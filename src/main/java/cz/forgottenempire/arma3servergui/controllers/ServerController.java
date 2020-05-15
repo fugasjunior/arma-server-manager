@@ -51,6 +51,11 @@ public class ServerController {
         return new ResponseEntity<>(serverService.getServerStatus(findServerSettings()), HttpStatus.OK);
     }
 
+    @GetMapping("/alive")
+    public ResponseEntity<Boolean> isServerProcessAlive() {
+        return new ResponseEntity<>(serverService.isServerProcessAlive(), HttpStatus.OK);
+    }
+
     @GetMapping("/settings")
     public ResponseEntity<ServerSettings> getServerSettings() {
         return new ResponseEntity<>(findServerSettings(), HttpStatus.OK);

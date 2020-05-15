@@ -8,5 +8,7 @@ public interface ArmaServerService {
 
     boolean shutDownServer(ServerSettings settings);
 
+    boolean isServerProcessAlive();
+
     ServerStatus getServerStatus(ServerSettings settings);
 }

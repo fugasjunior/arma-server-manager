@@ -26,3 +26,7 @@ export function restartServer() {
 export function getStatus() {
     return http.get(apiEndpoint + "/status");
 }
+
+export function getServerProcessAlive() {
+    return http.get(apiEndpoint + "/alive");
+}

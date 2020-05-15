@@ -68,6 +68,11 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Override
+    public boolean isServerProcessAlive() {
+        return serverProcess != null && serverProcess.isAlive();
+    }
+
+    @Override
     public ServerStatus getServerStatus(ServerSettings settings) {
         if (serverProcess == null || !serverProcess.isAlive()) {
             ServerStatus serverStatus = new ServerStatus();

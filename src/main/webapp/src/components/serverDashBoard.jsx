@@ -1,20 +1,28 @@
 import React, {Component} from "react";
-import {getServerSettings, getStatus, restartServer, startServer, stopServer} from "../services/serverService";
+import {
+    getServerProcessAlive,
+    getServerSettings,
+    getStatus,
+    restartServer,
+    startServer,
+    stopServer
+} from "../services/serverService";
 import ServerStatus from "./serverStatus";
 
 class ServerDashBoard extends Component {
 
     state = {
         serverStatus: {},
-        serverSettings: {}
+        serverSettings: {},
+        alive: false
     };
 
     async componentDidMount() {
-        await this.updateServerStatus();
-
         const {data: serverSettings} = await getServerSettings();
-        this.setState({serverSettings});
+        const {data: alive} = await getServerProcessAlive();
+        this.setState({alive, serverSettings});
 
+        await this.updateServerStatus();
         this.interval = setInterval(this.updateServerStatus, 10000);
     };
 
@@ -23,19 +31,20 @@ class ServerDashBoard extends Component {
     };
 
     updateServerStatus = async () => {
+        const {data: alive} = await getServerProcessAlive();
         const {data: serverStatus} = await getStatus();
-        this.setState({serverStatus});
+        this.setState({serverStatus, alive});
     };
 
     handleStart = async () => {
         await startServer();
+        const {data: alive} = await getServerProcessAlive();
+        this.setState({alive});
     };
 
     handleStop = async () => {
         await stopServer();
-        const serverStatus = {...this.state.serverStatus};
-        serverStatus.serverUp = false;
-        this.setState({serverStatus});
+        this.setState({alive: false});
     };
 
     handleRestart = async () => {
@@ -46,10 +55,10 @@ class ServerDashBoard extends Component {
     };
 
     renderControlButtons = () => {
-        const {serverUp} = this.state.serverStatus;
+        const {alive} = this.state;
         return (
             <React.Fragment>
-                {(serverUp || serverUp === null || serverUp === undefined) ?
+                {alive ?
                     <button className="btn btn-lg btn-danger m-2"
                             onClick={this.handleStop}>
                         Stop
@@ -70,7 +79,7 @@ class ServerDashBoard extends Component {
     };
 
     render() {
-        const {serverStatus} = this.state;
+        const {serverStatus, alive} = this.state;
         const {maxPlayers} = this.state.serverSettings;
 
         return (
@@ -81,11 +90,10 @@ class ServerDashBoard extends Component {
                         {this.renderControlButtons()}
                     </div>
                     <div className="col-6">
-                        <ServerStatus status={serverStatus} maxPlayers={maxPlayers}/>
+                        <ServerStatus status={serverStatus} maxPlayers={maxPlayers} alive={alive}/>
                     </div>
                 </div>
             </React.Fragment>
-
         )
     };
 }
