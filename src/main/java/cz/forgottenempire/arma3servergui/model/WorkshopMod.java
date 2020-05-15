@@ -15,6 +15,7 @@ public class WorkshopMod {
     private String name;
     private String lastUpdated;
     private boolean installed;
+    private boolean failed;
     private boolean active;
     private Long fileSize;
 

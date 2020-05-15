@@ -6,4 +6,7 @@ public class Constants {
     public final static Long ACCOUND_DEFAULT_ID = 1L;
 
     public final static String TEMPLATE_SERVER_CONFIG = "serverConfig.ftl";
+
+    public final static int STEAMCMD_RETVAL_SUCCESS = 0;
+    public final static int STEAMCMD_RETVAL_LOGIN_FAIL = 5;
 }

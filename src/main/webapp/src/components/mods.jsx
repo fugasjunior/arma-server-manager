@@ -15,7 +15,7 @@ class Mods extends Component {
 
     async componentDidMount() {
         await this.refreshModList();
-        this.interval = setInterval(this.refreshModList, 5000);
+        this.interval = setInterval(this.refreshModList, 7500);
     };
 
     componentWillUnmount() {
@@ -39,9 +39,16 @@ class Mods extends Component {
         try {
             const {data: mod} = await installMod(modId);
 
-            if (this.state.mods.filter(m => m.id === modId).length === 0) {
-                const mods = [mod, ...this.state.mods];
+            const existingMods = [...this.state.mods];
+            const existingMod = existingMods.find(m => m.id === modId);
+
+            if (!existingMod) {
+                const mods = [...existingMods, mod];
                 this.setState({mods});
+            } else {
+                existingMod.failed = false;
+                existingMod.installed = false;
+                this.setState({existingMods});
             }
         } catch (e) {
             toast.error("Error during mod install");

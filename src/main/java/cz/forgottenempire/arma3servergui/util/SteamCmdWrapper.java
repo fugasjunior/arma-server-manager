@@ -18,7 +18,7 @@ public class SteamCmdWrapper {
         this.steamCmdPath = steamCmdPath;
     }
 
-    public boolean execute(List<String> arguments) throws IOException, InterruptedException {
+    public int execute(List<String> arguments) throws IOException, InterruptedException {
         List<String> commands = new ArrayList<>();
         commands.add(steamCmdPath);
         commands.addAll(arguments);
@@ -29,6 +29,6 @@ public class SteamCmdWrapper {
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .start();
 
-        return process.waitFor() == 0;
+        return process.waitFor();
     }
 }

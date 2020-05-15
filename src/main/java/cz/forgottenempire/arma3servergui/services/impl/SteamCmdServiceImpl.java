@@ -41,21 +41,27 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
     @Override
-    public boolean installOrUpdateMod(SteamAuth auth, WorkshopMod mod) {
+    public void installOrUpdateMod(SteamAuth auth, WorkshopMod mod) {
         executor.submit(() -> {
             mod.setInstalled(false);
+            mod.setFailed(false);
             modDb.save(mod, WorkshopMod.class);
 
             log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
 
-            if (!downloadMod(auth, mod.getId())) {
+            if (!downloadMod(auth, mod.getId()) || !verifyModDirectoryExists(mod.getId())) {
                 log.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
+
+                mod.setFailed(true);
+                modDb.save(mod, WorkshopMod.class);
+                return;
             }
 
             copyBiKeys(mod.getId());
             createSymlink(mod);
 
             mod.setInstalled(true);
+            mod.setFailed(false);
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             mod.setLastUpdated(formatter.format(new Date()));
             mod.setFileSize(steamWorkshopService.getFileSize(mod.getId()));
@@ -64,8 +70,6 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
                     executor.getQueue().size());
         });
-
-        return true;
     }
 
     @Override
@@ -131,7 +135,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     private boolean downloadMod(SteamAuth auth, Long modId) {
         List<String> args = new ArrayList<>();
         args.add("+@NoPromptForPassword 1");
-        args.add("+@ShutdownOnFailedCommand 0");
+        args.add("+@ShutdownOnFailedCommand 1");
 
         String token = auth.getSteamGuardToken();
         if (token != null && !token.isBlank()) {
@@ -145,10 +149,17 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
         boolean success = false;
         int attempts = 0;
-        while (!success && attempts++ <= 10) {
+        while (!success && attempts++ < 10) {
             try {
                 log.info("Starting mod download, attempt {} / 10", attempts);
-                success = steamCmd.execute(args);
+
+                int returnValue = steamCmd.execute(args);
+                if (returnValue == Constants.STEAMCMD_RETVAL_LOGIN_FAIL) {
+                    log.error("Invalid Steam authentication given!");
+                    break;
+                }
+
+                success = returnValue == Constants.STEAMCMD_RETVAL_SUCCESS;
             } catch (IOException | InterruptedException e) {
                 log.error("SteamCmd execution failed due to {}", e.toString());
             }
@@ -165,8 +176,8 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
     private void createSymlink(WorkshopMod mod) {
         // create symlink to server
-        Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
-        Path targetPath = Path.of(getDownloadPath() + File.separatorChar + mod.getId());
+        Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
+        Path targetPath = Path.of(getModDirectoryPath(mod.getId()));
 
         log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
 
@@ -181,7 +192,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     }
 
     private void deleteSymlink(WorkshopMod mod) {
-        Path linkPath = Path.of(serverPath + File.separatorChar + mod.getNormalizedName());
+        Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
         log.info("Deleting symlink {}", linkPath);
         try {
             Files.delete(linkPath);
@@ -192,8 +203,9 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
     private void copyBiKeys(Long modId) {
         String[] extensions = new String[]{"bikey"};
-        File modDirectory = new File(getDownloadPath() + File.separatorChar + modId);
-        if (!modDirectory.isDirectory()) {
+        File modDirectory = new File(getModDirectoryPath(modId));
+
+        if (!verifyModDirectoryExists(modId)) {
             log.error("Can not access mod directory {}", modId);
             return;
         }
@@ -207,6 +219,18 @@ public class SteamCmdServiceImpl implements SteamCmdService {
                 log.error("Could not copy bikeys due to {}", e.toString());
             }
         }
+    }
+
+    private boolean verifyModDirectoryExists(Long modId) {
+        return new File(getModDirectoryPath(modId)).isDirectory();
+    }
+
+    private String getModDirectoryPath(Long modId) {
+        return getDownloadPath() + File.separatorChar + modId;
+    }
+
+    private String getSymlinkTargetPath(String name) {
+        return serverPath + File.separatorChar + name;
     }
 
     private String getDownloadPath() {
