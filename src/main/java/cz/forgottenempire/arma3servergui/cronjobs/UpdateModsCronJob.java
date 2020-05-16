@@ -3,7 +3,7 @@ package cz.forgottenempire.arma3servergui.cronjobs;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
-import cz.forgottenempire.arma3servergui.services.SteamCmdService;
+import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class UpdateModsCronJob {
-    private SteamCmdService steamCmdService;
+    private WorkshopInstallerService workshopInstallerService;
     private JsonDbService<SteamAuth> steamAuthDb;
 
     public UpdateModsCronJob() {
@@ -24,7 +24,7 @@ public class UpdateModsCronJob {
         log.info("Running update job");
         SteamAuth auth = steamAuthDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class);
         if (auth != null && auth.getUsername() != null && auth.getPassword() != null) {
-            steamCmdService.refreshMods(auth);
+            workshopInstallerService.updateAllMods(auth);
             log.info("Update job finished");
         } else {
             log.warn("Could not finish update job, no auth for steam workshop given");
@@ -32,8 +32,8 @@ public class UpdateModsCronJob {
     }
 
     @Autowired
-    public void setSteamCmdService(SteamCmdService steamCmdService) {
-        this.steamCmdService = steamCmdService;
+    public void setWorkshopInstallerService(WorkshopInstallerService workshopInstallerService) {
+        this.workshopInstallerService = workshopInstallerService;
     }
 
     @Autowired

@@ -16,7 +16,7 @@ export function uninstallMod(modId) {
 }
 
 export function refreshMods() {
-    return http.post(apiEndpoint + "/refresh");
+    return http.post(apiEndpoint + "/updateAll");
 }
 
 export function setActive(modId, val) {

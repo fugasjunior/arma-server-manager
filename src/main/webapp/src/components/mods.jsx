@@ -3,14 +3,14 @@ import {getMods, installMod, refreshMods, setActive, uninstallMod} from "../serv
 import {toast} from "react-toastify";
 import ModInstallForm from "./modInstallForm";
 import ModsTable from "./modsTable";
-import {getFreeSpace} from "../services/systemService";
+import {getSystemInfo} from "../services/systemService";
 import {humanFileSize} from "../util/util";
 
 class Mods extends Component {
 
     state = {
         mods: [],
-        freeSpace: 0
+        systemInfo: {}
     };
 
     async componentDidMount() {
@@ -25,8 +25,8 @@ class Mods extends Component {
     refreshModList = async () => {
         try {
             const {data: mods} = await getMods();
-            const {data: freeSpace} = await getFreeSpace();
-            this.setState({mods, freeSpace})
+            const {data: systemInfo} = await getSystemInfo();
+            this.setState({mods, systemInfo})
         } catch (e) {
             toast.error("Error during loading mods");
         }
@@ -108,7 +108,7 @@ class Mods extends Component {
                         </button>
                     </div>
                     <div className="col-6">
-                        <span>Free space: {humanFileSize(this.state.freeSpace)}</span>
+                        <span>Free space: {humanFileSize(this.state.systemInfo.spaceLeft)}</span>
                     </div>
                 </div>
                 <ModsTable mods={this.state.mods}

@@ -4,11 +4,12 @@ import com.google.common.base.Joiner;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.dtos.ServerStatus;
+import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
+import cz.forgottenempire.arma3servergui.util.LogUtils;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,9 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Value("${hostName}")
     private String hostName;
+
+    @Value("${arma3server.logDir}")
+    private String logDir;
 
     private JsonDbService<WorkshopMod> modDb;
 
@@ -73,11 +77,11 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Override
-    public ServerStatus getServerStatus(ServerSettings settings) {
+    public ServerQuery queryServer(ServerSettings settings) {
         if (serverProcess == null || !serverProcess.isAlive()) {
-            ServerStatus serverStatus = new ServerStatus();
-            serverStatus.setServerUp(false);
-            return serverStatus;
+            ServerQuery serverQuery = new ServerQuery();
+            serverQuery.setServerUp(false);
+            return serverQuery;
         }
 
         SourceServer serverInfo = null;
@@ -87,7 +91,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
             serverInfo = sourceQueryClient.getServerInfo(serverAddress).get();
         } catch (Exception ignored) {}
 
-        return ServerStatus.from(serverInfo);
+        return ServerQuery.from(serverInfo);
     }
 
     private Process startServerProcess(ServerSettings settings) {
@@ -104,13 +108,19 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         List<String> mods = getModsList();
         if (!mods.isEmpty()) parameters.addAll(mods);
 
+        File logFile = new File(logDir + File.separatorChar + "out.log");
+        LogUtils.prepareLogFile(logFile);
+
         try {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
 
-            serverProcess = new ProcessBuilder(parameters)
-                    .directory(new File(serverDir))
-                    .inheritIO()
-                    .start();
+            ProcessBuilder pb = new ProcessBuilder(parameters)
+                    .directory(new File(serverDir));
+
+            if (logFile.exists()) {
+                pb.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
+            }
+            serverProcess = pb.start();
 
             log.info("Server process started (pid {})", serverProcess.pid());
         } catch (IOException e) {

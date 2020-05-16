@@ -23,10 +23,10 @@ export function restartServer() {
     return http.post(apiEndpoint + "/restart");
 }
 
-export function getStatus() {
-    return http.get(apiEndpoint + "/status");
+export function queryServer() {
+    return http.get(apiEndpoint + "/query");
 }
 
-export function getServerProcessAlive() {
-    return http.get(apiEndpoint + "/alive");
+export function getServerStatus() {
+    return http.get(apiEndpoint + "/status");
 }

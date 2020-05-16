@@ -4,8 +4,8 @@ import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
-import cz.forgottenempire.arma3servergui.services.SteamCmdService;
-import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
+import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
+import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,8 @@ import java.util.Collection;
 @Slf4j
 @RequestMapping("/api/mods")
 public class WorkshopModsController {
-    private SteamWorkshopService steamWorkshopService;
-    private SteamCmdService steamCmdService;
+    private WorkshopFileDetailsService workshopFileDetailsService;
+    private WorkshopInstallerService workshopInstallerService;
     private JsonDbService<SteamAuth> steamAuthDb;
     private JsonDbService<WorkshopMod> modsDb;
 
@@ -34,18 +34,18 @@ public class WorkshopModsController {
 
         WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
         if (mod == null) {
-            Long consumerAppId = steamWorkshopService.getModAppId(id);
+            Long consumerAppId = workshopFileDetailsService.getModAppId(id);
             if (!Constants.STEAM_ARMA3_ID.equals(consumerAppId)) {
                 log.warn("Mod ID {} is not consumed by Arma 3", id);
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);// TODO throw custom exception instead
             }
 
             mod = new WorkshopMod(id);
-            mod.setName(steamWorkshopService.getModName(id));
+            mod.setName(workshopFileDetailsService.getModName(id));
             modsDb.save(mod, WorkshopMod.class);
         }
 
-        steamCmdService.installOrUpdateMod(getAuth(), mod);
+        workshopInstallerService.installOrUpdateMod(getAuth(), mod);
 
         return new ResponseEntity<>(mod, HttpStatus.OK);
     }
@@ -56,7 +56,7 @@ public class WorkshopModsController {
 
         WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
         if (mod != null) {
-            steamCmdService.deleteMod(mod);
+            workshopInstallerService.deleteMod(mod);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -80,11 +80,11 @@ public class WorkshopModsController {
     }
 
 
-    @PostMapping("/refresh")
+    @PostMapping("/updateAll")
     public ResponseEntity<WorkshopMod> refreshMods() {
         log.info("Refreshing all mods");
 
-        if (!steamCmdService.refreshMods(getAuth()))
+        if (!workshopInstallerService.updateAllMods(getAuth()))
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -95,13 +95,13 @@ public class WorkshopModsController {
     }
 
     @Autowired
-    public void setSteamWorkshopService(SteamWorkshopService steamWorkshopService) {
-        this.steamWorkshopService = steamWorkshopService;
+    public void setWorkshopFileDetailsService(WorkshopFileDetailsService workshopFileDetailsService) {
+        this.workshopFileDetailsService = workshopFileDetailsService;
     }
 
     @Autowired
-    public void setSteamCmdService(SteamCmdService steamCmdService) {
-        this.steamCmdService = steamCmdService;
+    public void setWorkshopInstallerService(WorkshopInstallerService workshopInstallerService) {
+        this.workshopInstallerService = workshopInstallerService;
     }
 
     @Autowired

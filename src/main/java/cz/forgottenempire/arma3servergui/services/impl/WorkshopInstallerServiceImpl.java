@@ -4,8 +4,8 @@ import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
-import cz.forgottenempire.arma3servergui.services.SteamCmdService;
-import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
+import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
+import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class SteamCmdServiceImpl implements SteamCmdService {
+public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     @Value("${installDir}")
     private String downloadPath;
 
@@ -35,7 +35,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
     private JsonDbService<WorkshopMod> modDb;
     private SteamCmdWrapper steamCmd;
-    private SteamWorkshopService steamWorkshopService;
+    private WorkshopFileDetailsService workshopFileDetailsService;
 
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -64,7 +64,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
             mod.setFailed(false);
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             mod.setLastUpdated(formatter.format(new Date()));
-            mod.setFileSize(steamWorkshopService.getFileSize(mod.getId()));
+            mod.setFileSize(getActualSizeOfMod(mod.getId()));
             modDb.save(mod, WorkshopMod.class);
 
             log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
@@ -88,7 +88,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     }
 
     @Override
-    public boolean refreshMods(SteamAuth auth) {
+    public boolean updateAllMods(SteamAuth auth) {
         File modDirectory = new File(getDownloadPath());
 
         try {
@@ -119,7 +119,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
                 if (mod == null) {
                     // create mods which were not persisted in db
                     mod = new WorkshopMod(modId);
-                    mod.setName(steamWorkshopService.getModName(modId));
+                    mod.setName(workshopFileDetailsService.getModName(modId));
                     modDb.save(mod, WorkshopMod.class);
                 }
 
@@ -148,6 +148,8 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         args.add("+workshop_download_item " + Constants.STEAM_ARMA3_ID + " " + modId + " validate");
         args.add("+quit");
 
+        // the download of large mods often fails due to timeout. repeating the install process should continue the
+        // interrupted download and successfully install the mod after a few attempts
         boolean success = false;
         int attempts = 0;
         while (!success && attempts++ < 10) {
@@ -176,7 +178,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     }
 
     private void createSymlink(WorkshopMod mod) {
-        // create symlink to server
+        // create symlink to server directory
         Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
         Path targetPath = Path.of(getModDirectoryPath(mod.getId()));
 
@@ -202,6 +204,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         }
     }
 
+    // copies all .bikey files to the server keys folder
     private void copyBiKeys(Long modId) {
         String[] extensions = new String[]{"bikey"};
         File modDirectory = new File(getModDirectoryPath(modId));
@@ -224,6 +227,11 @@ public class SteamCmdServiceImpl implements SteamCmdService {
 
     private boolean verifyModDirectoryExists(Long modId) {
         return new File(getModDirectoryPath(modId)).isDirectory();
+    }
+
+    // as data about mod size from workshop API are not reliable, find the size of disk instead
+    private Long getActualSizeOfMod(Long modId) {
+        return FileUtils.sizeOfDirectory(new File(getModDirectoryPath(modId)));
     }
 
     private String getModDirectoryPath(Long modId) {
@@ -253,7 +261,7 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     }
 
     @Autowired
-    public void setSteamWorkshopService(SteamWorkshopService steamWorkshopService) {
-        this.steamWorkshopService = steamWorkshopService;
+    public void setWorkshopFileDetailsService(WorkshopFileDetailsService workshopFileDetailsService) {
+        this.workshopFileDetailsService = workshopFileDetailsService;
     }
 }

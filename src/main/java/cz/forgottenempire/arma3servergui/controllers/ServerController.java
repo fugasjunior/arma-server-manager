@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
 import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.dtos.ServerStatus;
+import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
@@ -46,12 +46,12 @@ public class ServerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/status")
-    public ResponseEntity<ServerStatus> getServerStatus() {
-        return new ResponseEntity<>(serverService.getServerStatus(findServerSettings()), HttpStatus.OK);
+    @GetMapping("/query")
+    public ResponseEntity<ServerQuery> getServerStatus() {
+        return new ResponseEntity<>(serverService.queryServer(findServerSettings()), HttpStatus.OK);
     }
 
-    @GetMapping("/alive")
+    @GetMapping("/status")
     public ResponseEntity<Boolean> isServerProcessAlive() {
         return new ResponseEntity<>(serverService.isServerProcessAlive(), HttpStatus.OK);
     }

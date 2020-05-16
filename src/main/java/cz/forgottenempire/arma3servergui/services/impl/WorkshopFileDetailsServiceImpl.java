@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import cz.forgottenempire.arma3servergui.services.SteamWorkshopService;
+import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class SteamWorkshopServiceImpl implements SteamWorkshopService {
+public class WorkshopFileDetailsServiceImpl implements WorkshopFileDetailsService {
 
     private final String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
 
@@ -63,6 +63,8 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
         return appId;
     }
 
+    // the data about mod size from workshop is unreliable
+    @Deprecated
     @Override
     public Long getFileSize(Long modId) {
         String value = getValueFromInfo(modId, "file_size");
@@ -112,6 +114,7 @@ public class SteamWorkshopServiceImpl implements SteamWorkshopService {
     }
 
     private JsonNode loadModInfoFromCache(Long modId) {
+        // the mod info is cached to avoid unnecessary calls to the Workshop API
         try {
             return cache.get(modId);
         } catch (ExecutionException e) {

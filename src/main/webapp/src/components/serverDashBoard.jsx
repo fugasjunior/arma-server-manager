@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {
-    getServerProcessAlive,
     getServerSettings,
-    getStatus,
+    getServerStatus,
+    queryServer,
     restartServer,
     startServer,
     stopServer
@@ -19,7 +19,7 @@ class ServerDashBoard extends Component {
 
     async componentDidMount() {
         const {data: serverSettings} = await getServerSettings();
-        const {data: alive} = await getServerProcessAlive();
+        const {data: alive} = await getServerStatus();
         this.setState({alive, serverSettings});
 
         await this.updateServerStatus();
@@ -31,14 +31,14 @@ class ServerDashBoard extends Component {
     };
 
     updateServerStatus = async () => {
-        const {data: alive} = await getServerProcessAlive();
-        const {data: serverStatus} = await getStatus();
+        const {data: alive} = await getServerStatus();
+        const {data: serverStatus} = await queryServer();
         this.setState({serverStatus, alive});
     };
 
     handleStart = async () => {
         await startServer();
-        const {data: alive} = await getServerProcessAlive();
+        const {data: alive} = await getServerStatus();
         this.setState({alive});
     };
 

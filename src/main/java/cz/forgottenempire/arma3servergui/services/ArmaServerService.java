@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.services;
 
-import cz.forgottenempire.arma3servergui.dtos.ServerStatus;
+import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 
 public interface ArmaServerService {
@@ -10,5 +10,5 @@ public interface ArmaServerService {
 
     boolean isServerProcessAlive();
 
-    ServerStatus getServerStatus(ServerSettings settings);
+    ServerQuery queryServer(ServerSettings settings);
 }

@@ -20,3 +20,7 @@ jsonDb.key=<key used for json database encryption
 # App Login
 auth.username=
 auth.password=
+
+# Process logs settings
+steamcmd.logDir=
+arma3server.logDir=

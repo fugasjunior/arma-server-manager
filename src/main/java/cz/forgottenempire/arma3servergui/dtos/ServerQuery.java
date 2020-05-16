@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServerStatus {
+public class ServerQuery {
     private boolean isServerUp;
     private int playersOnline;
     private int maxPlayers;
@@ -16,8 +16,8 @@ public class ServerStatus {
     private String mapName;
     private String gameDescription;
 
-    public static ServerStatus from(SourceServer sourceServer) {
-        ServerStatus status = new ServerStatus();
+    public static ServerQuery from(SourceServer sourceServer) {
+        ServerQuery status = new ServerQuery();
 
         if (sourceServer == null) {
             status.isServerUp = false;

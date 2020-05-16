@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
+import cz.forgottenempire.arma3servergui.dtos.ServerDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,16 @@ public class SystemController {
     public ResponseEntity<Long> getSpaceLeftOnDevice() {
         File file = new File(installDir);
         return new ResponseEntity<>(file.getUsableSpace(), HttpStatus.OK);
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<ServerDetails> getServerDetails() {
+        ServerDetails details = new ServerDetails();
+
+        File file = new File(installDir);
+        details.setSpaceLeft(file.getUsableSpace());
+        details.setSpaceTotal(file.getTotalSpace());
+
+        return ResponseEntity.ok(details);
     }
 }

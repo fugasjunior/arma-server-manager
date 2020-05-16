@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.services;
 
-public interface SteamWorkshopService {
+public interface WorkshopFileDetailsService {
     String getModName(Long modId);
 
     String getModDescription(Long modId);
