@@ -30,3 +30,7 @@ export function queryServer() {
 export function getServerStatus() {
     return http.get(apiEndpoint + "/status");
 }
+
+export function updateServer() {
+    return http.post(apiEndpoint + "/update");
+}

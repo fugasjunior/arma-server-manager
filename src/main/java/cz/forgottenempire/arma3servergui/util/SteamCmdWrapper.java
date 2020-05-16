@@ -24,7 +24,7 @@ public class SteamCmdWrapper {
         this.steamCmdPath = steamCmdPath;
     }
 
-    public int execute(List<String> arguments) throws IOException, InterruptedException {
+    public synchronized int execute(List<String> arguments) throws IOException, InterruptedException {
         List<String> commands = new ArrayList<>();
         commands.add(steamCmdPath);
         commands.addAll(arguments);

@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.controllers;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
@@ -21,6 +22,7 @@ public class ServerController {
     private ArmaServerService serverService;
     private JsonDbService<ServerSettings> settingsDb;
     private JsonDbService<WorkshopMod> modsDb;
+    private JsonDbService<SteamAuth> authDb;
 
     @PostMapping("/start")
     public ResponseEntity<?> startServer() {
@@ -33,7 +35,7 @@ public class ServerController {
     @PostMapping("/stop")
     public ResponseEntity<?> stopServer() {
         log.info("Received request to stop server");
-        serverService.shutDownServer(findServerSettings());
+        serverService.shutDownServer();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -70,6 +72,16 @@ public class ServerController {
         return new ResponseEntity<>(findServerSettings(), HttpStatus.OK);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<?> updateServer() {
+        if (serverService.isServerUpdating()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        serverService.updateServer(authDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     private ServerSettings findServerSettings() {
         ServerSettings serverSettings = settingsDb.find(Constants.SERVER_MAIN_ID, ServerSettings.class);
 
@@ -99,5 +111,10 @@ public class ServerController {
     @Autowired
     public void setModsDb(JsonDbService<WorkshopMod> modsDb) {
         this.modsDb = modsDb;
+    }
+
+    @Autowired
+    public void setAuthDb(JsonDbService<SteamAuth> authDb) {
+        this.authDb = authDb;
     }
 }

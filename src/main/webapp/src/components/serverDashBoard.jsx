@@ -5,11 +5,13 @@ import {
     queryServer,
     restartServer,
     startServer,
-    stopServer
+    stopServer,
+    updateServer
 } from "../services/serverService";
 import ServerStatus from "./serverStatus";
 import {getSystemInfo} from "../services/systemService";
 import {humanFileSize} from "../util/util";
+import {toast} from "react-toastify";
 
 class ServerDashBoard extends Component {
 
@@ -35,9 +37,10 @@ class ServerDashBoard extends Component {
     };
 
     updateServerStatus = async () => {
+        const {data: systemInfo} = await getSystemInfo();
         const {data: alive} = await getServerStatus();
         const {data: serverStatus} = await queryServer();
-        this.setState({serverStatus, alive});
+        this.setState({serverStatus, alive, systemInfo});
     };
 
     handleStart = async () => {
@@ -56,6 +59,19 @@ class ServerDashBoard extends Component {
         const serverStatus = {...this.state.serverStatus};
         serverStatus.serverUp = false;
         this.setState({serverStatus});
+    };
+
+    handleUpdate = async () => {
+        const systemInfo = {...this.state.systemInfo};
+        systemInfo.updating = true;
+        this.setState({systemInfo});
+
+        try {
+            await updateServer();
+        } catch (e) {
+            console.error(e);
+            toast.error("Server could not be updated");
+        }
     };
 
     renderControlButtons = () => {
@@ -78,6 +94,11 @@ class ServerDashBoard extends Component {
                 >
                     Restart
                 </button>
+                <button className="btn btn-lg btn-warning m-3"
+                        onClick={this.handleUpdate}
+                >
+                    Update
+                </button>
             </React.Fragment>
         );
     };
@@ -94,39 +115,49 @@ class ServerDashBoard extends Component {
     render() {
         const {serverStatus, alive, systemInfo, serverSettings} = this.state;
         const {maxPlayers} = serverSettings;
-        const {hostName, port, spaceLeft, spaceTotal} = systemInfo;
+        const {hostName, port, spaceLeft, spaceTotal, updating} = systemInfo;
 
         const spaceRatio = Math.ceil(100 - (spaceLeft / spaceTotal) * 100);
 
         return (
             <React.Fragment>
                 <h2>Server Dashboard</h2>
-                <div className="row">
-                    <div className="col-sm-6">
-                        {this.renderControlButtons()}
-                        {systemInfo &&
-                        <div>
-                            <h3>System Info</h3>
-                            <p>Server IP: {hostName + ":" + port}</p>
-                            <p>
-                                Space
-                                left: {spaceLeft && humanFileSize(spaceLeft)} / {spaceTotal && humanFileSize(spaceTotal)}
-                                <div className="progress">
-                                    <div className={this.getSpaceProgressBarClassname(spaceRatio)}
-                                         role="progressbar"
-                                         style={{width: spaceRatio + "%"}}
-                                         aria-valuenow={spaceRatio}
-                                         aria-valuemin="0"
-                                         aria-valuemax="100"/>
-                                </div>
-                            </p>
+                {updating ?
+                    <div className="text-center">
+                        <h3>Server is updating, please wait...</h3>
+                        <div className="spinner-border mt-3"
+                             role="status">
+                            <span className="sr-only">Loading...</span>
                         </div>
-                        }
                     </div>
-                    <div className="col-6">
-                        <ServerStatus status={serverStatus} maxPlayers={maxPlayers} alive={alive}/>
+                    :
+                    <div className="row">
+                        <div className="col-sm-6">
+                            {this.renderControlButtons()}
+                            {systemInfo &&
+                            <div>
+                                <h3>System Info</h3>
+                                <p>Server IP: {hostName + ":" + port}</p>
+                                <p>
+                                    Space
+                                    left: {spaceLeft && humanFileSize(spaceLeft)} / {spaceTotal && humanFileSize(spaceTotal)}
+                                    <div className="progress">
+                                        <div className={this.getSpaceProgressBarClassname(spaceRatio)}
+                                             role="progressbar"
+                                             style={{width: spaceRatio + "%"}}
+                                             aria-valuenow={spaceRatio}
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"/>
+                                    </div>
+                                </p>
+                            </div>
+                            }
+                        </div>
+                        <div className="col-6">
+                            <ServerStatus status={serverStatus} maxPlayers={maxPlayers} alive={alive}/>
+                        </div>
                     </div>
-                </div>
+                }
             </React.Fragment>
         )
     };

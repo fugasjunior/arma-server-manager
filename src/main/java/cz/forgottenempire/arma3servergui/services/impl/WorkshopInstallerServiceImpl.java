@@ -144,7 +144,8 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         }
 
         args.add("+login " + auth.getUsername() + " " + auth.getPassword());
-        args.add("+force_install_dir " + downloadPath);
+        args.add("+force_install_dir");
+        args.add(downloadPath);
         args.add("+workshop_download_item " + Constants.STEAM_ARMA3_ID + " " + modId + " validate");
         args.add("+quit");
 

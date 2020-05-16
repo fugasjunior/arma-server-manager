@@ -6,10 +6,12 @@ import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import cz.forgottenempire.arma3servergui.util.LogUtils;
+import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +41,13 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     private String logDir;
 
     private JsonDbService<WorkshopMod> modDb;
+    private SteamCmdWrapper steamCmdWrapper;
 
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
     private Process serverProcess;
+
+    private boolean serverUpdating;
 
     public ArmaServerServiceImpl() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -61,19 +66,19 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Override
-    public boolean shutDownServer(ServerSettings settings) {
+    public void shutDownServer() {
         log.info("Shutting down server process");
 
         if (serverProcess != null) {
             serverProcess.destroy();
             serverProcess = null;
         }
-        return true;
     }
 
     @Override
     public boolean restartServer(ServerSettings settings) {
-        return shutDownServer(settings) && startServer(settings);
+        shutDownServer();
+        return startServer(settings);
     }
 
     @Override
@@ -97,6 +102,44 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         } catch (Exception ignored) {}
 
         return ServerQuery.from(serverInfo);
+    }
+
+    @Override
+    public synchronized void updateServer(SteamAuth auth) {
+        log.info("Updating server...");
+        serverUpdating = true;
+        shutDownServer();
+
+        new Thread(() -> {
+            List<String> args = new ArrayList<>();
+            args.add("+@NoPromptForPassword 1");
+            args.add("+@ShutdownOnFailedCommand 1");
+
+            String token = auth.getSteamGuardToken();
+            if (token != null && !token.isBlank()) {
+                args.add("+set_steam_guard_code " + token);
+            }
+
+            args.add("+login " + auth.getUsername() + " " + auth.getPassword());
+            args.add("+force_install_dir");
+            args.add(serverDir);
+            args.add("+app_update " + Constants.STEAM_ARMA3SERVER_ID + " validate");
+            args.add("+quit");
+
+            try {
+                steamCmdWrapper.execute(args);
+            } catch (IOException | InterruptedException e) {
+                log.error("Error during server update: {}", e.toString());
+            }
+
+            log.info("Server update done");
+            serverUpdating = false;
+        }).start();
+    }
+
+    @Override
+    public boolean isServerUpdating() {
+        return serverUpdating;
     }
 
     private Process startServerProcess(ServerSettings settings) {
@@ -173,5 +216,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Autowired
     public void setFreeMarkerConfigurer(FreeMarkerConfigurer freeMarkerConfigurer) {
         this.freeMarkerConfigurer = freeMarkerConfigurer;
+    }
+
+    @Autowired
+    public void setSteamCmdWrapper(SteamCmdWrapper steamCmdWrapper) {
+        this.steamCmdWrapper = steamCmdWrapper;
     }
 }

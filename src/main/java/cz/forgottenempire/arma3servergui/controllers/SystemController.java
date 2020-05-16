@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.controllers;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.dtos.ServerDetails;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class SystemController {
     private String hostName;
 
     private JsonDbService<ServerSettings> settingsDb;
+    private ArmaServerService serverService;
 
     @GetMapping("/space")
     public ResponseEntity<Long> getSpaceLeftOnDevice() {
@@ -38,6 +40,8 @@ public class SystemController {
 
         ServerSettings settings = settingsDb.find(Constants.SERVER_MAIN_ID, ServerSettings.class);
 
+        details.setUpdating(serverService.isServerUpdating());
+
         details.setHostName(hostName);
         details.setPort(settings.getPort());
 
@@ -46,6 +50,11 @@ public class SystemController {
         details.setSpaceTotal(file.getTotalSpace());
 
         return ResponseEntity.ok(details);
+    }
+
+    @Autowired
+    public void setServerService(ArmaServerService serverService) {
+        this.serverService = serverService;
     }
 
     @Autowired
