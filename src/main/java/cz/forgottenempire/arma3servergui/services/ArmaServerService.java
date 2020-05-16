@@ -8,6 +8,8 @@ public interface ArmaServerService {
 
     boolean shutDownServer(ServerSettings settings);
 
+    boolean restartServer(ServerSettings settings);
+
     boolean isServerProcessAlive();
 
     ServerQuery queryServer(ServerSettings settings);

@@ -16,10 +16,10 @@ public class UpdateModsCronJob {
     private JsonDbService<SteamAuth> steamAuthDb;
 
     public UpdateModsCronJob() {
-        log.info("Scheduling mod update cronjob for 02:00 AM every day");
+        log.info("Scheduling mod update cronjob for 03:00 AM every day");
     }
 
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 0 3 * * *")
     public void refreshMods() {
         log.info("Running update job");
         SteamAuth auth = steamAuthDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class);

@@ -72,6 +72,11 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Override
+    public boolean restartServer(ServerSettings settings) {
+        return shutDownServer(settings) && startServer(settings);
+    }
+
+    @Override
     public boolean isServerProcessAlive() {
         return serverProcess != null && serverProcess.isAlive();
     }

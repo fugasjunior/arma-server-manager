@@ -40,9 +40,10 @@ public class ServerController {
     @PostMapping("/restart")
     public ResponseEntity<?> restartServer() {
         log.info("Received request to restart server");
-        ServerSettings serverSettings = findServerSettings();
-        serverService.shutDownServer(findServerSettings());
-        serverService.startServer(serverSettings);
+        if (!serverService.restartServer(findServerSettings())) {
+            log.error("Error during server restart!");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
