@@ -59,6 +59,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Override
     public boolean startServer(ServerSettings settings) {
+        if (serverUpdating) {
+            return false;
+        }
+
         writeConfig(settings);
         serverProcess = startServerProcess(settings);
 
