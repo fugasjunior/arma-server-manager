@@ -7,6 +7,9 @@ public class ServerDetails {
     private String version;
     private boolean updating;
 
+    private String hostName;
+    private int port;
+
     private long spaceLeft;
     private long spaceTotal;
 }
