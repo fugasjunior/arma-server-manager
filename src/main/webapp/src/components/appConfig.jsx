@@ -22,10 +22,17 @@ class AppConfig extends Component {
         }
     }
 
-    renderInputBox = (name, label, type) => {
+    renderInputBox = (name, label, tooltip, type) => {
         return (
             <div className="form-group">
-                <label htmlFor={name}>{label}</label>
+                <label htmlFor={name}>
+                    {label}
+                    {tooltip &&
+                    <a data-tip={tooltip}>
+                        &nbsp;<i className="fa fa-question-circle" aria-hidden="true"></i>
+                    </a>
+                    }
+                </label>
                 <input className="form-control"
                        type={type ? type : "text"}
                        id={name} name={name}
@@ -67,7 +74,9 @@ class AppConfig extends Component {
                     this token in your email upon the first attempt to download any Workshop item</p>
                 <form onSubmit={this.handleSubmit}>
                     {this.renderInputBox("username", "Username")}
-                    {this.renderInputBox("password", "Password", "password")}
+                    {this.renderInputBox("password", "Password",
+                        "By leaving the password empty, previously saved password will be used instead",
+                        "password")}
                     {this.renderInputBox("steamGuardToken", "Steam Guard Token")}
                     <button type="submit" className="btn btn-primary">Submit</button>
                 </form>
