@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {deleteScenario, getScenarios, uploadScenario} from "../services/scenarioService";
+import {deleteScenario, downloadScenario, getScenarios, uploadScenario} from "../services/scenarioService";
 import {humanFileSize} from "../util/util";
 import {toast} from "react-toastify";
 
@@ -63,6 +63,21 @@ class Scenarios extends Component {
         }
     };
 
+    handleDownload = async name => {
+        try {
+            const {data} = await downloadScenario(name);
+            const url = window.URL.createObjectURL(new Blob([data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', name);
+            document.body.appendChild(link);
+            link.click();
+        } catch (e) {
+            console.error(e);
+            toast.error("Error during scenario download");
+        }
+    };
+
     handleDelete = async (name) => {
         const origScenarios = [...this.state.scenarios];
         const scenarios = origScenarios.filter(s => s.name !== name);
@@ -102,6 +117,7 @@ class Scenarios extends Component {
                                     File size
                                 </th>
                                 <th/>
+                                <th/>
                             </tr>
                             </thead>
                             <tbody>
@@ -109,8 +125,19 @@ class Scenarios extends Component {
                                 <td>{s.name}</td>
                                 <td>{s.fileSize && humanFileSize(s.fileSize)}</td>
                                 <td>
+                                    <button className="btn btn-primary btn-sm"
+                                            onClick={() => this.handleDownload(s.name)}>
+                                        <i className="fa fa-download" aria-hidden="true"></i>
+                                        &nbsp;
+                                        Download
+                                    </button>
+                                </td>
+                                <td>
                                     <button className="btn btn-danger btn-sm"
-                                            onClick={() => this.handleDelete(s.name)}>Delete
+                                            onClick={() => this.handleDelete(s.name)}>
+                                        <i className="fa fa-trash-o" aria-hidden="true"></i>
+                                        &nbsp;
+                                        Delete
                                     </button>
                                 </td>
                             </tr>)}

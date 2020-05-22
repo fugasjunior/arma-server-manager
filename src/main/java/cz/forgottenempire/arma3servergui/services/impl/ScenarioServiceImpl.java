@@ -7,9 +7,11 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,6 +28,12 @@ public class ScenarioServiceImpl implements ScenarioService {
     @Override
     public boolean uploadScenarioToServer(MultipartFile file) {
         String scenarioName = file.getOriginalFilename();
+        if (scenarioName != null) {
+            // as some files may already be URI-endoded, decode them
+            scenarioName = UriUtils.decode(scenarioName, Charset.defaultCharset());
+        } else {
+            return false;
+        }
 
         log.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
         try {

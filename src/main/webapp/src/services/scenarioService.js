@@ -7,6 +7,10 @@ export function getScenarios() {
     return http.get(apiEndpoint);
 }
 
+export function downloadScenario(name) {
+    return http.get(apiEndpoint + "/download/" + name);
+}
+
 export function uploadScenario(formData, config) {
     return http.post(apiEndpoint + "/upload", formData, config);
 }
