@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -79,6 +80,23 @@ public class WorkshopModsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/setMultipleActive")
+    public ResponseEntity<WorkshopMod> setActive(@RequestBody Map<Long, Boolean> mods) {
+
+        mods.forEach((id, active) -> {
+            WorkshopMod mod = modsDb.find(id, WorkshopMod.class);
+            if (mod == null) {
+                log.info("Mod id {} not found", id);
+                return;
+            }
+            log.info("Setting mod {} ({}) active: {}", mod.getName(), id, active);
+
+            mod.setActive(active);
+            modsDb.save(mod, WorkshopMod.class);
+        });
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @PostMapping("/updateAll")
     public ResponseEntity<WorkshopMod> refreshMods() {

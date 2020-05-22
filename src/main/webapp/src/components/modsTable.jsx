@@ -19,7 +19,7 @@ const getInstalledIcon = ({installed, failed}) => {
     );
 };
 
-const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange}) => {
+const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange, onApplyClicked}) => {
     return (
         <React.Fragment>
             {mods.some(m => m.failed) &&
@@ -47,7 +47,7 @@ const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange}) 
                 </thead>
                 <tbody>
                 {mods.map(mod => (
-                        <tr key={mod.id} className={mod.failed && "table-danger"}>
+                        <tr key={mod.id} className={mod.failed ? "table-danger" : ""}>
                             <td>
                                 <a href={getWorkshopUrl(mod.id)}
                                    target="_blank"
@@ -86,6 +86,11 @@ const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange}) 
                 )}
                 </tbody>
             </table>
+
+            <button className="float-right btn btn-primary"
+                    onClick={onApplyClicked}>
+                Apply
+            </button>
         </React.Fragment>
     );
 };

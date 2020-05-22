@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {getMods, installMod, refreshMods, setActive, uninstallMod} from "../services/modsService";
+import {getMods, installMod, refreshMods, setMultipleActive, uninstallMod} from "../services/modsService";
 import {toast} from "react-toastify";
 import ModInstallForm from "./modInstallForm";
 import ModsTable from "./modsTable";
@@ -10,16 +10,17 @@ class Mods extends Component {
 
     state = {
         mods: [],
-        systemInfo: {}
+        systemInfo: {},
+        refreshAutomatically: true,
     };
 
     async componentDidMount() {
         await this.refreshModList();
-        this.interval = setInterval(this.refreshModList, 7500);
+        await this.toggleAutoRefresh(true);
     };
 
     componentWillUnmount() {
-        clearInterval(this.interval);
+        clearInterval(this.refreshInterval);
     };
 
     refreshModList = async () => {
@@ -36,6 +37,7 @@ class Mods extends Component {
 
     handleInstall = async (modId, e) => {
         if (e) e.preventDefault();
+
         try {
             const {data: mod} = await installMod(modId);
 
@@ -50,6 +52,8 @@ class Mods extends Component {
                 existingMod.installed = false;
                 this.setState({existingMods});
             }
+
+            await this.toggleAutoRefresh(true);
         } catch (e) {
             toast.error("Error during mod install");
         }
@@ -62,6 +66,7 @@ class Mods extends Component {
 
         try {
             await uninstallMod(modId);
+            await this.toggleAutoRefresh(true);
         } catch (e) {
             toast.error("Error during mod uninstall");
             this.setState({mods: originalMods});
@@ -69,28 +74,47 @@ class Mods extends Component {
     };
 
     handleActiveChange = async ({currentTarget: input}) => {
-        console.log(input);
         const modId = parseInt(input.value);
-        const active = input.checked;
 
-        const newMods = [...this.state.mods];
-        newMods.find(mod => mod.id === modId).active = active;
-        this.setState({newMods});
+        const isActive = input.checked;
+        const mods = [...this.state.mods];
 
-        try {
-            await setActive(modId, active);
-            toast.success("Mod " + modId + " successfully " + (active ? "activated" : "deactivated"));
-        } catch (e) {
-            toast.error("Error during activating mod " + modId);
-        }
+        mods.find(mod => mod.id === modId).active = isActive;
+        this.setState({mods});
+
+        await this.toggleAutoRefresh(false);
     }
 
     handleUpdateAll = async () => {
         try {
             await refreshMods();
-            await this.refreshModList();
+            await this.toggleAutoRefresh(true);
         } catch (e) {
             toast.error("Error during updating all mods");
+        }
+    };
+
+    handleRefreshChange = ({currentTarget: input}) => {
+        this.toggleAutoRefresh(input.checked);
+    };
+
+    handleApplyActive = async () => {
+        const mods = this.state.mods.reduce((map, mod) => {
+            map[mod.id] = mod.active;
+            return map;
+        }, {});
+
+        await setMultipleActive(mods);
+    };
+
+    toggleAutoRefresh = async isRefreshEnabled => {
+        this.setState({refreshAutomatically: isRefreshEnabled});
+
+        if (isRefreshEnabled) {
+            this.refreshInterval = setInterval(this.refreshModList, 7500);
+            await this.refreshModList();
+        } else {
+            clearInterval(this.refreshInterval);
         }
     };
 
@@ -99,7 +123,7 @@ class Mods extends Component {
             <div>
                 <h2>Installed mods</h2>
                 <div className="row">
-                    <div className="col-6">
+                    <div className="col-4">
                         <button className="btn btn-primary m-2"
                                 onClick={this.handleRefreshList}>Refresh
                         </button>
@@ -107,14 +131,28 @@ class Mods extends Component {
                                 onClick={this.handleUpdateAll}>Update all
                         </button>
                     </div>
-                    <div className="col-6">
+                    <div className="col-4">
                         <span>Free space: {humanFileSize(this.state.systemInfo.spaceLeft)}</span>
+                    </div>
+                    <div className="col-4">
+                        <div className="form-check">
+                            <input className="form-check-input"
+                                   type="checkbox"
+                                   name="refresh" id="refresh"
+                                   onChange={this.handleRefreshChange}
+                                   checked={this.state.refreshAutomatically}
+                            />
+                            <label htmlFor="refresh" className="form-check-label">
+                                Refresh automatically
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <ModsTable mods={this.state.mods}
                            onUninstallClicked={this.handleUninstall}
                            onUpdateClicked={this.handleInstall}
                            onActiveChange={this.handleActiveChange}
+                           onApplyClicked={this.handleApplyActive}
                 />
 
                 <ModInstallForm onSubmit={this.handleInstall}/>

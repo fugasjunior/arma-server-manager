@@ -22,3 +22,7 @@ export function refreshMods() {
 export function setActive(modId, val) {
     return http.post(apiEndpoint + "/setActive/" + modId + "/?active=" + val);
 }
+
+export function setMultipleActive(mods) {
+    return http.post(apiEndpoint + "/setMultipleActive", mods);
+}
