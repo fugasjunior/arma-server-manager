@@ -32,60 +32,62 @@ const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange, o
                 </p>
             </div>
             }
-            <table className="table">
-                <thead>
-                <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">File size</th>
-                    <th scope="col" className="text-center">Installed</th>
-                    <th scope="col">Last update</th>
-                    <th scope="col"/>
-                    <th scope="col"/>
-                    <th scope="col" className="text-center">Active</th>
-                </tr>
-                </thead>
-                <tbody>
-                {mods.map(mod => (
-                        <tr key={mod.id} className={mod.failed ? "table-danger" : ""}>
-                            <td>
-                                <a href={getWorkshopUrl(mod.id)}
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                >
-                                    {mod.id}
-                                </a>
-                            </td>
-                            <td>{mod.name}</td>
-                            <td>{mod.fileSize && humanFileSize(mod.fileSize)}</td>
-                            <td className="text-center">{getInstalledIcon(mod)}</td>
-                            <td>{mod.lastUpdated}</td>
-                            <td>
-                                <button className="btn btn-sm btn-primary"
-                                        onClick={() => onUpdateClicked(mod.id)}
-                                >
-                                    Update
-                                </button>
-                            </td>
-                            <td>
-                                <button className="btn btn-sm btn-danger"
-                                        onClick={() => onUninstallClicked(mod.id)}
-                                >
-                                    Uninstall
-                                </button>
-                            </td>
-                            <td className="text-center">
-                                <input type="checkbox"
-                                       value={mod.id}
-                                       checked={mod.active}
-                                       disabled={!mod.active && mod.failed}
-                                       onChange={onActiveChange}/>
-                            </td>
-                        </tr>
-                    )
-                )}
-                </tbody>
-            </table>
+            <div className="mods-table__wrapper">
+                <table className="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">File size</th>
+                        <th scope="col" className="text-center">Installed</th>
+                        <th scope="col">Last update</th>
+                        <th scope="col"/>
+                        <th scope="col"/>
+                        <th scope="col" className="text-center">Active</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {mods.map(mod => (
+                            <tr key={mod.id} className={mod.failed ? "table-danger" : ""}>
+                                <td>
+                                    <a href={getWorkshopUrl(mod.id)}
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                    >
+                                        {mod.id}
+                                    </a>
+                                </td>
+                                <td>{mod.name}</td>
+                                <td>{mod.fileSize && humanFileSize(mod.fileSize)}</td>
+                                <td className="text-center">{getInstalledIcon(mod)}</td>
+                                <td>{mod.lastUpdated}</td>
+                                <td>
+                                    <button className="btn btn-sm btn-primary"
+                                            onClick={() => onUpdateClicked(mod.id)}
+                                    >
+                                        Update
+                                    </button>
+                                </td>
+                                <td>
+                                    <button className="btn btn-sm btn-danger"
+                                            onClick={() => onUninstallClicked(mod.id)}
+                                    >
+                                        Uninstall
+                                    </button>
+                                </td>
+                                <td className="text-center">
+                                    <input type="checkbox"
+                                           value={mod.id}
+                                           checked={mod.active}
+                                           disabled={!mod.active && mod.failed}
+                                           onChange={onActiveChange}/>
+                                </td>
+                            </tr>
+                        )
+                    )}
+                    </tbody>
+                </table>
+            </div>
 
             <button className="float-right btn btn-primary"
                     onClick={onApplyClicked}>
