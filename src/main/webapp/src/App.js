@@ -9,12 +9,10 @@ import ServerSettingsForm from "./components/serverSettingsForm";
 import ServerDashBoard from "./components/serverDashBoard";
 import Scenarios from "./components/scenarios";
 import AppConfig from "./components/appConfig";
-import ReactTooltip from "react-tooltip";
 
 function App() {
     return (
         <React.Fragment>
-            <ReactTooltip/>
             <ToastContainer/>
             <Navbar/>
             <main role="main" className="container">

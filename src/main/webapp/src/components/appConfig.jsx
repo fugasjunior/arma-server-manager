@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {getAuth, setAuth} from "../services/configService";
 import {toast} from "react-toastify";
+import ReactTooltip from "react-tooltip";
 
 class AppConfig extends Component {
 
@@ -66,6 +67,7 @@ class AppConfig extends Component {
     render() {
         return (
             <div>
+                <ReactTooltip/>
                 <h2>App configuration</h2>
                 <h3>Steam account</h3>
                 <p>Steam account with a copy of Arma 3 is needed for downloading workshop mods and keeping
