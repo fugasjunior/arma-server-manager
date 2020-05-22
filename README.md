@@ -3,13 +3,14 @@ A simple administration web app for managing your Arma 3 server
 
 [Screenshots](https://imgur.com/a/jEkDCkc) 
 
-##Features
+## Features
+
 - Start, stop, update your server while keeping track of its current state
 - Configure the server without the need for modifying your server.cfg
 - Download and manage Steam Workshop mods
 - Upload custom scenarios from your local machine
 
-##Installation
+## Installation
 Before attempting to install this GUI, make sure you've successfully installed SteamCMD and Arma 3 dedicated server. 
 You can follow [this guide](https://community.bistudio.com/wiki/Arma_3_Dedicated_Server). 
 
@@ -32,7 +33,7 @@ issues such as being disconnected from your Steam account when it's needed for m
 If your account is protected by Steam Guard 2FA, you can optionally put in the verification token. This token should
 be delivered to your account's email after the first attempt of updating the server and/or downloading a mod.
 
-##Planned features
+## Planned features
 - Server logs access
 - Managing bikeys
 - Integrated search in Steam Workshop
