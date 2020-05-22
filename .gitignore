@@ -5,8 +5,8 @@ config/
 
 HELP.md
 .gradle
+gradle/
 build/
-gradle*
 !**/src/main/**
 !**/src/test/**
 
