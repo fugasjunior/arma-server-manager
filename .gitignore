@@ -5,7 +5,6 @@ config/
 
 HELP.md
 .gradle
-gradle/
 build/
 !**/src/main/**
 !**/src/test/**
