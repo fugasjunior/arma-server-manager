@@ -25,6 +25,7 @@ const ServerStatus = ({status, maxPlayers, alive}) => {
             }
             {alive && status.serverUp &&
             <table className="table table-borderless">
+                <tbody>
                 <tr>
                     <th scope="row">Players</th>
                     <td>{status.playersOnline} / {Math.min(status.maxPlayers, maxPlayers)}</td>
@@ -43,6 +44,7 @@ const ServerStatus = ({status, maxPlayers, alive}) => {
                     <th scope="row">Game version</th>
                     <td>{status.gameVersion}</td>
                 </tr>
+                </tbody>
             </table>
             }
         </React.Fragment>

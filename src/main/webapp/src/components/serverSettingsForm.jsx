@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import Joi from "joi-browser"
 import {getServerSettings, setServerSettings} from "../services/serverService";
-import {getMods} from "../services/modsService";
 import {toast} from "react-toastify";
 
 class ServerSettingsForm extends Component {
@@ -55,10 +54,6 @@ class ServerSettingsForm extends Component {
 
     async componentDidMount() {
         let {data: server} = await getServerSettings();
-
-        let activeMods = server.mods;
-        let {data: allMods} = await getMods();
-
         this.setState({server});
     };
 

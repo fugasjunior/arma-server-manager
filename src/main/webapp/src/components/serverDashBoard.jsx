@@ -105,7 +105,7 @@ class ServerDashBoard extends Component {
                             <div>
                                 <h3>System Info</h3>
                                 <p>Server IP: {hostName + ":" + port}</p>
-                                <p>
+                                <div>
                                     Space
                                     left: {spaceLeft && humanFileSize(spaceLeft)} / {spaceTotal && humanFileSize(spaceTotal)}
                                     <div className="progress">
@@ -116,7 +116,7 @@ class ServerDashBoard extends Component {
                                              aria-valuemin="0"
                                              aria-valuemax="100"/>
                                     </div>
-                                </p>
+                                </div>
                             </div>
                             }
                         </div>
