@@ -27,6 +27,8 @@ class Mods extends Component {
         try {
             const {data: mods} = await getMods();
             const {data: systemInfo} = await getSystemInfo();
+
+            mods.sort((a, b) => a.name.localeCompare(b.name));
             this.setState({mods, systemInfo})
         } catch (e) {
             toast.error("Error during loading mods");
