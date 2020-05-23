@@ -1,73 +1,39 @@
 import React, {Component} from "react";
-import {
-    getServerSettings,
-    getServerStatus,
-    queryServer,
-    restartServer,
-    startServer,
-    stopServer,
-    updateServer
-} from "../services/serverService";
+import {getServerSettings, restartServer, startServer, stopServer, updateServer} from "../services/serverService";
 import ServerStatus from "./serverStatus";
-import {getSystemInfo} from "../services/systemService";
 import {humanFileSize} from "../util/util";
 import {toast} from "react-toastify";
 
 class ServerDashBoard extends Component {
 
     state = {
-        serverStatus: {},
         serverSettings: {},
-        systemInfo: {},
-        alive: false
     };
 
     async componentDidMount() {
         const {data: serverSettings} = await getServerSettings();
-        const {data: alive} = await getServerStatus();
-        const {data: systemInfo} = await getSystemInfo();
-        this.setState({alive, serverSettings, systemInfo});
-
-        await this.updateServerStatus();
-        this.interval = setInterval(this.updateServerStatus, 10000);
-    };
-
-    componentWillUnmount() {
-        clearInterval(this.interval);
-    };
-
-    updateServerStatus = async () => {
-        const {data: systemInfo} = await getSystemInfo();
-        const {data: alive} = await getServerStatus();
-        const {data: serverStatus} = await queryServer();
-        this.setState({serverStatus, alive, systemInfo});
+        this.setState({serverSettings});
     };
 
     handleStart = async () => {
         await startServer();
-        const {data: alive} = await getServerStatus();
-        this.setState({alive});
+        await this.props.onUpdate();
     };
 
     handleStop = async () => {
         await stopServer();
-        this.setState({alive: false});
+        await this.props.onUpdate();
     };
 
     handleRestart = async () => {
         await restartServer();
-        const serverStatus = {...this.state.serverStatus};
-        serverStatus.serverUp = false;
-        this.setState({serverStatus});
+        await this.props.onUpdate();
     };
 
     handleUpdate = async () => {
-        const systemInfo = {...this.state.systemInfo};
-        systemInfo.updating = true;
-        this.setState({systemInfo});
-
         try {
             await updateServer();
+            await this.props.onUpdate();
         } catch (e) {
             console.error(e);
             toast.error("Server could not be updated");
@@ -75,7 +41,7 @@ class ServerDashBoard extends Component {
     };
 
     renderControlButtons = () => {
-        const {alive} = this.state;
+        const {alive} = this.props;
         return (
             <React.Fragment>
                 {alive ?
@@ -113,7 +79,8 @@ class ServerDashBoard extends Component {
     }
 
     render() {
-        const {serverStatus, alive, systemInfo, serverSettings} = this.state;
+        const {alive, serverStatus, systemInfo} = this.props;
+        const {serverSettings} = this.state;
         const {maxPlayers} = serverSettings;
         const {hostName, port, spaceLeft, spaceTotal, updating} = systemInfo;
 
@@ -154,7 +121,9 @@ class ServerDashBoard extends Component {
                             }
                         </div>
                         <div className="col-6">
-                            <ServerStatus status={serverStatus} maxPlayers={maxPlayers} alive={alive}/>
+                            <ServerStatus status={serverStatus}
+                                          maxPlayers={maxPlayers}
+                                          alive={alive}/>
                         </div>
                     </div>
                 }
