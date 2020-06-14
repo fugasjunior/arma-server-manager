@@ -9,6 +9,7 @@ import ServerSettingsForm from "./components/serverSettingsForm";
 import ServerDashBoard from "./components/serverDashBoard";
 import Scenarios from "./components/scenarios";
 import AppConfig from "./components/appConfig";
+import AdditionalServers from "./components/additionalServers";
 import {getSystemInfo} from "./services/systemService";
 import {getServerStatus, queryServer} from "./services/serverService";
 
@@ -56,6 +57,7 @@ class App extends Component {
                         <Route path="/scenarios" component={Scenarios}/>
                         <Route path="/mods" component={Mods}/>
                         <Route path="/config" component={AppConfig}/>
+                        <Route path="/additionalServers" component={AdditionalServers}/>
                         <Route path="/not-found" component={NotFound}/>
                         <Redirect from="/" exact to="/dashboard"/>
                         <Redirect to="/not-found"/>

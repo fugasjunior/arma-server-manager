@@ -28,6 +28,9 @@ const Navbar = () => {
                     <li className="nav-item">
                         <NavLink className="nav-link" to="/config">App config</NavLink>
                     </li>
+                    <li className="nav-item">
+                        <NavLink className="nav-link" to="/additionalServers">Additional servers</NavLink>
+                    </li>
                 </ul>
             </div>
         </nav>
