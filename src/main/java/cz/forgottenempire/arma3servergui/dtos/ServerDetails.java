@@ -12,4 +12,9 @@ public class ServerDetails {
 
     private long spaceLeft;
     private long spaceTotal;
+
+    private long memoryLeft;
+    private long memoryTotal;
+
+    private double cpuUsage;
 }

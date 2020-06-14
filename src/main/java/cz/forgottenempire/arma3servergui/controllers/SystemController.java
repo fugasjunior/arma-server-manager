@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
+import com.sun.management.OperatingSystemMXBean;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.dtos.ServerDetails;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 
 @RestController
 @RequestMapping("/api/system")
@@ -48,6 +50,11 @@ public class SystemController {
         File file = new File(installDir);
         details.setSpaceLeft(file.getUsableSpace());
         details.setSpaceTotal(file.getTotalSpace());
+
+        OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+        details.setMemoryLeft(osBean.getFreePhysicalMemorySize());
+        details.setMemoryTotal(osBean.getTotalPhysicalMemorySize());
+        details.setCpuUsage(osBean.getSystemCpuLoad());
 
         return ResponseEntity.ok(details);
     }

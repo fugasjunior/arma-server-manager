@@ -69,7 +69,7 @@ class ServerDashBoard extends Component {
         );
     };
 
-    getSpaceProgressBarClassname = (ratio) => {
+    getProgressBarClassname = (ratio) => {
         const spaceWarning = ratio > 75;
         const spaceDanger = ratio > 90;
 
@@ -82,9 +82,11 @@ class ServerDashBoard extends Component {
         const {alive, serverStatus, systemInfo} = this.props;
         const {serverSettings} = this.state;
         const {maxPlayers} = serverSettings;
-        const {hostName, port, spaceLeft, spaceTotal, updating} = systemInfo;
+        const {hostName, port, spaceLeft, spaceTotal, memoryLeft, memoryTotal, cpuUsage, updating} = systemInfo;
 
         const spaceRatio = Math.ceil(100 - (spaceLeft / spaceTotal) * 100);
+        const memoryRatio = Math.ceil(100 - (memoryLeft / memoryTotal) * 100);
+        const cpuRatio = Math.ceil(cpuUsage * 100);
 
         return (
             <React.Fragment>
@@ -106,10 +108,32 @@ class ServerDashBoard extends Component {
                                 <h3>System Info</h3>
                                 <p>Server IP: {hostName + ":" + port}</p>
                                 <div>
+                                    CPU usage: {cpuRatio}%
+                                    <div className="progress">
+                                        <div className={this.getProgressBarClassname(cpuRatio)}
+                                             role="progressbar"
+                                             style={{width: cpuRatio + "%"}}
+                                             aria-valuenow={cpuRatio}
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"/>
+                                    </div>
+                                </div>
+                                <div>
+                                    Memory: {memoryLeft && humanFileSize(memoryLeft)} / {memoryTotal && humanFileSize(memoryTotal)}
+                                    <div className="progress">
+                                        <div className={this.getProgressBarClassname(memoryRatio)}
+                                             role="progressbar"
+                                             style={{width: memoryRatio + "%"}}
+                                             aria-valuenow={memoryRatio}
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"/>
+                                    </div>
+                                </div>
+                                <div>
                                     Space
                                     left: {spaceLeft && humanFileSize(spaceLeft)} / {spaceTotal && humanFileSize(spaceTotal)}
                                     <div className="progress">
-                                        <div className={this.getSpaceProgressBarClassname(spaceRatio)}
+                                        <div className={this.getProgressBarClassname(spaceRatio)}
                                              role="progressbar"
                                              style={{width: spaceRatio + "%"}}
                                              aria-valuenow={spaceRatio}
