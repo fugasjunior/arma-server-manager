@@ -84,8 +84,11 @@ class ServerDashBoard extends Component {
         const {maxPlayers} = serverSettings;
         const {hostName, port, spaceLeft, spaceTotal, memoryLeft, memoryTotal, cpuUsage, updating} = systemInfo;
 
-        const spaceRatio = Math.ceil(100 - (spaceLeft / spaceTotal) * 100);
-        const memoryRatio = Math.ceil(100 - (memoryLeft / memoryTotal) * 100);
+        const spaceUsed = spaceTotal - spaceLeft;
+        const memoryUsed = memoryTotal - memoryLeft;
+
+        const spaceRatio = Math.ceil((spaceUsed / spaceTotal) * 100);
+        const memoryRatio = Math.ceil((memoryUsed / memoryTotal) * 100);
         const cpuRatio = Math.ceil(cpuUsage * 100);
 
         return (
@@ -119,7 +122,7 @@ class ServerDashBoard extends Component {
                                     </div>
                                 </div>
                                 <div>
-                                    Memory: {memoryLeft && humanFileSize(memoryLeft)} / {memoryTotal && humanFileSize(memoryTotal)}
+                                    Memory: {memoryLeft && humanFileSize(memoryUsed)} / {memoryTotal && humanFileSize(memoryTotal)}
                                     <div className="progress">
                                         <div className={this.getProgressBarClassname(memoryRatio)}
                                              role="progressbar"
@@ -130,8 +133,8 @@ class ServerDashBoard extends Component {
                                     </div>
                                 </div>
                                 <div>
-                                    Space
-                                    left: {spaceLeft && humanFileSize(spaceLeft)} / {spaceTotal && humanFileSize(spaceTotal)}
+                                    Storage
+                                    used: {spaceLeft && humanFileSize(spaceUsed)} / {spaceTotal && humanFileSize(spaceTotal)}
                                     <div className="progress">
                                         <div className={this.getProgressBarClassname(spaceRatio)}
                                              role="progressbar"
