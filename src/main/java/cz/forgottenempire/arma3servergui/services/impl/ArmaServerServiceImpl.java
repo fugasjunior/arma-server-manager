@@ -1,11 +1,9 @@
 package cz.forgottenempire.arma3servergui.services.impl;
 
 import com.google.common.base.Joiner;
-import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
-import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.model.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,14 +31,12 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Value("${serverDir}")
     private String serverDir;
 
-    @Value("${hostName}")
-    private String hostName;
-
     @Value("${arma3server.logDir}")
     private String logDir;
 
     private JsonDbService<WorkshopMod> modDb;
     private SteamCmdWrapper steamCmdWrapper;
+    private ServerStatus serverStatus;
 
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
@@ -88,24 +83,6 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Override
     public boolean isServerProcessAlive() {
         return serverProcess != null && serverProcess.isAlive();
-    }
-
-    @Override
-    public ServerQuery queryServer(ServerSettings settings) {
-        if (serverProcess == null || !serverProcess.isAlive()) {
-            ServerQuery serverQuery = new ServerQuery();
-            serverQuery.setServerUp(false);
-            return serverQuery;
-        }
-
-        SourceServer serverInfo = null;
-        try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
-            // default steam query port is (game server port + 1)
-            InetSocketAddress serverAddress = new InetSocketAddress(hostName, settings.getPort() + 1);
-            serverInfo = sourceQueryClient.getServerInfo(serverAddress).get();
-        } catch (Exception ignored) {}
-
-        return ServerQuery.from(serverInfo);
     }
 
     @Override
@@ -225,5 +202,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Autowired
     public void setSteamCmdWrapper(SteamCmdWrapper steamCmdWrapper) {
         this.steamCmdWrapper = steamCmdWrapper;
+    }
+
+    @Autowired
+    public void setServerStatus(ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
     }
 }

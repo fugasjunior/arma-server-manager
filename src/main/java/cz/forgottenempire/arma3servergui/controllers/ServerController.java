@@ -1,8 +1,8 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
 import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.dtos.ServerQuery;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.model.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
@@ -23,6 +23,7 @@ public class ServerController {
     private JsonDbService<ServerSettings> settingsDb;
     private JsonDbService<WorkshopMod> modsDb;
     private JsonDbService<SteamAuth> authDb;
+    private ServerStatus serverStatus;
 
     @PostMapping("/start")
     public ResponseEntity<?> startServer() {
@@ -50,8 +51,8 @@ public class ServerController {
     }
 
     @GetMapping("/query")
-    public ResponseEntity<ServerQuery> getServerStatus() {
-        return new ResponseEntity<>(serverService.queryServer(findServerSettings()), HttpStatus.OK);
+    public ResponseEntity<ServerStatus> getServerStatus() {
+        return new ResponseEntity<>(serverStatus, HttpStatus.OK);
     }
 
     @GetMapping("/status")
@@ -72,14 +73,9 @@ public class ServerController {
         return new ResponseEntity<>(findServerSettings(), HttpStatus.OK);
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<?> updateServer() {
-        if (serverService.isServerUpdating()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        serverService.updateServer(authDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class));
-        return new ResponseEntity<>(HttpStatus.OK);
+    @Autowired
+    public void setServerStatus(ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
     }
 
     private ServerSettings findServerSettings() {
@@ -116,5 +112,20 @@ public class ServerController {
     @Autowired
     public void setAuthDb(JsonDbService<SteamAuth> authDb) {
         this.authDb = authDb;
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> updateServer() {
+        if (serverService.isServerUpdating()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        SteamAuth auth = authDb.find(Constants.ACCOUND_DEFAULT_ID, SteamAuth.class);
+        if (auth == null) {
+            return new ResponseEntity<>("No steam authentication set", HttpStatus.BAD_REQUEST);
+        }
+
+        serverService.updateServer(auth);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
