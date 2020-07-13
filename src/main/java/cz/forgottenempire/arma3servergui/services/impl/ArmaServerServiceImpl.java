@@ -34,6 +34,9 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Value("${arma3server.logDir}")
     private String logDir;
 
+    @Value("${betaBranch:#{null}}")
+    private String betaBranch;
+
     private JsonDbService<WorkshopMod> modDb;
     private SteamCmdWrapper steamCmdWrapper;
     private ServerStatus serverStatus;
@@ -104,7 +107,9 @@ public class ArmaServerServiceImpl implements ArmaServerService {
             args.add("+login " + auth.getUsername() + " " + auth.getPassword());
             args.add("+force_install_dir");
             args.add(serverDir);
-            args.add("+app_update " + Constants.STEAM_ARMA3SERVER_ID + " validate");
+            args.add("+app_update " + Constants.STEAM_ARMA3SERVER_ID +
+                    (betaBranch == null ? "" : " -beta " + betaBranch) +
+                    " validate");
             args.add("+quit");
 
             try {
