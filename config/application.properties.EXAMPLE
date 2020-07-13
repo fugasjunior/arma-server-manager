@@ -7,6 +7,7 @@ config.path=<path to json config files>
 # Server config
 hostName=<server-hostname>
 betaBranch=<optional-beta-branch>
+additionalMods=mod1,mod2,...
 
 # Steam config
 steam.api.key=<steam api key>

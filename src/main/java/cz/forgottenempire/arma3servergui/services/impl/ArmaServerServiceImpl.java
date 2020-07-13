@@ -21,6 +21,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,9 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Value("${betaBranch:#{null}}")
     private String betaBranch;
+
+    @Value("${additionalMods:#{null}}")
+    private String[] additionalMods;
 
     private JsonDbService<WorkshopMod> modDb;
     private SteamCmdWrapper steamCmdWrapper;
@@ -141,6 +145,13 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
         List<String> mods = getModsList();
         if (!mods.isEmpty()) parameters.addAll(mods);
+
+        // add additional mods from properties
+        if (additionalMods != null && additionalMods.length > 0) {
+            Arrays.stream(additionalMods)
+                    .map(mod -> "-mod=" + mod)
+                    .forEach(parameters::add);
+        }
 
         File logFile = new File(logDir + File.separatorChar + "out.log");
         LogUtils.prepareLogFile(logFile);
