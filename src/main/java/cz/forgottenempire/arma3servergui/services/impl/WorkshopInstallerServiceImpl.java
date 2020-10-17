@@ -7,26 +7,31 @@ import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
+
     @Value("${installDir}")
     private String downloadPath;
 
@@ -57,6 +62,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
                 return;
             }
 
+            convertModFilesToLowercase(mod);
             copyBiKeys(mod.getId());
             createSymlink(mod);
 
@@ -178,6 +184,22 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         return success;
     }
 
+    private void convertModFilesToLowercase(WorkshopMod mod) {
+        Path modDir = Path.of(getModDirectoryPath(mod.getId()));
+        try (Stream<Path> files = Files.walk(modDir)) {
+            files.forEach(f -> {
+                File oldFile = f.toFile();
+                File newFile = new File(f.getParent().toString(), f.getFileName().toString().toLowerCase());
+                boolean status = oldFile.renameTo(newFile);
+                if (!status) {
+                    log.error("Could not rename file {} to {}", oldFile.getAbsolutePath(), newFile.getAbsolutePath());
+                }
+            });
+        } catch (IOException e) {
+            log.error("Error while converting mod file names to lowercase", e);
+        }
+    }
+
     private void createSymlink(WorkshopMod mod) {
         // create symlink to server directory
         Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
@@ -219,7 +241,8 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             File key = it.next();
             try {
                 log.info("Copying bikey {} to server", key.getName());
-                FileUtils.copyFile(key, new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
+                FileUtils.copyFile(key,
+                        new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
             } catch (IOException e) {
                 log.error("Could not copy bikeys due to {}", e.toString());
             }
