@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -60,6 +61,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
                 return;
             }
 
+            convertModFilesToLowercase(mod);
             copyBiKeys(mod.getId());
             createSymlink(mod);
 
@@ -178,6 +180,22 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         }
 
         return success;
+    }
+
+    private void convertModFilesToLowercase(WorkshopMod mod) {
+        Path modDir = Path.of(getModDirectoryPath(mod.getId()));
+        try (Stream<Path> files = Files.walk(modDir)) {
+            files.forEach(f -> {
+                File oldFile = f.toFile();
+                File newFile = new File(f.getParent().toString(), f.getFileName().toString().toLowerCase());
+                boolean status = oldFile.renameTo(newFile);
+                if (!status) {
+                    log.error("Could not rename file {} to {}", oldFile.getAbsolutePath(), newFile.getAbsolutePath());
+                }
+            });
+        } catch (IOException e) {
+            log.error("Error while converting mod file names to lowercase", e);
+        }
     }
 
     private void createSymlink(WorkshopMod mod) {
