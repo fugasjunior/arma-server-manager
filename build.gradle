@@ -63,6 +63,7 @@ dependencies {
 	compile group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
 	compile group: 'org.springframework', name: 'spring-context-support', version: '5.2.6.RELEASE'
 	compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+	compile group: 'com.bol', name: 'spring-data-mongodb-encrypt', version:'2.4.4'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
