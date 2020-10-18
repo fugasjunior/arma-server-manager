@@ -1,11 +1,9 @@
 package cz.forgottenempire.arma3servergui.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ServerSettings {
 
     @Id
-    @NotNull
     private Long id;
     @NotEmpty
     private String name;
