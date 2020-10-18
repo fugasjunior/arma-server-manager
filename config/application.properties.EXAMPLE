@@ -9,15 +9,9 @@ hostName=<server-hostname>
 betaBranch=<optional-beta-branch>
 additionalMods=mod1,mod2,...
 
-# Steam config
-steam.api.key=<steam api key>
-
 # File upload limits
 spring.servlet.multipart.max-file-size=100MB
 spring.servlet.multipart.max-request-size=100MB
-
-# Misc settings
-jsonDb.key=<key used for json database encryption
 
 # App Login
 auth.username=
@@ -26,3 +20,14 @@ auth.password=
 # Process logs settings
 steamcmd.logDir=
 arma3server.logDir=
+
+# MongoDB setting
+spring.data.mongodb.host=<db-hostname>
+spring.data.mongodb.port=<db-port>
+spring.data.mongodb.database=<db-name>
+spring.data.mongodb.username=<db-user>
+spring.data.mongodb.password=<db-user-password>
+
+# database encryption settings
+mongodb.encrypt.keys[0].version=1
+mongodb.encrypt.keys[0].key=hqTaSs8gUHEoovpzOYvYDzDHAqRXTtQC65EkDmJ99rw=
