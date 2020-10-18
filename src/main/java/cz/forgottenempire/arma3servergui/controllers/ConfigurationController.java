@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping("/api/config")
-public class AppConfigController {
+public class ConfigurationController {
 
     private SteamAuthService authService;
 
@@ -30,8 +30,8 @@ public class AppConfigController {
     public ResponseEntity<SteamAuthDto> getAuthAccount() {
         SteamAuth steamAuth = authService.getAuthAccount();
         SteamAuthDto dto = new SteamAuthDto();
-        steamAuth.setUsername(steamAuth.getUsername());
-        steamAuth.setSteamGuardToken(steamAuth.getSteamGuardToken());
+        dto.setUsername(steamAuth.getUsername());
+        dto.setSteamGuardToken(steamAuth.getSteamGuardToken());
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }

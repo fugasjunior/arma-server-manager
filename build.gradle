@@ -55,9 +55,9 @@ compileJava.dependsOn copyWebApp
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	compile group: 'io.jsondb', name: 'jsondb-core', version: '1.0.106'
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'
 	compile group: 'com.ibasco.agql', name: 'agql-source-query', version: '0.1.7'
 	compile group: 'org.freemarker', name: 'freemarker', version: '2.3.30'

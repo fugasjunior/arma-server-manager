@@ -37,7 +37,6 @@ public class ScenarioServiceImpl implements ScenarioService {
 
         log.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
         try {
-            System.out.println(file.getContentType());
             File scenarioFile = new File(getMissionsFolder() + File.separatorChar + scenarioName);
             file.transferTo(scenarioFile);
             log.info("Successfully downloaded scenario {}", scenarioName);

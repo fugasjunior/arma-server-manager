@@ -6,8 +6,8 @@ import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.model.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.services.JsonDbService;
 import cz.forgottenempire.arma3servergui.util.LogUtils;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
 import freemarker.template.Template;
@@ -41,7 +41,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Value("${additionalMods:#{null}}")
     private String[] additionalMods;
 
-    private JsonDbService<WorkshopMod> modDb;
+    private WorkshopModRepository modRepository;
     private SteamCmdWrapper steamCmdWrapper;
     private ServerStatus serverStatus;
 
@@ -143,7 +143,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         parameters.add("-config=" + getConfigFile().getAbsolutePath());
         parameters.add("-port=" + settings.getPort());
 
-        List<String> mods = getModsList();
+        List<String> mods = getActiveModsListAsParameters();
         if (!mods.isEmpty()) parameters.addAll(mods);
 
         // add additional mods from properties
@@ -194,9 +194,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         }
     }
 
-    private List<String> getModsList() {
-        return modDb.findAll(WorkshopMod.class).stream()
-                .filter(WorkshopMod::isActive)
+    private List<String> getActiveModsListAsParameters() {
+        return modRepository.findByActiveTrue().stream()
                 .map(mod -> "-mod=" + mod.getNormalizedName())
                 .collect(Collectors.toList());
     }
@@ -206,8 +205,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Autowired
-    public void setModDb(JsonDbService<WorkshopMod> modDb) {
-        this.modDb = modDb;
+    public void setModRepository(WorkshopModRepository modRepository) {
+        this.modRepository = modRepository;
     }
 
     @Autowired

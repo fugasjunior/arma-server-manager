@@ -1,11 +1,12 @@
 package cz.forgottenempire.arma3servergui.controllers;
 
 import com.sun.management.OperatingSystemMXBean;
-import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.dtos.ServerDetails;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.services.JsonDbService;
+import cz.forgottenempire.arma3servergui.services.SettingsService;
+import java.io.File;
+import java.lang.management.ManagementFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -13,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.File;
-import java.lang.management.ManagementFactory;
 
 @RestController
 @RequestMapping("/api/system")
@@ -27,7 +25,7 @@ public class SystemController {
     @Value("${hostName}")
     private String hostName;
 
-    private JsonDbService<ServerSettings> settingsDb;
+    private SettingsService settingsService;
     private ArmaServerService serverService;
 
     @GetMapping("/space")
@@ -40,7 +38,7 @@ public class SystemController {
     public ResponseEntity<ServerDetails> getServerDetails() {
         ServerDetails details = new ServerDetails();
 
-        ServerSettings settings = settingsDb.find(Constants.SERVER_MAIN_ID, ServerSettings.class);
+        ServerSettings settings = settingsService.getServerSettings();
 
         details.setUpdating(serverService.isServerUpdating());
 
@@ -65,7 +63,7 @@ public class SystemController {
     }
 
     @Autowired
-    public void setSettingsDb(JsonDbService<ServerSettings> settingsDb) {
-        this.settingsDb = settingsDb;
+    public void setSettingsService(SettingsService settingsService) {
+        this.settingsService = settingsService;
     }
 }

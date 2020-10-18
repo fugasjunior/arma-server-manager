@@ -3,7 +3,7 @@ package cz.forgottenempire.arma3servergui.cronjobs;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.services.JsonDbService;
+import cz.forgottenempire.arma3servergui.services.SettingsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,8 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ServerRestartCronJob {
-    ArmaServerService serverService;
-    JsonDbService<ServerSettings> settingsDb;
+
+    private ArmaServerService serverService;
+    private SettingsService settingsService;
 
     public ServerRestartCronJob() {
         log.info("Scheduling server restart cronjob for 05:00 AM every day");
@@ -25,7 +26,7 @@ public class ServerRestartCronJob {
 
         if (serverService.isServerProcessAlive()) {
             log.info("Restarting server...");
-            ServerSettings settings = settingsDb.find(Constants.SERVER_MAIN_ID, ServerSettings.class);
+            ServerSettings settings = settingsService.getServerSettings();
             if (serverService.restartServer(settings)) {
                 log.info("Server restarted");
             } else {
@@ -42,7 +43,7 @@ public class ServerRestartCronJob {
     }
 
     @Autowired
-    public void setSettingsDb(JsonDbService<ServerSettings> settingsDb) {
-        this.settingsDb = settingsDb;
+    public void setSettingsService(SettingsService settingsService) {
+        this.settingsService = settingsService;
     }
 }
