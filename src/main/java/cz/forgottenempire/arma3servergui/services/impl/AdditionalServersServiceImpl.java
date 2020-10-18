@@ -1,25 +1,28 @@
 package cz.forgottenempire.arma3servergui.services.impl;
 
+import com.google.common.collect.Lists;
 import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.repositories.AdditionalServerRepository;
 import cz.forgottenempire.arma3servergui.services.AdditionalServersService;
-import cz.forgottenempire.arma3servergui.services.JsonDbService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class AdditionalServersServiceImpl implements AdditionalServersService {
 
     private final Map<Long, Process> serverProcesses = new HashMap<>();
-    private JsonDbService<AdditionalServer> serversDb;
+    private AdditionalServerRepository serverRepository;
 
     public AdditionalServersServiceImpl() {
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
@@ -33,11 +36,9 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
             return;
         }
 
-        AdditionalServer settings = serversDb.find(serverId, AdditionalServer.class);
-        if (settings == null) {
-            log.warn("Server with id {} not found", serverId);
-            return;
-        }
+        AdditionalServer settings = serverRepository
+                .findById(serverId)
+                .orElseThrow(NoSuchElementException::new);
 
         List<String> commands = Arrays.asList(settings.getCommand().split(" "));
 
@@ -68,7 +69,7 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
 
         if (process.isAlive()) {
             try {
-                Thread.sleep(10 * 1000);
+                Thread.sleep(10 * 1000L);
             } catch (InterruptedException ignored) {} finally {
                 if (process.isAlive()) {
                     process.destroyForcibly();
@@ -83,8 +84,14 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
         return serverProcesses.get(serverId).isAlive();
     }
 
+    @Override
+    public Collection<AdditionalServer> getAllServers() {
+        return Lists.newArrayList(serverRepository.findAll());
+    }
+
     @Autowired
-    public void setServersDb(JsonDbService<AdditionalServer> serversDb) {
-        this.serversDb = serversDb;
+    public void setServerRepository(
+            AdditionalServerRepository serverRepository) {
+        this.serverRepository = serverRepository;
     }
 }

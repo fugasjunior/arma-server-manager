@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServerStatus {
+
     private boolean isServerUp;
     private int playersOnline;
     private int maxPlayers;

@@ -1,17 +1,18 @@
 package cz.forgottenempire.arma3servergui.model;
 
-import io.jsondb.annotation.Document;
-import io.jsondb.annotation.Id;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collection = "additionalServer", schemaVersion = "1.0")
+@Document
 public class AdditionalServer {
-    @Id
+
     @NotNull
+    @Id
     private Long id;
     @NotEmpty
     private String name;

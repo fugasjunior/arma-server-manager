@@ -1,17 +1,24 @@
 package cz.forgottenempire.arma3servergui.model;
 
-import io.jsondb.annotation.Document;
-import io.jsondb.annotation.Id;
-import io.jsondb.annotation.Secret;
+import com.bol.secure.Encrypted;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
-@Document(collection = "steamAuth", schemaVersion = "1.0")
+@AllArgsConstructor
+@NoArgsConstructor
+@Document
 public class SteamAuth {
+
     @Id
     private Long id;
     private String username;
-    @Secret
+    @Field
+    @Encrypted
     private String password;
     private String steamGuardToken;
 }

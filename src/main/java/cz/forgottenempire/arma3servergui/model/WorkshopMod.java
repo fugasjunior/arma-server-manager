@@ -1,15 +1,16 @@
 package cz.forgottenempire.arma3servergui.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.jsondb.annotation.Document;
-import io.jsondb.annotation.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
-@Document(collection = "mods", schemaVersion = "1.0")
+@Document
 public class WorkshopMod {
+
     @Id
     private Long id;
     private String name;
@@ -24,7 +25,7 @@ public class WorkshopMod {
     }
 
     // as the download and install process happens in another thread, better to synchronize this setter
-    public void setInstalled(Boolean installed){
+    public void setInstalled(Boolean installed) {
         synchronized (this) {
             this.installed = installed;
         }

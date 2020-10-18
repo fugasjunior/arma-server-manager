@@ -3,37 +3,42 @@ package cz.forgottenempire.arma3servergui.services.impl;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
-import cz.forgottenempire.arma3servergui.services.JsonDbService;
+import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
+
     @Value("${installDir}")
     private String downloadPath;
 
     @Value("${serverDir}")
     private String serverPath;
 
-    private JsonDbService<WorkshopMod> modDb;
+    private WorkshopModRepository modRepository;
     private SteamCmdWrapper steamCmd;
     private WorkshopFileDetailsService workshopFileDetailsService;
 
@@ -41,19 +46,17 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
     @Override
-    public void installOrUpdateMod(SteamAuth auth, WorkshopMod mod) {
+    public void installOrUpdateMod(SteamAuth auth, final WorkshopMod mod) {
         executor.submit(() -> {
             mod.setInstalled(false);
             mod.setFailed(false);
-            modDb.save(mod, WorkshopMod.class);
-
+            modRepository.save(mod);
             log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
 
             if (!downloadMod(auth, mod.getId()) || !verifyModDirectoryExists(mod.getId())) {
                 log.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
-
                 mod.setFailed(true);
-                modDb.save(mod, WorkshopMod.class);
+                modRepository.save(mod);
                 return;
             }
 
@@ -65,7 +68,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             mod.setLastUpdated(formatter.format(new Date()));
             mod.setFileSize(getActualSizeOfMod(mod.getId()));
-            modDb.save(mod, WorkshopMod.class);
+            modRepository.save(mod);
 
             log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
                     executor.getQueue().size());
@@ -78,7 +81,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         try {
             FileUtils.deleteDirectory(modDirectory);
             deleteSymlink(mod);
-            modDb.remove(mod, WorkshopMod.class);
+            modRepository.delete(mod);
         } catch (IOException e) {
             log.error("Could not delete directory {} due to {}", modDirectory, e.toString());
             return false;
@@ -104,25 +107,24 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
                     .collect(Collectors.toSet());
 
             // add all missing mods from db
-            modDb.findAll(WorkshopMod.class).stream()
+            StreamSupport.stream(modRepository.findAll().spliterator(), false)
                     .peek(mod -> {
                         mod.setInstalled(false);
                         mod.setFailed(false);
-                        modDb.save(mod, WorkshopMod.class);
+                        modRepository.save(mod);
                     })
                     .map(WorkshopMod::getId)
                     .forEach(modIds::add);
 
             // refresh/update all found mods
             for (Long modId : modIds) {
-                WorkshopMod mod = modDb.find(modId, WorkshopMod.class);
-                if (mod == null) {
-                    // create mods which were not persisted in db
-                    mod = new WorkshopMod(modId);
-                    mod.setName(workshopFileDetailsService.getModName(modId));
-                    modDb.save(mod, WorkshopMod.class);
-                }
-
+                WorkshopMod mod = modRepository.findById(modId)
+                        .orElseGet(() -> {
+                            // create mods which were not persisted in db
+                            WorkshopMod newMod = new WorkshopMod(modId);
+                            newMod.setName(workshopFileDetailsService.getModName(modId));
+                            return modRepository.save(newMod);
+                        });
                 installOrUpdateMod(auth, mod);
             }
         } catch (IOException e) {
@@ -219,7 +221,8 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             File key = it.next();
             try {
                 log.info("Copying bikey {} to server", key.getName());
-                FileUtils.copyFile(key, new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
+                FileUtils.copyFile(key,
+                        new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
             } catch (IOException e) {
                 log.error("Could not copy bikeys due to {}", e.toString());
             }
@@ -257,8 +260,8 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     }
 
     @Autowired
-    public void setModDb(JsonDbService<WorkshopMod> modDb) {
-        this.modDb = modDb;
+    public void setModRepository(WorkshopModRepository modRepository) {
+        this.modRepository = modRepository;
     }
 
     @Autowired
