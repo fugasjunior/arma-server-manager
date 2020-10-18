@@ -6,7 +6,6 @@ class ModInstallForm extends Component {
     }
 
     handleIdChange = ({currentTarget: input}) => {
-        console.log(input);
         let value = input.value.trim().replace(/\D/g, '');
         this.setState({modId: value});
     }
