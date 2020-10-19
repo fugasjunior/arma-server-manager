@@ -65,13 +65,7 @@ class Scenarios extends Component {
 
     handleDownload = async name => {
         try {
-            const {data} = await downloadScenario(name);
-            const url = window.URL.createObjectURL(new Blob([data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', name);
-            document.body.appendChild(link);
-            link.click();
+            downloadScenario(name);
         } catch (e) {
             console.error(e);
             toast.error("Error during scenario download");

@@ -8,7 +8,7 @@ export function getScenarios() {
 }
 
 export function downloadScenario(name) {
-    return http.get(apiEndpoint + "/download/" + name);
+    return window.open(apiEndpoint + "/download/" + name);
 }
 
 export function uploadScenario(formData, config) {
