@@ -3,17 +3,19 @@ import {humanFileSize} from "../util/util";
 
 const getWorkshopUrl = modId => "https://steamcommunity.com/sharedfiles/filedetails/?id=" + modId;
 
-const getInstalledIcon = ({installed, failed}) => {
+const getInstalledIcon = ({installed, failed, lastUpdated}) => {
+    const getLastUpdate = (date) => "Last updated: " + date;
+
     if (failed) return (
-        <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        <i title={getLastUpdate(lastUpdated)} className="fa fa-exclamation-triangle" aria-hidden="true"></i>
     );
 
     if (installed) return (
-        <i className="fa fa-check" aria-hidden="true"></i>
+        <i title={getLastUpdate(lastUpdated)} className="fa fa-check" aria-hidden="true"></i>
     );
 
     else return (
-        <div className="spinner-border spinner-border-sm" role="status">
+        <div title={getLastUpdate(lastUpdated)} className="spinner-border spinner-border-sm" role="status">
             <span className="sr-only">Loading...</span>
         </div>
     );
@@ -40,7 +42,6 @@ const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange, o
                         <th scope="col">Name</th>
                         <th scope="col">File size</th>
                         <th scope="col" className="text-center">Installed</th>
-                        <th scope="col">Last update</th>
                         <th scope="col"/>
                         <th scope="col"/>
                         <th scope="col" className="text-center">Active</th>
@@ -60,7 +61,6 @@ const ModsTable = ({mods, onUpdateClicked, onUninstallClicked, onActiveChange, o
                                 <td>{mod.name}</td>
                                 <td>{mod.fileSize && humanFileSize(mod.fileSize)}</td>
                                 <td className="text-center">{getInstalledIcon(mod)}</td>
-                                <td>{mod.lastUpdated}</td>
                                 <td>
                                     <button className="btn btn-sm btn-primary"
                                             onClick={() => onUpdateClicked(mod.id)}
