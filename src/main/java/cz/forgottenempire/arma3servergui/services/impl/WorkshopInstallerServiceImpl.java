@@ -6,6 +6,7 @@ import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
+import cz.forgottenempire.arma3servergui.util.FileSystemUtils;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -21,10 +23,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -183,18 +186,13 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     }
 
     private void convertModFilesToLowercase(WorkshopMod mod) {
-        Path modDir = Path.of(getModDirectoryPath(mod.getId()));
-        try (Stream<Path> files = Files.walk(modDir)) {
-            files.forEach(f -> {
-                File oldFile = f.toFile();
-                File newFile = new File(f.getParent().toString(), f.getFileName().toString().toLowerCase());
-                boolean status = oldFile.renameTo(newFile);
-                if (!status) {
-                    log.error("Could not rename file {} to {}", oldFile.getAbsolutePath(), newFile.getAbsolutePath());
-                }
-            });
-        } catch (IOException e) {
-            log.error("Error while converting mod file names to lowercase", e);
+        log.info("Converting mod file names to lowercase");
+        File modDir = new File(getModDirectoryPath(mod.getId()));
+        try {
+            FileSystemUtils.directoryToLowercase(modDir);
+            log.info("Converting file names to lowercase done");
+        } catch (Exception e) {
+            log.error("Failure when converting to lowercase", e);
         }
     }
 
