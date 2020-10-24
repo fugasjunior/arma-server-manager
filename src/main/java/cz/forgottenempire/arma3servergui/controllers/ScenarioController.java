@@ -33,7 +33,7 @@ public class ScenarioController {
         return new ResponseEntity<>(scenarioService.getAllScenarios(), HttpStatus.OK);
     }
 
-    @GetMapping("/download/{name:.+}")
+    @GetMapping("/{name:.+}")
     public ResponseEntity<Resource> downloadScenario(@PathVariable String name) {
         String modPath = serverDir + File.separatorChar + "mpmissions" + File.separatorChar + name;
         File file = new File(modPath);
@@ -52,7 +52,7 @@ public class ScenarioController {
         }
     }
 
-    @PostMapping("/upload")
+    @PostMapping
     public ResponseEntity<?> uploadScenario(@RequestParam MultipartFile file) {
         log.info("Receiving file upload ({})", file.getOriginalFilename());
 
@@ -69,7 +69,7 @@ public class ScenarioController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{name:.+}")
+    @DeleteMapping("/{name:.+}")
     public ResponseEntity<?> deleteScenario(@PathVariable String name) {
         log.info("Received request to delete scenario {}", name);
 

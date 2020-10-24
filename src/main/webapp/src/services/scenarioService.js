@@ -8,13 +8,13 @@ export function getScenarios() {
 }
 
 export function downloadScenario(name) {
-    return window.open(apiEndpoint + "/download/" + name);
+    return window.open(apiEndpoint + "/" + name);
 }
 
 export function uploadScenario(formData, config) {
-    return http.post(apiEndpoint + "/upload", formData, config);
+    return http.post(apiEndpoint, formData, config);
 }
 
 export function deleteScenario(name) {
-    return http.delete(apiEndpoint + "/delete/" + name);
+    return http.delete(apiEndpoint + "/" + name);
 }
