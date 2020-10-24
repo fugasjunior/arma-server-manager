@@ -6,13 +6,13 @@ import cz.forgottenempire.arma3servergui.repositories.AdditionalServerRepository
 import cz.forgottenempire.arma3servergui.services.AdditionalServersService;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,10 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
     public AdditionalServersServiceImpl() {
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
                 serverProcesses.forEach((id, process) -> destroyWithTimeout(process))));
+    }
+
+    public Optional<AdditionalServer> getServer(Long id) {
+        return serverRepository.findById(id);
     }
 
     @Override

@@ -2,8 +2,10 @@ package cz.forgottenempire.arma3servergui.controllers;
 
 import cz.forgottenempire.arma3servergui.dtos.AdditionalServerDto;
 import cz.forgottenempire.arma3servergui.dtos.AdditionalServersDto;
+import cz.forgottenempire.arma3servergui.model.AdditionalServer;
 import cz.forgottenempire.arma3servergui.services.AdditionalServersService;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,13 +31,24 @@ public class AdditionalServersController {
         return ResponseEntity.ok(new AdditionalServersDto(servers));
     }
 
-    @PostMapping("/start/{serverId}")
+    @GetMapping("/{serverId}")
+    public ResponseEntity<AdditionalServerDto> getAdditionalServer(@PathVariable Long serverId) {
+        Optional<AdditionalServer> serverResult = serversService.getServer(serverId);
+        if (serverResult.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        AdditionalServer server = serverResult.get();
+        boolean alive = serversService.isAlive(serverId);
+        return ResponseEntity.ok(AdditionalServerDto.fromModel(server, alive));
+    }
+
+    @PostMapping("/{serverId}/start")
     public ResponseEntity<?> startServer(@PathVariable Long serverId) {
         serversService.startServer(serverId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/stop/{serverId}")
+    @PostMapping("/{serverId}/stop")
     public ResponseEntity<?> stopServer(@PathVariable Long serverId) {
         serversService.stopServer(serverId);
         return new ResponseEntity<>(HttpStatus.OK);
