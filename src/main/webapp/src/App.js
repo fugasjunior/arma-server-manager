@@ -58,9 +58,9 @@ class App extends Component {
                         <Route path="/mods" component={Mods}/>
                         <Route path="/config" component={AppConfig}/>
                         <Route path="/additionalServers" component={AdditionalServers}/>
-                        <Route path="/not-found" component={NotFound}/>
+                        <Route path="/notFound" component={NotFound}/>
                         <Redirect from="/" exact to="/dashboard"/>
-                        <Redirect to="/not-found"/>
+                        <Redirect to="/notFound"/>
                     </Switch>
                 </main>
             </React.Fragment>
