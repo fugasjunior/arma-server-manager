@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.services.impl;
 
 import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.model.DownloadStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
@@ -8,16 +9,15 @@ import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.util.FileSystemUtils;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
+import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,9 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,9 +55,11 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             modRepository.save(mod);
             log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
 
-            if (!downloadMod(auth, mod.getId()) || !verifyModDirectoryExists(mod.getId())) {
+            DownloadStatus downloadStatus = downloadMod(mod.getId());
+            mod.setDownloadStatus(downloadStatus);
+            if (!downloadStatus.isSuccess() || !verifyModDirectoryExists(mod.getId())) {
                 log.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
-                mod.setFailed(true);
+                downloadStatus.setSuccess(false);
                 modRepository.save(mod);
                 return;
             }
@@ -140,49 +140,14 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         return true;
     }
 
-    private boolean downloadMod(SteamAuth auth, Long modId) {
-        List<String> args = new ArrayList<>();
-        args.add("+@NoPromptForPassword 1");
-        args.add("+@ShutdownOnFailedCommand 1");
+    private DownloadStatus downloadMod(Long modId) {
+        SteamCmdParameters parameters = new SteamCmdParameterBuilder()
+                .withAnonymousLogin() // Arma 3 allows downloading mods with anonymous login
+                .withInstallDir(downloadPath)
+                .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
+                .build();
 
-        String token = auth.getSteamGuardToken();
-        if (token != null && !token.isBlank()) {
-            args.add("+set_steam_guard_code " + token);
-        }
-
-        args.add("+login " + auth.getUsername() + " " + auth.getPassword());
-        args.add("+force_install_dir");
-        args.add(downloadPath);
-        args.add("+workshop_download_item " + Constants.STEAM_ARMA3_ID + " " + modId + " validate");
-        args.add("+quit");
-
-        // the download of large mods often fails due to timeout. repeating the install process should continue the
-        // interrupted download and successfully install the mod after a few attempts
-        boolean success = false;
-        int attempts = 0;
-        while (!success && attempts++ < 10) {
-            try {
-                log.info("Starting mod download, attempt {} / 10", attempts);
-
-                int returnValue = steamCmd.execute(args);
-                if (returnValue == Constants.STEAMCMD_RETVAL_LOGIN_FAIL) {
-                    log.error("Invalid Steam authentication given!");
-                    break;
-                }
-
-                success = returnValue == Constants.STEAMCMD_RETVAL_SUCCESS;
-            } catch (IOException | InterruptedException e) {
-                log.error("SteamCmd execution failed due to {}", e.toString());
-            }
-        }
-
-        if (success) {
-            log.info("SteamCMD successfully returned");
-        } else {
-            log.error("SteamCMD failed");
-        }
-
-        return success;
+        return steamCmd.execute(parameters);
     }
 
     private void convertModFilesToLowercase(WorkshopMod mod) {

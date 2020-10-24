@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.services.impl;
 
 import com.google.common.base.Joiner;
 import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.model.DownloadStatus;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
 import cz.forgottenempire.arma3servergui.model.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
@@ -10,6 +11,8 @@ import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.util.LogUtils;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
+import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
@@ -99,29 +102,18 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         shutDownServer();
 
         new Thread(() -> {
-            List<String> args = new ArrayList<>();
-            args.add("+@NoPromptForPassword 1");
-            args.add("+@ShutdownOnFailedCommand 1");
+            SteamCmdParameters parameters = new SteamCmdParameterBuilder()
+                    .withSteamGuardToken(auth.getSteamGuardToken())
+                    .withLogin(auth.getUsername(), auth.getPassword())
+                    .withInstallDir(serverDir)
+                    .withAppInstall(Constants.STEAM_ARMA3SERVER_ID, true,
+                            betaBranch == null ? "" : " -beta " + betaBranch)
+                    .build();
+            DownloadStatus status = steamCmdWrapper.execute(parameters);
 
-            String token = auth.getSteamGuardToken();
-            if (token != null && !token.isBlank()) {
-                args.add("+set_steam_guard_code " + token);
+            if (!status.isSuccess()) {
+                log.error("Server update failed due to {}", status.getErrorStatus());
             }
-
-            args.add("+login " + auth.getUsername() + " " + auth.getPassword());
-            args.add("+force_install_dir");
-            args.add(serverDir);
-            args.add("+app_update " + Constants.STEAM_ARMA3SERVER_ID +
-                    (betaBranch == null ? "" : " -beta " + betaBranch) +
-                    " validate");
-            args.add("+quit");
-
-            try {
-                steamCmdWrapper.execute(args);
-            } catch (IOException | InterruptedException e) {
-                log.error("Error during server update: {}", e.toString());
-            }
-
             log.info("Server update done");
             serverUpdating = false;
         }).start();

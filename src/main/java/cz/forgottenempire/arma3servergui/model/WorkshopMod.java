@@ -15,10 +15,13 @@ public class WorkshopMod {
     private Long id;
     private String name;
     private String lastUpdated;
-    private boolean installed;
-    private boolean failed;
+    @Deprecated
+    private boolean installed; // TODO remove this attribute
+    @Deprecated
+    private boolean failed; // TODO remove this attribute
     private boolean active;
     private Long fileSize;
+    private DownloadStatus downloadStatus;
 
     public WorkshopMod(Long id) {
         this.id = id;

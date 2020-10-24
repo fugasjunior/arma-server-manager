@@ -18,7 +18,6 @@ auth.username=
 auth.password=
 
 # Process logs settings
-steamcmd.logDir=
 arma3server.logDir=
 
 # MongoDB setting
