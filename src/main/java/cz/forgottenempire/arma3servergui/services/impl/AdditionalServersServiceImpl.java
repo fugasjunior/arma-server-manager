@@ -69,13 +69,18 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
     }
 
     private void destroyWithTimeout(Process process) {
+        process.descendants().forEach(ProcessHandle::destroy);
         process.destroy();
 
         if (process.isAlive()) {
             try {
-                Thread.sleep(10 * 1000L);
-            } catch (InterruptedException ignored) {} finally {
+                Thread.sleep(30 * 1000L);
+            } catch (InterruptedException e) {
+                log.error("Thread interrupted");
+                Thread.currentThread().interrupt();
+            } finally {
                 if (process.isAlive()) {
+                    process.descendants().forEach(ProcessHandle::destroyForcibly);
                     process.destroyForcibly();
                 }
             }
