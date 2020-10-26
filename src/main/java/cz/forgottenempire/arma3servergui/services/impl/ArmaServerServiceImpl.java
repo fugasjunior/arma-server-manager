@@ -15,6 +15,7 @@ import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
 import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Value("${additionalMods:#{null}}")
     private String[] additionalMods;
+
+    @Value("${arma3server.x64:#{true}}")
+    private boolean x64Enabled;
 
     private WorkshopModRepository modRepository;
     private SteamCmdWrapper steamCmdWrapper;
@@ -128,7 +132,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         Process serverProcess = null;
 
         List<String> parameters = new ArrayList<>();
-        parameters.add(serverDir + File.separatorChar + "arma3server");
+        parameters.add(getServerExecutable());
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
         parameters.add("-world=empty");
@@ -164,6 +168,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
             log.error("Could not start server due to {}", e.toString());
         }
         return serverProcess;
+    }
+
+    private String getServerExecutable() {
+        return Path.of(serverDir, x64Enabled ? "arma3server_x64" : "arma3server").toString();
     }
 
     private void writeConfig(ServerSettings settings) {
