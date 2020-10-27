@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import Joi from "joi-browser"
 import {getServerSettings, setServerSettings} from "../services/serverService";
 import {toast} from "react-toastify";
+import TextareaAutosize from "react-textarea-autosize";
 
 class ServerSettingsForm extends Component {
 
@@ -119,7 +120,7 @@ class ServerSettingsForm extends Component {
             <div className="form-group row">
                 <label htmlFor={name} className="col-sm-2 col-form-label">{label}</label>
                 <div className="col-sm-10">
-                    <textarea className="form-control"
+                    <TextareaAutosize className="form-control"
                               id={name} name={name}
                               placeholder={label}
                               value={this.state.server[name]}
