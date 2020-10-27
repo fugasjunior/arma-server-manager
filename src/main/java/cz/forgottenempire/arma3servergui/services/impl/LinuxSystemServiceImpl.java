@@ -27,7 +27,7 @@ public class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
 
     @Override
     public double getCpuUsage() {
-        return osBean.getSystemLoadAverage();
+        return osBean.getSystemLoadAverage() / osBean.getAvailableProcessors();
     }
 
     private Long getValueFromMemInfo(String key) {
