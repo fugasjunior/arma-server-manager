@@ -1,6 +1,6 @@
 import http from "./httpService";
 
-const apiEndpoint = "http://localhost:8080/login";
+const apiEndpoint = "/login";
 const tokenKey = "token";
 
 http.setJwt(getJwt());
