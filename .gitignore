@@ -1,7 +1,7 @@
 ### Project specific files
 config/
 !config/application.properties.EXAMPLE
-
+logs/
 
 HELP.md
 .gradle

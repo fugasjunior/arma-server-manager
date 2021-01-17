@@ -64,6 +64,7 @@ dependencies {
 	compile group: 'org.springframework', name: 'spring-context-support', version: '5.2.6.RELEASE'
 	compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
 	compile group: 'com.bol', name: 'spring-data-mongodb-encrypt', version:'2.4.4'
+	compile group: 'com.auth0', name:  'java-jwt', version: '3.4.0'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

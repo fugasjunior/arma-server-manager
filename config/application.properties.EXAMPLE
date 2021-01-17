@@ -31,3 +31,6 @@ spring.data.mongodb.password=<db-user-password>
 # database encryption settings
 mongodb.encrypt.keys[0].version=1
 mongodb.encrypt.keys[0].key=hqTaSs8gUHEoovpzOYvYDzDHAqRXTtQC65EkDmJ99rw=
+
+# jwt secret
+jwt.secret=qw0X9U7xM5WjYaDDxVlib9hU8S09qeaP
