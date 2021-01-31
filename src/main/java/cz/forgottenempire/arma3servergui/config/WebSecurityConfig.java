@@ -1,6 +1,5 @@
 package cz.forgottenempire.arma3servergui.config;
 
-import com.mongodb.lang.NonNull;
 import cz.forgottenempire.arma3servergui.filters.JWTAuthenticationFilter;
 import cz.forgottenempire.arma3servergui.filters.JWTAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -47,8 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().disable()
                 .authorizeRequests()
-                .antMatchers("/static/**", "/{spring:[^(api)]}**", "/").permitAll()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/static/**", "/{spring:[^(api)]}/**", "/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
