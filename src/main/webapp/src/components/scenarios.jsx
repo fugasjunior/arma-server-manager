@@ -16,7 +16,8 @@ class Scenarios extends Component {
         upload: {
             inProgress: false,
             status: 0,
-        }
+        },
+        searchTerm: ""
     };
 
     async componentDidMount() {
@@ -27,6 +28,14 @@ class Scenarios extends Component {
         const {data: scenarios} = await getScenarios();
         this.setState({scenarios});
     };
+
+    getFilteredResults = () => {
+        const {scenarios, searchTerm} = this.state;
+        if (!searchTerm) {
+            return scenarios;
+        }
+        return scenarios.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
 
     handleRefresh = this.refreshScenarios;
 
@@ -100,8 +109,13 @@ class Scenarios extends Component {
         this.setState({pageSize: e.target.value, currentPage: 1});
     }
 
+    handleSearch = e => {
+        this.setState({searchTerm: e.target.value, currentPage: 1});
+    }
+
     render() {
-        const {currentPage, pageSize, file, upload, scenarios} = this.state;
+        const {currentPage, pageSize, file, upload, scenarios, searchTerm} = this.state;
+        const filteredScenarios = this.getFilteredResults();
 
         return (
                 <React.Fragment>
@@ -120,6 +134,21 @@ class Scenarios extends Component {
                                                     pageSize={pageSize}
                                                     onPageSizeChange={this.handlePageSizeChange}/>
                                         </div>
+                                        <div className="form-inline">
+                                            <label htmlFor="search" className="sr-only ">Search</label>
+                                            <div className="input-group mt-3 mb-1">
+                                                <div className="input-group-prepend">
+                                                    <div className="input-group-text">
+                                                        <i className="fa fa-search"></i>
+                                                    </div>
+                                                </div>
+                                                <input className="form-control" id="search"
+                                                       placeholder="Search"
+                                                       value={searchTerm}
+                                                       onChange={this.handleSearch}
+                                                />
+                                            </div>
+                                        </div>
                                         <table className="table">
                                             <thead>
                                             <tr>
@@ -134,7 +163,7 @@ class Scenarios extends Component {
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {paginate(scenarios, currentPage, pageSize).map(s =>
+                                            {paginate(filteredScenarios, currentPage, pageSize).map(s =>
                                                     <tr key={s.name}>
                                                         <td>{s.name}</td>
                                                         <td>{s.fileSize && humanFileSize(s.fileSize)}</td>
@@ -158,7 +187,7 @@ class Scenarios extends Component {
                                             )}
                                             </tbody>
                                         </table>
-                                        <Pagination itemsCount={scenarios.length}
+                                        <Pagination itemsCount={filteredScenarios.length}
                                                     currentPage={currentPage}
                                                     pageSize={pageSize}
                                                     onPageChange={this.handlePageChange}/>
