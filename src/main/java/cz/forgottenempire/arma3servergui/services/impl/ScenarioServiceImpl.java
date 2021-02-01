@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.services.impl;
 
 import cz.forgottenempire.arma3servergui.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.services.ScenarioService;
+import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +60,7 @@ public class ScenarioServiceImpl implements ScenarioService {
             Scenario scenarioDto = new Scenario(scenarioFile.getName(), scenarioFile.length());
             scenarios.add(scenarioDto);
         }
-
+        scenarios.sort(Comparator.naturalOrder());
         return scenarios;
     }
 

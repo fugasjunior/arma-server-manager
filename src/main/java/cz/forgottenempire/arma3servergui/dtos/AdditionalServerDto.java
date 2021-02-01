@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AdditionalServerDto {
+public class AdditionalServerDto implements Comparable<AdditionalServerDto>{
     private Long id;
     private String name;
     private boolean alive;
@@ -23,5 +23,10 @@ public class AdditionalServerDto {
 
     public AdditionalServerDto fromModel(AdditionalServer model) {
         return fromModel(model, false);
+    }
+
+    @Override
+    public int compareTo(AdditionalServerDto server) {
+        return this.name.compareTo(server.getName());
     }
 }

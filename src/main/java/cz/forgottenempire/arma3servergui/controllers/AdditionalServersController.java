@@ -26,6 +26,7 @@ public class AdditionalServersController {
     public ResponseEntity<AdditionalServersDto> getAdditionalServers() {
         List<AdditionalServerDto> servers = serversService.getAllServers().stream()
                 .map(model -> AdditionalServerDto.fromModel(model, serversService.isAlive(model.getId())))
+                .sorted()
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new AdditionalServersDto(servers));
