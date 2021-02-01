@@ -69,8 +69,8 @@ class AdditionalServers extends Component {
     )
 
     serverComparator = (a, b) => {
-        if (a.alive && !b.alive) return 1;
-        if (!a.alive && b.alive) return -1;
+        if (a.alive && !b.alive) return -1;
+        if (!a.alive && b.alive) return 1;
         return a.name.localeCompare(b.name);
     }
 
