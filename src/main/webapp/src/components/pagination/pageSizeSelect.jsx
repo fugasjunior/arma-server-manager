@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const PageSizeSelect = ({pageSize, onPageSizeChange}) => {
     return (
@@ -15,5 +16,10 @@ const PageSizeSelect = ({pageSize, onPageSizeChange}) => {
             </div>
     );
 };
+
+PageSizeSelect.propTypes = {
+    pageSize: PropTypes.number.isRequired,
+    onPageSizeChange: PropTypes.func.isRequired
+}
 
 export default PageSizeSelect;
