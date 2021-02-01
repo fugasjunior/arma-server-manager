@@ -23,3 +23,5 @@ yarn-error.log*
 
 /node
 pnpm*
+
+.eslintcache
