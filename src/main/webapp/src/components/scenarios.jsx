@@ -106,7 +106,7 @@ class Scenarios extends Component {
     }
 
     handlePageSizeChange = e => {
-        this.setState({pageSize: e.target.value, currentPage: 1});
+        this.setState({pageSize: parseInt(e.target.value), currentPage: 1});
     }
 
     handleSearch = e => {
