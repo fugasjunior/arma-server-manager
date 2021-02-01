@@ -12,10 +12,10 @@ import AppConfig from "./components/appConfig";
 import AdditionalServers from "./components/additionalServers";
 import {getSystemInfo} from "./services/systemService";
 import {getServerStatus, queryServer} from "./services/serverService";
-import Login from "./components/login";
+import Login from "./components/auth/login";
 import {isAuthenticated} from "./services/authService";
 import ProtectedRoute from "./components/protectedRoute";
-import Logout from "./components/logout";
+import Logout from "./components/auth/logout";
 
 class App extends Component {
     state = {
