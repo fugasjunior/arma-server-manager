@@ -1,5 +1,5 @@
 import http from "./httpService";
-import {verify} from "jsonwebtoken";
+import {decode} from "jsonwebtoken";
 
 const apiEndpoint = "/login";
 const tokenKey = "token";
@@ -27,10 +27,18 @@ export function getJwt() {
 
 export function isAuthenticated() {
     try {
-        verify(getJwt());
-        return true;
+        const jwtEncoded = getJwt();
+        if (!jwtEncoded) {
+            return false;
+        }
+        const jwt = decode(jwtEncoded.split(" ")[1]);
+        return isJwtValid(jwt);
     } catch (err) {
-        logout();
+        console.error(err);
         return false;
     }
+}
+
+function isJwtValid(jwt) {
+    return Date.now() <= jwt.exp * 1000;
 }
