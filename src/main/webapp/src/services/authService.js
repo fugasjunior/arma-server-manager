@@ -1,9 +1,12 @@
 import http from "./httpService";
+import {verify} from "jsonwebtoken";
 
 const apiEndpoint = "/login";
 const tokenKey = "token";
 
-http.setJwt(getJwt());
+if (isAuthenticated()) {
+    http.setJwt(getJwt());
+}
 
 export async function login(username, password) {
     const formData = new FormData();
@@ -23,5 +26,11 @@ export function getJwt() {
 }
 
 export function isAuthenticated() {
-    return !!getJwt();
+    try {
+        verify(getJwt());
+        return true;
+    } catch (err) {
+        logout();
+        return false;
+    }
 }
