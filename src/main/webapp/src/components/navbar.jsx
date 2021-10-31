@@ -24,6 +24,9 @@ const Navbar = () => {
                             <NavLink className="nav-link" to="/mods">Mods</NavLink>
                         </li>
                         <li className="nav-item">
+                            <NavLink className="nav-link" to="/creatordlcs">Creator DLCs</NavLink>
+                        </li>
+                        <li className="nav-item">
                             <NavLink className="nav-link" to="/scenarios">Scenarios</NavLink>
                         </li>
                         <li className="nav-item">

@@ -2,11 +2,11 @@ package cz.forgottenempire.arma3servergui.services.impl;
 
 import com.google.common.base.Joiner;
 import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.model.CreatorDLC;
 import cz.forgottenempire.arma3servergui.model.DownloadStatus;
 import cz.forgottenempire.arma3servergui.model.ServerSettings;
-import cz.forgottenempire.arma3servergui.model.ServerStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.repositories.CreatorDLCRepository;
 import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.util.LogUtils;
@@ -15,19 +15,22 @@ import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
 import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -49,8 +52,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     private boolean x64Enabled;
 
     private WorkshopModRepository modRepository;
+    private CreatorDLCRepository creatorDLCRepository;
     private SteamCmdWrapper steamCmdWrapper;
-    private ServerStatus serverStatus;
 
     private FreeMarkerConfigurer freeMarkerConfigurer;
 
@@ -140,13 +143,20 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         parameters.add("-port=" + settings.getPort());
 
         List<String> mods = getActiveModsListAsParameters();
-        if (!mods.isEmpty()) parameters.addAll(mods);
+        if (!mods.isEmpty()) {
+            parameters.addAll(mods);
+        }
 
         // add additional mods from properties
         if (additionalMods != null && additionalMods.length > 0) {
             Arrays.stream(additionalMods)
                     .map(mod -> "-mod=" + mod)
                     .forEach(parameters::add);
+        }
+
+        // add enabled Creator DLCs
+        for (CreatorDLC dlc : creatorDLCRepository.findAllByEnabledTrue()) {
+            mods.add("-mod=" + dlc.getGameId());
         }
 
         File logFile = new File(logDir + File.separatorChar + "out.log");
@@ -179,7 +189,8 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         try {
             log.info("Deleting old server.conf");
             FileUtils.forceDelete(getConfigFile());
-        } catch (FileNotFoundException ignored) {} catch (IOException e) {
+        } catch (FileNotFoundException ignored) {
+        } catch (IOException e) {
             log.error("Could not delete old server config due to {}", e.toString());
         }
 
@@ -220,7 +231,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Autowired
-    public void setServerStatus(ServerStatus serverStatus) {
-        this.serverStatus = serverStatus;
+    public void setCreatorDLCRepository(CreatorDLCRepository creatorDLCRepository) {
+        this.creatorDLCRepository = creatorDLCRepository;
     }
 }
