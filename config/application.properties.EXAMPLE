@@ -2,13 +2,14 @@
 steamcmd.path=<absolute path to a steamcmd EXECUTABLE (eg. C:\\SteamCMD\\steamcmd.exe)>
 installDir=<absolute path to a directory where the mods are installed>
 serverDir=<absolute path to Arma 3 server>
-config.path=<path to json config files>
 
 # Server config
 hostName=<server-hostname>
 betaBranch=<optional-beta-branch>
 additionalMods=mod1,mod2,...
 arma3server.x64=true
+
+steam.api.key=<API-KEY>
 
 # File upload limits
 spring.servlet.multipart.max-file-size=100MB

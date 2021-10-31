@@ -1,6 +1,7 @@
 ### Project specific files
 config/
 !config/application.properties.EXAMPLE
+!config/mongo-init.js
 logs/
 
 HELP.md

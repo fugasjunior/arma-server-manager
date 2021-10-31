@@ -89,7 +89,7 @@ public class SteamCmdExecutor {
     private boolean containsErrorKeyword(String targetString) {
         return SteamCmdExecutor.ERROR_KEYWORDS.stream()
                 .map(String::toLowerCase)
-                .anyMatch(targetString::contains);
+                .anyMatch(keyword -> targetString.contains(keyword) && !targetString.contains("warning"));
     }
 
     public void setParameters(SteamCmdParameters parameters) {
