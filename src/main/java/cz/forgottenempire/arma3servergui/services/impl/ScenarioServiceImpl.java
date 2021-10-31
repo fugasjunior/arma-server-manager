@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.services.impl;
 
 import cz.forgottenempire.arma3servergui.dtos.Scenario;
+import cz.forgottenempire.arma3servergui.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.arma3servergui.services.ScenarioService;
 import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,11 @@ public class ScenarioServiceImpl implements ScenarioService {
 
     @Override
     public boolean uploadScenarioToServer(MultipartFile file) {
+        File missionsFolder = new File(getMissionsFolder());
+        if (!missionsFolder.isDirectory()) {
+            throw new ServerNotInitializedException();
+        }
+
         String scenarioName = file.getOriginalFilename();
         if (scenarioName != null) {
             // as some files may already be URI-endoded, decode them
@@ -38,7 +44,7 @@ public class ScenarioServiceImpl implements ScenarioService {
 
         log.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
         try {
-            File scenarioFile = new File(getMissionsFolder() + File.separatorChar + scenarioName);
+            File scenarioFile = new File(missionsFolder, scenarioName);
             file.transferTo(scenarioFile);
             log.info("Successfully downloaded scenario {}", scenarioName);
         } catch (IOException e) {
@@ -55,6 +61,9 @@ public class ScenarioServiceImpl implements ScenarioService {
 
         String[] extensions = new String[]{"pbo"};
         File missionsFolder = new File(getMissionsFolder());
+        if (!missionsFolder.isDirectory()) {
+            throw new ServerNotInitializedException();
+        }
         for (Iterator<File> it = FileUtils.iterateFiles(missionsFolder, extensions, false); it.hasNext(); ) {
             File scenarioFile = it.next();
             Scenario scenarioDto = new Scenario(scenarioFile.getName(), scenarioFile.length());
