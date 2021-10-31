@@ -156,7 +156,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
         // add enabled Creator DLCs
         for (CreatorDLC dlc : creatorDLCRepository.findAllByEnabledTrue()) {
-            mods.add("-mod=" + dlc.getGameId());
+            parameters.add("-mod=" + dlc.getGameId());
         }
 
         File logFile = new File(logDir + File.separatorChar + "out.log");
