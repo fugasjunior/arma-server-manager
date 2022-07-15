@@ -5,6 +5,7 @@ import cz.forgottenempire.arma3servergui.model.DownloadStatus;
 import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.model.WorkshopMod;
 import cz.forgottenempire.arma3servergui.repositories.WorkshopModRepository;
+import cz.forgottenempire.arma3servergui.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.util.FileSystemUtils;
@@ -43,6 +44,8 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private WorkshopModRepository modRepository;
     private SteamCmdWrapper steamCmd;
     private WorkshopFileDetailsService workshopFileDetailsService;
+
+    private SteamAuthService steamAuthService;
 
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -141,8 +144,10 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     }
 
     private DownloadStatus downloadMod(Long modId) {
+        SteamAuth auth = steamAuthService.getAuthAccount();
         SteamCmdParameters parameters = new SteamCmdParameterBuilder()
-                .withAnonymousLogin() // Arma 3 allows downloading mods with anonymous login
+                .withLogin(auth.getUsername(), auth.getPassword())
+                .withSteamGuardToken(auth.getSteamGuardToken())
                 .withInstallDir(downloadPath)
                 .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
                 .build();
@@ -248,5 +253,10 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     @Autowired
     public void setWorkshopFileDetailsService(WorkshopFileDetailsService workshopFileDetailsService) {
         this.workshopFileDetailsService = workshopFileDetailsService;
+    }
+
+    @Autowired
+    public void setSteamAuthService(SteamAuthService steamAuthService) {
+        this.steamAuthService = steamAuthService;
     }
 }
