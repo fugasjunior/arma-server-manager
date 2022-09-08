@@ -1,7 +1,7 @@
 import http from "./httpService";
-import {apiUrl} from "../config.json";
+import config from "../config";
 
-const apiEndpoint = apiUrl + "/config";
+const apiEndpoint = config.apiUrl + "/config";
 
 export function getAuth() {
     return http.get(apiEndpoint + "/auth");

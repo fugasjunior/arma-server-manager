@@ -146,8 +146,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private DownloadStatus downloadMod(Long modId) {
         SteamAuth auth = steamAuthService.getAuthAccount();
         SteamCmdParameters parameters = new SteamCmdParameterBuilder()
-                .withLogin(auth.getUsername(), auth.getPassword())
-                .withSteamGuardToken(auth.getSteamGuardToken())
+                .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
                 .withInstallDir(downloadPath)
                 .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
                 .build();

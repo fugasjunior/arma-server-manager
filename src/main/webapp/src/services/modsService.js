@@ -1,7 +1,7 @@
 import http from "./httpService";
-import {apiUrl} from "../config.json";
+import config from "../config";
 
-const apiEndpoint = apiUrl + "/mods";
+const apiEndpoint = config.apiUrl + "/mods";
 
 export function getMods() {
     return http.get(apiEndpoint);

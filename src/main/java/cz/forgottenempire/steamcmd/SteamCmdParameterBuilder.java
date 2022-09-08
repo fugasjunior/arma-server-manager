@@ -32,6 +32,18 @@ public class SteamCmdParameterBuilder {
         return this;
     }
 
+    public SteamCmdParameterBuilder withLogin(@NotNull String username, @Nullable String password, @Nullable String steamGuardToken) {
+        String loginParameter = "+login " + username;
+        if (StringUtils.isNotBlank(password)) {
+            loginParameter += " " + password;
+        }
+        if (StringUtils.isNotBlank(steamGuardToken)) {
+            loginParameter += " " + steamGuardToken;
+        }
+        parameters.addParameter(loginParameter);
+        return this;
+    }
+
     public SteamCmdParameterBuilder withAnonymousLogin() {
         parameters.addParameter("+login anonymous");
         return this;

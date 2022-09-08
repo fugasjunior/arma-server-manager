@@ -1,7 +1,7 @@
 import http from "./httpService";
-import {apiUrl} from "../config.json";
+import config from "../config";
 
-const apiEndpoint = apiUrl + "/scenarios";
+const apiEndpoint = config.apiUrl + "/scenarios";
 
 export function getScenarios() {
     return http.get(apiEndpoint);
