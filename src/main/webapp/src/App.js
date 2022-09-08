@@ -3,7 +3,7 @@ import {ToastContainer} from "react-toastify";
 import './App.css';
 import Navbar from "./components/navbar";
 import Mods from "./components/mods";
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import NotFound from "./components/notFound";
 import ServerSettingsForm from "./components/serverSettingsForm";
 import ServerDashBoard from "./components/serverDashBoard";
@@ -52,9 +52,9 @@ class App extends Component {
                     <ToastContainer/>
                     <Navbar/>
                     <main role="main" className="container">
-                        <Switch>
-                            <Route path="/login" exact component={Login}/>
-                            <Route path="/logout" exact component={Logout}/>
+                        <Routes>
+                            <Route path="/login" exact element={<Login/>}/>
+                            <Route path="/logout" exact element={<Logout/>}/>
                             <ProtectedRoute path="/dashboard"
                                             render={() => <ServerDashBoard
                                                     systemInfo={systemInfo}
@@ -64,16 +64,16 @@ class App extends Component {
                                             />
                                             }
                             />
-                            <ProtectedRoute path="/settings" component={ServerSettingsForm}/>
-                            <ProtectedRoute path="/scenarios" component={Scenarios}/>
-                            <ProtectedRoute path="/mods" component={Mods}/>
-                            <ProtectedRoute path="/creatordlcs" component={CreatorDLCs}/>
-                            <ProtectedRoute path="/config" component={AppConfig}/>
-                            <ProtectedRoute path="/additionalServers" component={AdditionalServers}/>
-                            <Route path="/notFound" component={NotFound}/>
-                            <Redirect from="/" exact to="/dashboard"/>
-                            <Redirect to="/notFound"/>
-                        </Switch>
+                            <ProtectedRoute path="/settings" element={<ServerSettingsForm/>}/>
+                            <ProtectedRoute path="/scenarios" element={<Scenarios/>}/>
+                            <ProtectedRoute path="/mods" element={<Mods/>}/>
+                            <ProtectedRoute path="/creatordlcs" element={<CreatorDLCs/>}/>
+                            <ProtectedRoute path="/config" element={<AppConfig/>}/>
+                            <ProtectedRoute path="/additionalServers" element={<AdditionalServers/>}/>
+                            <Route path="/notFound" element={<NotFound/>}/>
+                            <Navigate from="/" exact to="/dashboard"/>
+                            <Navigate to="/notFound"/>
+                        </Routes>
                     </main>
                 </React.Fragment>
         );

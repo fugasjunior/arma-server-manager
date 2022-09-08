@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {isAuthenticated, login} from "../../services/authService";
-import {Redirect} from "react-router-dom";
+import {Navigate} from "react-router-dom";
 
 class Login extends Component {
 
@@ -37,7 +37,7 @@ class Login extends Component {
 
     render() {
         if (isAuthenticated()) {
-            return <Redirect to="/"/>;
+            return <Navigate to="/"/>;
         }
 
         return (

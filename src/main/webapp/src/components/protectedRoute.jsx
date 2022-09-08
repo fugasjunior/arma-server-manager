@@ -1,5 +1,5 @@
 import React from 'react';
-import {Redirect, Route} from "react-router-dom";
+import {Navigate, Route} from "react-router-dom";
 import {isAuthenticated} from "../services/authService";
 
 const ProtectedRoute = ({component: Component, render, ...rest}) => {
@@ -7,7 +7,7 @@ const ProtectedRoute = ({component: Component, render, ...rest}) => {
             {...rest}
             render={props => {
                 if (!isAuthenticated()) {
-                    return <Redirect to="/login"/>;
+                    return <Navigate to="/login"/>;
                 }
                 return Component ? <Component {...props} /> : render(props);
             }}/>;

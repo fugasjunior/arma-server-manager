@@ -1,6 +1,6 @@
 import http from "./httpService";
-import {apiUrl} from "../config.json";
 
+const {apiUrl} = fetch("../config.json");
 const apiEndpoint = apiUrl + "/mods";
 
 export function getMods() {
