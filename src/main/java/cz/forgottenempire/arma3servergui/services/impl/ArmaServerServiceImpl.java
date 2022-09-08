@@ -110,8 +110,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
         new Thread(() -> {
             SteamCmdParameters parameters = new SteamCmdParameterBuilder()
-                    .withSteamGuardToken(auth.getSteamGuardToken())
-                    .withLogin(auth.getUsername(), auth.getPassword())
+                    .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
                     .withInstallDir(serverDir)
                     .withAppInstall(Constants.STEAM_ARMA3SERVER_ID, true,
                             betaBranch == null ? "" : " -beta " + betaBranch)

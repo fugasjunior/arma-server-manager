@@ -53,26 +53,34 @@ class App extends Component {
                     <Navbar/>
                     <main role="main" className="container">
                         <Routes>
-                            <Route path="/login" exact element={<Login/>}/>
-                            <Route path="/logout" exact element={<Logout/>}/>
-                            <ProtectedRoute path="/dashboard"
-                                            render={() => <ServerDashBoard
-                                                    systemInfo={systemInfo}
-                                                    serverStatus={serverStatus}
-                                                    alive={alive}
-                                                    onUpdate={this.updateServerStatus}
-                                            />
-                                            }
+                            <Route index element={
+                                <ProtectedRoute>
+                                    <ServerDashBoard systemInfo={systemInfo} serverStatus={serverStatus} alive={alive}
+                                                     onUpdate={this.updateServerStatus}
+                                    />
+                                </ProtectedRoute>}
                             />
-                            <ProtectedRoute path="/settings" element={<ServerSettingsForm/>}/>
-                            <ProtectedRoute path="/scenarios" element={<Scenarios/>}/>
-                            <ProtectedRoute path="/mods" element={<Mods/>}/>
-                            <ProtectedRoute path="/creatordlcs" element={<CreatorDLCs/>}/>
-                            <ProtectedRoute path="/config" element={<AppConfig/>}/>
-                            <ProtectedRoute path="/additionalServers" element={<AdditionalServers/>}/>
-                            <Route path="/notFound" element={<NotFound/>}/>
-                            <Navigate from="/" exact to="/dashboard"/>
-                            <Navigate to="/notFound"/>
+                            <Route path="login" exact element={<Login/>}/>
+                            <Route path="logout" exact element={<Logout/>}/>
+                            <Route path="settings" element={
+                                <ProtectedRoute><ServerSettingsForm/></ProtectedRoute>
+                            }/>
+                            <Route path="scenarios" element={
+                                <ProtectedRoute><Scenarios/></ProtectedRoute>
+                            }/>
+                            <Route path="mods" element={
+                                <ProtectedRoute><Mods/></ProtectedRoute>
+                            }/>
+                            <Route path="creatordlcs" element={
+                                <ProtectedRoute><CreatorDLCs/></ProtectedRoute>
+                            }/>
+                            <Route path="config" element={
+                                <ProtectedRoute><AppConfig/></ProtectedRoute>
+                            }/>
+                            <Route path="additionalServers" element={
+                                <ProtectedRoute><AdditionalServers/></ProtectedRoute>
+                            }/>
+                            <Route path="notFound" element={<NotFound/>}/>
                         </Routes>
                     </main>
                 </React.Fragment>

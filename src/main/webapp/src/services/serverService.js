@@ -1,7 +1,7 @@
 import http from "./httpService";
+import config from "../config";
 
-const {apiUrl} = fetch("../config.json");
-const apiEndpoint = apiUrl + "/server";
+const apiEndpoint = config.apiUrl + "/server";
 
 export function getServerSettings() {
     return http.get(apiEndpoint + "/settings");

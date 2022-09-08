@@ -1,7 +1,7 @@
 import http from "./httpService";
+import config from "../config";
 
-const {apiUrl} = fetch("../config.json");
-const apiEndpoint = apiUrl + "/additionalServers";
+const apiEndpoint = config.apiUrl + "/additionalServers";
 
 export function getServer(id) {
     return http.get(apiEndpoint + "/" + id);

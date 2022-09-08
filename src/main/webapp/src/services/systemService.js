@@ -1,7 +1,7 @@
 import http from "./httpService";
+import config from "../config";
 
-const {apiUrl} = fetch("../config.json");
-const apiEndpoint = apiUrl + "/system";
+const apiEndpoint = config.apiUrl + "/system";
 
 export function getFreeSpace() {
     return http.get(apiEndpoint + "/space");

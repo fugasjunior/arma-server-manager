@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.27.2",
-    "bootstrap": "^5.2.1",
+    "bootstrap": "^4.4.1",
     "font-awesome": "^4.7.0",
     "gridjs": "^5.1.0",
     "gridjs-react": "^5.1.0",

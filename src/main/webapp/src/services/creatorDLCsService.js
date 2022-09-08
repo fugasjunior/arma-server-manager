@@ -1,7 +1,7 @@
 import http from "./httpService";
+import config from "../config";
 
-const {apiUrl} = fetch("../config.json");
-const apiEndpoint = apiUrl + "/creatordlcs";
+const apiEndpoint = config.apiUrl + "/creatordlcs";
 
 export function getCreatorDLCs() {
     return http.get(apiEndpoint);

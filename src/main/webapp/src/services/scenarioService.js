@@ -1,7 +1,7 @@
 import http from "./httpService";
+import config from "../config";
 
-const {apiUrl} = fetch("../config.json");
-const apiEndpoint = apiUrl + "/scenarios";
+const apiEndpoint = config.apiUrl + "/scenarios";
 
 export function getScenarios() {
     return http.get(apiEndpoint);
