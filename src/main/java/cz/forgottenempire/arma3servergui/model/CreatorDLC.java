@@ -1,16 +1,14 @@
 package cz.forgottenempire.arma3servergui.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document
+@Entity
 public class CreatorDLC {
 
-    @NotNull
     @Id
     private Long id;
     @NotEmpty
