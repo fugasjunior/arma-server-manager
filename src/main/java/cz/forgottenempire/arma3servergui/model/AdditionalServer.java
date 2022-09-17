@@ -2,11 +2,14 @@ package cz.forgottenempire.arma3servergui.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import lombok.Data;
-
 import javax.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 public class AdditionalServer {
 

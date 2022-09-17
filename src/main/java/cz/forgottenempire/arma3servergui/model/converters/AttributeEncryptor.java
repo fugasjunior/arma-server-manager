@@ -8,27 +8,37 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Converter
+@Configurable
 public class AttributeEncryptor implements AttributeConverter<String, String> {
 
-    private static final String AES = "AES";
+    private final boolean encryptionEnabled;
+    private Key key;
+    private Cipher cipher;
 
-    @Value("${}")
-    private static final String SECRET = "secret-key-12345";
-
-    private final Key key;
-    private final Cipher cipher;
-
-    public AttributeEncryptor() throws Exception {
-        key = new SecretKeySpec(SECRET.getBytes(), AES);
-        cipher = Cipher.getInstance(AES);
+    public AttributeEncryptor(@Value("${database.encryption.secret:#{null}}") String secret) throws Exception {
+        if (!StringUtils.isBlank(secret)) {
+            encryptionEnabled = true;
+            key = new SecretKeySpec(secret.getBytes(), "AES");
+            cipher = Cipher.getInstance("AES");
+        } else {
+            encryptionEnabled = false;
+        }
     }
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
+        if(!encryptionEnabled) {
+            return attribute;
+        }
+
         try {
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return Base64.getEncoder().encodeToString(cipher.doFinal(attribute.getBytes()));
@@ -39,6 +49,10 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
 
     @Override
     public String convertToEntityAttribute(String dbData) {
+        if(!encryptionEnabled) {
+            return dbData;
+        }
+
         try {
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));

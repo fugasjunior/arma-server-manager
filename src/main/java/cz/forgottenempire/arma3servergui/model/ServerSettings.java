@@ -1,13 +1,19 @@
 package cz.forgottenempire.arma3servergui.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @Entity
 public class ServerSettings {
@@ -33,6 +39,6 @@ public class ServerSettings {
     private boolean von;
     private boolean verifySignatures;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
-
 }

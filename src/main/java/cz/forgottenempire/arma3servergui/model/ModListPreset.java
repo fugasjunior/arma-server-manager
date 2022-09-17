@@ -6,10 +6,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.ToString.Exclude;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @NoArgsConstructor
 public class ModListPreset {
@@ -23,6 +28,7 @@ public class ModListPreset {
     private String name;
 
     @OneToMany
+    @Exclude
     private Collection<WorkshopMod> mods;
 
     public ModListPreset(

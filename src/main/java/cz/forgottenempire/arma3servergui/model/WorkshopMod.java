@@ -1,14 +1,17 @@
 package cz.forgottenempire.arma3servergui.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @Entity
 public class WorkshopMod {
@@ -23,6 +26,7 @@ public class WorkshopMod {
     private boolean failed; // TODO remove this attribute
     private boolean active;
     private Long fileSize;
+    @Embedded
     private DownloadStatus downloadStatus;
 
     public WorkshopMod(Long id) {
@@ -47,5 +51,4 @@ public class WorkshopMod {
 
         return retVal;
     }
-
 }

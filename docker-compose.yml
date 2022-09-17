@@ -1,0 +1,45 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: arma3gui_db
+      MYSQL_USER: arma3gui
+      MYSQL_PASSWORD: example
+    ports:
+      - "3306:3306"
+    volumes:
+      - arma3gui-db:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8090:8080"
+
+### TODO: NOT READY YET
+#  arma3gui:
+#    build: .
+#    ports:
+#      - 8080:8080
+#      - 2302:2302
+#    depends_on:
+#      - mongo
+#    volumes:
+#      - /e/arma3gui/:/mnt/a3
+#    environment:
+#      AUTH_USERNAME: test
+#      AUTH_PASSWORD: test
+#      INSTALLDIR: /mnt/a3/arma3_install
+#      SERVERDIR: /mnt/a3/arma3_server
+#      ARMA3SERVER_LOGDIR: /mnt/a3/logs
+#      SPRING_DATA_MONGODB_DATABASE: arma3gui
+#      SPRING_DATA_MONGODB_USERNAME: arma3gui_user
+#      SPRING_DATA_MONGODB_PASSWORD: test
+#      STEAM_API_KEY:
+
+volumes:
+  arma3gui-db:

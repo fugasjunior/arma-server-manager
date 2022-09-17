@@ -63,13 +63,12 @@ dependencies {
 	implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
 	implementation group: 'org.springframework', name: 'spring-context-support', version: '5.2.6.RELEASE'
 	implementation group: 'com.google.guava', name: 'guava', version: '30.0-android'
-	implementation group: 'com.bol', name: 'spring-data-mongodb-encrypt', version:'2.4.4'
 	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	compileOnly 'org.projectlombok:lombok'
 
-	runtimeOnly 'com.h2database'
+	runtimeOnly 'mysql:mysql-connector-java'
+	runtimeOnly 'com.h2database:h2'
 
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'

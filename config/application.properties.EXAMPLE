@@ -1,37 +1,62 @@
-# Paths
-steamcmd.path=<absolute path to a steamcmd EXECUTABLE (eg. C:\\SteamCMD\\steamcmd.exe)>
-installDir=<absolute path to a directory where the mods are installed>
-serverDir=<absolute path to Arma 3 server>
-
-# Server config
-hostName=<server-hostname>
-betaBranch=<optional-beta-branch>
-additionalMods=mod1,mod2,...
-arma3server.x64=true
-
+### Secrets, API keys
+# Steam API key, needed for Steam Workshop interaction.
+# Generated with https://steamcommunity.com/dev/apikey.
 steam.api.key=<API-KEY>
 
-# File upload limits
+### App Login
+# Username and password used for logging into the admin UI.
+auth.username=user
+auth.password=password
+
+# JWT secret
+# Used for creating JSON web tokens for app authentication.
+# Any string can be used as a secret. The secret should be at least 32 characters long.
+jwt.secret=<JWT secret key>
+
+# Database encryption secret used for encrypting the Steam account password inside the database.
+# Must be a valid AES 256-bit key (https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx).
+# This setting is optional. In case the secret is not provided, the password will be stored in plain text form.
+database.encryption.secret=<AES-256 key>
+
+### Paths
+# Absolute path to SteamCMD executable.
+steamcmd.path=/usr/games/steamcmd
+
+# Absolute path to a directory where the mods are installed.
+installDir=/home/arma3gui/server/mods
+
+# Absolute path to Arma 3 server.
+serverDir=/home/arma3gui/server/serverfiles/
+
+# Logs directory for Arma 3 server and additional servers.
+arma3server.logDir=/home/arma3gui/logs/server
+
+
+### Server config
+# Hostname or server IP to be used in the server system info
+hostName=forgottenEmpire.cz
+
+# Optional branch to be used for Arma 3 server. creatordlc branch recommended for playing with community DLCs.
+betaBranch=creatordlc
+
+# Additional mods to be activated when running the server that are not managed through the UI.
+# Comma separated list, such as: mod1,mod2,mod3. Can be left blank in most cases.
+additionalMods=
+
+# Use 64bit executable.
+arma3server.x64=true
+
+### Database settings
+spring.datasource.url=jdbc:mysql://localhost:3306/arma3gui_db
+spring.datasource.username=arma3gui
+spring.datasource.password=example
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.sql.init.mode=always
+spring.jpa.defer-datasource-initialization=true
+
+
+### File upload limits
+# Can limit the maximum size of scenario files that are uploaded through the UI.
 spring.servlet.multipart.max-file-size=100MB
 spring.servlet.multipart.max-request-size=100MB
-
-# App Login
-auth.username=
-auth.password=
-
-# Process logs settings
-arma3server.logDir=
-
-# MongoDB setting
-spring.data.mongodb.host=<db-hostname>
-spring.data.mongodb.port=<db-port>
-spring.data.mongodb.database=<db-name>
-spring.data.mongodb.username=<db-user>
-spring.data.mongodb.password=<db-user-password>
-
-# database encryption settings
-mongodb.encrypt.keys[0].version=1
-mongodb.encrypt.keys[0].key=hqTaSs8gUHEoovpzOYvYDzDHAqRXTtQC65EkDmJ99rw=
-
-# jwt secret
-jwt.secret=qw0X9U7xM5WjYaDDxVlib9hU8S09qeaP
