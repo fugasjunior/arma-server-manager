@@ -1,0 +1,14 @@
+package cz.forgottenempire.arma3servergui.scenario.services;
+
+import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+public interface ScenarioService {
+    boolean uploadScenarioToServer(MultipartFile file);
+
+    boolean deleteScenario(String name);
+
+    List<Scenario> getAllScenarios();
+}
