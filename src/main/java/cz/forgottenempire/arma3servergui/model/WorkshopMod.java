@@ -1,14 +1,19 @@
 package cz.forgottenempire.arma3servergui.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
-@Document
+@Entity
 public class WorkshopMod {
 
     @Id
@@ -21,6 +26,7 @@ public class WorkshopMod {
     private boolean failed; // TODO remove this attribute
     private boolean active;
     private Long fileSize;
+    @Embedded
     private DownloadStatus downloadStatus;
 
     public WorkshopMod(Long id) {
@@ -45,5 +51,4 @@ public class WorkshopMod {
 
         return retVal;
     }
-
 }

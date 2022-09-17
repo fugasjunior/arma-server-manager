@@ -1,16 +1,21 @@
 package cz.forgottenempire.arma3servergui.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
+import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Transient;
 import lombok.Data;
 
 @Data
+@Embeddable
 public class DownloadStatus {
 
     private Date timestamp;
     private boolean success;
+    @Enumerated(EnumType.STRING)
     private ErrorStatus errorStatus;
-    @JsonIgnore
+    @Transient
     private Throwable exception;
 
     public DownloadStatus() {

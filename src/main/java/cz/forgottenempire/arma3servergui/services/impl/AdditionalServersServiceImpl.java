@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AdditionalServersServiceImpl implements AdditionalServersService {
 
-    private final Map<Long, Process> serverProcesses = new HashMap<>();
+    private final Map<Long, Process> serverProcesses = new ConcurrentHashMap<>();
     private AdditionalServerRepository serverRepository;
 
     @Value("${arma3server.logDir}")

@@ -26,7 +26,7 @@ public class ModPresetsServiceImpl implements ModPresetsService {
 
     @Override
     public void createOrUpdatePreset(String name, Collection<Long> modIds) {
-        ModListPreset preset = presetsRepository.findById(name).orElse(new ModListPreset(name));
+        ModListPreset preset = presetsRepository.findModListPresetByName(name).orElse(new ModListPreset(name));
         List<WorkshopMod> mods = modIds.stream()
                 .map(modRepository::findById)
                 .filter(Optional::isPresent)
