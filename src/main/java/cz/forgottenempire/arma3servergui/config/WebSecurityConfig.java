@@ -23,7 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO fix deprecation
 
     @Value("${auth.username}")
     private String username;
@@ -49,13 +49,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and()
                 .authorizeRequests()
-                .antMatchers("/static/**", "/{spring:[^(api)]}/**", "/*").permitAll()
+                .antMatchers("/static/**", "/{spring:[^(api)]}/**", "/*", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .headers().frameOptions().sameOrigin();
     }
 
     @Bean

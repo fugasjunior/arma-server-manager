@@ -1,24 +1,29 @@
 package cz.forgottenempire.arma3servergui.model;
 
-import com.bol.secure.Encrypted;
+import cz.forgottenempire.arma3servergui.model.converters.AttributeEncryptor;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Entity
 public class SteamAuth {
 
     @Id
     private Long id;
     private String username;
-    @Field
-    @Encrypted
+
+    @Convert(converter = AttributeEncryptor.class)
     private String password;
+
     private String steamGuardToken;
 }

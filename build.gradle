@@ -55,7 +55,7 @@ compileJava.dependsOn copyWebApp
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation group: 'commons-io', name: 'commons-io', version: '2.7'
 	implementation group: 'com.auth0', name: 'java-jwt', version: '4.0.0'
@@ -63,10 +63,12 @@ dependencies {
 	implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
 	implementation group: 'org.springframework', name: 'spring-context-support', version: '5.2.6.RELEASE'
 	implementation group: 'com.google.guava', name: 'guava', version: '30.0-android'
-	implementation group: 'com.bol', name: 'spring-data-mongodb-encrypt', version:'2.4.4'
 	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
 	compileOnly 'org.projectlombok:lombok'
+
+	runtimeOnly 'mysql:mysql-connector-java'
+	runtimeOnly 'com.h2database:h2'
 
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'

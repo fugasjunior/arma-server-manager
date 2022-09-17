@@ -1,24 +1,34 @@
 package cz.forgottenempire.arma3servergui.model;
 
 import java.util.Collection;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.ToString.Exclude;
 
-@Data
-@Document
+@Getter
+@Setter
+@ToString
+@Entity
 @NoArgsConstructor
 public class ModListPreset {
 
+    @NotNull
     @Id
+    private Long id;
+
     @NotNull
     @Size(min = 1, max = 100)
     private String name;
-    @NotEmpty
+
+    @OneToMany
+    @Exclude
     private Collection<WorkshopMod> mods;
 
     public ModListPreset(

@@ -1,17 +1,18 @@
 package cz.forgottenempire.arma3servergui.model;
 
-import lombok.Data;
-
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-@Document
+@Getter
+@Setter
+@ToString
+@Entity
 public class AdditionalServer {
 
-    @NotNull
     @Id
     private Long id;
     @NotEmpty
