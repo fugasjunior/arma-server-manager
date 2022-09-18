@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.util;
 
-import cz.forgottenempire.arma3servergui.model.DownloadStatus;
-import cz.forgottenempire.arma3servergui.model.DownloadStatus.ErrorStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus.ErrorStatus;
 import cz.forgottenempire.steamcmd.SteamCmdExecutor;
 import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import cz.forgottenempire.steamcmd.exceptions.IOOperationException;
@@ -9,7 +9,6 @@ import cz.forgottenempire.steamcmd.exceptions.LoginException;
 import cz.forgottenempire.steamcmd.exceptions.NoMatchException;
 import cz.forgottenempire.steamcmd.exceptions.NoSubscriptionException;
 import java.io.File;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

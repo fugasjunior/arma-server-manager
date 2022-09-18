@@ -2,15 +2,15 @@ package cz.forgottenempire.arma3servergui.server.services.impl;
 
 import com.google.common.base.Joiner;
 import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.model.CreatorDLC;
-import cz.forgottenempire.arma3servergui.model.DownloadStatus;
-import cz.forgottenempire.arma3servergui.model.ServerSettings;
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
 import cz.forgottenempire.arma3servergui.creatorDLC.repositories.CreatorDLCRepository;
-import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
+import cz.forgottenempire.arma3servergui.server.entities.Server;
+import cz.forgottenempire.arma3servergui.server.repositories.ServerRepository;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.util.LogUtils;
 import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
 import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
 import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import freemarker.template.Template;
@@ -24,7 +24,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 @Service
 @Slf4j
 public class ArmaServerServiceImpl implements ArmaServerService {
-
     @Value("${serverDir}")
     private String serverDir;
 
@@ -51,6 +51,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Value("${arma3server.x64:#{true}}")
     private boolean x64Enabled;
 
+    private ServerRepository serverRepository;
     private WorkshopModRepository modRepository;
     private CreatorDLCRepository creatorDLCRepository;
     private SteamCmdWrapper steamCmdWrapper;
@@ -70,7 +71,31 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Override
-    public boolean startServer(ServerSettings settings) {
+    public List<Server> getAllServers() {
+        return serverRepository.findAll();
+    }
+
+    public Optional<Server> getServer(@NotNull Long id) {
+        return serverRepository.findById(id);
+    }
+
+    @Override
+    public Server createServer(Server server) {
+        return serverRepository.save(server);
+    }
+
+    @Override
+    public Server updateServer(Server server) {
+        return serverRepository.save(server);
+    }
+
+    @Override
+    public void deleteServer(Server server) {
+        serverRepository.delete(server);
+    }
+
+    @Override
+    public boolean startServer(Server settings) {
         if (serverUpdating) {
             return false;
         }
@@ -92,7 +117,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     @Override
-    public boolean restartServer(ServerSettings settings) {
+    public boolean restartServer(Server settings) {
         shutDownServer();
         return startServer(settings);
     }
@@ -130,7 +155,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         return serverUpdating;
     }
 
-    private Process startServerProcess(ServerSettings settings) {
+    private Process startServerProcess(Server settings) {
         Process serverProcess = null;
 
         List<String> parameters = new ArrayList<>();
@@ -141,10 +166,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         parameters.add("-config=" + getConfigFile().getAbsolutePath());
         parameters.add("-port=" + settings.getPort());
 
-        List<String> mods = getActiveModsListAsParameters();
-        if (!mods.isEmpty()) {
-            parameters.addAll(mods);
-        }
+//        List<String> mods = getActiveModsListAsParameters();
+//        if (!mods.isEmpty()) {
+//            parameters.addAll(mods);
+//        }
 
         // add additional mods from properties
         if (additionalMods != null && additionalMods.length > 0) {
@@ -154,9 +179,9 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         }
 
         // add enabled Creator DLCs
-        for (CreatorDLC dlc : creatorDLCRepository.findAllByEnabledTrue()) {
-            parameters.add("-mod=" + dlc.getGameId());
-        }
+//        for (CreatorDLC dlc : creatorDLCRepository.findAllByEnabledTrue()) {
+//            parameters.add("-mod=" + dlc.getGameId());
+//        }
 
         File logFile = new File(logDir + File.separatorChar + "out.log");
         LogUtils.prepareLogFile(logFile);
@@ -183,7 +208,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         return Path.of(serverDir, x64Enabled ? "arma3server_x64" : "arma3server").toString();
     }
 
-    private void writeConfig(ServerSettings settings) {
+    private void writeConfig(Server settings) {
         // delete old config file
         try {
             log.info("Deleting old server.conf");
@@ -204,11 +229,11 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         }
     }
 
-    private List<String> getActiveModsListAsParameters() {
-        return modRepository.findByActiveTrue().stream()
-                .map(mod -> "-mod=" + mod.getNormalizedName())
-                .collect(Collectors.toList());
-    }
+//    private List<String> getActiveModsListAsParameters() {
+//        return modRepository.findByActiveTrue().stream()
+//                .map(mod -> "-mod=" + mod.getNormalizedName())
+//                .collect(Collectors.toList());
+//    }
 
     private File getConfigFile() {
         return new File(serverDir + File.separatorChar + "server.cfg");
@@ -232,5 +257,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     @Autowired
     public void setCreatorDLCRepository(CreatorDLCRepository creatorDLCRepository) {
         this.creatorDLCRepository = creatorDLCRepository;
+    }
+
+    @Autowired
+    public void setServerRepository(ServerRepository serverRepository) {
+        this.serverRepository = serverRepository;
     }
 }

@@ -2,7 +2,7 @@ package cz.forgottenempire.arma3servergui.creatorDLC.services.impl;
 
 import cz.forgottenempire.arma3servergui.creatorDLC.dtos.CreatorDlcDto;
 import cz.forgottenempire.arma3servergui.exceptions.NotFoundException;
-import cz.forgottenempire.arma3servergui.model.CreatorDLC;
+import cz.forgottenempire.arma3servergui.creatorDLC.entities.CreatorDLC;
 import cz.forgottenempire.arma3servergui.creatorDLC.repositories.CreatorDLCRepository;
 import cz.forgottenempire.arma3servergui.creatorDLC.services.CreatorDLCsService;
 import java.util.List;
@@ -28,7 +28,6 @@ public class CreatorDLCsServiceImpl implements CreatorDLCsService {
         CreatorDLC dlc = creatorDLCRepository.findById(dlcDto.getId())
                 .orElseThrow(NotFoundException::new);
 
-        dlc.setEnabled(dlcDto.isEnabled());
         creatorDLCRepository.save(dlc);
     }
 

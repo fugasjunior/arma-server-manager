@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.workshop.controllers;
 
 import cz.forgottenempire.arma3servergui.workshop.dtos.ModPresetDto;
-import cz.forgottenempire.arma3servergui.model.ModListPreset;
+import cz.forgottenempire.arma3servergui.workshop.entities.ModListPreset;
 import cz.forgottenempire.arma3servergui.workshop.services.services.ModPresetsService;
 import java.util.Collection;
 import javax.validation.Valid;

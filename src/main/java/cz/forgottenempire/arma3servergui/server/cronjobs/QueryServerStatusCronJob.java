@@ -2,8 +2,8 @@ package cz.forgottenempire.arma3servergui.server.cronjobs;
 
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
-import cz.forgottenempire.arma3servergui.model.ServerSettings;
-import cz.forgottenempire.arma3servergui.model.ServerStatus;
+import cz.forgottenempire.arma3servergui.server.entities.Server;
+import cz.forgottenempire.arma3servergui.server.entities.ServerStatus;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.server.services.SettingsService;
 import java.net.InetSocketAddress;
@@ -29,7 +29,7 @@ public class QueryServerStatusCronJob {
         if (!serverService.isServerProcessAlive()) {
             serverStatus.resetStatus();
         } else {
-            ServerSettings settings = settingsService.getServerSettings();
+            Server settings = settingsService.getServerSettings();
             SourceServer serverInfo = null;
             try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
                 // default steam query port is (game server port + 1)

@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import java.util.Date;
 import javax.persistence.Embeddable;

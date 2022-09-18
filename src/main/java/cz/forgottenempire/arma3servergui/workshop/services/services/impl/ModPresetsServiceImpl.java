@@ -1,8 +1,8 @@
 package cz.forgottenempire.arma3servergui.workshop.services.services.impl;
 
 import com.google.common.collect.Lists;
-import cz.forgottenempire.arma3servergui.model.ModListPreset;
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.workshop.entities.ModListPreset;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.repositories.ModPresetsRepository;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.workshop.services.services.ModPresetsService;

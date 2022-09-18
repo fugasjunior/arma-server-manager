@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.scenario.cotrollers;
+package cz.forgottenempire.arma3servergui.scenario.controllers;
 
 import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.scenario.services.ScenarioService;

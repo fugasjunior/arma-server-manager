@@ -1,6 +1,7 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,7 +25,7 @@ public class WorkshopMod {
     private boolean installed; // TODO remove this attribute
     @Deprecated
     private boolean failed; // TODO remove this attribute
-    private boolean active;
+
     private Long fileSize;
     @Embedded
     private DownloadStatus downloadStatus;

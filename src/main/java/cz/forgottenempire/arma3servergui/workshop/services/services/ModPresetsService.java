@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.services.services;
 
-import cz.forgottenempire.arma3servergui.model.ModListPreset;
+import cz.forgottenempire.arma3servergui.workshop.entities.ModListPreset;
 import java.util.Collection;
 
 public interface ModPresetsService {

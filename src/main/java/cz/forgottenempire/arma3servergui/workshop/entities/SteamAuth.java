@@ -1,6 +1,6 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.workshop.entities;
 
-import cz.forgottenempire.arma3servergui.model.converters.AttributeEncryptor;
+import cz.forgottenempire.arma3servergui.converters.AttributeEncryptor;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;

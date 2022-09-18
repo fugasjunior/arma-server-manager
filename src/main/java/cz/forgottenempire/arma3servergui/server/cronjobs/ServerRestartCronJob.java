@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.server.cronjobs;
 
-import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.server.entities.Server;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.server.services.SettingsService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class ServerRestartCronJob {
 
         if (serverService.isServerProcessAlive()) {
             log.info("Restarting server...");
-            ServerSettings settings = settingsService.getServerSettings();
+            Server settings = settingsService.getServerSettings();
             if (serverService.restartServer(settings)) {
                 log.info("Server restarted");
             } else {

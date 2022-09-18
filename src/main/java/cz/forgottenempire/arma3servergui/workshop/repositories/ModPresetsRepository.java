@@ -1,7 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.repositories;
 
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
-import cz.forgottenempire.arma3servergui.model.ModListPreset;
+import cz.forgottenempire.arma3servergui.workshop.entities.ModListPreset;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

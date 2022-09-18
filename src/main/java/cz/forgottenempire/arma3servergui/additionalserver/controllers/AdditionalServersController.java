@@ -2,7 +2,7 @@ package cz.forgottenempire.arma3servergui.additionalserver.controllers;
 
 import cz.forgottenempire.arma3servergui.additionalserver.dtos.AdditionalServerDto;
 import cz.forgottenempire.arma3servergui.additionalserver.dtos.AdditionalServersDto;
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import cz.forgottenempire.arma3servergui.additionalserver.services.AdditionalServersService;
 import java.util.List;
 import java.util.Optional;

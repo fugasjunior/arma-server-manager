@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.additionalserver.services.impl;
 
 import com.google.common.collect.Lists;
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import cz.forgottenempire.arma3servergui.additionalserver.repositories.AdditionalServerRepository;
 import cz.forgottenempire.arma3servergui.additionalserver.services.AdditionalServersService;
 import java.io.File;

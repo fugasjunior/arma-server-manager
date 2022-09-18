@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.additionalserver.dtos;
 
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

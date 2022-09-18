@@ -1,5 +1,6 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.creatorDLC.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
@@ -11,15 +12,19 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-public class AdditionalServer {
+public class CreatorDLC {
 
     @Id
     private Long id;
+
     @NotEmpty
     private String name;
+
     @NotEmpty
-    private String serverDir;
-    @NotEmpty
-    private String command;
+    private String gameId;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String description;
+
     private String imageUrl;
 }

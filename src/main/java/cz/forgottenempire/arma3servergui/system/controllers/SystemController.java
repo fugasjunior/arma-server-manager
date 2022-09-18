@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.system.controllers;
 
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDetails;
-import cz.forgottenempire.arma3servergui.model.ServerSettings;
+import cz.forgottenempire.arma3servergui.server.entities.Server;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.server.services.SettingsService;
 import cz.forgottenempire.arma3servergui.system.services.SystemService;
@@ -34,7 +34,7 @@ public class SystemController {
     @GetMapping("/info")
     public ResponseEntity<ServerDetails> getServerDetails() {
         ServerDetails details = new ServerDetails();
-        ServerSettings settings = settingsService.getServerSettings();
+        Server settings = settingsService.getServerSettings();
 
         details.setUpdating(serverService.isServerUpdating());
         details.setHostName(hostName);

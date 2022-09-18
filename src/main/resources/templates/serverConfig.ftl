@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.model.ServerSettings" -->
+<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.server.entities.Server" -->
 
 // GLOBAL SETTINGS
 hostname = "${name}";

@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.workshop.controllers;
 
 import cz.forgottenempire.arma3servergui.workshop.dtos.SteamAuthDto;
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
+import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.workshop.services.SteamAuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

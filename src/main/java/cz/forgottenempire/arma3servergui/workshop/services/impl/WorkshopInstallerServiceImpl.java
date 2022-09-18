@@ -1,9 +1,9 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.model.DownloadStatus;
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.workshop.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;

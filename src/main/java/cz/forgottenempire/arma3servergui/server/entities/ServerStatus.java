@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.server.entities;
 
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import lombok.AllArgsConstructor;

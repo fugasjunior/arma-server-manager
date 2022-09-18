@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.services;
 
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.Collection;
 
 public interface WorkshopModsService {
@@ -11,7 +11,7 @@ public interface WorkshopModsService {
 
     void uninstallMod(Long id);
 
-    void activateMod(Long id, boolean active);
+//    void activateMod(Long id, boolean active);
 
     void updateAllMods();
 

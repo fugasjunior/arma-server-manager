@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.controllers;
 
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
 import java.util.Map;
@@ -43,20 +43,20 @@ public class WorkshopModsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/setActive/{id}")
-    public ResponseEntity<WorkshopMod> setActive(@PathVariable Long id, @RequestParam boolean active) {
-        modsService.activateMod(id, active);
-        log.info("Mod {} successfully {}", id, (active ? "activated" : "deactivated"));
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PostMapping("/setMultipleActive")
-    public ResponseEntity<WorkshopMod> setActive(@RequestBody Map<Long, Boolean> mods) {
-        mods.forEach((id, active) -> {
-            modsService.activateMod(id, active);
-        });
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @PostMapping("/setActive/{id}")
+//    public ResponseEntity<WorkshopMod> setActive(@PathVariable Long id, @RequestParam boolean active) {
+//        modsService.activateMod(id, active);
+//        log.info("Mod {} successfully {}", id, (active ? "activated" : "deactivated"));
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+//
+//    @PostMapping("/setMultipleActive")
+//    public ResponseEntity<WorkshopMod> setActive(@RequestBody Map<Long, Boolean> mods) {
+//        mods.forEach((id, active) -> {
+//            modsService.activateMod(id, active);
+//        });
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
     @PostMapping("/updateAll")
     public ResponseEntity<WorkshopMod> refreshMods() {

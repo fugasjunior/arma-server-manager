@@ -1,24 +1,12 @@
-package cz.forgottenempire.arma3servergui.model;
+package cz.forgottenempire.arma3servergui.server.dtos;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@Entity
-public class ServerSettings {
-
-    @Id
+@Data
+public class ServerDto {
     private Long id;
     @NotEmpty
     private String name;
@@ -32,13 +20,13 @@ public class ServerSettings {
 
     private boolean clientFilePatching;
     private boolean serverFilePatching;
-
     private boolean persistent;
-
     private boolean battlEye;
     private boolean von;
     private boolean verifySignatures;
 
-    @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
+
+    private List<ServerWorkshopModDto> activeMods;
+    private List<ServerCreatorDLCDto> activeDLCs;
 }

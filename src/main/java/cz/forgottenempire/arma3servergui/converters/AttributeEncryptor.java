@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.model.converters;
+package cz.forgottenempire.arma3servergui.converters;
 
 import java.security.InvalidKeyException;
 import java.security.Key;
