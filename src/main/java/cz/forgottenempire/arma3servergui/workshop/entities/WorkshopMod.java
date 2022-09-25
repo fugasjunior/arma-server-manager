@@ -1,9 +1,10 @@
 package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
-import javax.persistence.Embedded;
+import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,24 +22,16 @@ public class WorkshopMod {
     private Long id;
     private String name;
     private String lastUpdated;
-    @Deprecated
-    private boolean installed; // TODO remove this attribute
-    @Deprecated
-    private boolean failed; // TODO remove this attribute
-
     private Long fileSize;
-    @Embedded
-    private DownloadStatus downloadStatus;
+
+    @Enumerated(EnumType.STRING)
+    private InstallationStatus installationStatus;
+
+    @Enumerated(EnumType.STRING)
+    private ErrorStatus errorStatus;
 
     public WorkshopMod(Long id) {
         this.id = id;
-    }
-
-    // as the download and install process happens in another thread, better to synchronize this setter
-    public void setInstalled(Boolean installed) {
-        synchronized (this) {
-            this.installed = installed;
-        }
     }
 
     @JsonIgnore
@@ -51,5 +44,12 @@ public class WorkshopMod {
         retVal = "@".concat(retVal);
 
         return retVal;
+    }
+
+    public enum InstallationStatus {
+        INSTALLATION_QUEUED,
+        INSTALLATION_IN_PROGRESS,
+        ERROR,
+        FINISHED
     }
 }

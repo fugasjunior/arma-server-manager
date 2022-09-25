@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.util;
 
 import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
-import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus.ErrorStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
 import cz.forgottenempire.steamcmd.SteamCmdExecutor;
 import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import cz.forgottenempire.steamcmd.exceptions.IOOperationException;
@@ -40,6 +40,6 @@ public class SteamCmdWrapper {
             log.error("SteamCmd execution failed", e);
             return new DownloadStatus(ErrorStatus.GENERIC, e);
         }
-        return new DownloadStatus(true);
+        return new DownloadStatus();
     }
 }

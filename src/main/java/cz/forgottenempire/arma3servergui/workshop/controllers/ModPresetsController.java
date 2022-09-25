@@ -2,7 +2,7 @@ package cz.forgottenempire.arma3servergui.workshop.controllers;
 
 import cz.forgottenempire.arma3servergui.workshop.dtos.ModPresetDto;
 import cz.forgottenempire.arma3servergui.workshop.entities.ModListPreset;
-import cz.forgottenempire.arma3servergui.workshop.services.services.ModPresetsService;
+import cz.forgottenempire.arma3servergui.workshop.services.ModPresetsService;
 import java.util.Collection;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

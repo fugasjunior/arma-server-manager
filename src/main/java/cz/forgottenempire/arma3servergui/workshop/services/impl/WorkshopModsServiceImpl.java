@@ -1,6 +1,5 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
-import com.google.common.collect.Lists;
 import cz.forgottenempire.arma3servergui.Constants;
 import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
@@ -10,7 +9,7 @@ import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsSe
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,12 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     @Override
     public Collection<WorkshopMod> getAllMods() {
-        return Lists.newArrayList(modRepository.findAll());
+        return modRepository.findAll();
+    }
+
+    @Override
+    public Optional<WorkshopMod> getMod(Long id) {
+        return modRepository.findById(id);
     }
 
     @Override
@@ -50,14 +54,6 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
     public void uninstallMod(Long id) {
         modRepository.findById(id).ifPresent(installerService::deleteMod);
     }
-
-//    @Override
-//    public void activateMod(Long id, boolean active) {
-//        WorkshopMod mod = modRepository.findById(id)
-//                .orElseThrow(NoSuchElementException::new);
-//        mod.setActive(active);
-//        modRepository.save(mod);
-//    }
 
     @Override
     public void updateAllMods() {

@@ -6,8 +6,7 @@ public class Constants {
     public final static Long SERVER_MAIN_ID = 0L;
     public final static Long ACCOUND_DEFAULT_ID = 0L;
 
-    public final static String TEMPLATE_SERVER_CONFIG = "serverConfig.ftl";
+    public final static String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
 
-    public final static int STEAMCMD_RETVAL_SUCCESS = 0;
-    public final static int STEAMCMD_RETVAL_LOGIN_FAIL = 5;
+    public final static String TEMPLATE_SERVER_CONFIG = "serverConfig.ftl";
 }
