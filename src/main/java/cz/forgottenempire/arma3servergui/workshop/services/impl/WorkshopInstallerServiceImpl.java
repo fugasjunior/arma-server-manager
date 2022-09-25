@@ -55,6 +55,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         executor.submit(() -> {
             mod.setInstalled(false);
             mod.setFailed(false);
+            mod.setDownloadStatus(new DownloadStatus());
             modRepository.save(mod);
             log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
 
@@ -119,6 +120,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
                     .peek(mod -> {
                         mod.setInstalled(false);
                         mod.setFailed(false);
+                        mod.setDownloadStatus(new DownloadStatus());
                         modRepository.save(mod);
                     })
                     .map(WorkshopMod::getId)
