@@ -27,7 +27,7 @@ public class WorkshopMod {
     private boolean active;
     private Long fileSize;
     @Embedded
-    private DownloadStatus downloadStatus;
+    private DownloadStatus downloadStatus = new DownloadStatus();
 
     public WorkshopMod(Long id) {
         this.id = id;

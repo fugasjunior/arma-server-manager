@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -19,6 +20,7 @@ import lombok.ToString;
 public class ServerSettings {
 
     @Id
+    @GeneratedValue
     private Long id;
     @NotEmpty
     private String name;
