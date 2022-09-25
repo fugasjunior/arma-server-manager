@@ -14,12 +14,11 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public ServerSettings getServerSettings() {
-        return settingsRepository.findById(Constants.SERVER_MAIN_ID).orElse(new ServerSettings());
+        return settingsRepository.findAll().stream().findFirst().orElse(new ServerSettings());
     }
 
     @Override
     public void setServerSettings(ServerSettings settings) {
-        settings.setId(Constants.SERVER_MAIN_ID);
         settingsRepository.save(settings);
     }
 

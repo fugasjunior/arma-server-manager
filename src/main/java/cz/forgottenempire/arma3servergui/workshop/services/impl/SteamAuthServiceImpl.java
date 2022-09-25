@@ -18,27 +18,16 @@ public class SteamAuthServiceImpl implements SteamAuthService {
 
     @Override
     public SteamAuth getAuthAccount() {
-        return authRepository.findById(Constants.ACCOUND_DEFAULT_ID).orElse(new SteamAuth());
+        return authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
     }
 
     @Override
     public void setAuthAccount(SteamAuthDto auth) {
         log.info("Setting new Steam Auth account: username {}, token {}",
                 auth.getUsername(), auth.getSteamGuardToken());
-        SteamAuth persistedAuth = authRepository.findById(Constants.ACCOUND_DEFAULT_ID)
-                .orElse(createNewAuth(auth));
+        SteamAuth persistedAuth = getAuthAccount();
         populateAuth(auth, persistedAuth);
         authRepository.save(persistedAuth);
-    }
-
-    private SteamAuth createNewAuth(SteamAuthDto auth) {
-        SteamAuth retVal = new SteamAuth(Constants.ACCOUND_DEFAULT_ID, "", "", "");
-        if (auth != null) {
-            retVal.setUsername(auth.getUsername());
-            retVal.setPassword(auth.getPassword());
-            retVal.setSteamGuardToken(auth.getSteamGuardToken());
-        }
-        return authRepository.save(retVal);
     }
 
     private void populateAuth(SteamAuthDto auth, SteamAuth persistedAuth) {
