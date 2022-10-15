@@ -3,13 +3,14 @@ import {getServers, startServer, stopServer} from "../services/additionalServers
 import PageSizeSelect from "./pagination/pageSizeSelect";
 import Pagination from "./pagination/pagination";
 import {paginate} from "../util/paginate";
+import "./additionalServers.css";
 
 class AdditionalServers extends Component {
 
     state = {
         servers: [],
         currentPage: 1,
-        pageSize: 4,
+        pageSize: 10,
         searchTerm: ""
     };
 
@@ -24,7 +25,7 @@ class AdditionalServers extends Component {
 
     getFilteredServers = () => {
         const {servers, searchTerm} = this.state;
-        if(!searchTerm) {
+        if (!searchTerm) {
             return servers;
         }
         return servers.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -32,6 +33,7 @@ class AdditionalServers extends Component {
 
     updateServers = async () => {
         const {data} = await getServers();
+        console.log(data);
         this.setState({servers: data.servers});
     };
 
@@ -69,11 +71,8 @@ class AdditionalServers extends Component {
     )
 
     serverComparator = (a, b) => {
-        if (a.alive && !b.alive) return -1;
-        if (!a.alive && b.alive) return 1;
         return a.name.localeCompare(b.name);
     }
-
 
     render() {
         const {servers, currentPage, pageSize, searchTerm} = this.state;
@@ -82,43 +81,53 @@ class AdditionalServers extends Component {
 
         return (
                 <React.Fragment>
-                    <div className="float-right">
-                        <div className="mb-3">
-                            <label htmlFor="search" className="sr-only">Search</label>
-                            <div className="input-group">
-                                <div className="input-group-prepend">
-                                    <div className="input-group-text">
-                                        <i className="fa fa-search"></i>
-                                    </div>
-                                </div>
-                                <input className="form-control" id="search"
-                                       placeholder="Search"
-                                       value={searchTerm}
-                                       onChange={this.handleSearch}
-                                />
-                            </div>
+                    <div className="row">
+                        <div className="col-9">
+                            <table className="servers-table table table-hover">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Started at</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {paginate(filteredServers, currentPage, pageSize).map(s => (
+                                        <tr>
+                                            <td><img className="servers-table__icon" src={s.imageUrl}
+                                                     alt={s.name + " icon"}/></td>
+                                            <td className="servers-table__name">{s.name}</td>
+                                            <td className="servers-table__started-at">{s.startedAt}</td>
+                                            <td className="servers-table__start-stop">{this.renderButton(s)}</td>
+                                        </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                            <Pagination itemsCount={servers.length} pageSize={pageSize} currentPage={currentPage}
+                                        onPageChange={this.handlePageChange}/>
                         </div>
-                        <PageSizeSelect onPageSizeChange={this.handlePageSizeChange} pageSize={pageSize}
-                                        min={2} max={16} step={2}/>
-                    </div>
-                    <div className="row row-cols-1 row-cols-md-2">
-                        {paginate(filteredServers, currentPage, pageSize).map(s => (
-                                <div className="col mb-4">
-                                    <div className="card">
-                                        {s.imageUrl &&
-                                        <img src={s.imageUrl} className="card-img-top" alt={s.name}
-                                             style={{maxHeight: "250px"}}
-                                        />}
-                                        <div className="card-body">
-                                            <h5 className="card-title">{s.name}</h5>
-                                            {this.renderButton(s)}
+                        <div className="col-3">
+                            <div className="mb-3">
+                                <label htmlFor="search" className="sr-only">Search</label>
+                                <div className="input-group">
+                                    <div className="input-group-prepend">
+                                        <div className="input-group-text">
+                                            <i className="fa fa-search"></i>
                                         </div>
                                     </div>
+                                    <input className="form-control" id="search"
+                                           placeholder="Search"
+                                           value={searchTerm}
+                                           onChange={this.handleSearch}
+                                    />
                                 </div>
-                        ))}
+                            </div>
+
+                            <PageSizeSelect onPageSizeChange={this.handlePageSizeChange} pageSize={pageSize}
+                                            min={5} max={50} step={5}/>
+                        </div>
                     </div>
-                    <Pagination itemsCount={servers.length} pageSize={pageSize} currentPage={currentPage}
-                                onPageChange={this.handlePageChange}/>
                 </React.Fragment>
         )
     }
