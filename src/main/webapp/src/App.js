@@ -17,6 +17,7 @@ import {isAuthenticated} from "./services/authService";
 import ProtectedRoute from "./components/protectedRoute";
 import Logout from "./components/auth/logout";
 import CreatorDLCs from "./components/creatorDLCs";
+import ServersPage from "./pages/ServersPage";
 
 class App extends Component {
     state = {
@@ -62,6 +63,9 @@ class App extends Component {
                             />
                             <Route path="login" exact element={<Login/>}/>
                             <Route path="logout" exact element={<Logout/>}/>
+                            <Route path="servers" element={
+                                <ProtectedRoute><ServersPage/></ProtectedRoute>
+                            }/>
                             <Route path="settings" element={
                                 <ProtectedRoute><ServerSettingsForm/></ProtectedRoute>
                             }/>

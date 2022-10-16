@@ -3,6 +3,10 @@ import config from "../config";
 
 const apiEndpoint = config.apiUrl + "/server";
 
+export function getServers() {
+    return http.get(apiEndpoint);
+}
+
 export function getServerSettings() {
     return http.get(apiEndpoint + "/settings");
 }

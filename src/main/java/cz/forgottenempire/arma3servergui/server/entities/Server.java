@@ -34,6 +34,8 @@ public class Server {
     @Min(1)
     private int port;
     @Min(1)
+    private int queryPort;
+    @Min(1)
     private int maxPlayers;
 
     private String password;
@@ -58,6 +60,9 @@ public class Server {
     private List<CreatorDLC> activeDLCs;
 
     public enum ServerType {
-        ARMA3
+        ARMA3,
+        DAYZ, // TODO currently only Arma 3 is supported
+        REFORGER,
+        ARMA4 // :)
     }
 }

@@ -1,9 +1,7 @@
 package cz.forgottenempire.arma3servergui.system.controllers;
 
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDetails;
-import cz.forgottenempire.arma3servergui.server.entities.Server;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.server.services.SettingsService;
 import cz.forgottenempire.arma3servergui.system.services.SystemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ public class SystemController {
     @Value("${hostName}")
     private String hostName;
 
-    private SettingsService settingsService;
     private ArmaServerService serverService;
     private SystemService systemService;
 
@@ -34,11 +31,9 @@ public class SystemController {
     @GetMapping("/info")
     public ResponseEntity<ServerDetails> getServerDetails() {
         ServerDetails details = new ServerDetails();
-        Server settings = settingsService.getServerSettings();
 
         details.setUpdating(serverService.isServerUpdating());
         details.setHostName(hostName);
-        details.setPort(settings.getPort());
 
         details.setSpaceLeft(systemService.getDiskSpaceLeft());
         details.setSpaceTotal(systemService.getDiskSpaceTotal());
@@ -52,11 +47,6 @@ public class SystemController {
     @Autowired
     public void setServerService(ArmaServerService serverService) {
         this.serverService = serverService;
-    }
-
-    @Autowired
-    public void setSettingsService(SettingsService settingsService) {
-        this.settingsService = settingsService;
     }
 
     @Autowired

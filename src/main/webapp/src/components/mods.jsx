@@ -40,6 +40,7 @@ class Mods extends Component {
             mods.sort((a, b) => a.name.localeCompare(b.name));
             this.setState({mods, systemInfo, presets})
         } catch (e) {
+            console.error(e);
             toast.error("Error during loading mods");
         }
     };
