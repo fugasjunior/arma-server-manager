@@ -1,17 +1,19 @@
 package cz.forgottenempire.arma3servergui.additionalserver.services;
 
+import cz.forgottenempire.arma3servergui.additionalserver.AdditionalServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface AdditionalServersService {
-    void startServer(Long serverId);
 
-    void stopServer(Long serverId);
-
-    boolean isAlive(Long serverId);
+    List<AdditionalServer> getAllServers();
 
     Optional<AdditionalServer> getServer(Long id);
 
-    Collection<AdditionalServer> getAllServers();
+    AdditionalServerInstanceInfo getServerInstanceInfo(Long id);
+
+    void startServer(Long serverId);
+
+    void stopServer(Long serverId);
 }

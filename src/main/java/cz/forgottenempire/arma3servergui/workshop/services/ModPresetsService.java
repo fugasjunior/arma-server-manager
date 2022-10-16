@@ -9,5 +9,6 @@ public interface ModPresetsService {
 
     void createOrUpdatePreset(String name, Collection<Long> modIds);
 
+    // TODO change this to preset ID
     void deletePreset(String name);
 }

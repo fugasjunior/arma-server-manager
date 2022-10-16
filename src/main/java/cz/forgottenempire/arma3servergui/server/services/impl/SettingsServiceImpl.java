@@ -13,6 +13,7 @@ public class SettingsServiceImpl implements SettingsService {
     private ServerRepository settingsRepository;
 
     @Override
+<<<<<<< HEAD
     public Server getServerSettings() {
         return settingsRepository.findById(Constants.SERVER_MAIN_ID).orElse(new Server());
     }
@@ -20,6 +21,14 @@ public class SettingsServiceImpl implements SettingsService {
     @Override
     public void setServerSettings(Server settings) {
         settings.setId(Constants.SERVER_MAIN_ID);
+=======
+    public ServerSettings getServerSettings() {
+        return settingsRepository.findAll().stream().findFirst().orElse(new ServerSettings());
+    }
+
+    @Override
+    public void setServerSettings(ServerSettings settings) {
+>>>>>>> dev
         settingsRepository.save(settings);
     }
 

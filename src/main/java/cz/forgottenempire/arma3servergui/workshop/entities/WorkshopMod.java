@@ -1,7 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;

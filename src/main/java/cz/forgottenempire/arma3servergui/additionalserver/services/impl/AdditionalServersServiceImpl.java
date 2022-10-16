@@ -1,20 +1,19 @@
 package cz.forgottenempire.arma3servergui.additionalserver.services.impl;
 
-import com.google.common.collect.Lists;
+import cz.forgottenempire.arma3servergui.additionalserver.AdditionalServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
+import cz.forgottenempire.arma3servergui.additionalserver.repositories.AdditionalServerInstanceInfoRepository;
 import cz.forgottenempire.arma3servergui.additionalserver.repositories.AdditionalServerRepository;
 import cz.forgottenempire.arma3servergui.additionalserver.services.AdditionalServersService;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,19 +23,38 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AdditionalServersServiceImpl implements AdditionalServersService {
 
-    private final Map<Long, Process> serverProcesses = new ConcurrentHashMap<>();
-    private AdditionalServerRepository serverRepository;
+    private final AdditionalServerRepository serverRepository;
+
+    private final AdditionalServerInstanceInfoRepository instanceInfoRepository;
 
     @Value("${arma3server.logDir}")
     private String logDirectory;
 
-    public AdditionalServersServiceImpl() {
+    @Autowired
+    public AdditionalServersServiceImpl(
+            AdditionalServerRepository serverRepository,
+            AdditionalServerInstanceInfoRepository instanceInfoRepository
+    ) {
+        this.serverRepository = serverRepository;
+        this.instanceInfoRepository = instanceInfoRepository;
+
+        // add shutdown hook to stop all running servers
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
-                serverProcesses.forEach((id, process) -> destroyWithTimeout(process))));
+                instanceInfoRepository.getAll().forEach(server -> destroyWithTimeout(server.getProcess()))));
     }
+
 
     public Optional<AdditionalServer> getServer(Long id) {
         return serverRepository.findById(id);
+    }
+
+    public AdditionalServerInstanceInfo getServerInstanceInfo(Long id) {
+        return instanceInfoRepository.getServerInstanceInfo(id);
+    }
+
+    @Override
+    public List<AdditionalServer> getAllServers() {
+        return serverRepository.findAll();
     }
 
     @Override
@@ -59,18 +77,41 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
                     .redirectOutput(Redirect.appendTo(getLogFile(settings.getName())))
                     .redirectError(Redirect.appendTo(getLogFile(settings.getName())))
                     .start();
-            serverProcesses.put(serverId, process);
-            log.info("{} server started (PID {})", settings.getName(), process.pid());
+            instanceInfoRepository.storeServerInstanceInfo(serverId,
+                    new AdditionalServerInstanceInfo(serverId, true, LocalDateTime.now(), process));
+            log.info("Server '{}' started (PID {})", settings.getName(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server {} with command {} in directory {} due to {}",
                     settings.getName(), settings.getCommand(), settings.getServerDir(), e.getMessage());
         }
     }
 
+    @Override
+    public void stopServer(Long serverId) {
+        AdditionalServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(serverId);
+        Process process = instanceInfo.getProcess();
+        if (process == null) {
+            log.warn("Server ID {} could not be stopped because it's not running", serverId);
+            return;
+        }
+
+        destroyWithTimeout(process);
+        instanceInfoRepository.storeServerInstanceInfo(serverId,
+                new AdditionalServerInstanceInfo(serverId, false, null, null));
+        log.info("Server id {} stopped", serverId);
+    }
+
+    private boolean isAlive(Long serverId) {
+        AdditionalServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(serverId);
+        return instanceInfo.isAlive();
+    }
+
+    // TODO split log files automatically
     private File getLogFile(String serverName) {
         File logFile = new File(Path.of(logDirectory, sanitizeServerName(serverName), "log.txt").toUri());
         File parent = logFile.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) {
+            log.error("Failed to create log directory '{}'", parent);
             throw new IllegalStateException("Couldn't create dir: " + parent);
         }
         return logFile;
@@ -78,17 +119,6 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
 
     private String sanitizeServerName(String serverName) {
         return serverName.replaceAll("[^a-zA-Z0-9.\\-]", "_");
-    }
-
-    @Override
-    public void stopServer(Long serverId) {
-        if (!serverProcesses.containsKey(serverId)) {
-            return;
-        }
-        Process process = serverProcesses.get(serverId);
-        destroyWithTimeout(process);
-        serverProcesses.remove(serverId);
-        log.info("Server id {} stopped", serverId);
     }
 
     private void destroyWithTimeout(Process process) {
@@ -108,24 +138,5 @@ public class AdditionalServersServiceImpl implements AdditionalServersService {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean isAlive(Long serverId) {
-        if (!serverProcesses.containsKey(serverId)) {
-            return false;
-        }
-        return serverProcesses.get(serverId).isAlive();
-    }
-
-    @Override
-    public Collection<AdditionalServer> getAllServers() {
-        return Lists.newArrayList(serverRepository.findAll());
-    }
-
-    @Autowired
-    public void setServerRepository(
-            AdditionalServerRepository serverRepository) {
-        this.serverRepository = serverRepository;
     }
 }

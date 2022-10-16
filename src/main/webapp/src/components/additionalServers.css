@@ -1,0 +1,29 @@
+.servers-table {
+}
+
+.servers-table td, th {
+  vertical-align: middle !important;
+}
+
+.servers-table__started-at {
+  width: 10%;
+}
+
+.servers-table__name {
+
+  font-size: 1.2rem;
+  width: 50%;
+}
+
+.servers-table__started-at {
+  min-width: 20%;
+}
+
+.servers-table__start-stop {
+  min-width: 20%;
+}
+
+.servers-table__icon {
+  max-width: 48px;
+  max-height: 48px;
+}
