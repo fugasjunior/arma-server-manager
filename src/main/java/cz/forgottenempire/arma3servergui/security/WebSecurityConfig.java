@@ -47,12 +47,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO fi
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(authenticationManager());
+        jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
+
         http.cors().and()
                 .authorizeRequests()
-                .antMatchers("/static/**", "/{spring:[^(api)]}/**", "/*", "/h2-console/**").permitAll()
+                .antMatchers("/api/login", "/static/**", "/{spring:[^(api)]}/**", "/*", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(jwtAuthenticationFilter)
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

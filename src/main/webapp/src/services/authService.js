@@ -1,7 +1,8 @@
+import config from "../config"
 import http from "./httpService";
 import jwt_decode from "jwt-decode";
 
-const apiEndpoint = "localhost:8080/login";
+const apiEndpoint = config.apiUrl + "/login";
 const tokenKey = "token";
 
 if (isAuthenticated()) {
