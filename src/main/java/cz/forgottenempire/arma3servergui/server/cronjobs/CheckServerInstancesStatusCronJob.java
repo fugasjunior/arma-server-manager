@@ -89,6 +89,6 @@ public class CheckServerInstancesStatusCronJob {
 
     private Server getServer(Long serverId) {
         return serverService.getServer(serverId)
-                .orElseThrow(() -> new IllegalStateException("Invalid ID " + serverId + "in server instances map"));
+                .orElseThrow(() -> new IllegalStateException("Invalid ID " + serverId + " in server instances map"));
     }
 }

@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.server.controllers;
 
+import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServersDto;
 import cz.forgottenempire.arma3servergui.server.entities.Server;
@@ -11,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @Slf4j
 @RequestMapping("/api/server")
+@Validated
 public class ServerController {
 
     private ArmaServerService serverService;
@@ -35,24 +38,30 @@ public class ServerController {
         ServersDto serversDto = new ServersDto(serverMapper.serversToServerDtos(serverService.getAllServers()));
         return ResponseEntity.ok(serversDto);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<ServerDto> getServer(@PathVariable Long id) {
         Server server = serverService.getServer(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " doesn't exist"));
-        return ResponseEntity.ok(serverMapper.serverToServerDto(server));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " doesn't exist"));
+        ServerDto serverDto = serverMapper.serverToServerDto(server);
+        ServerInstanceInfo instanceInfo = serverService.getServerInstanceInfo(id);
+        serverDto.setInstanceInfo(serverMapper.serverInstanceInfoToServerInstanceInfoDto(instanceInfo));
+        return ResponseEntity.ok(serverDto);
     }
 
     @PostMapping
-    public ResponseEntity<ServerDto> createServer(@RequestBody @Valid ServerDto serverDto) {
+    public ResponseEntity<ServerDto> createServer(@Valid @RequestBody ServerDto serverDto) {
         Server server = serverMapper.serverDtoToServer(serverDto);
         server = serverService.createServer(server);
         return ResponseEntity.status(HttpStatus.CREATED).body(serverMapper.serverToServerDto(server));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServerDto> updateServer(@PathVariable Long id, @RequestBody @Valid ServerDto serverDto) {
+    public ResponseEntity<ServerDto> updateServer(@PathVariable Long id, @Valid @RequestBody ServerDto serverDto) {
         Server server = serverService.getServer(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " doesn't exist"));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " doesn't exist"));
         serverDto.setId(server.getId());
         serverMapper.updateServerFromDto(serverDto, server);
         server = serverService.updateServer(server);
@@ -65,39 +74,25 @@ public class ServerController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping("/start")
-//    public ResponseEntity<?> startServer() {
-//        log.info("Received request to start server");
-//        Server serverSettings = settingsService.getServerSettings();
-//        serverService.startServer(serverSettings);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-//
-//    @PostMapping("/stop")
-//    public ResponseEntity<?> stopServer() {
-//        log.info("Received request to stop server");
-//        serverService.shutDownServer();
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-//
-//    @PostMapping("/{id}/restart")
-//    public ResponseEntity<?> restartServer(@PathVariable Long id) {
-//        log.info("Received request to restart server");
-//        if (!serverService.restartServer(id)) {
-//            log.error("Error during server restart!");
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-//
-//    @GetMapping("/query")
-//    public ResponseEntity<ServerStatus> getServerStatus() {
-//        return new ResponseEntity<>(serverStatus, HttpStatus.OK);
-//    }
+    @PostMapping("/{id}/start")
+    public ResponseEntity<?> startServer(@PathVariable Long id) {
+        log.info("Received request to start server ID {}", id);
+        serverService.startServer(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-    @GetMapping("/status")
-    public ResponseEntity<Boolean> isServerProcessAlive() {
-        return new ResponseEntity<>(serverService.isServerProcessAlive(), HttpStatus.OK);
+    @PostMapping("/{id}/stop")
+    public ResponseEntity<?> stopServer(@PathVariable Long id) {
+        log.info("Received request to stop server ID {}", id);
+        serverService.shutDownServer(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/restart")
+    public ResponseEntity<?> restartServer(@PathVariable Long id) {
+        log.info("Received request to restart server ID {}", id);
+        serverService.restartServer(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Autowired

@@ -1,8 +1,10 @@
 package cz.forgottenempire.arma3servergui.server.dtos;
 
+import cz.forgottenempire.arma3servergui.server.entities.Server.ServerType;
 import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -13,7 +15,12 @@ public class ServerDto {
     @Min(1)
     private int port;
     @Min(1)
+    private int queryPort;
+    @Min(1)
     private int maxPlayers;
+
+    @NotNull
+    private ServerType type;
 
     private String password;
     private String adminPassword;
@@ -29,4 +36,6 @@ public class ServerDto {
 
     private List<ServerWorkshopModDto> activeMods;
     private List<ServerCreatorDLCDto> activeDLCs;
+
+    private ServerInstanceInfoDto instanceInfo;
 }

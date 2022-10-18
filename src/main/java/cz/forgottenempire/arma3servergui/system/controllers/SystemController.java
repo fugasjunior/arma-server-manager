@@ -20,7 +20,6 @@ public class SystemController {
     @Value("${hostName}")
     private String hostName;
 
-    private ArmaServerService serverService;
     private SystemService systemService;
 
     @GetMapping("/space")
@@ -32,7 +31,6 @@ public class SystemController {
     public ResponseEntity<ServerDetails> getServerDetails() {
         ServerDetails details = new ServerDetails();
 
-        details.setUpdating(serverService.isServerUpdating());
         details.setHostName(hostName);
 
         details.setSpaceLeft(systemService.getDiskSpaceLeft());
@@ -42,11 +40,6 @@ public class SystemController {
         details.setCpuUsage(systemService.getCpuUsage());
 
         return ResponseEntity.ok(details);
-    }
-
-    @Autowired
-    public void setServerService(ArmaServerService serverService) {
-        this.serverService = serverService;
     }
 
     @Autowired

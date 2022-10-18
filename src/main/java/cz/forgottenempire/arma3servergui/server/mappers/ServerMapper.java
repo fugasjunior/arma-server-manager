@@ -1,8 +1,10 @@
 package cz.forgottenempire.arma3servergui.server.mappers;
 
 import cz.forgottenempire.arma3servergui.creatorDLC.entities.CreatorDLC;
+import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerCreatorDLCDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDto;
+import cz.forgottenempire.arma3servergui.server.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerWorkshopModDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServersDto;
 import cz.forgottenempire.arma3servergui.server.entities.Server;
@@ -21,6 +23,9 @@ public interface ServerMapper {
     Server serverDtoToServer(ServerDto serverDto);
 
     void updateServerFromDto(ServerDto serverDto, @MappingTarget Server server);
+
+    @Mapping(source = "startedAt", target = "startedAt", dateFormat = "yyyy-MM-dd HH:mm")
+    ServerInstanceInfoDto serverInstanceInfoToServerInstanceInfoDto(ServerInstanceInfo instanceInfo);
 
     ServerWorkshopModDto workshopModToServerWorkshopModDto(WorkshopMod workshopMod);
 

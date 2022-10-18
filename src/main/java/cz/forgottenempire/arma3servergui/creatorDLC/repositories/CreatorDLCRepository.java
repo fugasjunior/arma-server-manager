@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CreatorDLCRepository extends CrudRepository<CreatorDLC, Long> {
-
-//    List<CreatorDLC> findAllByEnabledTrue();
 }
