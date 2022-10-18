@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.util;
+package cz.forgottenempire.arma3servergui.common.util;
 
 import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
 import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;

@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.server.services.impl;
 
 import com.google.common.base.Joiner;
-import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.entities.Server;
 import cz.forgottenempire.arma3servergui.server.entities.Server.ServerType;
@@ -9,7 +9,7 @@ import cz.forgottenempire.arma3servergui.server.exceptions.PortAlreadyTakenExcep
 import cz.forgottenempire.arma3servergui.server.repositories.ServerInstanceInfoRepository;
 import cz.forgottenempire.arma3servergui.server.repositories.ServerRepository;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.util.LogUtils;
+import cz.forgottenempire.arma3servergui.common.util.LogUtils;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import java.io.BufferedWriter;

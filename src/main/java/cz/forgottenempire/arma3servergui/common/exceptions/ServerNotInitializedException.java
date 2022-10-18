@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.exceptions;
+package cz.forgottenempire.arma3servergui.common.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

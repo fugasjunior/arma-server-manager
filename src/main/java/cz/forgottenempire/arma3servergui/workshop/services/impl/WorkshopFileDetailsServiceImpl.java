@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

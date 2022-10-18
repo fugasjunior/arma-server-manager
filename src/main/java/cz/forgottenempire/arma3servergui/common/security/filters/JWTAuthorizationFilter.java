@@ -1,8 +1,8 @@
-package cz.forgottenempire.arma3servergui.security.filters;
+package cz.forgottenempire.arma3servergui.common.security.filters;
 
-import static cz.forgottenempire.arma3servergui.security.SecurityConstants.HEADER_STRING;
-import static cz.forgottenempire.arma3servergui.security.SecurityConstants.secret;
-import static cz.forgottenempire.arma3servergui.security.SecurityConstants.TOKEN_PREFIX;
+import static cz.forgottenempire.arma3servergui.common.security.SecurityConstants.HEADER_STRING;
+import static cz.forgottenempire.arma3servergui.common.security.SecurityConstants.secret;
+import static cz.forgottenempire.arma3servergui.common.security.SecurityConstants.TOKEN_PREFIX;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

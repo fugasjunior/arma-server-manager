@@ -1,7 +1,7 @@
-package cz.forgottenempire.arma3servergui.security;
+package cz.forgottenempire.arma3servergui.common.security;
 
-import cz.forgottenempire.arma3servergui.security.filters.JWTAuthenticationFilter;
-import cz.forgottenempire.arma3servergui.security.filters.JWTAuthorizationFilter;
+import cz.forgottenempire.arma3servergui.common.security.filters.JWTAuthenticationFilter;
+import cz.forgottenempire.arma3servergui.common.security.filters.JWTAuthorizationFilter;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;

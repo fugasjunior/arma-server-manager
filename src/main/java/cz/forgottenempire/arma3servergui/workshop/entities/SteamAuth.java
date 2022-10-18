@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.entities;
 
-import cz.forgottenempire.arma3servergui.converters.AttributeEncryptor;
+import cz.forgottenempire.arma3servergui.common.converters.AttributeEncryptor;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

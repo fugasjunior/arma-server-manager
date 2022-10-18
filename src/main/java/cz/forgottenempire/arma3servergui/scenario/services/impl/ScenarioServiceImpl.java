@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.scenario.services.impl;
 
 import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
-import cz.forgottenempire.arma3servergui.exceptions.ServerNotInitializedException;
+import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.arma3servergui.scenario.services.ScenarioService;
 import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;

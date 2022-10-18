@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui;
+package cz.forgottenempire.arma3servergui.common;
 
 public class Constants {
     public final static Long STEAM_ARMA3_ID = 107410L;

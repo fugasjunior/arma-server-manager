@@ -19,7 +19,7 @@ public class ServerDto {
     @Min(1)
     private int maxPlayers;
 
-    @NotNull
+    @NotNull(message = "must be filled in. Available types: [ARMA3, ARMA4, DAYZ, REFORGER]")
     private ServerType type;
 
     private String password;

@@ -1,12 +1,12 @@
-package cz.forgottenempire.arma3servergui.security.filters;
+package cz.forgottenempire.arma3servergui.common.security.filters;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import static cz.forgottenempire.arma3servergui.security.SecurityConstants.EXPIRATION_TIME;
-import static cz.forgottenempire.arma3servergui.security.SecurityConstants.HEADER_STRING;
-import static cz.forgottenempire.arma3servergui.security.SecurityConstants.TOKEN_PREFIX;
+import static cz.forgottenempire.arma3servergui.common.security.SecurityConstants.EXPIRATION_TIME;
+import static cz.forgottenempire.arma3servergui.common.security.SecurityConstants.HEADER_STRING;
+import static cz.forgottenempire.arma3servergui.common.security.SecurityConstants.TOKEN_PREFIX;
 
 import com.auth0.jwt.JWT;
-import cz.forgottenempire.arma3servergui.security.SecurityConstants;
+import cz.forgottenempire.arma3servergui.common.security.SecurityConstants;
 import java.io.IOException;
 import java.util.Date;
 import javax.servlet.FilterChain;

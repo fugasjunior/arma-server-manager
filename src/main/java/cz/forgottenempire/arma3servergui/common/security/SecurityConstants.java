@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.security;
+package cz.forgottenempire.arma3servergui.common.security;
 
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

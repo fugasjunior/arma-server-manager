@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.util;
+package cz.forgottenempire.arma3servergui.common.util;
 
 import java.io.File;
 import java.io.IOException;

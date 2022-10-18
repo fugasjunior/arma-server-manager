@@ -1,8 +1,8 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
-import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.util.FileSystemUtils;
-import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
+import cz.forgottenempire.arma3servergui.common.Constants;
+import cz.forgottenempire.arma3servergui.common.util.FileSystemUtils;
+import cz.forgottenempire.arma3servergui.common.util.SteamCmdWrapper;
 import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
 import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
 import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;

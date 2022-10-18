@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
-import cz.forgottenempire.arma3servergui.Constants;
+import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
