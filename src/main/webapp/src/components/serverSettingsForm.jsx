@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import Joi from "joi-browser"
-import {getServerSettings, setServerSettings} from "../services/serverService";
+import {getServerSettings, setServerSettings} from "../services/serversService";
 import {toast} from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
 

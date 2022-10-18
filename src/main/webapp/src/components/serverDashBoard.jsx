@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {getServerSettings, restartServer, startServer, stopServer, updateServer} from "../services/serverService";
+import {getServerSettings, restartServer, startServer, stopServer, updateServer} from "../services/serversService";
 import ServerStatus from "./serverStatus";
 import {humanFileSize} from "../util/util";
 import {toast} from "react-toastify";

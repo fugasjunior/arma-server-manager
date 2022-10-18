@@ -11,7 +11,7 @@ import Scenarios from "./components/scenarios";
 import AppConfig from "./components/appConfig";
 import AdditionalServers from "./components/additionalServers";
 import {getSystemInfo} from "./services/systemService";
-import {getServerStatus, queryServer} from "./services/serverService";
+import {getServerStatus, queryServer} from "./services/serversService";
 import Login from "./components/auth/login";
 import {isAuthenticated} from "./services/authService";
 import ProtectedRoute from "./components/protectedRoute";
