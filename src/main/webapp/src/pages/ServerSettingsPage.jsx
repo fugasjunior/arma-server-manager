@@ -12,6 +12,8 @@ const ServerSettingsPage = () => {
     const [server, setServer] = useState({});
     const [availableMods, setAvailableMods] = useState([]);
     const [selectedMods, setSelectedMods] = useState([]);
+    const [availableDlcs, setAvailableDlcs] = useState([]);
+    const [selectedDlcs, setSelectedDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -24,13 +26,21 @@ const ServerSettingsPage = () => {
             const {data: fetchedServer} = await getServer(id);
             const {data: modsDto} = await getMods();
 
+            console.log(fetchedServer, modsDto);
+
             const newSelectedMods = fetchedServer.activeMods;
             const newAvailableMods = modsDto.workshopMods.filter(
                     mod => !newSelectedMods.find(searchedMod => searchedMod.id === mod.id));
+            const newSelectedDlcs = fetchedServer.activeDLCs;
+            const newAvailableDlcs = modsDto.creatorDlcs.filter(
+                    cdlc => !newSelectedDlcs.find(searchedDlc => searchedDlc.id === cdlc.id));
+
 
             setServer(fetchedServer);
             setSelectedMods(newSelectedMods);
             setAvailableMods(newAvailableMods);
+            setSelectedDlcs(newSelectedDlcs);
+            setAvailableDlcs(newAvailableDlcs);
             setLoading(false);
         } catch (e) {
             console.error(e);
@@ -43,6 +53,7 @@ const ServerSettingsPage = () => {
             ...values,
             type: server.type,
             activeMods: selectedMods,
+            activeDLCs: selectedDlcs,
             instanceInfo: null,
         }
 
@@ -75,6 +86,26 @@ const ServerSettingsPage = () => {
         });
     }
 
+    const handleDlcSelect = option => {
+        setAvailableDlcs((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setSelectedDlcs((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleDlcDeselect = option => {
+        setSelectedDlcs((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setAvailableDlcs((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
     return (
             <>
                 <h1>Server</h1>
@@ -85,6 +116,8 @@ const ServerSettingsPage = () => {
                             <EditServerSettingsForm server={server} onSubmit={handleSubmit}/>
                             <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
                                          onSelect={handleModSelect} onDeselect={handleModDeselect}/>
+                            <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
+                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}/>
                         </>}
 
             </>
