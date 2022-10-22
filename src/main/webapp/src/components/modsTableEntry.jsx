@@ -7,7 +7,7 @@ const getInstalledIcon = (mod) => {
     const error = mod.errorStatus;
 
     if (status === "INSTALLATION_QUEUED") {
-        return <i title="Update queued" className="fa-solid fa-layer-group"></i>
+        return <i title="Update queued" className="fa fa-clock-o"></i>
     }
     if (status === "INSTALLATION_IN_PROGRESS") {
         return (
@@ -34,7 +34,7 @@ const ModsTableEntry = (props) => {
     const workshopUrl = "https://steamcommunity.com/sharedfiles/filedetails/?id=" + mod.id;
 
     return (
-            <tr key={mod.id} className={mod.failed ? "table-danger" : ""}>
+            <tr className={mod.failed ? "table-danger" : ""}>
                 <td>
                     <a href={workshopUrl}
                        target="_blank"

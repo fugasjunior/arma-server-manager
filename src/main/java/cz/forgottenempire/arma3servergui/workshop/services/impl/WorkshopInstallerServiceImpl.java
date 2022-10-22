@@ -146,12 +146,11 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     }
 
     @Override
-    public void deleteMod(WorkshopMod mod) {
+    public void uninstallMod(WorkshopMod mod) {
         File modDirectory = new File(getDownloadPath() + File.separatorChar + mod.getId());
         try {
             deleteSymlink(mod);
             FileUtils.deleteDirectory(modDirectory);
-            modRepository.delete(mod);
         } catch (IOException e) {
             log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
             throw new RuntimeException(e);

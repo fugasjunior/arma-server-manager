@@ -111,11 +111,14 @@ const ServerSettingsPage = () => {
                 {!loading &&
                         <>
                             <p>Type: {server.type}</p>
-                            <EditServerSettingsForm server={server} onSubmit={handleSubmit}/>
+                            <EditServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                    isServerRunning={server.instanceInfo && server.instanceInfo.alive}/>
                             <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                         onSelect={handleModSelect} onDeselect={handleModDeselect}/>
+                                         onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                         itemsLabel="mods" showFilter/>
                             <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
-                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}/>
+                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                         itemsLabel="DLCs"/>
                         </>}
 
             </>

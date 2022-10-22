@@ -23,7 +23,7 @@ const ModsTable = props => {
                         </thead>
                         <tbody>
                         {mods.map(mod => (
-                                        <ModsTableEntry mod={mod}
+                                        <ModsTableEntry key={mod.id} mod={mod}
                                                         onUpdateClicked={onUpdateClicked}
                                                         onUninstallClicked={onUninstallClicked}
                                         />

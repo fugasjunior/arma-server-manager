@@ -6,7 +6,7 @@ import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 public interface WorkshopInstallerService {
     void installOrUpdateMod(SteamAuth auth, WorkshopMod mod);
 
-    void deleteMod(WorkshopMod mod);
+    void uninstallMod(WorkshopMod mod);
 
     void updateAllMods(SteamAuth auth);
 }

@@ -38,7 +38,7 @@ const ModsPage = () => {
                 const newState = [...prevState];
                 const updatedMod = newState.find(mod => mod.id === modId);
                 if (updatedMod) {
-                    updatedMod.installationStatus = "INSTALLATION_IN_PROGRESS";
+                    updatedMod.installationStatus = "INSTALLATION_QUEUED";
                     updatedMod.errorStatus = null;
                 }
                 return newState;

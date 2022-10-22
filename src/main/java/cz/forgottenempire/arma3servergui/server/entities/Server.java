@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.server.entities;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -10,6 +11,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -56,7 +60,11 @@ public class Server {
     @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+            name = "server_mod",
+            joinColumns = @JoinColumn(name = "server_id"),
+            inverseJoinColumns = @JoinColumn(name = "mod_id"))
     private List<WorkshopMod> activeMods;
 
     @ElementCollection(targetClass = Arma3CDLC.class)

@@ -126,7 +126,9 @@ const EditServerSettingsForm = props => {
                         </div>
                     </div>
 
-                    <button className="btn btn-primary btn-lg" type="submit">Submit</button>
+                    <button disabled={props.isServerRunning}
+                            title={props.isServerRunning && "Stop the server to be able to update the settings."}
+                            className="btn btn-primary btn-lg" type="submit">Submit</button>
                 </Form>
             </Formik>
     );

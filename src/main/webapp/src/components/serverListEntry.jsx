@@ -12,8 +12,8 @@ const ServerListEntry = (props) => {
                 <td className="server__info">
                     <p className="server__name">{server.name}</p>
                     <p>Port: {server.port} (query: {server.queryPort})</p>
-                    {server.activeMods && <p>Mods active</p>}
-                    {server.activeDLCs && <p>Creator DLC(s) active</p>}
+                    {server.activeMods.length > 0 && <p>Mods active</p>}
+                    {server.activeDLCs.length > 0 && <p>Creator DLC(s) active</p>}
                 </td>
                 <td>{serverRunning ?
                         <Fragment>

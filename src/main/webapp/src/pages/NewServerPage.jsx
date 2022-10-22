@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import "./ServersPage.css";
-import {Navigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {createServer} from "../services/serversService";
 import {toast} from "react-toastify";
 import ListBuilder from "../UI/ListBuilder";
@@ -13,6 +13,8 @@ const ServerSettingsPage = () => {
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [selectedDlcs, setSelectedDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -43,7 +45,7 @@ const ServerSettingsPage = () => {
         try {
             await createServer(server);
             toast.success("Server successfully created");
-            return <Navigate to={"/"}/>
+            navigate("/");
         } catch (e) {
             console.error(e);
             toast.error("Creating server failed");
@@ -100,7 +102,7 @@ const ServerSettingsPage = () => {
                                 type: "ARMA3",
                                 name: "",
                                 port: 2302,
-                                queryPort: 0,
+                                queryPort: 2303,
                                 maxPlayers: 32,
                                 password: "",
                                 adminPassword: "",
@@ -113,9 +115,11 @@ const ServerSettingsPage = () => {
                                 additionalOptions: ""
                             }} onSubmit={handleSubmit}/>
                             <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                         onSelect={handleModSelect} onDeselect={handleModDeselect}/>
+                                         onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                         itemsLabel="mods" showFilter/>
                             <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
-                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}/>
+                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                         itemsLabel="DLCs"/>
                         </>}
 
             </>

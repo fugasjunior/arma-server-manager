@@ -73,16 +73,18 @@ const ServersPage = () => {
                 <Link to="/servers/new" className="btn btn-lg btn-success mb-4">Create new server</Link>
                 <div className="servers">
                     <table className="table servers__list">
+                        <tbody>
                         {servers.map(server =>
-                                <ServerListEntry
-                                        server={server}
-                                        onStartServer={handleStartServer}
-                                        onStopServer={handleStopServer}
-                                        onRestartServer={handleRestartServer}
-                                        onDeleteServer={handleDeleteServer}
-                                        serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                                <ServerListEntry key={server.id}
+                                                 server={server}
+                                                 onStartServer={handleStartServer}
+                                                 onStopServer={handleStopServer}
+                                                 onRestartServer={handleRestartServer}
+                                                 onDeleteServer={handleDeleteServer}
+                                                 serverWithSamePortRunning={isServerWithSamePortRunning(server)}
                                 />
                         )}
+                        </tbody>
                     </table>
                 </div>
             </>

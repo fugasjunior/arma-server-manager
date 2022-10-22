@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
+import cz.forgottenempire.arma3servergui.server.repositories.ServerRepository;
 import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
@@ -19,10 +20,21 @@ import org.springframework.stereotype.Service;
 public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     private SteamAuthService authService;
-    private WorkshopInstallerService installerService;
     private WorkshopFileDetailsService fileDetailsService;
-
+    private WorkshopInstallerService installerService;
     private WorkshopModRepository modRepository;
+    private ServerRepository serverRepository;
+
+    @Autowired
+    public WorkshopModsServiceImpl(SteamAuthService authService, WorkshopFileDetailsService fileDetailsService,
+            WorkshopInstallerService installerService, WorkshopModRepository modRepository,
+            ServerRepository serverRepository) {
+        this.authService = authService;
+        this.fileDetailsService = fileDetailsService;
+        this.installerService = installerService;
+        this.modRepository = modRepository;
+        this.serverRepository = serverRepository;
+    }
 
     @Override
     public Collection<WorkshopMod> getAllMods() {
@@ -52,7 +64,14 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     @Override
     public void uninstallMod(Long id) {
-        modRepository.findById(id).ifPresent(installerService::deleteMod);
+        modRepository.findById(id).ifPresent(mod -> {
+            mod.getServers().forEach(server -> {
+                server.getActiveMods().remove(mod);
+                serverRepository.save(server);
+            });
+            installerService.uninstallMod(mod);
+            modRepository.delete(mod);
+        });
     }
 
     @Override
@@ -67,25 +86,5 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     private SteamAuth getAuth() {
         return authService.getAuthAccount();
-    }
-
-    @Autowired
-    public void setAuthService(SteamAuthService authService) {
-        this.authService = authService;
-    }
-
-    @Autowired
-    public void setInstallerService(WorkshopInstallerService installerService) {
-        this.installerService = installerService;
-    }
-
-    @Autowired
-    public void setFileDetailsService(WorkshopFileDetailsService fileDetailsService) {
-        this.fileDetailsService = fileDetailsService;
-    }
-
-    @Autowired
-    public void setModRepository(WorkshopModRepository modRepository) {
-        this.modRepository = modRepository;
     }
 }
