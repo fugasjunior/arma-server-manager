@@ -15,14 +15,6 @@ export function uninstallMod(modId) {
     return http.delete(apiEndpoint + "/" + modId);
 }
 
-export function refreshMods() {
-    return http.post(apiEndpoint + "/updateAll");
-}
-
-export function setActive(modId, val) {
-    return http.post(apiEndpoint + "/setActive/" + modId + "/?active=" + val);
-}
-
-export function setMultipleActive(mods) {
-    return http.post(apiEndpoint + "/setMultipleActive", mods);
+export function updateAllMods() {
+    return http.post(apiEndpoint + "/update");
 }

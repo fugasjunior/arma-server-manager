@@ -60,7 +60,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         executor.submit(() -> {
             log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
             initializeModDownloadStatus(mod);
-            if (!downloadMod(mod) && !installMod(mod)) {
+            if (!downloadMod(mod) || !installMod(mod)) {
                 return;
             }
             updateModInfo(mod);
@@ -153,7 +153,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             FileUtils.deleteDirectory(modDirectory);
             modRepository.delete(mod);
         } catch (IOException e) {
-            log.error("Could not delete directory {} due to {}", modDirectory, e.toString());
+            log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
             throw new RuntimeException(e);
         }
         log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());

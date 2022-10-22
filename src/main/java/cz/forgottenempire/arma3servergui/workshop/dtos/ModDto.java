@@ -10,7 +10,7 @@ public class ModDto {
     private Long id;
     private String name;
     private Long fileSize;
-    private Date lastUpdated;
+    private String lastUpdated;
     private String installationStatus;
     private String errorStatus;
 }

@@ -1,40 +1,42 @@
-import React, {Component} from "react";
+import React, {Component, useState} from "react";
 
-class ModInstallForm extends Component {
-    state = {
-        modId: ""
+const ModInstallForm = (props) => {
+
+    const [enteredModId, setEnteredModId] = useState("");
+
+    const handleModIdChanged = (e) => {
+        setEnteredModId(e.target.value.trim().replace(/\D/g, ''));
     }
 
-    handleIdChange = ({currentTarget: input}) => {
-        let value = input.value.trim().replace(/\D/g, '');
-        this.setState({modId: value});
+    const handleInstallClicked = () => {
+        props.onInstallClicked(enteredModId);
+        setEnteredModId("");
     }
 
-    render() {
-        return (
-            <React.Fragment>
+    return (
+            <>
                 <h3>Install new mod</h3>
 
-                <form className="form-inline"
-                      onSubmit={(e) => this.props.onSubmit(this.state.modId, e)}>
+                <div className="form-inline">
                     <div className="form-group">
                         <label htmlFor="modId" className="sr-only">Steam Workshop Mod ID</label>
                         <input type="text"
                                className="form-control"
                                id="modId" name="modId"
                                placeholder="Workshop mod ID"
-                               value={this.state.modId}
-                               onChange={this.handleIdChange}
+                               value={enteredModId}
+                               onChange={handleModIdChanged}
                         />
                     </div>
-                    <button type="submit"
+                    <button
+                            onClick={handleInstallClicked}
                             className="btn btn-primary ml-2"
-                            disabled={this.state.modId.length < 1}>Install
+                            disabled={enteredModId.length < 1}>
+                        Install
                     </button>
-                </form>
-            </React.Fragment>
-        );
-    }
+                </div>
+            </>
+    );
 }
 
 export default ModInstallForm;
