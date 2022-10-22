@@ -6,6 +6,7 @@ const EditServerSettingsForm = props => {
 
     return (
             <Formik initialValues={props.server}
+                    enableReinitialize
                     onSubmit={props.onSubmit}>
                 <Form>
                     <div className="form-group row">
@@ -22,13 +23,15 @@ const EditServerSettingsForm = props => {
                         </div>
                     </div>
 
-                    <div className="form-group row">
-                        <label htmlFor="queryPort" className="col-sm-2 col-form-label">Query port</label>
-                        <div className="col-sm-10">
-                            <Field id="queryPort" name="queryPort" type="number" placeholder="Query port"
-                                   className="form-control"/>
+                    {props.server.type !== "ARMA3" &&
+                        <div className="form-group row">
+                            <label htmlFor="queryPort" className="col-sm-2 col-form-label">Query port</label>
+                            <div className="col-sm-10">
+                                <Field id="queryPort" name="queryPort" type="number" placeholder="Query port"
+                                       className="form-control"/>
+                            </div>
                         </div>
-                    </div>
+                    }
 
                     <div className="form-group row">
                         <label htmlFor="maxPlayers" className="col-sm-2 col-form-label">Max players</label>

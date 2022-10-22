@@ -26,15 +26,12 @@ const ServerSettingsPage = () => {
             const {data: fetchedServer} = await getServer(id);
             const {data: modsDto} = await getMods();
 
-            console.log(fetchedServer, modsDto);
-
             const newSelectedMods = fetchedServer.activeMods;
             const newAvailableMods = modsDto.workshopMods.filter(
                     mod => !newSelectedMods.find(searchedMod => searchedMod.id === mod.id));
             const newSelectedDlcs = fetchedServer.activeDLCs;
             const newAvailableDlcs = modsDto.creatorDlcs.filter(
                     cdlc => !newSelectedDlcs.find(searchedDlc => searchedDlc.id === cdlc.id));
-
 
             setServer(fetchedServer);
             setSelectedMods(newSelectedMods);
@@ -52,6 +49,7 @@ const ServerSettingsPage = () => {
         const request = {
             ...values,
             type: server.type,
+            queryPort: server.type === "ARMA3" ? server.port + 1 : server.queryPort,
             activeMods: selectedMods,
             activeDLCs: selectedDlcs,
             instanceInfo: null,

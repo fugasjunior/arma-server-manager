@@ -96,7 +96,7 @@ const ServersPage = () => {
                                             Start
                                         </button>
                                 }
-                                    <Link className="btn btn-info" to={"/server/" + server.id}>Settings</Link>
+                                    <Link className="btn btn-info" to={"/servers/" + server.id}>Settings</Link>
                                 </td>
                                 <td>
                                     {!isServerRunning(server) &&

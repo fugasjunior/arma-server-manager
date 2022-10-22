@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.workshop.entities;
+package cz.forgottenempire.arma3servergui.system.entities;
 
 import cz.forgottenempire.arma3servergui.common.converters.AttributeEncryptor;
 import javax.persistence.Convert;

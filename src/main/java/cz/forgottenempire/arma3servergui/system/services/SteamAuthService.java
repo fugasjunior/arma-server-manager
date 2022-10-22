@@ -1,7 +1,7 @@
-package cz.forgottenempire.arma3servergui.workshop.services;
+package cz.forgottenempire.arma3servergui.system.services;
 
 import cz.forgottenempire.arma3servergui.workshop.dtos.SteamAuthDto;
-import cz.forgottenempire.arma3servergui.workshop.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 
 public interface SteamAuthService {
     SteamAuth getAuthAccount();
