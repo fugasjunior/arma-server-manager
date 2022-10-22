@@ -1,6 +1,8 @@
 package cz.forgottenempire.arma3servergui.common;
 
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
+import cz.forgottenempire.arma3servergui.server.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.server.exceptions.PortAlreadyTakenException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .message(ex.getLocalizedMessage())
                 .build();
         return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value = {ModifyingRunningServerException.class})
+    protected ResponseEntity<Object> handleBadRequest(RuntimeException ex, WebRequest request) {
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(ex.getLocalizedMessage())
+                .build();
+        return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler({NotFoundException.class})
+    public ResponseEntity<Object> handleNotFound(Exception ex, WebRequest request) {
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .message(ex.getLocalizedMessage())
+                .build();
+        return new ResponseEntity<>(error, new HttpHeaders(), error.getStatus());
     }
 
     @ExceptionHandler({Exception.class})

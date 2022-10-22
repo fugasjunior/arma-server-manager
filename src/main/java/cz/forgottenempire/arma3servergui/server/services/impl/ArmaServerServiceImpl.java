@@ -2,14 +2,16 @@ package cz.forgottenempire.arma3servergui.server.services.impl;
 
 import com.google.common.base.Joiner;
 import cz.forgottenempire.arma3servergui.common.Constants;
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
+import cz.forgottenempire.arma3servergui.common.util.LogUtils;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.entities.Server;
 import cz.forgottenempire.arma3servergui.server.entities.Server.ServerType;
+import cz.forgottenempire.arma3servergui.server.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.server.exceptions.PortAlreadyTakenException;
 import cz.forgottenempire.arma3servergui.server.repositories.ServerInstanceInfoRepository;
 import cz.forgottenempire.arma3servergui.server.repositories.ServerRepository;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.common.util.LogUtils;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import java.io.BufferedWriter;
@@ -30,9 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 // TODO way too much responsibilities for this class, separate it into different services
@@ -101,11 +101,17 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     @Override
     public Server updateServer(Server server) {
+        if (isServerInstanceRunning(server)) {
+            throw new ModifyingRunningServerException("Cannot modify running server '" + server.getName() + "'");
+        }
         return createServer(server);
     }
 
     @Override
     public void deleteServer(Server server) {
+        if (isServerInstanceRunning(server)) {
+            throw new ModifyingRunningServerException("Cannot delete running server '" + server.getName() + "'");
+        }
         serverRepository.delete(server);
     }
 
@@ -113,7 +119,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     public void startServer(Long id) {
         Server server = serverRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " not found"));
+                        () -> new NotFoundException("Server ID " + id + " not found"));
 
         validatePortsNotTaken(server);
 
@@ -203,6 +209,10 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
     private boolean isServerInstanceRunning(ServerInstanceInfo instanceInfo) {
         return instanceInfo.isAlive() && instanceInfo.getProcess().isAlive();
+    }
+
+    private boolean isServerInstanceRunning(Server server) {
+        return isServerInstanceRunning(getServerInstanceInfo(server.getId()));
     }
 
     private Process startServerProcess(Server server) {

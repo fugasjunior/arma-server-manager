@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 class ServerControllerUnitTest {
 
@@ -95,8 +95,7 @@ class ServerControllerUnitTest {
         when(serverService.getServer(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> serverController.getServer(1L))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("404 NOT_FOUND")
+                .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Server ID 1 doesn't exist");
     }
 
@@ -126,8 +125,7 @@ class ServerControllerUnitTest {
         when(serverService.getServer(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> serverController.updateServer(1L, new ServerDto()))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("404 NOT_FOUND")
+                .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Server ID 1 doesn't exist");
     }
 

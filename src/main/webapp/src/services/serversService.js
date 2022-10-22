@@ -7,34 +7,26 @@ export function getServers() {
     return http.get(apiEndpoint);
 }
 
-export function getServerSettings() {
-    return http.get(apiEndpoint + "/settings");
+export function getServer(id) {
+    return http.get(apiEndpoint + "/" + id);
 }
 
-export function setServerSettings(settings) {
-    return http.post(apiEndpoint + "/settings", settings);
+export function updateServer(id, serverInfo) {
+    return http.put(apiEndpoint + "/" + id, serverInfo);
 }
 
-export function startServer() {
-    return http.post(apiEndpoint + "/start");
+export function startServer(id) {
+    return http.post(apiEndpoint + "/" + id + "/start");
 }
 
-export function stopServer() {
-    return http.post(apiEndpoint + "/stop");
+export function stopServer(id) {
+    return http.post(apiEndpoint + "/" + id + "/stop");
 }
 
-export function restartServer() {
-    return http.post(apiEndpoint + "/restart");
+export function restartServer(id) {
+    return http.post(apiEndpoint + "/" + id + "/restart");
 }
 
-export function queryServer() {
-    return http.get(apiEndpoint + "/query");
-}
-
-export function getServerStatus() {
-    return http.get(apiEndpoint + "/status");
-}
-
-export function updateServer() {
-    return http.post(apiEndpoint + "/update");
+export function deleteServer(id) {
+    return http.delete(apiEndpoint + "/" + id);
 }

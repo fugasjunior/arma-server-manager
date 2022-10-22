@@ -1,0 +1,30 @@
+.listbuilder {
+  display: flex;
+  user-select: none;
+}
+
+.listbuilder__list {
+  padding: 0.3rem 1rem;
+  width: 200px;
+  margin: 1rem;
+  max-height: 400px;
+  overflow: scroll;
+}
+
+.listbuilder__item {
+  background-color: #f3f3f3;
+  width: 100%;
+  padding: 0.5rem 1rem;
+}
+
+.listbuilder__item:hover {
+  background-color: #a8a8a8;
+}
+
+.listbuilder__filter {
+
+}
+
+.listbuilder__filter input {
+  width: 100%;
+}

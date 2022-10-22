@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.controllers;
 
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import cz.forgottenempire.arma3servergui.workshop.dtos.WorkshopModDto;
 import cz.forgottenempire.arma3servergui.workshop.dtos.WorkshopModsDto;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Slf4j
@@ -36,8 +36,7 @@ public class WorkshopModsController {
     @GetMapping("/{id}")
     public ResponseEntity<WorkshopModDto> getMod(@PathVariable Long id) {
         WorkshopMod mod = modsService.getMod(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Mod ID " + id + " does not exist or is not installed"));
+                .orElseThrow(() -> new NotFoundException("Mod ID " + id + " does not exist or is not installed"));
         return ResponseEntity.ok(workshopModMapper.modToModDto(mod));
     }
 

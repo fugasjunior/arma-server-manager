@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import {getServerSettings, restartServer, startServer, stopServer, updateServer} from "../services/serversService";
 import ServerStatus from "./serverStatus";
 import {humanFileSize} from "../util/util";
 import {toast} from "react-toastify";
@@ -8,36 +7,6 @@ class ServerDashBoard extends Component {
 
     state = {
         serverSettings: {},
-    };
-
-    async componentDidMount() {
-        const {data: serverSettings} = await getServerSettings();
-        this.setState({serverSettings});
-    };
-
-    handleStart = async () => {
-        await startServer();
-        await this.props.onUpdate();
-    };
-
-    handleStop = async () => {
-        await stopServer();
-        await this.props.onUpdate();
-    };
-
-    handleRestart = async () => {
-        await restartServer();
-        await this.props.onUpdate();
-    };
-
-    handleUpdate = async () => {
-        try {
-            await updateServer();
-            await this.props.onUpdate();
-        } catch (e) {
-            console.error(e);
-            toast.error("Server could not be updated");
-        }
     };
 
     renderControlButtons = () => {

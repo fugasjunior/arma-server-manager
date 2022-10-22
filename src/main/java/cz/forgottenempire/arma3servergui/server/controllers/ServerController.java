@@ -1,11 +1,14 @@
 package cz.forgottenempire.arma3servergui.server.controllers;
 
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDto;
+import cz.forgottenempire.arma3servergui.server.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServersDto;
 import cz.forgottenempire.arma3servergui.server.entities.Server;
 import cz.forgottenempire.arma3servergui.server.mappers.ServerMapper;
 import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Slf4j
@@ -35,15 +37,23 @@ public class ServerController {
 
     @GetMapping
     public ResponseEntity<ServersDto> getAllServers() {
-        ServersDto serversDto = new ServersDto(serverMapper.serversToServerDtos(serverService.getAllServers()));
-        return ResponseEntity.ok(serversDto);
+        List<ServerDto> serverDtos = serverService.getAllServers()
+                .stream()
+                .map(s -> serverMapper.serverToServerDto(s)).toList();
+        serverDtos.forEach(s -> {
+            ServerInstanceInfo instanceInfo = serverService.getServerInstanceInfo(s.getId());
+            ServerInstanceInfoDto instanceInfoDto = serverMapper.serverInstanceInfoToServerInstanceInfoDto(
+                    instanceInfo);
+            s.setInstanceInfo(instanceInfoDto);
+        });
+        return ResponseEntity.ok(new ServersDto(serverDtos));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ServerDto> getServer(@PathVariable Long id) {
         Server server = serverService.getServer(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " doesn't exist"));
+                        () -> new NotFoundException("Server ID " + id + " doesn't exist"));
         ServerDto serverDto = serverMapper.serverToServerDto(server);
         ServerInstanceInfo instanceInfo = serverService.getServerInstanceInfo(id);
         serverDto.setInstanceInfo(serverMapper.serverInstanceInfoToServerInstanceInfoDto(instanceInfo));
@@ -61,7 +71,7 @@ public class ServerController {
     public ResponseEntity<ServerDto> updateServer(@PathVariable Long id, @Valid @RequestBody ServerDto serverDto) {
         Server server = serverService.getServer(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Server ID " + id + " doesn't exist"));
+                        () -> new NotFoundException("Server ID " + id + " doesn't exist"));
         serverDto.setId(server.getId());
         serverMapper.updateServerFromDto(serverDto, server);
         server = serverService.updateServer(server);
