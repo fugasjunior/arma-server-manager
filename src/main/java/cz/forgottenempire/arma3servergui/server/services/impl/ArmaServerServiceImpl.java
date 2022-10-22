@@ -242,7 +242,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
         // add enabled Creator DLCs
         server.getActiveDLCs().stream()
-                .map(dlc -> "-mod=" + dlc.getGameId())
+                .map(dlc -> "-mod=" + dlc.getId())
                 .forEach(parameters::add);
 
         File logFile = new File(logDir + File.separatorChar + "out_" + server.getId() + ".log");

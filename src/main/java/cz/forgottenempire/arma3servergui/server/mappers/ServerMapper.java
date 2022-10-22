@@ -1,13 +1,12 @@
 package cz.forgottenempire.arma3servergui.server.mappers;
 
-import cz.forgottenempire.arma3servergui.creatorDLC.entities.CreatorDLC;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
-import cz.forgottenempire.arma3servergui.server.dtos.ServerCreatorDLCDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.arma3servergui.server.dtos.ServerWorkshopModDto;
-import cz.forgottenempire.arma3servergui.server.dtos.ServersDto;
 import cz.forgottenempire.arma3servergui.server.entities.Server;
+import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
+import cz.forgottenempire.arma3servergui.workshop.dtos.CreatorDlcDto;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.Collection;
 import java.util.List;
@@ -31,9 +30,13 @@ public interface ServerMapper {
 
     WorkshopMod ServerWorkshopModDtoToWorkshopMod(ServerWorkshopModDto serverWorkshopModDto);
 
-    ServerCreatorDLCDto creatorDLCToServerCreatorDLCDto(CreatorDLC creatorDLC);
-
-    CreatorDLC ServerCreatorDLCDtoToCreatorDLC(ServerCreatorDLCDto serverCreatorDLCDto);
-
     List<ServerDto> serversToServerDtos(Collection<Server> servers);
+
+    default CreatorDlcDto creatorDlcToCreatorDlcDto(Arma3CDLC cdlc) {
+        return new CreatorDlcDto(cdlc.getId(), cdlc.getName());
+    }
+
+    default Arma3CDLC creatorDlcDtoToCreatorDlc(CreatorDlcDto creatorDlcDto) {
+        return Arma3CDLC.fromId(creatorDlcDto.getId());
+    }
 }

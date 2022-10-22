@@ -43,17 +43,10 @@ class App extends Component {
                     <main role="main" className="container">
                         <Routes>
                             <Route index element={
-                                <ProtectedRoute>
-                                    <ServerDashBoard systemInfo={systemInfo} serverStatus={serverStatus} alive={alive}
-                                                     onUpdate={this.updateServerStatus}
-                                    />
-                                </ProtectedRoute>}
-                            />
-                            <Route path="login" exact element={<Login/>}/>
-                            <Route path="logout" exact element={<Logout/>}/>
-                            <Route path="servers" element={
                                 <ProtectedRoute><ServersPage/></ProtectedRoute>
                             }/>
+                            <Route path="login" exact element={<Login/>}/>
+                            <Route path="logout" exact element={<Logout/>}/>
                             <Route path="servers/:id" element={
                                 <ProtectedRoute><ServerSettingsPage/></ProtectedRoute>
                             }/>

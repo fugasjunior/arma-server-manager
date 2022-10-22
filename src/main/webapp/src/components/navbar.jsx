@@ -15,16 +15,10 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/">Dashboard</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="/settings">Settings</NavLink>
+                            <NavLink className="nav-link" to="/">Servers</NavLink>
                         </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/mods">Mods</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="/creatordlcs">Creator DLCs</NavLink>
                         </li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/scenarios">Scenarios</NavLink>

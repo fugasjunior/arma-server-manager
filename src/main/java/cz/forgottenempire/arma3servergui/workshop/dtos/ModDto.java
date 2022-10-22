@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import lombok.Data;
 
 @Data
-public class WorkshopModDto {
+public class ModDto {
     @Id
     private Long id;
     private String name;

@@ -39,7 +39,7 @@ public class ServerController {
     public ResponseEntity<ServersDto> getAllServers() {
         List<ServerDto> serverDtos = serverService.getAllServers()
                 .stream()
-                .map(s -> serverMapper.serverToServerDto(s)).toList();
+                .map(server -> serverMapper.serverToServerDto(server)).toList();
         serverDtos.forEach(s -> {
             ServerInstanceInfo instanceInfo = serverService.getServerInstanceInfo(s.getId());
             ServerInstanceInfoDto instanceInfoDto = serverMapper.serverInstanceInfoToServerInstanceInfoDto(

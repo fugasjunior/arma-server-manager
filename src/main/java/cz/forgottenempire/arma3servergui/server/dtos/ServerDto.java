@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.server.dtos;
 
 import cz.forgottenempire.arma3servergui.server.entities.Server.ServerType;
+import cz.forgottenempire.arma3servergui.workshop.dtos.CreatorDlcDto;
 import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -35,7 +36,7 @@ public class ServerDto {
     private String additionalOptions;
 
     private List<ServerWorkshopModDto> activeMods;
-    private List<ServerCreatorDLCDto> activeDLCs;
+    private List<CreatorDlcDto> activeDLCs;
 
     private ServerInstanceInfoDto instanceInfo;
 }

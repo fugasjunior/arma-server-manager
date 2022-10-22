@@ -1,11 +1,12 @@
 package cz.forgottenempire.arma3servergui.server.entities;
 
-import cz.forgottenempire.arma3servergui.creatorDLC.entities.CreatorDLC;
+import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.List;
-import javax.annotation.processing.Generated;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -58,8 +59,9 @@ public class Server {
     @OneToMany
     private List<WorkshopMod> activeMods;
 
-    @OneToMany
-    private List<CreatorDLC> activeDLCs;
+    @ElementCollection(targetClass = Arma3CDLC.class)
+    @Enumerated(EnumType.STRING)
+    private List<Arma3CDLC> activeDLCs;
 
     public enum ServerType {
         ARMA3,
