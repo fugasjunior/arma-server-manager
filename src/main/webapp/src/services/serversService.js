@@ -11,6 +11,10 @@ export function getServer(id) {
     return http.get(apiEndpoint + "/" + id);
 }
 
+export function createServer(serverInfo) {
+    return http.post(apiEndpoint, serverInfo);
+}
+
 export function updateServer(id, serverInfo) {
     return http.put(apiEndpoint + "/" + id, serverInfo);
 }

@@ -14,6 +14,7 @@ import Logout from "./components/auth/logout";
 import ServersPage from "./pages/ServersPage";
 import ServerSettingsPage from "./pages/ServerSettingsPage";
 import ModsPage from "./pages/ModsPage";
+import NewServerPage from "./pages/NewServerPage";
 
 class App extends Component {
     state = {
@@ -45,6 +46,9 @@ class App extends Component {
                             }/>
                             <Route path="login" exact element={<Login/>}/>
                             <Route path="logout" exact element={<Logout/>}/>
+                            <Route path="servers/new" element={
+                                <ProtectedRoute><NewServerPage/></ProtectedRoute>
+                            }/>
                             <Route path="servers/:id" element={
                                 <ProtectedRoute><ServerSettingsPage/></ProtectedRoute>
                             }/>

@@ -3,6 +3,7 @@ import {Fragment, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {useInterval} from "../hooks/use-interval";
 import "./ServersPage.css";
+import ServerListEntry from "../components/serverListEntry";
 
 const ServersPage = () => {
     const [servers, setServers] = useState([]);
@@ -20,9 +21,7 @@ const ServersPage = () => {
         setServers(servers.servers);
     }
 
-    const isServerRunning = server => (server.instanceInfo && server.instanceInfo.alive);
-
-    const serverWithSamePortRunning = server => {
+    const isServerWithSamePortRunning = server => {
         const activeServerWithSamePort = servers.filter(s => s !== server)
         .filter(s => s.instanceInfo && s.instanceInfo.alive)
         .filter(s => s.port === server.port || s.queryPort === server.queryPort);
@@ -70,53 +69,23 @@ const ServersPage = () => {
     }
 
     return (
-            <div className="servers">
-                <table className="table servers__list">
-                    {servers.map(server => (
-                            <tr className="server" key={server.id}>
-                                <td><img className="server__icon" src="./img/arma3_icon.png" alt="Arma 3 icon"/></td>
-                                <td className="server__info">
-                                    <p className="server__name">{server.name}</p>
-                                    <p>Port: {server.port} (query: {server.queryPort})</p>
-                                    {server.activeMods && <p>Mods active</p>}
-                                    {server.activeDLCs && <p>Creator DLC(s) active</p>}
-                                </td>
-                                <td>{isServerRunning(server) ?
-                                        <Fragment>
-                                            <button type="button" className="btn btn-danger"
-                                                    onClick={() => handleStopServer(server.id)}>Stop
-                                            </button>
-                                            <button type="button" className="btn btn-secondary"
-                                                    onClick={() => handleRestartServer(server.id)}>Restart
-                                            </button>
-                                        </Fragment>
-                                        : <button type="button" className="btn btn-primary"
-                                                  disabled={serverWithSamePortRunning(server)}
-                                                  onClick={() => handleStartServer(server.id)}>
-                                            Start
-                                        </button>
-                                }
-                                    <Link className="btn btn-info" to={"/servers/" + server.id}>Settings</Link>
-                                </td>
-                                <td>
-                                    {!isServerRunning(server) &&
-                                            <button className="btn btn-danger"
-                                                    onClick={() => handleDeleteServer(server.id)}>Delete
-                                            </button>}
-                                </td>
-                                {isServerRunning(server) && <td>
-                                    <p>Started on: {server.instanceInfo.startedAt}</p>
-                                    <p>Players: {server.instanceInfo.playersOnline} / {server.instanceInfo.maxPlayers}</p>
-                                    {server.instanceInfo.version && <p>Version: {server.instanceInfo.version}</p>}
-                                    {server.instanceInfo.map && <p>Map: {server.instanceInfo.map}</p>}
-                                    {server.instanceInfo.description &&
-                                            <p>Description: {server.instanceInfo.description}</p>}
-                                </td>
-                                }
-                            </tr>))
-                    }
-                </table>
-            </div>
+            <>
+                <Link to="/servers/new" className="btn btn-lg btn-success mb-4">Create new server</Link>
+                <div className="servers">
+                    <table className="table servers__list">
+                        {servers.map(server =>
+                                <ServerListEntry
+                                        server={server}
+                                        onStartServer={handleStartServer}
+                                        onStopServer={handleStopServer}
+                                        onRestartServer={handleRestartServer}
+                                        onDeleteServer={handleDeleteServer}
+                                        serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                                />
+                        )}
+                    </table>
+                </div>
+            </>
     )
 }
 
