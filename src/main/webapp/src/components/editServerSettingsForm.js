@@ -17,6 +17,14 @@ const EditServerSettingsForm = props => {
                     </div>
 
                     <div className="form-group row">
+                        <label htmlFor="description" className="col-sm-2 col-form-label">Description</label>
+                        <div className="col-sm-10">
+                            <Field id="description" name="description" placeholder="Server description"
+                                   className="form-control"/>
+                        </div>
+                    </div>
+
+                    <div className="form-group row">
                         <label htmlFor="port" className="col-sm-2 col-form-label">Port</label>
                         <div className="col-sm-10">
                             <Field id="port" name="port" type="number" placeholder="Port" className="form-control"/>
@@ -24,13 +32,13 @@ const EditServerSettingsForm = props => {
                     </div>
 
                     {props.server.type !== "ARMA3" &&
-                        <div className="form-group row">
-                            <label htmlFor="queryPort" className="col-sm-2 col-form-label">Query port</label>
-                            <div className="col-sm-10">
-                                <Field id="queryPort" name="queryPort" type="number" placeholder="Query port"
-                                       className="form-control"/>
+                            <div className="form-group row">
+                                <label htmlFor="queryPort" className="col-sm-2 col-form-label">Query port</label>
+                                <div className="col-sm-10">
+                                    <Field id="queryPort" name="queryPort" type="number" placeholder="Query port"
+                                           className="form-control"/>
+                                </div>
                             </div>
-                        </div>
                     }
 
                     <div className="form-group row">
@@ -128,7 +136,8 @@ const EditServerSettingsForm = props => {
 
                     <button disabled={props.isServerRunning}
                             title={props.isServerRunning && "Stop the server to be able to update the settings."}
-                            className="btn btn-primary btn-lg" type="submit">Submit</button>
+                            className="btn btn-primary btn-lg" type="submit">Submit
+                    </button>
                 </Form>
             </Formik>
     );

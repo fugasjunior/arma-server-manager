@@ -36,6 +36,8 @@ public class Server {
     @NotNull
     private ServerType type;
 
+    private String description;
+
     @NotEmpty
     private String name;
     @Min(1)

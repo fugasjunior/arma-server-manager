@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.system.services.impl;
 
+import com.google.common.base.Supplier;
 import cz.forgottenempire.arma3servergui.system.conditions.LinuxEnvironmentCondition;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,18 +17,18 @@ import org.springframework.stereotype.Service;
 public class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
 
     @Override
-    public long getMemoryLeft() {
-        return getValueFromMemInfo("MemAvailable");
+    protected Supplier<Long> memoryLeftSupplier() {
+        return () -> getValueFromMemInfo("MemAvailable");
     }
 
     @Override
-    public long getMemoryTotal() {
-        return getValueFromMemInfo("MemTotal");
+    protected Supplier<Long> memoryTotalSupplier() {
+        return () -> getValueFromMemInfo("MemMotal");
     }
 
     @Override
-    public double getCpuUsage() {
-        return osBean.getSystemLoadAverage() / osBean.getAvailableProcessors();
+    protected Supplier<Double> cpuUsageSupplier() {
+        return () -> osBean.getSystemLoadAverage() / osBean.getAvailableProcessors();
     }
 
     private Long getValueFromMemInfo(String key) {

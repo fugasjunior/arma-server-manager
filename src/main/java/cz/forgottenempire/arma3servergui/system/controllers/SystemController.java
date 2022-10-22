@@ -1,12 +1,9 @@
 package cz.forgottenempire.arma3servergui.system.controllers;
 
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDetails;
-import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
 import cz.forgottenempire.arma3servergui.system.services.SystemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,33 +14,23 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SystemController {
 
-    @Value("${hostName}")
-    private String hostName;
-
-    private SystemService systemService;
-
-    @GetMapping("/space")
-    public ResponseEntity<Long> getSpaceLeftOnDevice() {
-        return new ResponseEntity<>(systemService.getDiskSpaceLeft(), HttpStatus.OK);
-    }
-
-    @GetMapping("/info")
-    public ResponseEntity<ServerDetails> getServerDetails() {
-        ServerDetails details = new ServerDetails();
-
-        details.setHostName(hostName);
-
-        details.setSpaceLeft(systemService.getDiskSpaceLeft());
-        details.setSpaceTotal(systemService.getDiskSpaceTotal());
-        details.setMemoryLeft(systemService.getMemoryLeft());
-        details.setMemoryTotal(systemService.getMemoryTotal());
-        details.setCpuUsage(systemService.getCpuUsage());
-
-        return ResponseEntity.ok(details);
-    }
+    private final SystemService systemService;
 
     @Autowired
-    public void setSystemService(SystemService systemService) {
+    public SystemController(SystemService systemService) {
         this.systemService = systemService;
+    }
+
+    @GetMapping
+    public ResponseEntity<ServerDetails> getServerDetails() {
+        ServerDetails details = ServerDetails.builder()
+                .spaceLeft(systemService.getDiskSpaceLeft())
+                .spaceTotal(systemService.getDiskSpaceTotal())
+                .memoryLeft(systemService.getMemoryLeft())
+                .memoryTotal(systemService.getMemoryTotal())
+                .cpuUsage(systemService.getCpuUsage())
+                .build();
+
+        return ResponseEntity.ok(details);
     }
 }

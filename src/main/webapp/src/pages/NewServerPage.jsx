@@ -101,6 +101,7 @@ const ServerSettingsPage = () => {
                             <EditServerSettingsForm server={{
                                 type: "ARMA3",
                                 name: "",
+                                description: "",
                                 port: 2302,
                                 queryPort: 2303,
                                 maxPlayers: 32,

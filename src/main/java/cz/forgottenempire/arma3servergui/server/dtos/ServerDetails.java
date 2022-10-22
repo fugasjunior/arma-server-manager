@@ -1,15 +1,11 @@
 package cz.forgottenempire.arma3servergui.server.dtos;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class ServerDetails {
-    private String version;
-    private boolean updating;
-
-    private String hostName;
-    private int port;
-
     private long spaceLeft;
     private long spaceTotal;
 

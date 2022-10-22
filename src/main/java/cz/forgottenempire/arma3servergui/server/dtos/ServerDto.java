@@ -13,6 +13,7 @@ public class ServerDto {
     private Long id;
     @NotEmpty
     private String name;
+    private String description;
     @Min(1)
     private int port;
     @Min(1)
