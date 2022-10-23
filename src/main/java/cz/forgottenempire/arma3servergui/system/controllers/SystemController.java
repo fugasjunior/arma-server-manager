@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.system.controllers;
 
-import cz.forgottenempire.arma3servergui.server.dtos.ServerDetails;
+import cz.forgottenempire.arma3servergui.server.serverinstance.dtos.ServerDetails;
 import cz.forgottenempire.arma3servergui.system.services.SystemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

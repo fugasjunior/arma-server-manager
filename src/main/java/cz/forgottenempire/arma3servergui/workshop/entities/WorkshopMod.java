@@ -1,15 +1,12 @@
 package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import cz.forgottenempire.arma3servergui.server.entities.Server;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
