@@ -33,9 +33,6 @@ arma3server.logDir=/home/arma3gui/logs/server
 
 
 ### Server config
-# Hostname or server IP to be used in the server system info
-hostName=forgottenEmpire.cz
-
 # Optional branch to be used for Arma 3 server. creatordlc branch recommended for playing with community DLCs.
 betaBranch=creatordlc
 

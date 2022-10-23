@@ -11,4 +11,12 @@ public interface SystemService {
     long getMemoryTotal();
 
     double getCpuUsage();
+
+    int getProcessorCount();
+
+    String getOsName();
+
+    String getOsVersion();
+
+    String getOsArchitecture();
 }

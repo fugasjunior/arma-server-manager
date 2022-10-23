@@ -13,4 +13,9 @@ public class ServerDetails {
     private long memoryTotal;
 
     private double cpuUsage;
+    private int cpuCount;
+
+    private String osName;
+    private String osVersion;
+    private String osArchitecture;
 }

@@ -1,3 +1,5 @@
+-- Sample data only for development purposes
+
 INSERT INTO additional_server (id, name, server_dir, command, image_url)
 VALUES (0, 'AVS Code', 'C:\Program Files\Microsoft VS Code', 'C:\Program Files\Microsoft VS Code\Code.exe',
         'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png'),

@@ -29,6 +29,10 @@ public class SystemController {
                 .memoryLeft(systemService.getMemoryLeft())
                 .memoryTotal(systemService.getMemoryTotal())
                 .cpuUsage(systemService.getCpuUsage())
+                .cpuCount(systemService.getProcessorCount())
+                .osName(systemService.getOsName())
+                .osVersion(systemService.getOsVersion())
+                .osArchitecture(systemService.getOsArchitecture())
                 .build();
 
         return ResponseEntity.ok(details);

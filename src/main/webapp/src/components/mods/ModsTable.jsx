@@ -13,7 +13,7 @@ import ModsTableToolbar from "./ModsTableToolbar";
 import EnhancedTableHead from "../../UI/Table/EnhancedTableHead";
 import {humanFileSize} from "../../util/util";
 import PendingIcon from "@mui/icons-material/Pending";
-import {Button, CircularProgress, Stack, TextField} from "@mui/material";
+import {Button, CircularProgress, Stack, TextField, Typography} from "@mui/material";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
 import Tooltip from "@mui/material/Tooltip";
@@ -123,74 +123,76 @@ const ModsTable = (props) => {
                             onUpdateClicked={props.onUpdateClicked}
                             onUninstallClicked={props.onUninstallClicked}
                     />
-                    <TableContainer>
-                        <Table
-                                sx={{minWidth: 750}}
-                                aria-labelledby="tableTitle"
-                                size='small'
-                        >
-                            <EnhancedTableHead
-                                    numSelected={selected.length}
-                                    order={order}
-                                    orderBy={orderBy}
-                                    onSelectAllClick={props.onSelectAllClick}
-                                    onRequestSort={handleRequestSort}
-                                    rowCount={rows.length}
-                                    headCells={headCells}
-                            />
-                            <TableBody>
-                                {rows.slice().sort(getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    const isItemSelected = isSelected(row.id);
-                                    const labelId = `enhanced-table-checkbox-${index}`;
+                    {rows.length > 0 &&
+                            <TableContainer>
+                                <Table
+                                        sx={{minWidth: 750}}
+                                        aria-labelledby="tableTitle"
+                                        size='small'
+                                >
+                                    <EnhancedTableHead
+                                            numSelected={selected.length}
+                                            order={order}
+                                            orderBy={orderBy}
+                                            onSelectAllClick={props.onSelectAllClick}
+                                            onRequestSort={handleRequestSort}
+                                            rowCount={rows.length}
+                                            headCells={headCells}
+                                    />
+                                    <TableBody>
+                                        {rows.slice().sort(getComparator(order, orderBy))
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        .map((row, index) => {
+                                            const isItemSelected = isSelected(row.id);
+                                            const labelId = `enhanced-table-checkbox-${index}`;
 
-                                    return (
-                                            <TableRow
-                                                    hover
-                                                    onClick={(event) => props.onClick(event, row.id)}
-                                                    role="checkbox"
-                                                    aria-checked={isItemSelected}
-                                                    tabIndex={-1}
-                                                    key={row.id}
-                                                    selected={isItemSelected}
-                                            >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                            color="primary"
-                                                            checked={isItemSelected}
-                                                            inputProps={{
-                                                                'aria-labelledby': labelId,
-                                                            }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell
-                                                        component="th"
-                                                        id={labelId}
-                                                        scope="row"
-                                                        padding="none"
+                                            return (
+                                                    <TableRow
+                                                            hover
+                                                            onClick={(event) => props.onClick(event, row.id)}
+                                                            role="checkbox"
+                                                            aria-checked={isItemSelected}
+                                                            tabIndex={-1}
+                                                            key={row.id}
+                                                            selected={isItemSelected}
+                                                    >
+                                                        <TableCell padding="checkbox">
+                                                            <Checkbox
+                                                                    color="primary"
+                                                                    checked={isItemSelected}
+                                                                    inputProps={{
+                                                                        'aria-labelledby': labelId,
+                                                                    }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell
+                                                                component="th"
+                                                                id={labelId}
+                                                                scope="row"
+                                                                padding="none"
+                                                        >
+                                                            {row.id}
+                                                        </TableCell>
+                                                        <TableCell>{row.name}</TableCell>
+                                                        <TableCell>{humanFileSize(row.fileSize)}</TableCell>
+                                                        <TableCell>{row.lastUpdated}</TableCell>
+                                                        <TableCell>{getInstalledIcon(row)}</TableCell>
+                                                    </TableRow>
+                                            );
+                                        })}
+                                        {emptyRows > 0 && (
+                                                <TableRow
+                                                        style={{
+                                                            height: 33 * emptyRows,
+                                                        }}
                                                 >
-                                                    {row.id}
-                                                </TableCell>
-                                                <TableCell>{row.name}</TableCell>
-                                                <TableCell>{humanFileSize(row.fileSize)}</TableCell>
-                                                <TableCell>{row.lastUpdated}</TableCell>
-                                                <TableCell>{getInstalledIcon(row)}</TableCell>
-                                            </TableRow>
-                                    );
-                                })}
-                                {emptyRows > 0 && (
-                                        <TableRow
-                                                style={{
-                                                    height: 33 * emptyRows,
-                                                }}
-                                        >
-                                            <TableCell colSpan={6}/>
-                                        </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                                    <TableCell colSpan={6}/>
+                                                </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                    }
                     <Stack direction="row" justifyContent="space-between" alignItems="start" m={2}>
                         <Stack direction="row">
                             <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
@@ -198,7 +200,7 @@ const ModsTable = (props) => {
                             <Button variant="text" size="small" disabled={enteredModId.length === 0}
                                     onClick={() => props.onInstallClicked(enteredModId)}>Install</Button>
                         </Stack>
-                        <TablePagination
+                        {rows.length > 0 && <TablePagination
                                 rowsPerPageOptions={[10, 15, 25, 50]}
                                 component="div"
                                 count={rows.length}
@@ -206,7 +208,7 @@ const ModsTable = (props) => {
                                 page={page}
                                 onPageChange={handleChangePage}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
-                        />
+                        />}
                     </Stack>
                 </Paper>
             </Box>

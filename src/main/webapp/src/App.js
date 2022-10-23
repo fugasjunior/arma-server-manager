@@ -1,13 +1,11 @@
 import React from 'react';
 import {ToastContainer} from "material-react-toastify";
 import './App.css';
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 import {Route, Routes} from "react-router-dom";
-import AppConfig from "./components/appConfig";
-import AdditionalServers from "./components/additionalServers/additionalServers";
-import Login from "./components/auth/login";
-import ProtectedRoute from "./components/protectedRoute";
-import Logout from "./components/auth/logout";
+import Login from "./components/auth/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Logout from "./components/auth/Logout";
 import ServersPage from "./pages/ServersPage";
 import ServerSettingsPage from "./pages/ServerSettingsPage";
 import ModsPage from "./pages/ModsPage";
@@ -15,6 +13,9 @@ import NewServerPage from "./pages/NewServerPage";
 import {Container} from "@mui/material";
 import 'material-react-toastify/dist/ReactToastify.css'
 import ScenariosPage from "./pages/ScenariosPage";
+import AppConfigPage from "./pages/AppConfigPage";
+import AdditionalServersPage from "./pages/AdditionalServersPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const App = () => {
     return (
@@ -23,7 +24,7 @@ const App = () => {
                 <Container>
                     <Routes>
                         <Route index element={
-                            <ProtectedRoute><ServersPage/></ProtectedRoute>
+                            <ProtectedRoute><DashboardPage/></ProtectedRoute>
                         }/>
                         <Route path="login" exact element={<Login/>}/>
                         <Route path="logout" exact element={<Logout/>}/>
@@ -43,10 +44,10 @@ const App = () => {
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
                         }/>
                         <Route path="config" element={
-                            <ProtectedRoute><AppConfig/></ProtectedRoute>
+                            <ProtectedRoute><AppConfigPage/></ProtectedRoute>
                         }/>
                         <Route path="additionalServers" element={
-                            <ProtectedRoute><AdditionalServers/></ProtectedRoute>
+                            <ProtectedRoute><AdditionalServersPage/></ProtectedRoute>
                         }/>
                     </Routes>
                 </Container>

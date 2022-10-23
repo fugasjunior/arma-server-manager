@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {createServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../UI/ListBuilder";
-import EditServerSettingsForm from "../components/servers/editServerSettingsForm";
+import EditServerSettingsForm from "../components/servers/EditServerSettingsForm";
 import {getMods} from "../services/modsService";
 import {Button, Modal, Typography} from "@mui/material";
 

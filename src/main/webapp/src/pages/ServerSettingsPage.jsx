@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {getServer, updateServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../UI/ListBuilder";
-import EditServerSettingsForm from "../components/servers/editServerSettingsForm";
+import EditServerSettingsForm from "../components/servers/EditServerSettingsForm";
 import {getMods} from "../services/modsService";
 import {Box, Button, Modal, Typography} from "@mui/material";
 
@@ -61,14 +61,7 @@ const ServerSettingsPage = () => {
 
         try {
             await updateServer(id, request);
-            toast.success('🦄 Wow so easy!', {
-                position: "bottom-left",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            });
+            toast.success("Server successfully updated");
         } catch (e) {
             console.error(e);
         }
