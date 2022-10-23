@@ -1,8 +1,14 @@
 package cz.forgottenempire.arma3servergui.scenario.services.impl;
 
+import static java.time.ZoneId.systemDefault;
+
 import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.arma3servergui.scenario.services.ScenarioService;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -66,7 +72,10 @@ public class ScenarioServiceImpl implements ScenarioService {
         }
         for (Iterator<File> it = FileUtils.iterateFiles(missionsFolder, extensions, false); it.hasNext(); ) {
             File scenarioFile = it.next();
-            Scenario scenarioDto = new Scenario(scenarioFile.getName(), scenarioFile.length());
+            Scenario scenarioDto = new Scenario();
+            scenarioDto.setName(scenarioFile.getName());
+            scenarioDto.setFileSize(scenarioFile.length());
+            setScenarioFileCreationTime(scenarioFile, scenarioDto);
             scenarios.add(scenarioDto);
         }
         scenarios.sort(Comparator.naturalOrder());
@@ -87,5 +96,17 @@ public class ScenarioServiceImpl implements ScenarioService {
 
     private String getMissionsFolder() {
         return serverDir + File.separatorChar + "mpmissions";
+    }
+
+    private void setScenarioFileCreationTime(File scenarioFile, Scenario scenarioDto) {
+        try {
+            BasicFileAttributes attr = Files.readAttributes(scenarioFile.toPath(), BasicFileAttributes.class);
+            FileTime fileCreationTime = attr.creationTime();
+            LocalDateTime dateTime = LocalDateTime.ofInstant(fileCreationTime.toInstant(), systemDefault());
+            String formattedTime = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            scenarioDto.setCreatedOn(formattedTime);
+        } catch (IOException e) {
+            log.warn("Could not get file creation time for scenario file '{}'", scenarioFile.getName());
+        }
     }
 }

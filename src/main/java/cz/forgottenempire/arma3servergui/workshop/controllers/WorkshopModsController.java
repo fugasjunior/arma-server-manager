@@ -8,7 +8,10 @@ import cz.forgottenempire.arma3servergui.workshop.dtos.ModsDto;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.mappers.ModMapper;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,6 +49,14 @@ public class WorkshopModsController {
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
 
+    @PostMapping
+    public ResponseEntity<ModsDto> installOrUpdateMods(@RequestParam List<Long> modIds) {
+        log.info("Installing or updating mods: {}", modIds);
+        List<WorkshopMod> workshopMods = modIds.stream()
+                .map(modsService::installOrUpdateMod)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new ModsDto(modMapper.modsToModDtos(workshopMods), Collections.emptyList()));
+    }
     @PostMapping("/{id}")
     public ResponseEntity<ModDto> installOrUpdateMod(@PathVariable Long id) {
         log.info("Installing mod id {}", id);
@@ -52,18 +64,18 @@ public class WorkshopModsController {
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
 
+    @DeleteMapping
+    public ResponseEntity<?> uninstallMods(@RequestParam List<Long> modIds) {
+        log.info("Uninstalling mods: {}", modIds);
+        modIds.forEach(modsService::uninstallMod);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> uninstallMod(@PathVariable Long id) {
         log.info("Uninstalling mod {}", id);
         modsService.uninstallMod(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/update")
-    public ResponseEntity<WorkshopMod> updateAllMods() {
-        log.info("Updating all mods");
-        modsService.updateAllMods();
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Autowired

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import "./ServersPage.css";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {getServer, updateServer} from "../services/serversService";
-import {toast} from "react-toastify";
+import {toast} from "material-react-toastify";
 import ListBuilder from "../UI/ListBuilder";
-import EditServerSettingsForm from "../components/editServerSettingsForm";
+import EditServerSettingsForm from "../components/servers/editServerSettingsForm";
 import {getMods} from "../services/modsService";
+import {Box, Button, Modal, Typography} from "@mui/material";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
@@ -15,6 +15,10 @@ const ServerSettingsPage = () => {
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [selectedDlcs, setSelectedDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [modsModalOpen, setModsModalOpen] = useState(false);
+    const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -57,11 +61,21 @@ const ServerSettingsPage = () => {
 
         try {
             await updateServer(id, request);
-            toast.success("Server settings successfully changed");
+            toast.success('🦄 Wow so easy!', {
+                position: "bottom-left",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
         } catch (e) {
             console.error(e);
-            toast.error("Submitting server settings failed");
         }
+    }
+
+    const handleCancel = () => {
+        navigate("/servers");
     }
 
     const handleModSelect = option => {
@@ -104,21 +118,35 @@ const ServerSettingsPage = () => {
         });
     }
 
+    const handleToggleModsModal = () => {
+        setModsModalOpen(prevState => !prevState);
+    }
+
+    const handleToggleDlcsModal = () => {
+        setDlcsModalOpen(prevState => !prevState);
+    }
+
     return (
             <>
-                <h1>Server</h1>
+                <Typography variant="h4">Server Settings</Typography>
                 {loading && <h2>Loading server data...</h2>}
                 {!loading &&
                         <>
-                            <p>Type: {server.type}</p>
-                            <EditServerSettingsForm server={server} onSubmit={handleSubmit}
+                            <EditServerSettingsForm server={server} onSubmit={handleSubmit} onCancel={handleCancel}
                                                     isServerRunning={server.instanceInfo && server.instanceInfo.alive}/>
-                            <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                         onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                         itemsLabel="mods" showFilter/>
-                            <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
-                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
-                                         itemsLabel="DLCs"/>
+                            <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                            <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
+                            <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+
+                                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                                 itemsLabel="mods" showFilter/>
+                            </Modal>
+                            <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
+                                    <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
+                                                 onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                                 itemsLabel="DLCs"/>
+                            </Modal>
                         </>}
 
             </>

@@ -1,9 +1,10 @@
 import {deleteServer, getServers, restartServer, startServer, stopServer} from "../services/serversService"
-import {Fragment, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {useInterval} from "../hooks/use-interval";
-import "./ServersPage.css";
-import ServerListEntry from "../components/serverListEntry";
+import ServerListEntry from "../components/servers/serverListEntry";
+import {Button, Divider, Fab, Stack} from "@mui/material";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const ServersPage = () => {
     const [servers, setServers] = useState([]);
@@ -70,23 +71,24 @@ const ServersPage = () => {
 
     return (
             <>
-                <Link to="/servers/new" className="btn btn-lg btn-success mb-4">Create new server</Link>
-                <div className="servers">
-                    <table className="table servers__list">
-                        <tbody>
-                        {servers.map(server =>
-                                <ServerListEntry key={server.id}
-                                                 server={server}
-                                                 onStartServer={handleStartServer}
-                                                 onStopServer={handleStopServer}
-                                                 onRestartServer={handleRestartServer}
-                                                 onDeleteServer={handleDeleteServer}
-                                                 serverWithSamePortRunning={isServerWithSamePortRunning(server)}
-                                />
-                        )}
-                        </tbody>
-                    </table>
-                </div>
+                <Button variant="contained" size="large" sx={{mt: 2, mb: 4}}
+                component={Link} to="/servers/new"
+                >
+                    <AddCircleOutlineIcon sx={{mr: 1}}/>
+                    Create new server
+                </Button>
+                <Stack spacing={4} divider={<Divider orientation="horizontal" flexItem />}>
+                    {servers.map(server =>
+                            <ServerListEntry key={server.id}
+                                             server={server}
+                                             onStartServer={handleStartServer}
+                                             onStopServer={handleStopServer}
+                                             onRestartServer={handleRestartServer}
+                                             onDeleteServer={handleDeleteServer}
+                                             serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                            />
+                    )}
+                </Stack>
             </>
     )
 }

@@ -1,5 +1,6 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import styles from "./ListBuilder.module.css";
+import {Box, Grid, List, ListItemButton, TextField, Typography} from "@mui/material";
 
 const ListBuilder = props => {
     const {showFilter, availableOptions, selectedOptions, onSelect, onDeselect} = props;
@@ -16,33 +17,40 @@ const ListBuilder = props => {
     const itemsLabel = props.itemsLabel ?? "options";
 
     return (
-            <div className={styles.listbuilder}>
-                <div className={styles.listbuilder__list}>
-                    {showFilter && <div className={styles.listbuilder__filter}>
-                        <input placeholder="Filter" onChange={handleFilterChange}/>
-                    </div>}
-                    {filteredAvailableOptions.length === 0 && <span>No {itemsLabel} available</span>}
-                    {filteredAvailableOptions.map(opt =>
-                            <div className={styles.listbuilder__item}
-                                 key={opt.id}
-                                 onClick={() => onSelect(opt)}
-                            >
-                                {opt.name}
-                            </div>
-                    )}
-                </div>
-                <div className={styles.listbuilder__list}>
-                    {selectedOptions.length === 0 && <span>No {itemsLabel} selected</span>}
-                    {selectedOptions.map(opt =>
-                            <div className={styles.listbuilder__item}
-                                 key={opt.id}
-                                 onClick={() => onDeselect(opt)}
-                            >
-                                {opt.name}
-                            </div>
-                    )}
-                </div>
-            </div>
+            <Box className={styles.box} sx={{
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 4,
+            }}>
+                <Typography id="transition-modal-title" variant="h6">
+                    Select mods
+                </Typography>
+                <TextField label="Filter" type="search" variant="standard" onChange={handleFilterChange}/>
+                <Grid container spacing={4}>
+                    <Grid item xs={6}>
+                        <Typography variant="h6">Available {itemsLabel}</Typography>
+                        <List className={styles.list}>
+                            {filteredAvailableOptions.length === 0 && <span>No {itemsLabel} available</span>}
+                            {filteredAvailableOptions.map(opt =>
+                                    <ListItemButton key={opt.id} onClick={() => onSelect(opt)}>
+                                        {opt.name}
+                                    </ListItemButton>
+                            )}
+                        </List>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Typography variant="h6">Enabled {itemsLabel}</Typography>
+                        <List className={styles.list}>
+                            {selectedOptions.length === 0 && <span>No {itemsLabel} selected</span>}
+                            {selectedOptions.map(opt =>
+                                    <ListItemButton key={opt.id} onClick={() => onDeselect(opt)}>
+                                        {opt.name}
+                                    </ListItemButton>
+                            )}
+                        </List>
+                    </Grid>
+                </Grid>
+            </Box>
     )
 }
 

@@ -4,9 +4,6 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.css";
-import "font-awesome/css/font-awesome.css"
-import 'react-toastify/dist/ReactToastify.css';
 
 ReactDOM.render(
     <BrowserRouter>

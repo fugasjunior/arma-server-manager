@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {getAuth, setAuth} from "../services/configService";
-import {toast} from "react-toastify";
+import {toast} from "material-react-toastify";
 import ReactTooltip from "react-tooltip";
 
 class AppConfig extends Component {

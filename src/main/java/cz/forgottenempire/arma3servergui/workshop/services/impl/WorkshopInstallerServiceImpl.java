@@ -17,6 +17,7 @@ import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -151,6 +152,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         try {
             deleteSymlink(mod);
             FileUtils.deleteDirectory(modDirectory);
+        } catch (NoSuchFileException ignored) {
         } catch (IOException e) {
             log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
             throw new RuntimeException(e);

@@ -1,8 +1,8 @@
 import React, {Component} from "react";
-import {getServers, startServer, stopServer} from "../services/additionalServersService"
-import PageSizeSelect from "./pagination/pageSizeSelect";
-import Pagination from "./pagination/pagination";
-import {paginate} from "../util/paginate";
+import {getServers, startServer, stopServer} from "../../services/additionalServersService"
+import PageSizeSelect from "../pagination/pageSizeSelect";
+import Pagination from "../pagination/pagination";
+import {paginate} from "../../util/paginate";
 import "./additionalServers.css";
 
 class AdditionalServers extends Component {

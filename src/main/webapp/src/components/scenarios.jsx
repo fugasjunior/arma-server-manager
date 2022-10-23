@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {deleteScenario, downloadScenario, getScenarios, uploadScenario} from "../services/scenarioService";
 import {humanFileSize} from "../util/util";
-import {toast} from "react-toastify";
+import {toast} from "material-react-toastify";
 import Pagination from "./pagination/pagination";
 import {paginate} from "../util/paginate";
 import PageSizeSelect from "./pagination/pageSizeSelect";

@@ -1,78 +1,72 @@
-import React, {Component} from 'react';
-import {isAuthenticated, login} from "../../services/authService";
-import {Navigate} from "react-router-dom";
+import React, {Component, useState} from 'react';
+import {isUserAuthenticated, login} from "../../services/authService";
+import {Navigate, useNavigate} from "react-router-dom";
+import {Box, Button, Stack, TextField, Typography} from "@mui/material";
 
-class Login extends Component {
+const Login = () => {
 
-    state = {
-        username: "",
-        password: "",
-        error: false
-    }
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState(false);
 
-    handleSubmit = async e => {
+    const navigate = useNavigate()
+
+    const handleSubmit = async e => {
         e.preventDefault();
-        await this.doSubmit();
-    };
-
-    doSubmit = async () => {
         try {
-            const {username, password} = this.state;
             await login(username, password);
-            window.location = "/";
+            navigate("/");
         } catch (e) {
             if (e.response && e.response.status === 401) {
-                this.setState({error: true});
+                setError(true);
             }
         }
     };
 
-    handleUsernameChange = ({currentTarget: input}) => {
-        this.setState({username: input.value});
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
     }
 
-    handlePasswordChange = ({currentTarget: input}) => {
-        this.setState({password: input.value});
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
     }
 
-    render() {
-        if (isAuthenticated()) {
-            return <Navigate to="/"/>;
-        }
+    if(isUserAuthenticated()) {
+        return <Navigate to="/"/>;
+    }
 
-        return (
-                <div className="col-6">
-                    {this.state.error && <div className="alert alert-secondary" role="alert">
-                        Login failed!
-                    </div>}
-                    <form onSubmit={this.handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="username">
-                                Username
-                            </label>
-                            <input type="text" id="username" name="username"
-                                   className="form-control" placeholder="Enter username"
+    return (
+            <Box sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center",
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 4
+            }} alignContent="center">
+
+                <form onSubmit={handleSubmit}>
+                    <Stack spacing={2}>
+                        <Typography variant="h4" component="h2">
+                            Log in
+                        </Typography>
+                        <TextField type="text" id="username" name="username" placeholder="Enter username"
+                                   label="User name"
                                    required
-                                   value={this.state.username}
-                                   onChange={this.handleUsernameChange}/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="password">
-                                Password
-                            </label>
-                            <input type="password" id="password" name="password"
-                                   className="form-control" placeholder="Password"
+                                   value={username}
+                                   onChange={handleUsernameChange}/>
+                        <TextField type="password" id="password" name="password" placeholder="Password"
+                                   label="Password"
                                    required
-                                   value={this.state.password}
-                                   onChange={this.handlePasswordChange}/>
-                        </div>
-                        <div>
-                            <button type="submit" className="btn btn-primary">Submit</button>
-                        </div>
-                    </form>
-                </div>
-        )
-    }
-}
+                                   value={password}
+                                   onChange={handlePasswordChange}/>
+                        <Button fullWidth variant="contained" size="large" type="submit">Submit</Button>
+                    </Stack>
+                </form>
+            </Box>
+    );
+};
 
 export default Login;

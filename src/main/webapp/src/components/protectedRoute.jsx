@@ -1,9 +1,9 @@
 import React from 'react';
 import {Navigate, Route} from "react-router-dom";
-import {isAuthenticated} from "../services/authService";
+import {isUserAuthenticated} from "../services/authService";
 
 const ProtectedRoute = ({children}) => {
-    if (!isAuthenticated()) {
+    if (!isUserAuthenticated()) {
         return <Navigate to="/login"/>;
     }
     return children;

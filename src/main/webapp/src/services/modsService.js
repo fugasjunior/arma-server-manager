@@ -11,10 +11,15 @@ export function installMod(modId) {
     return http.post(apiEndpoint + "/" + modId);
 }
 
+export function updateMods(modIdsList) {
+    return http.post(apiEndpoint + "?modIds=" + modIdsList);
+}
+
+
 export function uninstallMod(modId) {
     return http.delete(apiEndpoint + "/" + modId);
 }
 
-export function updateAllMods() {
-    return http.post(apiEndpoint + "/update");
+export function uninstallMods(modIdsList) {
+    return http.delete(apiEndpoint + "?modIds=" + modIdsList);
 }

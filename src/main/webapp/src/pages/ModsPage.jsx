@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {getMods, installMod, updateAllMods, uninstallMod} from "../services/modsService";
-import {toast} from "react-toastify";
-import ModInstallForm from "../components/modInstallForm";
-import ModsTable from "../components/modsTable";
+import {getMods, installMod, uninstallMods, updateMods} from "../services/modsService";
+import {toast} from "material-react-toastify";
+import ModsTable from "../components/mods/ModsTable";
 import {useInterval} from "../hooks/use-interval";
+import ModsErrorAlertMessage from "../components/mods/ModsErrorAlertMessage";
 
 const ModsPage = () => {
     const [mods, setMods] = useState([]);
+    const [selected, setSelected] = useState([]);
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
@@ -31,89 +32,77 @@ const ModsPage = () => {
         }
     };
 
-    const handleUpdate = async (modId) => {
+    const handleUpdate = async () => {
         try {
-            await installMod(modId);
             setMods(prevState => {
-                const newState = [...prevState];
-                const updatedMod = newState.find(mod => mod.id === modId);
-                if (updatedMod) {
-                    updatedMod.installationStatus = "INSTALLATION_QUEUED";
-                    updatedMod.errorStatus = null;
+                const newMods = [...prevState];
+                for (const selectedModId of selected) {
+                    const selectedMod = newMods.find(mod => mod.id === selectedModId);
+                    selectedMod.installationStatus = "INSTALLATION_QUEUED";
+                    selectedMod.errorStatus = null;
                 }
-                return newState;
+                return newMods;
             })
+            await updateMods(selected.join(","));
         } catch (e) {
             console.error(e);
             toast.error("Error during mod install");
         }
     };
 
-    const handleUninstall = async (modId) => {
+    const handleUninstall = async () => {
         try {
+            // TODO add confirmation modal
             setMods(prevState => {
-                return prevState.filter(mod => mod.id !== modId);
+                return prevState.filter(mod => selected.indexOf(mod.id) === -1);
             })
-            await uninstallMod(modId);
+            setSelected([]);
+            await uninstallMods(selected.join(","));
+            toast.success("Mod(s) successfully uninstalled");
         } catch (e) {
             console.error(e);
             toast.error("Error during mod uninstall");
         }
     };
 
-    const handleUpdateAll = async () => {
-        try {
-            await updateAllMods();
-            await fetchMods();
-        } catch (e) {
-            console.error(e);
-            toast.error("Error during updating all mods");
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            const newSelected = mods.map((n) => n.id);
+            setSelected(newSelected);
+            return;
         }
+        setSelected([]);
     };
 
-    return (
-            <div>
-                <h2>Installed mods</h2>
-                <div className="row">
-                    <div className="col-md-4">
-                        <button className="btn btn-secondary m-2"
-                                onClick={handleUpdateAll}>Update all
-                        </button>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-12">
-                        <ModsTable mods={mods}
-                                   onUninstallClicked={handleUninstall}
-                                   onUpdateClicked={handleUpdate}
-                        />
-                        <ModInstallForm onInstallClicked={handleInstall}/>
-                    </div>
-                </div>
+    const handleClick = (event, id) => {
+        const selectedIndex = selected.indexOf(id);
+        let newSelected = [];
 
-                {/*<Modal show={newPreset.showModal} onHide={this.handlePresetModalClose}>*/}
-                {/*    <Modal.Header closeButton>*/}
-                {/*        <Modal.Title>Save preset</Modal.Title>*/}
-                {/*    </Modal.Header>*/}
-                {/*    <Modal.Body>*/}
-                {/*        <div className="form-group">*/}
-                {/*            <label htmlFor="presetName">Preset name</label>*/}
-                {/*            <input className="form-control" id="presetName"*/}
-                {/*                   value={newPreset.name}*/}
-                {/*                   onChange={this.handlePresetNameChange}/>*/}
-                {/*        </div>*/}
-                {/*    </Modal.Body>*/}
-                {/*    <Modal.Footer>*/}
-                {/*        <button className="btn btn-secondary" onClick={this.handlePresetModalClose}>*/}
-                {/*            Close*/}
-                {/*        </button>*/}
-                {/*        <button className="btn btn-primary" disabled={!this.isPresetNameValid()}*/}
-                {/*                onClick={this.handlePresetSaveConfirm}>*/}
-                {/*            Save Changes*/}
-                {/*        </button>*/}
-                {/*    </Modal.Footer>*/}
-                {/*</Modal>*/}
-            </div>
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, id);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(
+                    selected.slice(0, selectedIndex),
+                    selected.slice(selectedIndex + 1),
+            );
+        }
+
+        setSelected(newSelected);
+    };
+
+    const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
+
+    return (
+            <>
+                {errorOccured && <ModsErrorAlertMessage mods={mods}/>}
+            <ModsTable rows={mods} selected={selected} onClick={handleClick} onSelectAllClick={handleSelectAllClick}
+                onUpdateClicked={handleUpdate} onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
+            />
+            </>
     )
 }
 

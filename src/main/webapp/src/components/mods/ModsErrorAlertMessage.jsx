@@ -1,5 +1,6 @@
 import React from "react";
-import workshopErrorStatusMap from "../util/workshopErrorStatusMap";
+import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
+import {Alert, AlertTitle} from "@mui/material";
 
 const ModsErrorAlertMessage = (props) => {
     const {mods} = props;
@@ -10,7 +11,8 @@ const ModsErrorAlertMessage = (props) => {
             onlyUnique);
 
     return (
-            <div className="alert alert-danger" role="alert">
+            <Alert severity="error" sx={{mb: 2}}>
+                <AlertTitle>Some mods could not be installed</AlertTitle>
                 <p className="m-0 p-1">
                     Installation of some mods failed. Review the errors below:
                 </p>
@@ -19,7 +21,7 @@ const ModsErrorAlertMessage = (props) => {
                             <li key={error}>{workshopErrorStatusMap[error]}</li>
                     )}
                 </ul>
-            </div>
+            </Alert>
     )
 }
 

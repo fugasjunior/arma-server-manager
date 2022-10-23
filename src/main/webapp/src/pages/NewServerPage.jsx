@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import "./ServersPage.css";
 import {useNavigate} from "react-router-dom";
 import {createServer} from "../services/serversService";
-import {toast} from "react-toastify";
+import {toast} from "material-react-toastify";
 import ListBuilder from "../UI/ListBuilder";
-import EditServerSettingsForm from "../components/editServerSettingsForm";
+import EditServerSettingsForm from "../components/servers/editServerSettingsForm";
 import {getMods} from "../services/modsService";
+import {Button, Modal, Typography} from "@mui/material";
 
 const ServerSettingsPage = () => {
     const [availableMods, setAvailableMods] = useState([]);
@@ -13,6 +13,8 @@ const ServerSettingsPage = () => {
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [selectedDlcs, setSelectedDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [modsModalOpen, setModsModalOpen] = useState(false);
+    const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
 
     const navigate = useNavigate();
 
@@ -92,9 +94,17 @@ const ServerSettingsPage = () => {
         });
     }
 
+    const handleToggleModsModal = () => {
+        setModsModalOpen(prevState => !prevState);
+    }
+
+    const handleToggleDlcsModal = () => {
+        setDlcsModalOpen(prevState => !prevState);
+    }
+
     return (
             <>
-                <h1>New Server</h1>
+                <Typography variant="h4">New server</Typography>
                 {loading && <h2>Loading server data...</h2>}
                 {!loading &&
                         <>
@@ -115,12 +125,19 @@ const ServerSettingsPage = () => {
                                 verifySignatures: false,
                                 additionalOptions: ""
                             }} onSubmit={handleSubmit}/>
-                            <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                         onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                         itemsLabel="mods" showFilter/>
-                            <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
-                                         onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
-                                         itemsLabel="DLCs"/>
+                            <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                            <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
+                            <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+
+                                <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                             onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                             itemsLabel="mods" showFilter/>
+                            </Modal>
+                            <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
+                                <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
+                                             onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                             itemsLabel="DLCs"/>
+                            </Modal>
                         </>}
 
             </>
