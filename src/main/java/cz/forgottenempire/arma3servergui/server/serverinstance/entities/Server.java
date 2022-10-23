@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.server.serverinstance.entities;
 
+import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.List;
@@ -72,11 +73,4 @@ public class Server {
     @ElementCollection(targetClass = Arma3CDLC.class)
     @Enumerated(EnumType.STRING)
     private List<Arma3CDLC> activeDLCs;
-
-    public enum ServerType {
-        ARMA3,
-        DAYZ, // TODO currently only Arma 3 is supported
-        REFORGER,
-        ARMA4 // :)
-    }
 }

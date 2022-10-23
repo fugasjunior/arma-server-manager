@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.server.serverinstance.dtos;
 
-import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server.ServerType;
+import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.workshop.dtos.CreatorDlcDto;
 import java.util.List;
 import javax.validation.constraints.Min;
