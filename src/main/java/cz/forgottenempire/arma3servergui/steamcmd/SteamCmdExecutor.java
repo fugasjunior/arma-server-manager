@@ -1,10 +1,10 @@
-package cz.forgottenempire.steamcmd;
+package cz.forgottenempire.arma3servergui.steamcmd;
 
-import cz.forgottenempire.steamcmd.exceptions.GenericErrorException;
-import cz.forgottenempire.steamcmd.exceptions.IOOperationException;
-import cz.forgottenempire.steamcmd.exceptions.LoginException;
-import cz.forgottenempire.steamcmd.exceptions.NoMatchException;
-import cz.forgottenempire.steamcmd.exceptions.NoSubscriptionException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.GenericErrorException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.IOOperationException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.LoginException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.NoMatchException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.NoSubscriptionException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;

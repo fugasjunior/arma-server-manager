@@ -1,4 +1,4 @@
-package cz.forgottenempire.steamcmd;
+package cz.forgottenempire.arma3servergui.steamcmd;
 
 import java.util.ArrayList;
 import java.util.List;

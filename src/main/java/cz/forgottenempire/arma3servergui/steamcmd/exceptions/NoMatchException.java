@@ -1,4 +1,4 @@
-package cz.forgottenempire.steamcmd.exceptions;
+package cz.forgottenempire.arma3servergui.steamcmd.exceptions;
 
 public class NoMatchException extends RuntimeException {
 

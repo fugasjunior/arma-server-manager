@@ -1,4 +1,4 @@
-package cz.forgottenempire.steamcmd;
+package cz.forgottenempire.arma3servergui.steamcmd;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;

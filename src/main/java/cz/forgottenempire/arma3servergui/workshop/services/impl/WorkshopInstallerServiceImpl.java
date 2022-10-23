@@ -12,8 +12,8 @@ import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModReposi
 import cz.forgottenempire.arma3servergui.system.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
-import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
-import cz.forgottenempire.steamcmd.SteamCmdParameters;
+import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameterBuilder;
+import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
