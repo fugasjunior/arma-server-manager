@@ -1,12 +1,12 @@
 package cz.forgottenempire.arma3servergui.workshop.services;
 
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 
 public interface WorkshopInstallerService {
     void installOrUpdateMod(SteamAuth auth, WorkshopMod mod);
 
-    boolean deleteMod(WorkshopMod mod);
+    void uninstallMod(WorkshopMod mod);
 
-    boolean updateAllMods(SteamAuth auth);
+    void updateAllMods(SteamAuth auth);
 }

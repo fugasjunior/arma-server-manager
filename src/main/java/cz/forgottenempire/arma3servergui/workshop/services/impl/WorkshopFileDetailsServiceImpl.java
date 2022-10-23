@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class WorkshopFileDetailsServiceImpl implements WorkshopFileDetailsService {
-
-    private final String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
 
     @Value("${steam.api.key}")
     private String steamApiKey;
@@ -53,7 +52,9 @@ public class WorkshopFileDetailsServiceImpl implements WorkshopFileDetailsServic
     @Override
     public Long getModAppId(Long modId) {
         String value = getValueFromInfo(modId, "consumer_app_id");
-        if (value == null) return null;
+        if (value == null) {
+            return null;
+        }
 
         Long appId = null;
         try {
@@ -68,19 +69,24 @@ public class WorkshopFileDetailsServiceImpl implements WorkshopFileDetailsServic
     @Override
     public Long getFileSize(Long modId) {
         String value = getValueFromInfo(modId, "file_size");
-        if (value == null) return null;
+        if (value == null) {
+            return null;
+        }
 
         Long size = null;
         try {
             size = Long.parseLong(value);
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
 
         return size;
     }
 
     private String getValueFromInfo(Long modId, String key) {
         JsonNode modInfo = loadModInfoFromCache(modId);
-        if (modInfo == null) return null;
+        if (modInfo == null) {
+            return null;
+        }
 
         JsonNode titleNode = modInfo.findValue(key);
         return titleNode == null ? null : titleNode.asText();
@@ -100,7 +106,7 @@ public class WorkshopFileDetailsServiceImpl implements WorkshopFileDetailsServic
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> test = restTemplate.postForEntity(STEAM_API_URL, request, String.class);
+        ResponseEntity<String> test = restTemplate.postForEntity(Constants.STEAM_API_URL, request, String.class);
 
         JsonNode modInfo = null;
         try {

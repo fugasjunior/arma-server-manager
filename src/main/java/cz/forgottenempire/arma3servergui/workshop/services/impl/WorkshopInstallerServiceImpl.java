@@ -1,30 +1,33 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
-import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.model.DownloadStatus;
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.common.Constants;
+import cz.forgottenempire.arma3servergui.common.util.FileSystemUtils;
+import cz.forgottenempire.arma3servergui.common.util.SteamCmdWrapper;
+import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
+import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
-import cz.forgottenempire.arma3servergui.workshop.services.SteamAuthService;
+import cz.forgottenempire.arma3servergui.system.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
-import cz.forgottenempire.arma3servergui.util.FileSystemUtils;
-import cz.forgottenempire.arma3servergui.util.SteamCmdWrapper;
 import cz.forgottenempire.steamcmd.SteamCmdParameterBuilder;
 import cz.forgottenempire.steamcmd.SteamCmdParameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,148 +55,56 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
 
     @Override
     public void installOrUpdateMod(SteamAuth auth, final WorkshopMod mod) {
-        executor.submit(() -> {
-            mod.setInstalled(false);
-            mod.setFailed(false);
-            modRepository.save(mod);
-            log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
+        mod.setInstallationStatus(InstallationStatus.INSTALLATION_QUEUED);
+        modRepository.save(mod);
 
-            DownloadStatus downloadStatus = downloadMod(mod.getId());
-            mod.setDownloadStatus(downloadStatus);
-            if (!downloadStatus.isSuccess() || !verifyModDirectoryExists(mod.getId())) {
-                log.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
-                downloadStatus.setSuccess(false);
-                modRepository.save(mod);
+        executor.submit(() -> {
+            log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
+            initializeModDownloadStatus(mod);
+            if (!downloadMod(mod) || !installMod(mod)) {
                 return;
             }
-
-            convertModFilesToLowercase(mod);
-            copyBiKeys(mod.getId());
-            createSymlink(mod);
-
-            mod.setInstalled(true);
-            mod.setFailed(false);
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            mod.setLastUpdated(formatter.format(new Date()));
-            mod.setFileSize(getActualSizeOfMod(mod.getId()));
-            modRepository.save(mod);
-
+            updateModInfo(mod);
             log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
                     executor.getQueue().size());
         });
     }
 
-    @Override
-    public boolean deleteMod(WorkshopMod mod) {
-        File modDirectory = new File(getDownloadPath() + File.separatorChar + mod.getId());
-        try {
-            FileUtils.deleteDirectory(modDirectory);
-            deleteSymlink(mod);
-            modRepository.delete(mod);
-        } catch (IOException e) {
-            log.error("Could not delete directory {} due to {}", modDirectory, e.toString());
+    private boolean downloadMod(WorkshopMod mod) {
+        DownloadStatus downloadStatus = executeWorkshopModDownload(mod.getId());
+        if (!downloadStatus.isSuccess() || !verifyModDirectoryExists(mod.getId())) {
+            log.error("Failed to download mod {} ({}) ", mod.getName(), mod.getId());
+            mod.setInstallationStatus(InstallationStatus.ERROR);
+            mod.setErrorStatus(downloadStatus.getErrorStatus());
+            modRepository.save(mod);
             return false;
         }
-        log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());
         return true;
     }
 
-    @Override
-    public boolean updateAllMods(SteamAuth auth) {
-        File modDirectory = new File(getDownloadPath());
-
+    private boolean installMod(WorkshopMod mod) {
         try {
-            // find all installed mods in installation folder
-            Set<Long> modIds = Files.list(modDirectory.toPath())
-                    .map(p -> {
-                        try {
-                            return Long.parseLong(p.getFileName().toString());
-                        } catch (NumberFormatException e) {
-                            return null;
-                        }
-                    })
-                    .collect(Collectors.toSet());
-
-            // add all missing mods from db
-            StreamSupport.stream(modRepository.findAll().spliterator(), false)
-                    .peek(mod -> {
-                        mod.setInstalled(false);
-                        mod.setFailed(false);
-                        modRepository.save(mod);
-                    })
-                    .map(WorkshopMod::getId)
-                    .forEach(modIds::add);
-
-            // refresh/update all found mods
-            for (Long modId : modIds) {
-                WorkshopMod mod = modRepository.findById(modId)
-                        .orElseGet(() -> {
-                            // create mods which were not persisted in db
-                            WorkshopMod newMod = new WorkshopMod(modId);
-                            newMod.setName(workshopFileDetailsService.getModName(modId));
-                            return modRepository.save(newMod);
-                        });
-                installOrUpdateMod(auth, mod);
-            }
-        } catch (IOException e) {
-            log.error("Failed to refresh mods due to {}", e.toString());
+            convertModFilesToLowercase(mod);
+            copyBiKeys(mod.getId());
+            createSymlink(mod);
+        } catch (Exception e) {
+            log.error("Failed to install mod {} ({}) due to: {}", mod.getName(), mod.getId(), e.getMessage());
+            mod.setInstallationStatus(InstallationStatus.ERROR);
+            mod.setErrorStatus(ErrorStatus.IO);
+            modRepository.save(mod);
             return false;
         }
-
         return true;
     }
 
-    private DownloadStatus downloadMod(Long modId) {
-        SteamAuth auth = steamAuthService.getAuthAccount();
-        SteamCmdParameters parameters = new SteamCmdParameterBuilder()
-                .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
-                .withInstallDir(downloadPath)
-                .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
-                .build();
-
-        return steamCmd.execute(parameters);
-    }
-
-    private void convertModFilesToLowercase(WorkshopMod mod) {
+    private void convertModFilesToLowercase(WorkshopMod mod) throws IOException {
         log.info("Converting mod file names to lowercase");
         File modDir = new File(getModDirectoryPath(mod.getId()));
-        try {
-            FileSystemUtils.directoryToLowercase(modDir);
-            log.info("Converting file names to lowercase done");
-        } catch (Exception e) {
-            log.error("Failure when converting to lowercase", e);
-        }
+        FileSystemUtils.directoryToLowercase(modDir);
+        log.info("Converting file names to lowercase done");
     }
 
-    private void createSymlink(WorkshopMod mod) {
-        // create symlink to server directory
-        Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
-        Path targetPath = Path.of(getModDirectoryPath(mod.getId()));
-
-        log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
-
-        try {
-            if (!Files.isSymbolicLink(linkPath)) {
-                Files.createSymbolicLink(linkPath, targetPath);
-            }
-        } catch (IOException e) {
-            log.error("Failed to create symlink for mod {} ({}) due to {} ",
-                    mod.getName(), mod.getId(), e.toString());
-        }
-    }
-
-    private void deleteSymlink(WorkshopMod mod) {
-        Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
-        log.info("Deleting symlink {}", linkPath);
-        try {
-            Files.delete(linkPath);
-        } catch (IOException e) {
-            log.warn("Could not delete symlink {} due to {}", linkPath, e.toString());
-        }
-    }
-
-    // copies all .bikey files to the server keys folder
-    private void copyBiKeys(Long modId) {
+    private void copyBiKeys(Long modId) throws IOException {
         String[] extensions = new String[]{"bikey"};
         File modDirectory = new File(getModDirectoryPath(modId));
 
@@ -204,14 +115,108 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
 
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
-            try {
-                log.info("Copying bikey {} to server", key.getName());
-                FileUtils.copyFile(key,
-                        new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
-            } catch (IOException e) {
-                log.error("Could not copy bikeys due to {}", e.toString());
-            }
+            log.info("Copying BiKey {} to server", key.getName());
+            FileUtils.copyFile(key,
+                    new File(serverPath + File.separatorChar + "keys" + File.separatorChar + key.getName()));
         }
+    }
+
+    private void createSymlink(WorkshopMod mod) throws IOException {
+        // create symlink to server directory
+        Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
+        Path targetPath = Path.of(getModDirectoryPath(mod.getId()));
+
+        log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
+        if (!Files.isSymbolicLink(linkPath)) {
+            Files.createSymbolicLink(linkPath, targetPath);
+        }
+    }
+
+    private void updateModInfo(WorkshopMod mod) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        mod.setLastUpdated(formatter.format(new Date()));
+        mod.setFileSize(getActualSizeOfMod(mod.getId()));
+        mod.setInstallationStatus(InstallationStatus.FINISHED);
+        modRepository.save(mod);
+    }
+
+    private void initializeModDownloadStatus(WorkshopMod mod) {
+        mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+        mod.setErrorStatus(null);
+        modRepository.save(mod);
+    }
+
+    @Override
+    public void uninstallMod(WorkshopMod mod) {
+        File modDirectory = new File(getDownloadPath() + File.separatorChar + mod.getId());
+        try {
+            deleteSymlink(mod);
+            FileUtils.deleteDirectory(modDirectory);
+        } catch (NoSuchFileException ignored) {
+        } catch (IOException e) {
+            log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
+            throw new RuntimeException(e);
+        }
+        log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());
+    }
+
+    @Override
+    public void updateAllMods(SteamAuth auth) {
+        Set<Long> modIds = getModIds();
+
+        // refresh/update all found mods
+        for (Long modId : modIds) {
+            WorkshopMod mod = modRepository.findById(modId)
+                    .orElseGet(() -> {
+                        // create mods which were not persisted in db
+                        WorkshopMod newMod = new WorkshopMod(modId);
+                        newMod.setName(workshopFileDetailsService.getModName(modId));
+                        return modRepository.save(newMod);
+                    });
+            installOrUpdateMod(auth, mod);
+        }
+    }
+
+    private Set<Long> getModIds() {
+        File modDirectory = new File(getDownloadPath());
+        // find all installed mods in installation folder
+        Set<Long> modIds = new HashSet<>();
+        try (Stream<Path> files = Files.list(modDirectory.toPath())) {
+            files.forEach(p -> {
+                        try {
+                            long id = Long.parseLong(p.getFileName().toString());
+                            modIds.add(id);
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+            );
+        } catch (IOException e) {
+            log.error("Failed to collect existing mod directory IDs due to {}", e.toString());
+            throw new RuntimeException(e);
+        }
+
+        // add all missing mods from db
+        modRepository.findAll().stream()
+                .map(WorkshopMod::getId)
+                .forEach(modIds::add);
+        return modIds;
+    }
+
+    private DownloadStatus executeWorkshopModDownload(Long modId) {
+        SteamAuth auth = steamAuthService.getAuthAccount();
+        SteamCmdParameters parameters = new SteamCmdParameterBuilder()
+                .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
+                .withInstallDir(downloadPath)
+                .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
+                .build();
+
+        return steamCmd.execute(parameters);
+    }
+
+    private void deleteSymlink(WorkshopMod mod) throws IOException {
+        Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
+        log.info("Deleting symlink {}", linkPath);
+        Files.delete(linkPath);
     }
 
     private boolean verifyModDirectoryExists(Long modId) {

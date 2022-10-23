@@ -2,9 +2,10 @@ package cz.forgottenempire.arma3servergui.additionalserver.controllers;
 
 import cz.forgottenempire.arma3servergui.additionalserver.dtos.AdditionalServerDto;
 import cz.forgottenempire.arma3servergui.additionalserver.dtos.AdditionalServersDto;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import cz.forgottenempire.arma3servergui.additionalserver.mappers.AdditionalServerMapper;
 import cz.forgottenempire.arma3servergui.additionalserver.services.AdditionalServersService;
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/additionalServers")
@@ -45,8 +45,7 @@ public class AdditionalServersController {
     @GetMapping("/{serverId}")
     public ResponseEntity<AdditionalServerDto> getAdditionalServer(@PathVariable Long serverId) {
         AdditionalServer server = serversService.getServer(serverId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Additional server ID " + serverId + " not found"));
+                .orElseThrow(() -> new NotFoundException("Additional server ID " + serverId + " not found"));
 
         return ResponseEntity.ok(serverMapper.from(server, serversService.getServerInstanceInfo(serverId)));
     }

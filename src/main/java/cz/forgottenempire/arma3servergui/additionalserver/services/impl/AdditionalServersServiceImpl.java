@@ -1,10 +1,10 @@
 package cz.forgottenempire.arma3servergui.additionalserver.services.impl;
 
 import cz.forgottenempire.arma3servergui.additionalserver.AdditionalServerInstanceInfo;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import cz.forgottenempire.arma3servergui.additionalserver.repositories.AdditionalServerInstanceInfoRepository;
 import cz.forgottenempire.arma3servergui.additionalserver.repositories.AdditionalServerRepository;
 import cz.forgottenempire.arma3servergui.additionalserver.services.AdditionalServersService;
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;

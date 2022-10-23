@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.system.services.impl;
 
+import com.google.common.base.Supplier;
 import cz.forgottenempire.arma3servergui.system.conditions.WindowsEnvironmentCondition;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -9,18 +10,17 @@ import org.springframework.stereotype.Service;
 public class WindowsSystemServiceImpl extends AbstractSystemServiceImpl {
 
     @Override
-    public long getMemoryLeft() {
-        return osBean.getFreePhysicalMemorySize();
+    protected Supplier<Long> memoryLeftSupplier() {
+        return osBean::getFreeMemorySize;
     }
 
     @Override
-    public long getMemoryTotal() {
-        return osBean.getTotalPhysicalMemorySize();
+    protected Supplier<Long> memoryTotalSupplier() {
+        return osBean::getTotalMemorySize;
     }
 
     @Override
-    public double getCpuUsage() {
-        // on Windows, the preferable getSystemLoadAverage() method always returns -1, so this is a workaround
-        return osBean.getCpuLoad();
+    protected Supplier<Double> cpuUsageSupplier() {
+        return osBean::getCpuLoad;
     }
 }

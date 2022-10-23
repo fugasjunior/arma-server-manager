@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class Scenario implements Comparable<Scenario> {
     private String name;
     private Long fileSize;
+    private String createdOn;
 
     @Override
     public int compareTo(Scenario scenario) {

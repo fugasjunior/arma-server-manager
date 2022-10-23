@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.workshop.cronjobs;
+package cz.forgottenempire.arma3servergui.mods.cronjobs;
 
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,11 @@
+import config from "../config"
 import http from "./httpService";
 import jwt_decode from "jwt-decode";
 
-const apiEndpoint = "/login";
+const apiEndpoint = config.apiUrl + "/login";
 const tokenKey = "token";
 
-if (isAuthenticated()) {
+if (isUserAuthenticated()) {
     http.setJwt(getJwt());
 }
 
@@ -25,7 +26,7 @@ export function getJwt() {
     return localStorage.getItem(tokenKey);
 }
 
-export function isAuthenticated() {
+export function isUserAuthenticated() {
     try {
         const jwtEncoded = getJwt();
         if (!jwtEncoded) {

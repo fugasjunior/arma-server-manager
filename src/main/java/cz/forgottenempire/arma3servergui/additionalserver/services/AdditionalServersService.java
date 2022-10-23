@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.additionalserver.services;
 
 import cz.forgottenempire.arma3servergui.additionalserver.AdditionalServerInstanceInfo;
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import java.util.List;
 import java.util.Optional;
 

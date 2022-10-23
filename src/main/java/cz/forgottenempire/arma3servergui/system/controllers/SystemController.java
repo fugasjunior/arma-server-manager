@@ -1,14 +1,9 @@
 package cz.forgottenempire.arma3servergui.system.controllers;
 
 import cz.forgottenempire.arma3servergui.server.dtos.ServerDetails;
-import cz.forgottenempire.arma3servergui.model.ServerSettings;
-import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
-import cz.forgottenempire.arma3servergui.server.services.SettingsService;
 import cz.forgottenempire.arma3servergui.system.services.SystemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,48 +14,27 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SystemController {
 
-    @Value("${hostName}")
-    private String hostName;
+    private final SystemService systemService;
 
-    private SettingsService settingsService;
-    private ArmaServerService serverService;
-    private SystemService systemService;
-
-    @GetMapping("/space")
-    public ResponseEntity<Long> getSpaceLeftOnDevice() {
-        return new ResponseEntity<>(systemService.getDiskSpaceLeft(), HttpStatus.OK);
+    @Autowired
+    public SystemController(SystemService systemService) {
+        this.systemService = systemService;
     }
 
-    @GetMapping("/info")
+    @GetMapping
     public ResponseEntity<ServerDetails> getServerDetails() {
-        ServerDetails details = new ServerDetails();
-        ServerSettings settings = settingsService.getServerSettings();
-
-        details.setUpdating(serverService.isServerUpdating());
-        details.setHostName(hostName);
-        details.setPort(settings.getPort());
-
-        details.setSpaceLeft(systemService.getDiskSpaceLeft());
-        details.setSpaceTotal(systemService.getDiskSpaceTotal());
-        details.setMemoryLeft(systemService.getMemoryLeft());
-        details.setMemoryTotal(systemService.getMemoryTotal());
-        details.setCpuUsage(systemService.getCpuUsage());
+        ServerDetails details = ServerDetails.builder()
+                .spaceLeft(systemService.getDiskSpaceLeft())
+                .spaceTotal(systemService.getDiskSpaceTotal())
+                .memoryLeft(systemService.getMemoryLeft())
+                .memoryTotal(systemService.getMemoryTotal())
+                .cpuUsage(systemService.getCpuUsage())
+                .cpuCount(systemService.getProcessorCount())
+                .osName(systemService.getOsName())
+                .osVersion(systemService.getOsVersion())
+                .osArchitecture(systemService.getOsArchitecture())
+                .build();
 
         return ResponseEntity.ok(details);
-    }
-
-    @Autowired
-    public void setServerService(ArmaServerService serverService) {
-        this.serverService = serverService;
-    }
-
-    @Autowired
-    public void setSettingsService(SettingsService settingsService) {
-        this.settingsService = settingsService;
-    }
-
-    @Autowired
-    public void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
     }
 }

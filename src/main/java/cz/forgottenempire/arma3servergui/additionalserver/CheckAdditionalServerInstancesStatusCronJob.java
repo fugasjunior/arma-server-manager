@@ -1,8 +1,8 @@
 package cz.forgottenempire.arma3servergui.additionalserver;
 
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import cz.forgottenempire.arma3servergui.additionalserver.repositories.AdditionalServerInstanceInfoRepository;
 import cz.forgottenempire.arma3servergui.additionalserver.services.AdditionalServersService;
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

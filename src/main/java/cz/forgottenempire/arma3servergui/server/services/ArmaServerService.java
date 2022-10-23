@@ -1,18 +1,28 @@
 package cz.forgottenempire.arma3servergui.server.services;
 
-import cz.forgottenempire.arma3servergui.model.ServerSettings;
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
+import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
+import cz.forgottenempire.arma3servergui.server.entities.Server;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.constraints.NotNull;
 
 public interface ArmaServerService {
-    boolean startServer(ServerSettings settings);
 
-    void shutDownServer();
+    List<Server> getAllServers();
 
-    boolean restartServer(ServerSettings settings);
+    Optional<Server> getServer(@NotNull Long id);
 
-    boolean isServerProcessAlive();
+    Server createServer(Server server);
 
-    void updateServer(SteamAuth auth);
+    Server updateServer(Server server);
 
-    boolean isServerUpdating();
+    void deleteServer(Server server);
+
+    void startServer(@NotNull Long id);
+
+    void shutDownServer(@NotNull Long id);
+
+    void restartServer(@NotNull Long id);
+
+    ServerInstanceInfo getServerInstanceInfo(@NotNull Long id);
 }

@@ -1,16 +1,16 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
-import com.google.common.collect.Lists;
-import cz.forgottenempire.arma3servergui.Constants;
-import cz.forgottenempire.arma3servergui.model.SteamAuth;
-import cz.forgottenempire.arma3servergui.model.WorkshopMod;
+import cz.forgottenempire.arma3servergui.common.Constants;
+import cz.forgottenempire.arma3servergui.server.repositories.ServerRepository;
+import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
-import cz.forgottenempire.arma3servergui.workshop.services.SteamAuthService;
+import cz.forgottenempire.arma3servergui.system.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,14 +20,30 @@ import org.springframework.stereotype.Service;
 public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     private SteamAuthService authService;
-    private WorkshopInstallerService installerService;
     private WorkshopFileDetailsService fileDetailsService;
-
+    private WorkshopInstallerService installerService;
     private WorkshopModRepository modRepository;
+    private ServerRepository serverRepository;
+
+    @Autowired
+    public WorkshopModsServiceImpl(SteamAuthService authService, WorkshopFileDetailsService fileDetailsService,
+            WorkshopInstallerService installerService, WorkshopModRepository modRepository,
+            ServerRepository serverRepository) {
+        this.authService = authService;
+        this.fileDetailsService = fileDetailsService;
+        this.installerService = installerService;
+        this.modRepository = modRepository;
+        this.serverRepository = serverRepository;
+    }
 
     @Override
     public Collection<WorkshopMod> getAllMods() {
-        return Lists.newArrayList(modRepository.findAll());
+        return modRepository.findAll();
+    }
+
+    @Override
+    public Optional<WorkshopMod> getMod(Long id) {
+        return modRepository.findById(id);
     }
 
     @Override
@@ -48,15 +64,14 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     @Override
     public void uninstallMod(Long id) {
-        modRepository.findById(id).ifPresent(installerService::deleteMod);
-    }
-
-    @Override
-    public void activateMod(Long id, boolean active) {
-        WorkshopMod mod = modRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
-        mod.setActive(active);
-        modRepository.save(mod);
+        modRepository.findById(id).ifPresent(mod -> {
+            mod.getServers().forEach(server -> {
+                server.getActiveMods().remove(mod);
+                serverRepository.save(server);
+            });
+            installerService.uninstallMod(mod);
+            modRepository.delete(mod);
+        });
     }
 
     @Override
@@ -71,25 +86,5 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     private SteamAuth getAuth() {
         return authService.getAuthAccount();
-    }
-
-    @Autowired
-    public void setAuthService(SteamAuthService authService) {
-        this.authService = authService;
-    }
-
-    @Autowired
-    public void setInstallerService(WorkshopInstallerService installerService) {
-        this.installerService = installerService;
-    }
-
-    @Autowired
-    public void setFileDetailsService(WorkshopFileDetailsService fileDetailsService) {
-        this.fileDetailsService = fileDetailsService;
-    }
-
-    @Autowired
-    public void setModRepository(WorkshopModRepository modRepository) {
-        this.modRepository = modRepository;
     }
 }

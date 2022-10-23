@@ -3,18 +3,18 @@ import config from "../config";
 
 const apiEndpoint = config.apiUrl + "/additionalServers";
 
-export function getServer(id) {
+export function getAdditionalServer(id) {
     return http.get(apiEndpoint + "/" + id);
 }
 
-export function getServers() {
+export function getAdditionalServers() {
     return http.get(apiEndpoint);
 }
 
-export function startServer(id) {
+export function startAdditionalServer(id) {
     return http.post(apiEndpoint + "/" + id + "/start");
 }
 
-export function stopServer(id) {
+export function stopAdditionalServer(id) {
     return http.post(apiEndpoint + "/" + id + "/stop");
 }

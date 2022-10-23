@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.additionalserver.repositories;
 
-import cz.forgottenempire.arma3servergui.model.AdditionalServer;
+import cz.forgottenempire.arma3servergui.additionalserver.entities.AdditionalServer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
