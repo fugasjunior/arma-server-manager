@@ -4,6 +4,8 @@ import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.util.FileSystemUtils;
 import cz.forgottenempire.arma3servergui.steamcmd.DownloadStatus;
 import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
+import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
+import cz.forgottenempire.arma3servergui.steamcmd.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
@@ -20,9 +22,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -41,27 +42,65 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     @Value("${serverDir}")
     private String serverPath;
 
-    private WorkshopModRepository modRepository;
-    private WorkshopFileDetailsService workshopFileDetailsService;
+    private final WorkshopModRepository modRepository;
+    private final WorkshopFileDetailsService workshopFileDetailsService;
 
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
-            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+    private final SteamCmdService steamCmdService;
+
+    @Autowired
+    public WorkshopInstallerServiceImpl(WorkshopModRepository modRepository,
+            WorkshopFileDetailsService workshopFileDetailsService, SteamCmdService steamCmdService) {
+        this.modRepository = modRepository;
+        this.workshopFileDetailsService = workshopFileDetailsService;
+        this.steamCmdService = steamCmdService;
+    }
 
     @Override
     public void installOrUpdateMod(SteamAuth auth, final WorkshopMod mod) {
         mod.setInstallationStatus(InstallationStatus.INSTALLATION_QUEUED);
         modRepository.save(mod);
 
-        executor.submit(() -> {
-            log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
-            initializeModDownloadStatus(mod);
-            if (!downloadMod(mod) || !installMod(mod)) {
-                return;
+        Runnable runnable = () -> {
+            CompletableFuture<Void> steamCmdJobFuture = steamCmdService.installOrUpdateWorkshopMod(mod)
+                    .thenAccept(steamCmdJob -> {
+                        if (steamCmdJob.getErrorStatus() != null) {
+                            log.error("Download of mod '{}' (id {}) failed, reason: {}",
+                                    mod.getName(), mod.getId(), steamCmdJob.getErrorStatus());
+                            mod.setInstallationStatus(InstallationStatus.ERROR);
+                            mod.setErrorStatus(steamCmdJob.getErrorStatus());
+                        } else if (!verifyModDirectoryExists(mod.getId())) {
+                            log.error("Could not find downloaded mod diretory for mod '{}' (id {})",
+                                    mod.getName(), mod.getId());
+                            mod.setInstallationStatus(InstallationStatus.ERROR);
+                            mod.setErrorStatus(ErrorStatus.GENERIC);
+                        } else {
+                            log.info("Mod {} (id {}) successfully downloaded, now installing",
+                                    mod.getName(), mod.getId());
+                            // install mod
+                        }
+
+                        modRepository.save(mod);
+                    });
+            try {
+                steamCmdJobFuture.get();
+            } catch (InterruptedException e) { // TODO handle exceptions
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
             }
-            updateModInfo(mod);
-            log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
-                    executor.getQueue().size());
-        });
+        };
+
+        runnable.run();
+//        executor.submit(() -> {
+//            log.info("Starting download of mod {} (id {})", mod.getName(), mod.getId());
+//            initializeModDownloadStatus(mod);
+//            if (!downloadMod(mod) || !installMod(mod)) {
+//                return;
+//            }
+//            updateModInfo(mod);
+//            log.info("Mod {} (id {}) successfully installed ({} left in queue)", mod.getName(), mod.getId(),
+//                    executor.getQueue().size());
+//        });
     }
 
     private boolean downloadMod(WorkshopMod mod) {
@@ -237,15 +276,5 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
                 + File.separatorChar + "workshop"
                 + File.separatorChar + "content"
                 + File.separatorChar + Constants.STEAM_ARMA3_ID;
-    }
-
-    @Autowired
-    public void setModRepository(WorkshopModRepository modRepository) {
-        this.modRepository = modRepository;
-    }
-
-    @Autowired
-    public void setWorkshopFileDetailsService(WorkshopFileDetailsService workshopFileDetailsService) {
-        this.workshopFileDetailsService = workshopFileDetailsService;
     }
 }
