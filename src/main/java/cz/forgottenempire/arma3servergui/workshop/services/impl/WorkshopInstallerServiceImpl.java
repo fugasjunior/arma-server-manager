@@ -2,18 +2,17 @@ package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.util.FileSystemUtils;
-import cz.forgottenempire.arma3servergui.common.util.SteamCmdWrapper;
+import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameters;
+import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdWrapper;
+import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
+import cz.forgottenempire.arma3servergui.system.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
 import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
-import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
-import cz.forgottenempire.arma3servergui.system.services.SteamAuthService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
-import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameterBuilder;
-import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -204,7 +203,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
 
     private DownloadStatus executeWorkshopModDownload(Long modId) {
         SteamAuth auth = steamAuthService.getAuthAccount();
-        SteamCmdParameters parameters = new SteamCmdParameterBuilder()
+        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
                 .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
                 .withInstallDir(downloadPath)
                 .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)

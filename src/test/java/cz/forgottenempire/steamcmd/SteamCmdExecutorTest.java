@@ -1,10 +1,13 @@
 package cz.forgottenempire.steamcmd;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import cz.forgottenempire.steamcmd.exceptions.IOOperationException;
-import cz.forgottenempire.steamcmd.exceptions.LoginException;
-import cz.forgottenempire.steamcmd.exceptions.NoSubscriptionException;
+import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdExecutor;
+import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameters;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.IOOperationException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.LoginException;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.NoSubscriptionException;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
@@ -41,7 +44,7 @@ class SteamCmdExecutorTest {
 
     @Test
     void whenAnonymousLogin_noExceptionThrown() {
-        SteamCmdParameters params = new SteamCmdParameterBuilder()
+        SteamCmdParameters params = new SteamCmdParameters.Builder()
                 .withAnonymousLogin()
                 .build();
         steamCmdExecutor.setParameters(params);
@@ -51,7 +54,7 @@ class SteamCmdExecutorTest {
 
     @Test
     void whenAnonymousUserDownloadsArmaServer_NoSubscriptionExceptionThrown() {
-        SteamCmdParameters params = new SteamCmdParameterBuilder()
+        SteamCmdParameters params = new SteamCmdParameters.Builder()
                 .withAnonymousLogin()
                 .withInstallDir(INSTALL_DIR)
                 .withAppInstall(ARMA3_SERVER_ID, true)
@@ -63,7 +66,7 @@ class SteamCmdExecutorTest {
 
     @Test
     void whenAnonymousUserDownloadsArmaMod_noExceptionThrown() {
-        SteamCmdParameters params = new SteamCmdParameterBuilder()
+        SteamCmdParameters params = new SteamCmdParameters.Builder()
                 .withAnonymousLogin()
                 .withInstallDir(INSTALL_DIR)
                 .withWorkshopItemInstall(ARMA3_GAME_ID, ARMA3_MOD_WORKSHOP_ID, true)
@@ -75,7 +78,7 @@ class SteamCmdExecutorTest {
 
     @Test
     void whenInvalidInstallDirGiven_IOOperationExceptionThrown() {
-        SteamCmdParameters params = new SteamCmdParameterBuilder()
+        SteamCmdParameters params = new SteamCmdParameters.Builder()
                 .withAnonymousLogin()
                 .withInstallDir("H:\\NONEXISTING\\DIRECTORY")
                 .withWorkshopItemInstall(ARMA3_GAME_ID, ARMA3_MOD_WORKSHOP_ID, true)
@@ -87,7 +90,7 @@ class SteamCmdExecutorTest {
 
     @Test
     void whenInvalidLoginGiven_LoginExceptionThrown() {
-        SteamCmdParameters params = new SteamCmdParameterBuilder()
+        SteamCmdParameters params = new SteamCmdParameters.Builder()
                 .withLogin("test", "invalid_password")
                 .build();
         steamCmdExecutor.setParameters(params);
@@ -98,7 +101,7 @@ class SteamCmdExecutorTest {
     @Test
     @Disabled("Downloads a large mod file, which takes a long time and needs plenty of disk space")
     void whenDownloadsLargeMod_ExceptionNotThrown() {
-        SteamCmdParameters params = new SteamCmdParameterBuilder()
+        SteamCmdParameters params = new SteamCmdParameters.Builder()
                 .withAnonymousLogin()
                 .withInstallDir(INSTALL_DIR)
                 .withWorkshopItemInstall(ARMA3_GAME_ID, ARMA3_LARGE_MOD_WORKSHOP_ID, true)

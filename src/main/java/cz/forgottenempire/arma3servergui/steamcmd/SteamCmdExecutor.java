@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO make package-private
 public class SteamCmdExecutor {
 
     private final File steamCmdFile;

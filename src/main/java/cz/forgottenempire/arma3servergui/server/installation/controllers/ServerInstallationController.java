@@ -17,7 +17,7 @@ public class ServerInstallationController {
         return ResponseEntity.ok("TODO");
     }
 
-    @GetMapping
+    @GetMapping("/{type}")
     public ResponseEntity<?> getInstallation(@PathVariable ServerType type) {
         return ResponseEntity.ok("TODO");
     }
