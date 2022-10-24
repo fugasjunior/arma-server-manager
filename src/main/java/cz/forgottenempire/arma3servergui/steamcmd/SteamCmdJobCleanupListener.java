@@ -25,13 +25,13 @@ public class SteamCmdJobCleanupListener {
 
     @EventListener
     public void setInterruptedJobsStatusAfterRestart(ContextStartedEvent cse) {
-        List<SteamCmdJob> interruptedJobs = steamCmdJobRepository.findAllByStatusIn(
+        List<SteamCmdJob> interruptedJobs = steamCmdJobRepository.findAllByStateIn(
                 Set.of(JobStatus.QUEUED, JobStatus.RUNNING));
         interruptedJobs.forEach(job -> {
             String relatedEntity = getRelatedEntityName(job);
             log.warn("SteamCMD Job {} for {} was interrupted in {} status",
-                    job.getId(), relatedEntity, job.getStatus());
-            job.setStatus(JobStatus.INTERRUPTED);
+                    job.getId(), relatedEntity, job.getState());
+            job.setState(JobStatus.INTERRUPTED);
             steamCmdJobRepository.save(job);
         });
     }

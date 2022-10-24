@@ -25,7 +25,7 @@ public interface SteamCmdJobRepository extends JpaRepository<SteamCmdJob, Long> 
             "AND job.createdAt IN (SELECT MAX(createdAt) FROM SteamCmdJob WHERE job.relatedWorkshopMod = ?1)")
     Optional<SteamCmdJob> findLatestJobForWorkshopMod(WorkshopMod workshopMod);
 
-    List<SteamCmdJob> findAllByStatusIn(Collection<JobStatus> statuses);
+    List<SteamCmdJob> findAllByStateIn(Collection<JobStatus> statuses);
 
     List<SteamCmdJob> findAllByCreatedAtBefore(LocalDateTime localDateTime);
 }
