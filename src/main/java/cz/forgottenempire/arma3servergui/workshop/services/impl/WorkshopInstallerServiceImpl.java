@@ -2,12 +2,9 @@ package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.util.FileSystemUtils;
-import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameters;
-import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdWrapper;
+import cz.forgottenempire.arma3servergui.steamcmd.DownloadStatus;
+import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
-import cz.forgottenempire.arma3servergui.system.services.SteamAuthService;
-import cz.forgottenempire.arma3servergui.workshop.entities.DownloadStatus;
-import cz.forgottenempire.arma3servergui.workshop.entities.ErrorStatus;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
@@ -29,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,10 +42,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private String serverPath;
 
     private WorkshopModRepository modRepository;
-    private SteamCmdWrapper steamCmd;
     private WorkshopFileDetailsService workshopFileDetailsService;
-
-    private SteamAuthService steamAuthService;
 
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -202,14 +197,15 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     }
 
     private DownloadStatus executeWorkshopModDownload(Long modId) {
-        SteamAuth auth = steamAuthService.getAuthAccount();
-        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
-                .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
-                .withInstallDir(downloadPath)
-                .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
-                .build();
-
-        return steamCmd.execute(parameters);
+        // TODO extact this logic to SteamCmd package
+        throw new NotImplementedException("TODO extact this logic to SteamCmd package");
+//        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
+//                .withLogin()
+//                .withInstallDir(downloadPath)
+//                .withWorkshopItemInstall(Constants.STEAM_ARMA3_ID, modId, true)
+//                .build();
+//
+//        return steamCmd.execute(parameters);
     }
 
     private void deleteSymlink(WorkshopMod mod) throws IOException {
@@ -244,11 +240,6 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     }
 
     @Autowired
-    public void setSteamCmd(SteamCmdWrapper steamCmd) {
-        this.steamCmd = steamCmd;
-    }
-
-    @Autowired
     public void setModRepository(WorkshopModRepository modRepository) {
         this.modRepository = modRepository;
     }
@@ -256,10 +247,5 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     @Autowired
     public void setWorkshopFileDetailsService(WorkshopFileDetailsService workshopFileDetailsService) {
         this.workshopFileDetailsService = workshopFileDetailsService;
-    }
-
-    @Autowired
-    public void setSteamAuthService(SteamAuthService steamAuthService) {
-        this.steamAuthService = steamAuthService;
     }
 }

@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.steamcmd;
 
+import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
 import cz.forgottenempire.arma3servergui.steamcmd.exceptions.GenericErrorException;
 import cz.forgottenempire.arma3servergui.steamcmd.exceptions.IOOperationException;
 import cz.forgottenempire.arma3servergui.steamcmd.exceptions.LoginException;

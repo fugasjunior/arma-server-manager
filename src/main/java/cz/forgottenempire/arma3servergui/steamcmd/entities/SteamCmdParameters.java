@@ -1,16 +1,23 @@
-package cz.forgottenempire.arma3servergui.steamcmd;
+package cz.forgottenempire.arma3servergui.steamcmd.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import org.apache.commons.lang3.StringUtils;
 
+@Embeddable
 public class SteamCmdParameters {
 
+    private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
+
+    @ElementCollection
     private final List<String> parameters;
 
-    protected SteamCmdParameters() {
+    public SteamCmdParameters() {
         parameters = new ArrayList<>();
     }
 
@@ -18,7 +25,7 @@ public class SteamCmdParameters {
         return new ArrayList<>(parameters);
     }
 
-    protected void addParameter(String parameter) {
+    private void addParameter(String parameter) {
         parameters.add(parameter);
     }
 
@@ -36,29 +43,8 @@ public class SteamCmdParameters {
             parameters.addParameter("+@ShutdownOnFailedCommand 1");
         }
 
-        public Builder withSteamGuardToken(@NotNull String token) {
-            parameters.addParameter("+set_steam_guard_code " + token);
-            return this;
-        }
-
-        public Builder withLogin(@NotNull String username, @Nullable String password) {
-            String loginParameter = "+login " + username;
-            if (StringUtils.isNotBlank(password)) {
-                loginParameter += " " + password;
-            }
-            parameters.addParameter(loginParameter);
-            return this;
-        }
-
-        public Builder withLogin(@NotNull String username, @Nullable String password,
-                @Nullable String steamGuardToken) {
-            String loginParameter = "+login " + username;
-            if (StringUtils.isNotBlank(password)) {
-                loginParameter += " " + password;
-            }
-            if (StringUtils.isNotBlank(steamGuardToken)) {
-                loginParameter += " " + steamGuardToken;
-            }
+        public Builder withLogin() {
+            String loginParameter = "+login " + STEAM_CREDENTIALS_PLACEHOLDER;
             parameters.addParameter(loginParameter);
             return this;
         }
@@ -93,11 +79,6 @@ public class SteamCmdParameters {
                 installParameter += " validate";
             }
             parameters.addParameter(installParameter);
-            return this;
-        }
-
-        public Builder withCustomParameter(@NotNull String parameter) {
-            parameters.addParameter(parameter);
             return this;
         }
 

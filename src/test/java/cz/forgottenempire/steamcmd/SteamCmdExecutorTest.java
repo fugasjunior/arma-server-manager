@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdExecutor;
-import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdParameters;
+import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
 import cz.forgottenempire.arma3servergui.steamcmd.exceptions.IOOperationException;
-import cz.forgottenempire.arma3servergui.steamcmd.exceptions.LoginException;
 import cz.forgottenempire.arma3servergui.steamcmd.exceptions.NoSubscriptionException;
 import java.io.File;
 import java.io.IOException;
@@ -86,16 +85,6 @@ class SteamCmdExecutorTest {
         steamCmdExecutor.setParameters(params);
 
         assertThrows(IOOperationException.class, () -> steamCmdExecutor.execute());
-    }
-
-    @Test
-    void whenInvalidLoginGiven_LoginExceptionThrown() {
-        SteamCmdParameters params = new SteamCmdParameters.Builder()
-                .withLogin("test", "invalid_password")
-                .build();
-        steamCmdExecutor.setParameters(params);
-
-        assertThrows(LoginException.class, () -> steamCmdExecutor.execute());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.workshop.entities;
+package cz.forgottenempire.arma3servergui.steamcmd;
 
 public enum ErrorStatus {
     WRONG_AUTH,
@@ -6,5 +6,6 @@ public enum ErrorStatus {
     TIMEOUT,
     NO_MATCH,
     NO_SUBSCRIPTION,
-    GENERIC
+    GENERIC,
+    INTERRUPTED
 }

@@ -1,5 +1,6 @@
-package cz.forgottenempire.arma3servergui.workshop.entities;
+package cz.forgottenempire.arma3servergui.steamcmd;
 
+import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import java.util.Date;
 import lombok.Data;
 

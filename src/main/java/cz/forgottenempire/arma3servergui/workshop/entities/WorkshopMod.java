@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
+import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
