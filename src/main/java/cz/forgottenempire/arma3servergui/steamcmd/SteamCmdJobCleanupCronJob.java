@@ -20,7 +20,7 @@ public class SteamCmdJobCleanupCronJob {
         this.steamCmdJobRepository = steamCmdJobRepository;
     }
 
-    @Scheduled(cron = "0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void cleanupOldSteamCmdJobStatuses() {
         log.info("Cleaning up SteamCMD job statuses older than 1 month");
         List<SteamCmdJob> jobStatusesToDelete = steamCmdJobRepository.findAllByCreatedAtBefore(
