@@ -53,7 +53,6 @@ public class WorkshopMod {
     }
 
     public enum InstallationStatus {
-        INSTALLATION_QUEUED,
         INSTALLATION_IN_PROGRESS,
         ERROR,
         FINISHED

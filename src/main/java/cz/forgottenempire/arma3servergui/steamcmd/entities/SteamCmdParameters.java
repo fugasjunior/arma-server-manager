@@ -2,30 +2,23 @@ package cz.forgottenempire.arma3servergui.steamcmd.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-@Embeddable
 public class SteamCmdParameters {
 
     private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
 
-    @ElementCollection
     private final List<String> parameters;
 
     public SteamCmdParameters() {
         parameters = new ArrayList<>();
     }
 
-    public List<String> getParameters() {
+    public List<String> get() {
         return new ArrayList<>(parameters);
     }
 
-    private void addParameter(String parameter) {
+    private void add(String parameter) {
         parameters.add(parameter);
     }
 
@@ -39,24 +32,24 @@ public class SteamCmdParameters {
         }
 
         private void addDefaultParameters() {
-            parameters.addParameter("+@NoPromptForPassword 1");
-            parameters.addParameter("+@ShutdownOnFailedCommand 1");
+            parameters.add("+@NoPromptForPassword 1");
+            parameters.add("+@ShutdownOnFailedCommand 1");
         }
 
         public Builder withLogin() {
             String loginParameter = "+login " + STEAM_CREDENTIALS_PLACEHOLDER;
-            parameters.addParameter(loginParameter);
+            parameters.add(loginParameter);
             return this;
         }
 
         public Builder withAnonymousLogin() {
-            parameters.addParameter("+login anonymous");
+            parameters.add("+login anonymous");
             return this;
         }
 
         public Builder withInstallDir(String installDir) {
-            parameters.addParameter("+force_install_dir");
-            parameters.addParameter(installDir);
+            parameters.add("+force_install_dir");
+            parameters.add(installDir);
             return this;
         }
 
@@ -68,7 +61,7 @@ public class SteamCmdParameters {
             if (validate) {
                 installParameter.append(" validate");
             }
-            parameters.addParameter(installParameter.toString());
+            parameters.add(installParameter.toString());
             return this;
         }
 
@@ -78,12 +71,12 @@ public class SteamCmdParameters {
             if (validate) {
                 installParameter += " validate";
             }
-            parameters.addParameter(installParameter);
+            parameters.add(installParameter);
             return this;
         }
 
         public SteamCmdParameters build() {
-            parameters.addParameter("+quit");
+            parameters.add("+quit");
             return parameters;
         }
     }

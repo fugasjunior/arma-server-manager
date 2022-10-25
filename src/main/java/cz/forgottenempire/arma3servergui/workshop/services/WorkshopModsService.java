@@ -13,7 +13,4 @@ public interface WorkshopModsService {
     WorkshopMod installOrUpdateMod(Long id);
 
     void uninstallMod(Long id);
-
-    void updateAllMods();
-
 }

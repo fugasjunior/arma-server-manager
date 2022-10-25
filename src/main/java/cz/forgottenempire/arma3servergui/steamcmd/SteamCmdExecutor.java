@@ -2,16 +2,19 @@ package cz.forgottenempire.arma3servergui.steamcmd;
 
 import com.google.common.base.Strings;
 import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
-import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob.JobStatus;
-import cz.forgottenempire.arma3servergui.steamcmd.repositories.SteamCmdJobRepository;
+import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
 import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.system.repositories.SteamAuthRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,15 +22,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class SteamCmdExecutor {
-
 
     private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
 
@@ -37,18 +35,13 @@ public class SteamCmdExecutor {
     private static final int MAX_ATTEMPTS = 10;
 
     private final File steamCmdFile;
-
-    private final SteamCmdJobRepository jobRepository;
-
     private final SteamAuthRepository steamAuthRepository;
 
     @Autowired
     public SteamCmdExecutor(
             @Value("${steamcmd.path}") String steamCmdFilePath,
-            SteamCmdJobRepository jobRepository,
             SteamAuthRepository steamAuthRepository
     ) {
-        this.jobRepository = jobRepository;
         this.steamAuthRepository = steamAuthRepository;
 
         steamCmdFile = new File(steamCmdFilePath);
@@ -62,54 +55,53 @@ public class SteamCmdExecutor {
 
     public void processJob(SteamCmdJob job, CompletableFuture<SteamCmdJob> future) {
         executor.submit(() -> {
-            job.setState(JobStatus.RUNNING);
             execute(job);
-            job.setFinishedAt(LocalDateTime.now());
-            jobRepository.save(job);
             future.complete(job);
         });
     }
 
     private void execute(SteamCmdJob job) {
-        List<String> commands = new ArrayList<>();
-        commands.add(steamCmdFile.getAbsolutePath());
-
-        job.getSteamCmdParameters()
-                .getParameters()
-                .forEach(parameter -> {
-                    if (parameter.contains(STEAM_CREDENTIALS_PLACEHOLDER)) {
-                        commands.add(parameter.replace(STEAM_CREDENTIALS_PLACEHOLDER, getAuthString()));
-                    } else {
-                        commands.add(parameter);
-                    }
-                });
-
-        InputStream resultStream;
-        int attempts = 0;
-        int exitCode;
-
         try {
+            InputStream resultStream;
+            int attempts = 0;
+            int exitCode;
+
             do {
                 attempts++;
                 Process process = new ProcessBuilder()
-                        .command(commands)
+                        .command(getCommands(job.getSteamCmdParameters()))
                         .start();
 
                 resultStream = process.getInputStream();
                 exitCode = process.waitFor();
-            } while (attempts < MAX_ATTEMPTS &&
-                    (exitCode == EXIT_CODE_TIMEOUT_LINUX || exitCode == EXIT_CODE_TIMEOUT_WINDOWS));
+            } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
             handleProcessResult(resultStream, job);
         } catch (IOException e) {
-            log.error("SteamCMD job ID {} failed due to an IO error", job.getId(), e);
-            job.setState(JobStatus.FAILED);
+            log.error("SteamCMD job failed due to an IO error", e);
             job.setErrorStatus(ErrorStatus.IO);
         } catch (Exception e) {
-            log.error("SteamCMD job ID {} failed", job.getId(), e);
-            job.setState(JobStatus.FAILED);
+            log.error("SteamCMD job failed", e);
             job.setErrorStatus(ErrorStatus.GENERIC);
         }
+    }
+
+    private boolean exitedDueToTimeout(int exitCode) {
+        return exitCode == EXIT_CODE_TIMEOUT_LINUX || exitCode == EXIT_CODE_TIMEOUT_WINDOWS;
+    }
+
+    private List<String> getCommands(SteamCmdParameters parameters) {
+        List<String> commands = new ArrayList<>();
+        commands.add(steamCmdFile.getAbsolutePath());
+
+        parameters.get().forEach(parameter -> {
+            if (parameter.contains(STEAM_CREDENTIALS_PLACEHOLDER)) {
+                commands.add(parameter.replace(STEAM_CREDENTIALS_PLACEHOLDER, getAuthString()));
+            } else {
+                commands.add(parameter);
+            }
+        });
+        return commands;
     }
 
     private void handleProcessResult(InputStream cmdOutput, SteamCmdJob job) {
@@ -122,11 +114,9 @@ public class SteamCmdExecutor {
                 .orElse(null);
 
         if (errorLine == null) {
-            job.setState(JobStatus.FINISHED);
             return;
         }
 
-        job.setState(JobStatus.FAILED);
         job.setErrorStatus(ErrorStatus.GENERIC);
         if (errorLine.contains("login")) {
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);

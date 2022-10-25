@@ -10,6 +10,7 @@ import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsSe
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,18 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WorkshopModsServiceImpl implements WorkshopModsService {
 
-    private SteamAuthService authService;
-    private WorkshopFileDetailsService fileDetailsService;
-    private WorkshopInstallerService installerService;
-    private WorkshopModRepository modRepository;
-    private ServerRepository serverRepository;
+    private final WorkshopFileDetailsService fileDetailsService;
+    private final WorkshopInstallerService installerService;
+    private final WorkshopModRepository modRepository;
+    private final ServerRepository serverRepository;
 
     @Autowired
-    public WorkshopModsServiceImpl(SteamAuthService authService, WorkshopFileDetailsService fileDetailsService,
-            WorkshopInstallerService installerService, WorkshopModRepository modRepository,
-            ServerRepository serverRepository) {
-        this.authService = authService;
+    public WorkshopModsServiceImpl(
+            WorkshopFileDetailsService fileDetailsService,
+            WorkshopInstallerService installerService,
+            WorkshopModRepository modRepository,
+            ServerRepository serverRepository
+    ) {
         this.fileDetailsService = fileDetailsService;
         this.installerService = installerService;
         this.modRepository = modRepository;
@@ -46,6 +48,7 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
         return modRepository.findById(id);
     }
 
+    // TODO extract to separate service or call WorkshopInstallerService directly
     @Override
     public WorkshopMod installOrUpdateMod(Long id) {
         WorkshopMod mod = modRepository.findById(id)
@@ -58,7 +61,7 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
                     return modRepository.save(newMod);
                 });
 
-        installerService.installOrUpdateMod(getAuth(), mod);
+        installerService.installOrUpdateMods(List.of(mod));
         return mod;
     }
 
@@ -74,17 +77,8 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
         });
     }
 
-    @Override
-    public void updateAllMods() {
-        installerService.updateAllMods(getAuth());
-    }
-
     private boolean isModConsumedByArma3(Long modId) {
         Long consumerAppId = fileDetailsService.getModAppId(modId);
         return Constants.STEAM_ARMA3_ID.equals(consumerAppId);
-    }
-
-    private SteamAuth getAuth() {
-        return authService.getAuthAccount();
     }
 }
