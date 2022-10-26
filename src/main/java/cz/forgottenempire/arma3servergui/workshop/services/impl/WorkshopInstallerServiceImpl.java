@@ -74,7 +74,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(steamCmdJob.getErrorStatus());
         } else if (!verifyModDirectoryExists(mod.getId())) {
-            log.error("Could not find downloaded mod diretory for mod '{}' (id {}) " +
+            log.error("Could not find downloaded mod directory for mod '{}' (id {}) " +
                             "even though download finished successfully", mod.getName(), mod.getId());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.GENERIC);

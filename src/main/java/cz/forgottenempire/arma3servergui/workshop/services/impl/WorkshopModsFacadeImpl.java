@@ -1,6 +1,9 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
+import cz.forgottenempire.arma3servergui.common.Constants;
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
+import cz.forgottenempire.arma3servergui.workshop.exceptions.ModNotConsumedByGameException;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsFacade;
@@ -8,7 +11,6 @@ import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,15 +41,39 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
     }
 
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
-        throw new NotImplementedException();
+        List<WorkshopMod> workshopMods = ids.stream()
+                .peek(id -> validateModConsumedByGameId(id, Constants.STEAM_ARMA3_ID))
+                .map(id -> getMod(id).orElse(new WorkshopMod(id)))
+                .toList();
+
+        workshopMods.forEach(this::setModNameFromWorkshop);
+        modsService.saveAllMods(workshopMods);
+
+        installerService.installOrUpdateMods(workshopMods);
+        return workshopMods;
     }
 
     @Override
     public void updateAllMods() {
-        throw new NotImplementedException();
+        List<Long> allModIds = modsService.getAllMods().stream()
+                .map(WorkshopMod::getId)
+                .toList();
+        saveAndInstallMods(allModIds);
     }
 
     public void uninstallMod(long id) {
-        throw new NotImplementedException();
+        WorkshopMod workshopMod = getMod(id)
+                .orElseThrow(() -> new NotFoundException("Mod ID " + id + " not found."));
+        installerService.uninstallMod(workshopMod);
+    }
+
+    private void setModNameFromWorkshop(WorkshopMod mod) {
+        mod.setName(fileDetailsService.getModName(mod.getId()));
+    }
+
+    private void validateModConsumedByGameId(long modId, long gameId) {
+        if (gameId == fileDetailsService.getModAppId(modId)) {
+            throw new ModNotConsumedByGameException("The mod " + modId + " is not consumed by game " + gameId);
+        }
     }
 }
