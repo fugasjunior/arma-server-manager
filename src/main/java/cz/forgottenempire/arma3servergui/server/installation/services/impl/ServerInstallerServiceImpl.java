@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -61,16 +62,17 @@ public class ServerInstallerServiceImpl implements ServerInstallerService {
     private void handleInstallation(SteamCmdJob steamCmdJob, ServerInstallation server) {
         if (steamCmdJob.getErrorStatus() != null) {
             log.error("Download of server '{}' failed, reason: {}",
-                    server.getServerType(), steamCmdJob.getErrorStatus());
+                    server.getType(), steamCmdJob.getErrorStatus());
             server.setInstallationStatus(InstallationStatus.ERROR);
             server.setErrorStatus(steamCmdJob.getErrorStatus());
         } else {
             try {
                 performServerDryRun(server);
-                log.info("Server '{}' successfully installed", server.getServerType());
+                log.info("Server '{}' successfully installed", server.getType());
+                server.setLastUpdatedAt(LocalDateTime.now());
                 server.setInstallationStatus(InstallationStatus.FINISHED);
             } catch (Exception e) {
-                log.error("Server '{}' failed to start after installation", server.getServerType(), e);
+                log.error("Server '{}' failed to start after installation", server.getType(), e);
                 server.setInstallationStatus(InstallationStatus.ERROR);
                 server.setErrorStatus(ErrorStatus.GENERIC);
             }

@@ -13,4 +13,5 @@ public class ServerInstallationDto {
     private String version;
     private InstallationStatus installationStatus;
     private ErrorStatus errorStatus;
+    private String lastUpdatedAt;
 }

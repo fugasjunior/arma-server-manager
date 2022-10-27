@@ -20,7 +20,7 @@ public class ServerInstallation {
 
     @Id
     @Enumerated(EnumType.STRING)
-    private ServerType serverType;
+    private ServerType type;
 
     private String version;
     private LocalDateTime lastUpdatedAt;
@@ -31,7 +31,7 @@ public class ServerInstallation {
     @Enumerated(EnumType.STRING)
     private ErrorStatus errorStatus;
 
-    public ServerInstallation(ServerType serverType) {
-        this.serverType = serverType;
+    public ServerInstallation(ServerType type) {
+        this.type = type;
     }
 }

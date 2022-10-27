@@ -7,7 +7,9 @@ import cz.forgottenempire.arma3servergui.server.installation.repositories.Server
 import cz.forgottenempire.arma3servergui.server.installation.services.ServerInstallationService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ServerInstallationServiceImpl implements ServerInstallationService {
 
     private final ServerInstallationRepository installationRepository;
@@ -25,6 +27,6 @@ public class ServerInstallationServiceImpl implements ServerInstallationService 
     @Override
     public ServerInstallation getServerInstallation(ServerType type) {
         return installationRepository.findById(type)
-                .orElseThrow(() -> new NotFoundException("Server type " + type + " not found"));
+                .orElseGet(() -> installationRepository.save(new ServerInstallation(type)));
     }
 }

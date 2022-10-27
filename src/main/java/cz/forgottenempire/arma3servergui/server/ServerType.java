@@ -1,5 +1,7 @@
 package cz.forgottenempire.arma3servergui.server;
 
+import java.util.List;
+
 public enum ServerType {
     ARMA3,
     ARMA4, // :)
