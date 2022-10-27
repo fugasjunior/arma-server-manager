@@ -21,7 +21,9 @@ public class ServerInstallationServiceImpl implements ServerInstallationService 
 
     @Override
     public List<ServerInstallation> getAllServerInstallations() {
-        return installationRepository.findAll();
+        return ServerType.getAll().stream()
+                .map(this::getServerInstallation)
+                .toList();
     }
 
     @Override

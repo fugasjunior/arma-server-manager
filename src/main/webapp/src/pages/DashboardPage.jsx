@@ -1,16 +1,14 @@
-import {deleteServer, getServers, restartServer, startServer, stopServer} from "../services/serversService"
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {useInterval} from "../hooks/use-interval";
-import ServerListEntry from "../components/servers/ServerListEntry";
-import {Button, Divider, Fab, Stack} from "@mui/material";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import {Stack} from "@mui/material";
 import SystemResourcesMonitor from "../components/dashboard/SystemResourcesMonitor";
+import ServerInstallations from "../components/dashboard/ServerInstallations";
 
 const DashboardPage = () => {
 
     return (
-            <SystemResourcesMonitor />
+            <Stack spacing={4}>
+                <SystemResourcesMonitor/>
+                <ServerInstallations/>
+            </Stack>
     )
 }
 

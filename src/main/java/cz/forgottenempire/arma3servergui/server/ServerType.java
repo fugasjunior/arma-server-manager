@@ -3,8 +3,10 @@ package cz.forgottenempire.arma3servergui.server;
 import java.util.List;
 
 public enum ServerType {
-    ARMA3,
-    ARMA4, // :)
-    DAYZ, // TODO currently only Arma 3 is supported
-    REFORGER
+    ARMA3;
+    // TODO support more servers
+
+    public static List<ServerType> getAll() {
+        return List.of(ARMA3);
+    }
 }
