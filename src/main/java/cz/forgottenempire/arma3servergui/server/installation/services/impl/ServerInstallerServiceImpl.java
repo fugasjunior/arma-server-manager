@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.server.installation.services.impl;
 
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
+import cz.forgottenempire.arma3servergui.common.services.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.util.SystemUtils;
 import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.server.installation.entities.ServerInstallation;
@@ -11,10 +12,8 @@ import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
 import cz.forgottenempire.arma3servergui.steamcmd.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,29 +21,27 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class ServerInstallerServiceImpl implements ServerInstallerService {
 
-    @Value("${serverDir}")
-    private String ARMA3_SERVER_DIR;
-
     private static final String LOCALHOST = "localhost";
 
     private final ServerInstallationRepository installationRepository;
     private final SteamCmdService steamCmdService;
+    private final PathsFactory pathsFactory;
 
 
     @Autowired
     public ServerInstallerServiceImpl(
             ServerInstallationRepository installationRepository,
-            SteamCmdService steamCmdService
-    ) {
+            SteamCmdService steamCmdService,
+            PathsFactory pathsFactory) {
         this.installationRepository = installationRepository;
         this.steamCmdService = steamCmdService;
+        this.pathsFactory = pathsFactory;
     }
 
     @Override
@@ -107,15 +104,14 @@ public class ServerInstallerServiceImpl implements ServerInstallerService {
     private Process startServerForDryRun(int port) throws IOException {
 
         List<String> parameters = new ArrayList<>();
-        parameters.add(
-                Path.of(ARMA3_SERVER_DIR, "arma3server_x64").toString()); // TODO extract, enable 64bit check, ...
+        parameters.add(pathsFactory.getArma3ServerExecutable().toString());
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
         parameters.add("-world=empty");
         parameters.add("-port=" + port);
 
         return new ProcessBuilder(parameters)
-                .directory(new File(ARMA3_SERVER_DIR))
+                .directory(pathsFactory.getServerPath(ServerType.ARMA3).toFile())
                 .start();
     }
 

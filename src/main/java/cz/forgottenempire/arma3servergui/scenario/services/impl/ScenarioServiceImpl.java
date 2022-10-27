@@ -2,40 +2,43 @@ package cz.forgottenempire.arma3servergui.scenario.services.impl;
 
 import static java.time.ZoneId.systemDefault;
 
-import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
+import cz.forgottenempire.arma3servergui.common.services.PathsFactory;
+import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.scenario.services.ScenarioService;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 @Service
 @Slf4j
 public class ScenarioServiceImpl implements ScenarioService {
 
-    @Value("${serverDir}")
-    private String serverDir;
+    private final PathsFactory pathsFactory;
+
+    @Autowired
+    public ScenarioServiceImpl(PathsFactory pathsFactory) {
+        this.pathsFactory = pathsFactory;
+    }
 
     @Override
     public boolean uploadScenarioToServer(MultipartFile file) {
-        File missionsFolder = new File(getMissionsFolder());
+        File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
         if (!missionsFolder.isDirectory()) {
             throw new ServerNotInitializedException();
         }
@@ -66,7 +69,7 @@ public class ScenarioServiceImpl implements ScenarioService {
         List<Scenario> scenarios = new ArrayList<>();
 
         String[] extensions = new String[]{"pbo"};
-        File missionsFolder = new File(getMissionsFolder());
+        File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
         if (!missionsFolder.isDirectory()) {
             throw new ServerNotInitializedException();
         }
@@ -85,17 +88,13 @@ public class ScenarioServiceImpl implements ScenarioService {
     @Override
     public boolean deleteScenario(String name) {
         try {
-            Files.delete(Path.of(getMissionsFolder(), name));
+            Files.delete(pathsFactory.getScenarioPath(name));
             log.info("Successfully deleted scenario {}", name);
         } catch (IOException e) {
             log.error("Could not delete scenario {} due to {}", name, e.toString());
             return false;
         }
         return true;
-    }
-
-    private String getMissionsFolder() {
-        return serverDir + File.separatorChar + "mpmissions";
     }
 
     private void setScenarioFileCreationTime(File scenarioFile, Scenario scenarioDto) {

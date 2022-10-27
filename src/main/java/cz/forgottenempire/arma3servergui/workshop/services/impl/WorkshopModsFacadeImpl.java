@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
+import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.exceptions.ModNotConsumedByGameException;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
@@ -42,7 +43,7 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
 
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
         List<WorkshopMod> workshopMods = ids.stream()
-                .peek(id -> validateModConsumedByGameId(id, Constants.STEAM_ARMA3_ID))
+                .peek(id -> validateModConsumedByGameId(id, Constants.GAME_IDS.get(ServerType.ARMA3)))
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
                 .toList();
 

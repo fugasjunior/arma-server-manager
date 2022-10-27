@@ -22,11 +22,11 @@ database.encryption.secret=<AES-256 key>
 # Absolute path to SteamCMD executable.
 steamcmd.path=/usr/games/steamcmd
 
-# Absolute path to a directory where the mods are installed.
-installDir=/home/arma3gui/server/mods
+# Absolute path to a directory where the mods (and temporary server files) are installed.
+directory.mods=/home/arma3gui/mods
 
-# Absolute path to Arma 3 server.
-serverDir=/home/arma3gui/server/serverfiles/
+# Absolute path to servers base folder.
+directory.servers=/home/arma3gui/servers/
 
 # Logs directory for Arma 3 server and additional servers.
 arma3server.logDir=/home/arma3gui/logs/server

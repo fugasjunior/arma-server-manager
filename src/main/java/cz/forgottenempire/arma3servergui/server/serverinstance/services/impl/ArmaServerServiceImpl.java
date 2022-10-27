@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.server.serverinstance.services.impl;
 import com.google.common.base.Joiner;
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
+import cz.forgottenempire.arma3servergui.common.services.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.util.LogUtils;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.ServerType;
@@ -19,7 +20,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,36 +40,28 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 @Slf4j
 public class ArmaServerServiceImpl implements ArmaServerService {
 
-    @Value("${serverDir}")
-    private String serverDir;
-
     @Value("${arma3server.logDir}")
-    private String logDir;
-
-    @Value("${betaBranch:#{null}}")
-    private String betaBranch;
+    private String logDir; // TODO get rid of this, fix for multiple server instances
 
     @Value("${additionalMods:#{null}}")
     private String[] additionalMods;
 
-    @Value("${arma3server.x64:#{true}}")
-    private boolean x64Enabled;
-
     private final ServerRepository serverRepository;
-
     private final ServerInstanceInfoRepository instanceInfoRepository;
-
     private final FreeMarkerConfigurer freeMarkerConfigurer;
+    private final PathsFactory pathsFactory;
 
     @Autowired
     public ArmaServerServiceImpl(
             ServerRepository serverRepository,
             ServerInstanceInfoRepository instanceInfoRepository,
-            FreeMarkerConfigurer freeMarkerConfigurer
+            FreeMarkerConfigurer freeMarkerConfigurer,
+            PathsFactory pathsFactory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
+        this.pathsFactory = pathsFactory;
 
         // Turn off all servers on application shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -229,7 +221,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
 
             ProcessBuilder pb = new ProcessBuilder(parameters)
-                    .directory(new File(serverDir));
+                    .directory(pathsFactory.getServerPath(ServerType.ARMA3).toFile());
 
             if (logFile.exists()) {
                 pb.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
@@ -244,7 +236,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     private String getServerExecutable() {
-        return Path.of(serverDir, x64Enabled ? "arma3server_x64" : "arma3server").toString();
+        return pathsFactory.getArma3ServerExecutable().toString();
     }
 
     private void writeConfig(Server server) {
@@ -279,7 +271,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     private File getConfigFile(String fileName) {
-        return new File(serverDir + File.separatorChar + fileName);
+        return pathsFactory.getArma3ServerConfigFile(fileName).toFile();
     }
 
     private String getConfigFileName(Long serverId) {
