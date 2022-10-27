@@ -66,9 +66,8 @@ public class PathsFactory {
         return Path.of(getScenariosBasePath().toString(), scenarioName);
     }
 
-    public Path getArma3ServerExecutable() {
-        String executable = use64bitExec ? "arma3server_x64" :  "arma3server";
-        return Path.of(getServerPath(ServerType.ARMA3).toString(), executable);
+    public Path getServerExecutable(ServerType type) {
+        return Path.of(getServerPath(type).toString(), Constants.SERVER_EXECUTABLES.get(type));
     }
 
     public Path getArma3ServerConfigFile(String configName) {

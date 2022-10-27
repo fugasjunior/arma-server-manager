@@ -9,6 +9,6 @@ public enum ServerType {
     // TODO support more servers
 
     public static List<ServerType> getAll() {
-        return List.of(ARMA3);
+        return List.of(ARMA3, DAYZ, DAYZ_EXP);
     }
 }

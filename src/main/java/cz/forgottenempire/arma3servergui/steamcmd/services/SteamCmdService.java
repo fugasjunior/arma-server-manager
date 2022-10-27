@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 public interface SteamCmdService {
 
-    CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType, @Nullable String betaBranch);
+    CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType);
 
     CompletableFuture<SteamCmdJob> installOrUpdateWorkshopMod(WorkshopMod workshopMod);
 }

@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.common;
 
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
-import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
+import cz.forgottenempire.arma3servergui.server.installation.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.arma3servergui.server.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.server.serverinstance.exceptions.PortAlreadyTakenException;
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package cz.forgottenempire.arma3servergui.scenario.services.impl;
 
 import static java.time.ZoneId.systemDefault;
 
-import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
+import cz.forgottenempire.arma3servergui.server.installation.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.arma3servergui.common.services.PathsFactory;
 import cz.forgottenempire.arma3servergui.scenario.dtos.Scenario;
 import cz.forgottenempire.arma3servergui.scenario.services.ScenarioService;

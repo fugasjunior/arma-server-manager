@@ -28,12 +28,12 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     }
 
     @Override
-    public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType, @Nullable String betaBranch) {
-        String betaBranchParameter = betaBranch == null ? "" : "-beta " + betaBranch;
+    public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType) {
+        String betaBranchParameter = serverType == ServerType.ARMA3 ? "-beta creatordlc" : null;
 
         SteamCmdParameters parameters = new Builder()
                 .withLogin()
-                .withInstallDir(pathsFactory.getServerPath(ServerType.ARMA3).toAbsolutePath().toString())
+                .withInstallDir(pathsFactory.getServerPath(serverType).toAbsolutePath().toString())
                 .withAppInstall(Constants.SERVER_IDS.get(serverType), true, betaBranchParameter)
                 .build();
         return enqueueJob(new SteamCmdJob(serverType, parameters));

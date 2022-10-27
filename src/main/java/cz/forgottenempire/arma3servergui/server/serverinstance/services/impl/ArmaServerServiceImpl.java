@@ -236,7 +236,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     }
 
     private String getServerExecutable() {
-        return pathsFactory.getArma3ServerExecutable().toString();
+        return pathsFactory.getServerExecutable(ServerType.ARMA3).toString();
     }
 
     private void writeConfig(Server server) {
