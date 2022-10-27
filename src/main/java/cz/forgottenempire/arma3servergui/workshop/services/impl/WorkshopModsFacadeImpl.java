@@ -65,6 +65,7 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         WorkshopMod workshopMod = getMod(id)
                 .orElseThrow(() -> new NotFoundException("Mod ID " + id + " not found."));
         installerService.uninstallMod(workshopMod);
+        modsService.deleteMod(workshopMod);
     }
 
     private void setModNameFromWorkshop(WorkshopMod mod) {
