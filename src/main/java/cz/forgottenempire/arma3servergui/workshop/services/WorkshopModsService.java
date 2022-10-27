@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.workshop.services;
 
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface WorkshopModsService {
@@ -10,10 +11,9 @@ public interface WorkshopModsService {
 
     Optional<WorkshopMod> getMod(Long id);
 
-    WorkshopMod installOrUpdateMod(Long id);
+    WorkshopMod saveMod(WorkshopMod mod);
 
-    void uninstallMod(Long id);
+    List<WorkshopMod> saveAllMods(List<WorkshopMod> mod);
 
-    void updateAllMods();
-
+    void deleteMod(WorkshopMod mod);
 }

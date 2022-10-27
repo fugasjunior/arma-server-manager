@@ -7,15 +7,12 @@ import cz.forgottenempire.arma3servergui.workshop.dtos.ModDto;
 import cz.forgottenempire.arma3servergui.workshop.dtos.ModsDto;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.mappers.ModMapper;
-import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
+import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsFacade;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,21 +27,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/mod")
 public class WorkshopModsController {
 
-    private WorkshopModsService modsService;
+    private final WorkshopModsFacade modsFacade;
+    private final ModMapper modMapper = Mappers.getMapper(ModMapper.class);
 
-    ModMapper modMapper = Mappers.getMapper(ModMapper.class);
+    @Autowired
+    public WorkshopModsController(WorkshopModsFacade modsFacade) {
+        this.modsFacade = modsFacade;
+    }
 
     @GetMapping
     public ResponseEntity<ModsDto> getAllMods() {
         List<CreatorDlcDto> creatorDlcDtos = modMapper.creatorDlcsToCreatorDlcDtos(Arma3CDLC.getAll());
-        List<ModDto> workshopModDtos = modMapper.modsToModDtos(modsService.getAllMods());
+        List<ModDto> workshopModDtos = modMapper.modsToModDtos(modsFacade.getAllMods());
         ModsDto modsDto = new ModsDto(workshopModDtos, creatorDlcDtos);
         return ResponseEntity.ok(modsDto);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ModDto> getMod(@PathVariable Long id) {
-        WorkshopMod mod = modsService.getMod(id)
+        WorkshopMod mod = modsFacade.getMod(id)
                 .orElseThrow(() -> new NotFoundException("Mod ID " + id + " does not exist or is not installed"));
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
@@ -52,34 +53,28 @@ public class WorkshopModsController {
     @PostMapping
     public ResponseEntity<ModsDto> installOrUpdateMods(@RequestParam List<Long> modIds) {
         log.info("Installing or updating mods: {}", modIds);
-        List<WorkshopMod> workshopMods = modIds.stream()
-                .map(modsService::installOrUpdateMod)
-                .collect(Collectors.toList());
+        List<WorkshopMod> workshopMods = modsFacade.saveAndInstallMods(modIds);
         return ResponseEntity.ok(new ModsDto(modMapper.modsToModDtos(workshopMods), Collections.emptyList()));
     }
+
     @PostMapping("/{id}")
     public ResponseEntity<ModDto> installOrUpdateMod(@PathVariable Long id) {
         log.info("Installing mod id {}", id);
-        WorkshopMod mod = modsService.installOrUpdateMod(id);
+        WorkshopMod mod = modsFacade.saveAndInstallMods(List.of(id)).get(0);
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
 
     @DeleteMapping
     public ResponseEntity<?> uninstallMods(@RequestParam List<Long> modIds) {
         log.info("Uninstalling mods: {}", modIds);
-        modIds.forEach(modsService::uninstallMod);
+        modIds.forEach(modsFacade::uninstallMod);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> uninstallMod(@PathVariable Long id) {
         log.info("Uninstalling mod {}", id);
-        modsService.uninstallMod(id);
+        modsFacade.uninstallMod(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @Autowired
-    public void setModsService(WorkshopModsService modsService) {
-        this.modsService = modsService;
     }
 }

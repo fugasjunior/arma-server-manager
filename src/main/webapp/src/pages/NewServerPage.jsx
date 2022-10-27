@@ -47,7 +47,7 @@ const ServerSettingsPage = () => {
         try {
             await createServer(server);
             toast.success("Server successfully created");
-            navigate("/");
+            navigate("/servers");
         } catch (e) {
             console.error(e);
             toast.error("Creating server failed");

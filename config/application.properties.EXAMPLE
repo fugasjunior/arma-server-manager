@@ -33,9 +33,6 @@ arma3server.logDir=/home/arma3gui/logs/server
 
 
 ### Server config
-# Optional branch to be used for Arma 3 server. creatordlc branch recommended for playing with community DLCs.
-betaBranch=creatordlc
-
 # Additional mods to be activated when running the server that are not managed through the UI.
 # Comma separated list, such as: mod1,mod2,mod3. Can be left blank in most cases.
 additionalMods=

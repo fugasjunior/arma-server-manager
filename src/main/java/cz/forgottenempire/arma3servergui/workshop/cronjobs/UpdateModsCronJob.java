@@ -1,6 +1,6 @@
-package cz.forgottenempire.arma3servergui.mods.cronjobs;
+package cz.forgottenempire.arma3servergui.workshop.cronjobs;
 
-import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
+import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,20 +10,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UpdateModsCronJob {
 
-    private WorkshopModsService modsService;
+    private final WorkshopModsFacade modsFacade;
 
-    public UpdateModsCronJob() {
+    @Autowired
+    public UpdateModsCronJob(WorkshopModsFacade modsFacade) {
+        // TODO make customizable through UI
         log.info("Scheduling mod update cronjob for 03:00 AM every day");
+        this.modsFacade = modsFacade;
     }
 
     @Scheduled(cron = "0 0 3 * * *")
     public void refreshMods() {
         log.info("Running update job");
-        modsService.updateAllMods();
-    }
-
-    @Autowired
-    public void setModsService(WorkshopModsService modsService) {
-        this.modsService = modsService;
+        modsFacade.updateAllMods();
     }
 }

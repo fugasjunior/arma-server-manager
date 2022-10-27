@@ -7,10 +7,11 @@ import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import cz.forgottenempire.arma3servergui.server.dtos.ServerDto;
-import cz.forgottenempire.arma3servergui.server.dtos.ServersDto;
-import cz.forgottenempire.arma3servergui.server.entities.Server;
-import cz.forgottenempire.arma3servergui.server.services.ArmaServerService;
+import cz.forgottenempire.arma3servergui.server.serverinstance.controllers.ServerController;
+import cz.forgottenempire.arma3servergui.server.serverinstance.dtos.ServerDto;
+import cz.forgottenempire.arma3servergui.server.serverinstance.dtos.ServersDto;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
+import cz.forgottenempire.arma3servergui.server.serverinstance.services.ArmaServerService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
