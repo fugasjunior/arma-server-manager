@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.steamcmd;
 import com.google.common.base.Strings;
 import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
 import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
+import cz.forgottenempire.arma3servergui.steamcmd.exceptions.SteamAuthNotSetException;
 import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.system.repositories.SteamAuthRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class SteamCmdExecutor {
 
     private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
-
     private static final List<String> ERROR_KEYWORDS = Arrays.asList("error", "failure", "failed");
     private static final int EXIT_CODE_TIMEOUT_LINUX = 134;
     private static final int EXIT_CODE_TIMEOUT_WINDOWS = 10;
@@ -77,6 +77,9 @@ public class SteamCmdExecutor {
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
             handleProcessResult(resultStream, job);
+        } catch (SteamAuthNotSetException e) {
+            log.error("SteamAuth is not set up");
+            job.setErrorStatus(ErrorStatus.WRONG_AUTH);
         } catch (IOException e) {
             log.error("SteamCMD job failed due to an IO error", e);
             job.setErrorStatus(ErrorStatus.IO);
@@ -133,8 +136,8 @@ public class SteamCmdExecutor {
     }
 
     private String getAuthString() {
-        SteamAuth steamAuth = steamAuthRepository.findAll().stream().
-                findFirst().orElseThrow();
+        SteamAuth steamAuth = steamAuthRepository.findAll().stream()
+                        .findFirst().orElseThrow(SteamAuthNotSetException::new);
         String authString = steamAuth.getUsername() + " " + steamAuth.getPassword();
         if (!Strings.isNullOrEmpty(steamAuth.getSteamGuardToken())) {
             authString += " " + steamAuth.getSteamGuardToken();

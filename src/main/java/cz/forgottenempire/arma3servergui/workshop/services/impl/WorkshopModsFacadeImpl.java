@@ -72,7 +72,7 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
     }
 
     private void validateModConsumedByGameId(long modId, long gameId) {
-        if (gameId == fileDetailsService.getModAppId(modId)) {
+        if (gameId != fileDetailsService.getModAppId(modId)) {
             throw new ModNotConsumedByGameException("The mod " + modId + " is not consumed by game " + gameId);
         }
     }

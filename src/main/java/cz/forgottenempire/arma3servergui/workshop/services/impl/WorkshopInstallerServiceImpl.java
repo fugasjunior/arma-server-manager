@@ -7,17 +7,17 @@ import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
 import cz.forgottenempire.arma3servergui.steamcmd.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
-import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopInstallerService;
-
+import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +34,13 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     @Value("${serverDir}")
     private String serverPath;
 
-    private final WorkshopModRepository modRepository;
+    private final WorkshopModsService modsService;
 
     private final SteamCmdService steamCmdService;
 
     @Autowired
-    public WorkshopInstallerServiceImpl(WorkshopModRepository modRepository, SteamCmdService steamCmdService) {
-        this.modRepository = modRepository;
+    public WorkshopInstallerServiceImpl(WorkshopModsService modsService, SteamCmdService steamCmdService) {
+        this.modsService = modsService;
         this.steamCmdService = steamCmdService;
     }
 
@@ -49,22 +49,11 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         mods.forEach(mod -> {
             mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
             mod.setErrorStatus(null);
-            modRepository.save(mod);
+            modsService.saveMod(mod);
         });
 
-        Runnable runnable = () -> {
-            mods.stream()
-                    .map(mod -> steamCmdService.installOrUpdateWorkshopMod(mod)
-                            .thenAccept(steamCmdJob -> handleInstallation(mod, steamCmdJob)))
-                    .forEach(future -> {
-                        try {
-                            future.get();
-                        } catch (Exception e) {
-                            log.error("Error during mod download", e);
-                        }
-                    });
-        };
-        runnable.run();
+        mods.forEach(mod -> steamCmdService.installOrUpdateWorkshopMod(mod)
+                .thenAcceptAsync(steamCmdJob -> handleInstallation(mod, steamCmdJob)));
     }
 
     private void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
@@ -75,14 +64,16 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             mod.setErrorStatus(steamCmdJob.getErrorStatus());
         } else if (!verifyModDirectoryExists(mod.getId())) {
             log.error("Could not find downloaded mod directory for mod '{}' (id {}) " +
-                            "even though download finished successfully", mod.getName(), mod.getId());
+                    "even though download finished successfully", mod.getName(), mod.getId());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.GENERIC);
         } else {
             log.info("Mod {} (id {}) successfully downloaded, now installing",
                     mod.getName(), mod.getId());
             installMod(mod);
+            mod.setInstallationStatus(InstallationStatus.FINISHED);
         }
+        modsService.saveMod(mod);
     }
 
     private void installMod(WorkshopMod mod) {
@@ -90,9 +81,10 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
             convertModFilesToLowercase(mod);
             copyBiKeys(mod.getId());
             createSymlink(mod);
+            updateModInfo(mod);
             log.info("Mod '{}' (ID {}) successfully installed", mod.getName(), mod.getId());
         } catch (Exception e) {
-            log.error("Failed to install mod {} ({}) due to: {}", mod.getName(), mod.getId(), e.getMessage());
+            log.error("Failed to install mod {} (ID {})", mod.getName(), mod.getId(), e);
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.IO);
         }
@@ -108,11 +100,6 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private void copyBiKeys(Long modId) throws IOException {
         String[] extensions = new String[]{"bikey"};
         File modDirectory = new File(getModDirectoryPath(modId));
-
-        if (!verifyModDirectoryExists(modId)) {
-            log.error("Can not access mod directory {}", modId);
-            return;
-        }
 
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
@@ -137,8 +124,6 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         mod.setLastUpdated(formatter.format(new Date()));
         mod.setFileSize(getActualSizeOfMod(mod.getId()));
-        mod.setInstallationStatus(InstallationStatus.FINISHED);
-        modRepository.save(mod);
     }
 
     @Override
@@ -155,36 +140,12 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());
     }
 
-    // TODO extract somewhere else
-//    private Set<Long> getModIds() {
-//        File modDirectory = new File(getDownloadPath());
-//        // find all installed mods in installation folder
-//        Set<Long> modIds = new HashSet<>();
-//        try (Stream<Path> files = Files.list(modDirectory.toPath())) {
-//            files.forEach(p -> {
-//                        try {
-//                            long id = Long.parseLong(p.getFileName().toString());
-//                            modIds.add(id);
-//                        } catch (NumberFormatException ignored) {
-//                        }
-//                    }
-//            );
-//        } catch (IOException e) {
-//            log.error("Failed to collect existing mod directory IDs due to {}", e.toString());
-//            throw new RuntimeException(e);
-//        }
-//
-//        // add all missing mods from db
-//        modRepository.findAll().stream()
-//                .map(WorkshopMod::getId)
-//                .forEach(modIds::add);
-//        return modIds;
-//    }
-
     private void deleteSymlink(WorkshopMod mod) throws IOException {
         Path linkPath = Path.of(getSymlinkTargetPath(mod.getNormalizedName()));
         log.info("Deleting symlink {}", linkPath);
-        Files.delete(linkPath);
+        if (Files.isSymbolicLink(linkPath)) {
+            Files.delete(linkPath);
+        }
     }
 
     private boolean verifyModDirectoryExists(Long modId) {
