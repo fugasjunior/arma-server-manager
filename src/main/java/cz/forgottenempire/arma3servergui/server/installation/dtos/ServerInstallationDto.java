@@ -1,6 +1,8 @@
 package cz.forgottenempire.arma3servergui.server.installation.dtos;
 
 import cz.forgottenempire.arma3servergui.server.ServerType;
+import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
+import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,6 +11,6 @@ import lombok.Data;
 public class ServerInstallationDto {
     private ServerType type;
     private String version;
-    private boolean isInstalled;
-    private boolean isUpdating;
+    private InstallationStatus installationStatus;
+    private ErrorStatus errorStatus;
 }

@@ -165,29 +165,6 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         return instanceInfoRepository.getServerInstanceInfo(id);
     }
 
-//    @Override
-//    public synchronized void updateServer(SteamAuth auth) {
-//        log.info("Updating server...");
-//        serverUpdating = true;
-//        shutDownServer();
-//
-//        new Thread(() -> {
-//            SteamCmdParameters parameters = new SteamCmdParameterBuilder()
-//                    .withLogin(auth.getUsername(), auth.getPassword(), auth.getSteamGuardToken())
-//                    .withInstallDir(serverDir)
-//                    .withAppInstall(Constants.STEAM_ARMA3SERVER_ID, true,
-//                            betaBranch == null ? "" : " -beta " + betaBranch)
-//                    .build();
-//            DownloadStatus status = steamCmdWrapper.execute(parameters);
-//
-//            if (!status.isSuccess()) {
-//                log.error("Server update failed due to {}", status.getErrorStatus());
-//            }
-//            log.info("Server update done");
-//            serverUpdating = false;
-//        }).start();
-//    }
-
     private void validatePortsNotTaken(Server server) {
         serverRepository.findAllByPortOrQueryPort(server.getPort(), server.getQueryPort()).stream()
                 .filter(s -> !s.equals(server))

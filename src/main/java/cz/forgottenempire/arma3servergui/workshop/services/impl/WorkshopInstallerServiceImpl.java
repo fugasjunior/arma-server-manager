@@ -35,7 +35,6 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private String serverPath;
 
     private final WorkshopModsService modsService;
-
     private final SteamCmdService steamCmdService;
 
     @Autowired
@@ -54,6 +53,20 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
 
         mods.forEach(mod -> steamCmdService.installOrUpdateWorkshopMod(mod)
                 .thenAcceptAsync(steamCmdJob -> handleInstallation(mod, steamCmdJob)));
+    }
+
+    @Override
+    public void uninstallMod(WorkshopMod mod) {
+        File modDirectory = new File(getDownloadPath() + File.separatorChar + mod.getId());
+        try {
+            deleteSymlink(mod);
+            FileUtils.deleteDirectory(modDirectory);
+        } catch (NoSuchFileException ignored) {
+        } catch (IOException e) {
+            log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
+            throw new RuntimeException(e);
+        }
+        log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());
     }
 
     private void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
@@ -124,20 +137,6 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         mod.setLastUpdated(formatter.format(new Date()));
         mod.setFileSize(getActualSizeOfMod(mod.getId()));
-    }
-
-    @Override
-    public void uninstallMod(WorkshopMod mod) {
-        File modDirectory = new File(getDownloadPath() + File.separatorChar + mod.getId());
-        try {
-            deleteSymlink(mod);
-            FileUtils.deleteDirectory(modDirectory);
-        } catch (NoSuchFileException ignored) {
-        } catch (IOException e) {
-            log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
-            throw new RuntimeException(e);
-        }
-        log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());
     }
 
     private void deleteSymlink(WorkshopMod mod) throws IOException {

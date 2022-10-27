@@ -8,6 +8,7 @@ import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
 import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters.Builder;
 import cz.forgottenempire.arma3servergui.steamcmd.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,13 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     }
 
     @Override
-    public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType) {
+    public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType, @Nullable String betaBranch) {
+        String betaBranchParameter = betaBranch == null ? "" : "-beta " + betaBranch;
+
         SteamCmdParameters parameters = new Builder()
                 .withLogin()
                 .withInstallDir(ARMA3_SERVER_DIR)
-                .withAppInstall(Constants.STEAM_ARMA3SERVER_ID, true)
+                .withAppInstall(Constants.STEAM_ARMA3SERVER_ID, true, betaBranchParameter)
                 .build();
         return enqueueJob(new SteamCmdJob(serverType, parameters));
     }
