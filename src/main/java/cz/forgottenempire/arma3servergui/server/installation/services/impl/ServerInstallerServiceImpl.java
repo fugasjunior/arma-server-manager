@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.server.installation.services.impl;
 
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
+import cz.forgottenempire.arma3servergui.common.util.SystemUtils;
 import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.server.installation.entities.ServerInstallation;
 import cz.forgottenempire.arma3servergui.server.installation.repositories.ServerInstallationRepository;
@@ -12,9 +13,7 @@ import cz.forgottenempire.arma3servergui.steamcmd.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod.InstallationStatus;
 import java.io.File;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,20 +119,10 @@ public class ServerInstallerServiceImpl implements ServerInstallerService {
 
     private int findAvailablePort() {
         int port = 3000;
-        while (!isPortAvailable(port) || !isPortAvailable(port + 1)) {
+        while (!SystemUtils.isPortAvailable(port) || !SystemUtils.isPortAvailable(port + 1)) {
             port += 2;
         }
         return port;
-    }
-
-    private boolean isPortAvailable(int port) {
-        try (Socket ignored = new Socket("localhost", port)) {
-            return false;
-        } catch (ConnectException e) {
-            return true;
-        } catch (IOException e) {
-            throw new IllegalStateException("Error while trying to check open port", e);
-        }
     }
 }
 
