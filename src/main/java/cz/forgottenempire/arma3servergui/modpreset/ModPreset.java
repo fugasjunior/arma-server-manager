@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-class ModPreset {
+public class ModPreset {
 
     @Id
     private Long id;
