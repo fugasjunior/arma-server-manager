@@ -2,10 +2,9 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {createServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
-import ListBuilder from "../UI/ListBuilder";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import {getMods} from "../services/modsService";
-import {Button, Modal, Typography} from "@mui/material";
+import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 
 const ARMA3_INITIAL_STATE = {
@@ -23,6 +22,8 @@ const ARMA3_INITIAL_STATE = {
     battlEye: true,
     vonEnabled: true,
     verifySignatures: true,
+    activeMods: [],
+    activeDLCs: [],
     additionalOptions: ""
 }
 
@@ -56,12 +57,8 @@ const SERVER_NAMES = {
 
 const ServerSettingsPage = () => {
     const [availableMods, setAvailableMods] = useState([]);
-    const [selectedMods, setSelectedMods] = useState([]);
     const [availableDlcs, setAvailableDlcs] = useState([]);
-    const [selectedDlcs, setSelectedDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [modsModalOpen, setModsModalOpen] = useState(false);
-    const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
 
     const {type} = useParams();
 
@@ -84,13 +81,12 @@ const ServerSettingsPage = () => {
         }
     }
 
-    const handleSubmit = async values => {
+    const handleSubmit = async (values, selectedMods, selectedDlcs) => {
         const server = {
             ...values,
             type,
-            queryPort: values.port + 1,
-            activeMods: selectedMods,
-            activeDLCs: selectedDlcs,
+            activeMods: selectedMods ?? [],
+            activeDLCs: selectedDlcs ?? [],
         }
 
         try {
@@ -103,54 +99,6 @@ const ServerSettingsPage = () => {
         }
     }
 
-    const handleModSelect = option => {
-        setAvailableMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setSelectedMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        });
-    }
-
-    const handleModDeselect = option => {
-        setSelectedMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setAvailableMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        });
-    }
-
-    const handleDlcSelect = option => {
-        setAvailableDlcs((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setSelectedDlcs((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        });
-    }
-
-    const handleDlcDeselect = option => {
-        setSelectedDlcs((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setAvailableDlcs((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        });
-    }
-
-    const handleToggleModsModal = () => {
-        setModsModalOpen(prevState => !prevState);
-    }
-
-    const handleToggleDlcsModal = () => {
-        setDlcsModalOpen(prevState => !prevState);
-    }
-
     return (
             <>
                 <Typography variant="h4" mb={2}>New {SERVER_NAMES[type]} server</Typography>
@@ -158,24 +106,14 @@ const ServerSettingsPage = () => {
                 {!loading &&
                         <>
                             {type === "ARMA3" &&
-                                    <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE} onSubmit={handleSubmit}/>
+                                    <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE} onSubmit={handleSubmit}
+                                                                 availableMods={availableMods}
+                                                                 availableDlcs={availableDlcs}
+                                    />
                             }
                             {(type === "DAYZ" || type === "DAYZ_EXP") &&
                                     <EditDayZServerSettingsForm server={DAYZ_INITIAL_STATE} onSubmit={handleSubmit}/>
                             }
-                            <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
-                            <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
-                            <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
-
-                                <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                             onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                             itemsLabel="mods" showFilter/>
-                            </Modal>
-                            <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
-                                <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
-                                             onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
-                                             itemsLabel="DLCs"/>
-                            </Modal>
                         </>}
 
             </>

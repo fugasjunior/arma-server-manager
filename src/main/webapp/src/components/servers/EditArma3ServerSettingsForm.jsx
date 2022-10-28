@@ -1,16 +1,91 @@
 import {useFormik} from "formik";
-import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
-import React from "react";
+import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import ListBuilder from "../../UI/ListBuilder";
 
 const EditArma3ServerSettingsForm = props => {
 
+    const [modsModalOpen, setModsModalOpen] = useState(false);
+    const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
+    const [availableMods, setAvailableMods] = useState([]);
+    const [selectedMods, setSelectedMods] = useState([]);
+    const [availableDlcs, setAvailableDlcs] = useState([]);
+    const [selectedDlcs, setSelectedDlcs] = useState([]);
+
+    useEffect(() => {
+        setSelectedMods(props.server.activeMods);
+        setSelectedDlcs(props.server.activeDLCs);
+
+        const newAvailableMods = props.availableMods.filter(
+                mod => !props.server.activeMods.find(searchedMod => searchedMod.id === mod.id));
+        const newAvailableDlcs = props.availableDlcs.filter(
+                cdlc => !props.server.activeDLCs.find(searchedDlc => searchedDlc.id === cdlc.id));
+
+        setAvailableMods(newAvailableMods);
+        setAvailableDlcs(newAvailableDlcs);
+
+    }, [props.availableMods, props.availableDlcs]);
+
+    const handleSubmit = (values) => {
+        props.onSubmit(values, selectedMods, selectedDlcs);
+    }
+
     const formik = useFormik({
         initialValues: props.server,
-        onSubmit: props.onSubmit,
+        onSubmit: handleSubmit,
         enableReinitialize: true
     });
 
+    const handleModSelect = option => {
+        setAvailableMods((prevState) => {
+            return prevState.filter(item => item !== option);
+
+        });
+        setSelectedMods((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+
+    }
+
     const mediaQuery = useMediaQuery('(min-width:600px)');
+
+    const handleModDeselect = option => {
+        setSelectedMods((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setAvailableMods((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleDlcSelect = option => {
+        setAvailableDlcs((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setSelectedDlcs((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleDlcDeselect = option => {
+        setSelectedDlcs((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setAvailableDlcs((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleToggleModsModal = () => {
+        setModsModalOpen(prevState => !prevState);
+    }
+
+    const handleToggleDlcsModal = () => {
+        setDlcsModalOpen(prevState => !prevState);
+    }
 
     return (
             <div>
@@ -177,8 +252,7 @@ const EditArma3ServerSettingsForm = props => {
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <Button title={props.isServerRunning
-                                    && "Stop the server to be able to update the settings."}
+                            <Button title={props.isServerRunning ? "Stop the server to be able to update the settings." : ""}
                                     fullWidth={!mediaQuery}
                                     color="primary" variant="contained" type="submit" size="large">
                                 Submit
@@ -191,6 +265,22 @@ const EditArma3ServerSettingsForm = props => {
                         </Grid>
                     </Grid>
                 </form>
+                <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
+                <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+                    <Box>
+                        <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                     onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                     itemsLabel="mods" showFilter/>
+                    </Box>
+                </Modal>
+                <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
+                    <Box>
+                        <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
+                                     onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                     itemsLabel="DLCs"/>
+                    </Box>
+                </Modal>
             </div>
     );
 };
