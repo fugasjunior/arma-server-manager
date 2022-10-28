@@ -1,11 +1,8 @@
 package cz.forgottenempire.arma3servergui.steamcmd;
 
 import com.google.common.base.Strings;
-import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
-import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
-import cz.forgottenempire.arma3servergui.steamcmd.exceptions.SteamAuthNotSetException;
-import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
-import cz.forgottenempire.arma3servergui.system.repositories.SteamAuthRepository;
+import cz.forgottenempire.arma3servergui.system.SteamAuth;
+import cz.forgottenempire.arma3servergui.system.SteamAuthRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

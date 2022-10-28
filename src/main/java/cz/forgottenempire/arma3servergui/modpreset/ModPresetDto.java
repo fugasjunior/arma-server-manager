@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.modpreset;
 
-import cz.forgottenempire.arma3servergui.workshop.dtos.ModDto;
+import cz.forgottenempire.arma3servergui.workshop.ModDto;
 import java.util.List;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;

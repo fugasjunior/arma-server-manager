@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.modpreset;
 
-import cz.forgottenempire.arma3servergui.server.ServerType;
-import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
+import cz.forgottenempire.arma3servergui.common.ServerType;
+import cz.forgottenempire.arma3servergui.workshop.WorkshopMod;
 import java.util.Collection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

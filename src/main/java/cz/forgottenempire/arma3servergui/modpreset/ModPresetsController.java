@@ -1,7 +1,7 @@
 package cz.forgottenempire.arma3servergui.modpreset;
 
+import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
-import cz.forgottenempire.arma3servergui.server.ServerType;
 import java.util.Collection;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

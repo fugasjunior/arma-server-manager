@@ -1,6 +1,5 @@
 package cz.forgottenempire.arma3servergui.common;
 
-import cz.forgottenempire.arma3servergui.server.ServerType;
 import java.util.Map;
 
 public class Constants {
