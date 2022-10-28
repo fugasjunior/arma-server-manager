@@ -3,8 +3,10 @@ import config from "../config";
 
 const apiEndpoint = config.apiUrl + "/mod";
 
-export function getMods() {
-    return http.get(apiEndpoint);
+export function getMods(filterByServerType) {
+    const query = filterByServerType ? "?filter=" + filterByServerType
+            : ""
+    return http.get(apiEndpoint + query);
 }
 
 export function installMod(modId) {

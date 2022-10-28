@@ -29,25 +29,26 @@ const ARMA3_INITIAL_STATE = {
 }
 
 const DAYZ_INITIAL_STATE = {
-    "name": "",
-    "description": "",
-    "port": 2302,
-    "queryPort": 2303,
-    "maxPlayers": 32,
-    "password": "",
-    "adminPassword": "",
-    "clientFilePatching": false,
-    "persistent": true,
-    "verifySignatures": false,
-    "vonEnabled": true,
-    "forceSameBuild": false,
-    "thirdPersonViewEnabled": true,
-    "crosshairEnabled": true,
-    "instanceId": 1,
-    "respawnTime": 0,
-    "timeAcceleration": 1.0,
-    "nightTimeAcceleration": 1.0,
-    "additionalOptions": "",
+    name: "",
+    description: "",
+    port: 2302,
+    queryPort: 2303,
+    maxPlayers: 32,
+    password: "",
+    adminPassword: "",
+    clientFilePatching: false,
+    persistent: true,
+    verifySignatures: false,
+    vonEnabled: true,
+    forceSameBuild: false,
+    thirdPersonViewEnabled: true,
+    crosshairEnabled: true,
+    instanceId: 1,
+    respawnTime: 0,
+    timeAcceleration: 1.0,
+    nightTimeAcceleration: 1.0,
+    activeMods: [],
+    additionalOptions: "",
 }
 
 const ServerSettingsPage = () => {
@@ -66,7 +67,7 @@ const ServerSettingsPage = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const {data: modsDto} = await getMods();
+            const {data: modsDto} = await getMods(type);
             setAvailableMods(modsDto.workshopMods);
             setAvailableDlcs(modsDto.creatorDlcs);
             setLoading(false);
@@ -101,13 +102,17 @@ const ServerSettingsPage = () => {
                 {!loading &&
                         <>
                             {type === "ARMA3" &&
-                                    <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE} onSubmit={handleSubmit}
+                                    <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE}
                                                                  availableMods={availableMods}
                                                                  availableDlcs={availableDlcs}
+                                                                 onSubmit={handleSubmit}
                                     />
                             }
                             {(type === "DAYZ" || type === "DAYZ_EXP") &&
-                                    <EditDayZServerSettingsForm server={DAYZ_INITIAL_STATE} onSubmit={handleSubmit}/>
+                                    <EditDayZServerSettingsForm server={{...DAYZ_INITIAL_STATE, type}}
+                                                                availableMods={availableMods}
+                                                                onSubmit={handleSubmit}
+                                    />
                             }
                         </>}
 

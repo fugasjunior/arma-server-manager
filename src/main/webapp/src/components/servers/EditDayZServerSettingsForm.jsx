@@ -1,17 +1,58 @@
 import {useFormik} from "formik";
-import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
-import React from "react";
+import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import ListBuilder from "../../UI/ListBuilder";
 
 const EditDayZServerSettingsForm = props => {
 
+    const [modsModalOpen, setModsModalOpen] = useState(false);
+    const [availableMods, setAvailableMods] = useState([]);
+    const [selectedMods, setSelectedMods] = useState([]);
+
+    useEffect(() => {
+        setSelectedMods(props.server.activeMods);
+        const newAvailableMods = props.availableMods.filter(
+                mod => !props.server.activeMods.find(searchedMod => searchedMod.id === mod.id));
+        setAvailableMods(newAvailableMods);
+    }, [props.availableMods]);
+
+    const handleSubmit = (values) => {
+        props.onSubmit(values, selectedMods);
+    }
+
     const formik = useFormik({
         initialValues: props.server,
-        onSubmit: props.onSubmit,
+        onSubmit: handleSubmit,
         enableReinitialize: true,
         validateOnChange: false,
     });
 
     const mediaQuery = useMediaQuery('(min-width:600px)');
+
+    const handleModSelect = option => {
+        setAvailableMods((prevState) => {
+            return prevState.filter(item => item !== option);
+
+        });
+        setSelectedMods((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+
+    }
+
+    const handleModDeselect = option => {
+        setSelectedMods((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setAvailableMods((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleToggleModsModal = () => {
+        setModsModalOpen(prevState => !prevState);
+    }
 
     return (
             <div>
@@ -240,6 +281,19 @@ const EditDayZServerSettingsForm = props => {
                         </Grid>
                     </Grid>
                 </form>
+
+                {props.server.type !== "DAYZ_EXP" &&
+                        <>
+                            <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                            <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+                                <Box>
+                                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                                 itemsLabel="mods" showFilter/>
+                                </Box>
+                            </Modal>
+                        </>
+                }
             </div>
     );
 };

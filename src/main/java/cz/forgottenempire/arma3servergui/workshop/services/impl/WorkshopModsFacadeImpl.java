@@ -96,7 +96,7 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
             mod.setServerType(ServerType.ARMA3);
         } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
-            if (SystemUtils.getOsType() != OSType.LINUX) {
+            if (SystemUtils.getOsType() == OSType.LINUX) {
                 log.warn("Tried to install DayZ mod ID {} which is not supported on Linux", mod.getId());
                 throw new ServerUnsupportedOnOsException("DayZ mod cannot be installed because DayZ is not supported "
                         + "on Linux servers");

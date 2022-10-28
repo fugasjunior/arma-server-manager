@@ -25,7 +25,7 @@ const ServerSettingsPage = () => {
         try {
             setIsLoading(true);
             const {data: fetchedServer} = await getServer(id);
-            const {data: modsDto} = await getMods();
+            const {data: modsDto} = await getMods(fetchedServer.type);
 
             setServer(fetchedServer);
             setAvailableMods(modsDto.workshopMods);
@@ -78,6 +78,7 @@ const ServerSettingsPage = () => {
                             {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
                                     <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
                                                                 onCancel={handleCancel}
+                                                                availableMods={availableMods}
                                                                 isServerRunning={server.instanceInfo
                                                                         && server.instanceInfo.alive}
                                     />

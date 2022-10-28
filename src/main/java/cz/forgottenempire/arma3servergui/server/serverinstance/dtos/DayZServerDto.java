@@ -1,7 +1,6 @@
 package cz.forgottenempire.arma3servergui.server.serverinstance.dtos;
 
 import cz.forgottenempire.arma3servergui.server.ServerType;
-import cz.forgottenempire.arma3servergui.workshop.dtos.CreatorDlcDto;
 import java.util.List;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -12,6 +11,7 @@ import lombok.Data;
 
 @Data
 public class DayZServerDto implements ServerDto {
+
     private Long id;
 
     @NotEmpty
@@ -48,13 +48,15 @@ public class DayZServerDto implements ServerDto {
     @Min(0)
     private int respawnTime;
 
-    @DecimalMin("0.1") @DecimalMax("64")
+    @DecimalMin("0.1")
+    @DecimalMax("64")
     private double timeAcceleration;
 
-    @DecimalMin("0.1") @DecimalMax("64")
+    @DecimalMin("0.1")
+    @DecimalMax("64")
     private double nightTimeAcceleration;
 
     private String additionalOptions;
-
+    private List<ServerWorkshopModDto> activeMods;
     private ServerInstanceInfoDto instanceInfo;
 }

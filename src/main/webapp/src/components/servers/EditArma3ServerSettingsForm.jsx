@@ -36,6 +36,8 @@ const EditArma3ServerSettingsForm = props => {
         enableReinitialize: true
     });
 
+    const mediaQuery = useMediaQuery('(min-width:600px)');
+
     const handleModSelect = option => {
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
@@ -46,8 +48,6 @@ const EditArma3ServerSettingsForm = props => {
         });
 
     }
-
-    const mediaQuery = useMediaQuery('(min-width:600px)');
 
     const handleModDeselect = option => {
         setSelectedMods((prevState) => {

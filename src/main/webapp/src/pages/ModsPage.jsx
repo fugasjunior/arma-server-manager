@@ -120,7 +120,6 @@ const ModsPage = () => {
                            onClick={handleClick} onSelectAllClick={handleSelectAllClick} onUpdateClicked={handleUpdate}
                            onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
                            onFilterChange={handleFilterChange}
-
                 />
             </>
     )

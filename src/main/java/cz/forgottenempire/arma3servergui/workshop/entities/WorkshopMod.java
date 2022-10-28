@@ -35,9 +35,6 @@ public class WorkshopMod {
     @Enumerated(EnumType.STRING)
     private ErrorStatus errorStatus;
 
-    @ManyToMany(mappedBy = "activeMods")
-    private List<Arma3Server> servers;
-
     @Enumerated(EnumType.STRING)
     private ServerType serverType;
 

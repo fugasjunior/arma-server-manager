@@ -240,6 +240,7 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
             addArma3ModsAndDlcsToParameters(parameters, (Arma3Server) server);
         } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
             parameters.add("-limitFPS=60");
+            addDayZModsToParameters(parameters, (DayZServer) server);
         }
 
         return parameters;
@@ -261,6 +262,12 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
         // add enabled Creator DLCs
         server.getActiveDLCs().stream()
                 .map(dlc -> "-mod=" + dlc.getId())
+                .forEach(parameters::add);
+    }
+
+    private void addDayZModsToParameters(List<String> parameters, DayZServer server) {
+        server.getActiveMods().stream() // TODO check installation status
+                .map(mod -> "-mod=" + mod.getNormalizedName())
                 .forEach(parameters::add);
     }
 

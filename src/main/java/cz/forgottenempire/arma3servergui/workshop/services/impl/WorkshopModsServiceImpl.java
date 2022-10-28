@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.DayZServer;
 import cz.forgottenempire.arma3servergui.server.serverinstance.repositories.ServerRepository;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.repositories.WorkshopModRepository;
@@ -53,8 +54,13 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
 
     @Override
     public void deleteMod(WorkshopMod mod) {
-        mod.getServers().forEach(server -> {
-            ((Arma3Server) server).getActiveMods().remove(mod);
+        serverRepository.findAllByActiveMod(mod.getId())
+                .forEach(server -> {
+                    if (server instanceof Arma3Server arma3Server) {
+                        arma3Server.getActiveMods().remove(mod);
+                    } else if (server instanceof DayZServer dayZServer) {
+                        dayZServer.getActiveMods().remove(mod);
+                    }
             serverRepository.save(server);
         });
         modRepository.delete(mod);
