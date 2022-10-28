@@ -7,7 +7,7 @@ import cz.forgottenempire.arma3servergui.server.serverinstance.dtos.ServerInstan
 import cz.forgottenempire.arma3servergui.server.serverinstance.dtos.ServersDto;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.mappers.ServerMapper;
-import cz.forgottenempire.arma3servergui.server.serverinstance.services.ArmaServerService;
+import cz.forgottenempire.arma3servergui.server.serverinstance.services.ServerInstanceService;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,23 +25,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
 @RequestMapping("/api/server")
-@Validated
+@Slf4j
 public class ServerController {
 
-    private ArmaServerService serverService;
+    private final ServerInstanceService serverInstanceService;
+    private final ServerMapper serverMapper = Mappers.getMapper(ServerMapper.class);
 
-    ServerMapper serverMapper = Mappers.getMapper(ServerMapper.class);
+    @Autowired
+    public ServerController(ServerInstanceService serverInstanceService) {
+        this.serverInstanceService = serverInstanceService;
+    }
 
     @GetMapping
     public ResponseEntity<ServersDto> getAllServers() {
-        List<ServerDto> serverDtos = serverService.getAllServers()
+        List<ServerDto> serverDtos = serverInstanceService.getAllServers()
                 .stream()
-                .map(server -> serverMapper.serverToServerDto(server)).toList();
+                .map(serverMapper::mapServerToDto).toList();
         serverDtos.forEach(s -> {
-            ServerInstanceInfo instanceInfo = serverService.getServerInstanceInfo(s.getId());
-            ServerInstanceInfoDto instanceInfoDto = serverMapper.serverInstanceInfoToServerInstanceInfoDto(
+            ServerInstanceInfo instanceInfo = serverInstanceService.getServerInstanceInfo(s.getId());
+            ServerInstanceInfoDto instanceInfoDto = serverMapper.mapServerInstanceInfoToDto(
                     instanceInfo);
             s.setInstanceInfo(instanceInfoDto);
         });
@@ -51,62 +53,57 @@ public class ServerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ServerDto> getServer(@PathVariable Long id) {
-        Server server = serverService.getServer(id)
+        Server server = serverInstanceService.getServer(id)
                 .orElseThrow(
                         () -> new NotFoundException("Server ID " + id + " doesn't exist"));
-        ServerDto serverDto = serverMapper.serverToServerDto(server);
-        ServerInstanceInfo instanceInfo = serverService.getServerInstanceInfo(id);
-        serverDto.setInstanceInfo(serverMapper.serverInstanceInfoToServerInstanceInfoDto(instanceInfo));
+        ServerDto serverDto = serverMapper.mapServerToDto(server);
+        ServerInstanceInfo instanceInfo = serverInstanceService.getServerInstanceInfo(id);
+        serverDto.setInstanceInfo(serverMapper.mapServerInstanceInfoToDto(instanceInfo));
         return ResponseEntity.ok(serverDto);
     }
 
     @PostMapping
     public ResponseEntity<ServerDto> createServer(@Valid @RequestBody ServerDto serverDto) {
-        Server server = serverMapper.serverDtoToServer(serverDto);
-        server = serverService.createServer(server);
-        return ResponseEntity.status(HttpStatus.CREATED).body(serverMapper.serverToServerDto(server));
+        Server server = serverMapper.mapServerDtoToEntity(serverDto);
+        server = serverInstanceService.createServer(server);
+        return ResponseEntity.status(HttpStatus.CREATED).body(serverMapper.mapServerToDto(server));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ServerDto> updateServer(@PathVariable Long id, @Valid @RequestBody ServerDto serverDto) {
-        Server server = serverService.getServer(id)
+        Server server = serverInstanceService.getServer(id)
                 .orElseThrow(
                         () -> new NotFoundException("Server ID " + id + " doesn't exist"));
         serverDto.setId(server.getId());
         serverMapper.updateServerFromDto(serverDto, server);
-        server = serverService.updateServer(server);
-        return ResponseEntity.ok(serverMapper.serverToServerDto(server));
+        server = serverInstanceService.updateServer(server);
+        return ResponseEntity.ok(serverMapper.mapServerToDto(server));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteServer(@PathVariable Long id) {
-        serverService.getServer(id).ifPresent((server) -> serverService.deleteServer(server));
+        serverInstanceService.getServer(id).ifPresent(serverInstanceService::deleteServer);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/start")
     public ResponseEntity<?> startServer(@PathVariable Long id) {
         log.info("Received request to start server ID {}", id);
-        serverService.startServer(id);
+        serverInstanceService.startServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/stop")
     public ResponseEntity<?> stopServer(@PathVariable Long id) {
         log.info("Received request to stop server ID {}", id);
-        serverService.shutDownServer(id);
+        serverInstanceService.shutDownServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/restart")
     public ResponseEntity<?> restartServer(@PathVariable Long id) {
         log.info("Received request to restart server ID {}", id);
-        serverService.restartServer(id);
+        serverInstanceService.restartServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @Autowired
-    public void setServerService(ArmaServerService serverService) {
-        this.serverService = serverService;
     }
 }

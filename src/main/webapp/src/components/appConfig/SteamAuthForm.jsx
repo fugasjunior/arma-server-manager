@@ -57,7 +57,7 @@ const SteamAuthForm = () => {
                                     value={formik.values.username}
                                     onChange={formik.handleChange}
                                     error={formik.touched.username && Boolean(formik.errors.username)}
-                                    helperText={formik.touched.username && formik.errors.username}
+
                             />
                             <Tooltip
                                     title="By leaving the password empty, previously saved password will be used instead"
@@ -72,7 +72,7 @@ const SteamAuthForm = () => {
                                         value={formik.values.password}
                                         onChange={formik.handleChange}
                                         error={formik.touched.password && Boolean(formik.errors.password)}
-                                        helperText={formik.touched.password && formik.errors.password}
+
                                 /></Tooltip>
                             <TextField
                                     fullWidth
@@ -82,7 +82,7 @@ const SteamAuthForm = () => {
                                     value={formik.values.steamGuardToken}
                                     onChange={formik.handleChange}
                                     error={formik.touched.steamGuardToken && Boolean(formik.errors.steamGuardToken)}
-                                    helperText={formik.touched.steamGuardToken && formik.errors.steamGuardToken}
+
                             />
                             <Button variant="contained" type="submit">Submit</Button>
                     </Stack>

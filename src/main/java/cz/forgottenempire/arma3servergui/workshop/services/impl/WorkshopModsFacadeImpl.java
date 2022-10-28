@@ -2,6 +2,10 @@ package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
+import cz.forgottenempire.arma3servergui.common.util.SystemUtils;
+import cz.forgottenempire.arma3servergui.common.util.SystemUtils.OSType;
+import cz.forgottenempire.arma3servergui.server.ServerType;
+import cz.forgottenempire.arma3servergui.server.installation.exceptions.ServerUnsupportedOnOsException;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.exceptions.ModNotConsumedByGameException;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
@@ -11,10 +15,13 @@ import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
 
     private final WorkshopModsService modsService;
@@ -32,18 +39,30 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         this.fileDetailsService = fileDetailsService;
     }
 
+    @Override
     public Optional<WorkshopMod> getMod(long id) {
         return modsService.getMod(id);
     }
 
+    @Override
     public Collection<WorkshopMod> getAllMods() {
         return modsService.getAllMods();
     }
 
+    @Override
+    public Collection<WorkshopMod> getAllMods(@Nullable ServerType filter) {
+        if (filter == null) {
+            return getAllMods();
+        }
+        return modsService.getAllMods(filter);
+    }
+
+    @Override
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
+
         List<WorkshopMod> workshopMods = ids.stream()
-                .peek(id -> validateModConsumedByGameId(id, Constants.STEAM_ARMA3_ID))
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
+                .peek(this::setModServerType)
                 .toList();
 
         workshopMods.forEach(this::setModNameFromWorkshop);
@@ -72,9 +91,22 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         mod.setName(fileDetailsService.getModName(mod.getId()));
     }
 
-    private void validateModConsumedByGameId(long modId, long gameId) {
-        if (gameId != fileDetailsService.getModAppId(modId)) {
-            throw new ModNotConsumedByGameException("The mod " + modId + " is not consumed by game " + gameId);
+    private void setModServerType(WorkshopMod mod) {
+        Long appId = fileDetailsService.getModAppId(mod.getId());
+        if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
+            mod.setServerType(ServerType.ARMA3);
+        } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
+            if (SystemUtils.getOsType() == OSType.LINUX) {
+                log.warn("Tried to install DayZ mod ID {} which is not supported on Linux", mod.getId());
+                throw new ServerUnsupportedOnOsException("DayZ mod cannot be installed because DayZ is not supported "
+                        + "on Linux servers");
+            }
+
+            mod.setServerType(ServerType.DAYZ);
+        } else {
+            log.warn("Tried to install mod ID {} which is not consumed by any of the supported servers", mod.getId());
+            throw new ModNotConsumedByGameException(
+                    "The mod " + mod.getId() + " is not consumed by any supported game");
         }
     }
 }

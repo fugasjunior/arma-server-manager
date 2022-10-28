@@ -4,7 +4,6 @@ import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -20,7 +19,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -32,33 +30,26 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="type_intern",  discriminatorType = DiscriminatorType.INTEGER)
-@DiscriminatorValue("1")
-public class Server {
+@DiscriminatorValue("2")
+public class Arma3Server extends Server {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+    private boolean clientFilePatching;
+    private boolean serverFilePatching;
 
-    @Enumerated
-    @NotNull
-    private ServerType type;
+    private boolean persistent;
 
-    private String description;
+    private boolean battlEye;
+    private boolean vonEnabled;
+    private boolean verifySignatures;
 
-    @NotEmpty
-    private String name;
-    @Min(1)
-    private int port;
-    @Min(1)
-    private int queryPort;
-    @Min(1)
-    private int maxPlayers;
+    @ManyToMany
+    @JoinTable(
+            name = "server_mod",
+            joinColumns = @JoinColumn(name = "server_id"),
+            inverseJoinColumns = @JoinColumn(name = "mod_id"))
+    private List<WorkshopMod> activeMods;
 
-    private String password;
-    private String adminPassword;
-
-    @Column(columnDefinition = "LONGTEXT")
-    private String additionalOptions;
+    @ElementCollection(targetClass = Arma3CDLC.class)
+    @Enumerated(EnumType.STRING)
+    private List<Arma3CDLC> activeDLCs;
 }

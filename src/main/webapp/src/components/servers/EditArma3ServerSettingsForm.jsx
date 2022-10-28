@@ -1,25 +1,91 @@
-import {Field, Form, Formik, useFormik} from "formik";
-import {
-    Button,
-    FormControlLabel,
-    FormGroup,
-    Grid,
-    Switch,
-    TextareaAutosize,
-    TextField,
-    useMediaQuery
-} from "@mui/material";
-import React from "react";
+import {useFormik} from "formik";
+import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import ListBuilder from "../../UI/ListBuilder";
 
-const EditServerSettingsForm = props => {
+const EditArma3ServerSettingsForm = props => {
+
+    const [modsModalOpen, setModsModalOpen] = useState(false);
+    const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
+    const [availableMods, setAvailableMods] = useState([]);
+    const [selectedMods, setSelectedMods] = useState([]);
+    const [availableDlcs, setAvailableDlcs] = useState([]);
+    const [selectedDlcs, setSelectedDlcs] = useState([]);
+
+    useEffect(() => {
+        setSelectedMods(props.server.activeMods);
+        setSelectedDlcs(props.server.activeDLCs);
+
+        const newAvailableMods = props.availableMods.filter(
+                mod => !props.server.activeMods.find(searchedMod => searchedMod.id === mod.id));
+        const newAvailableDlcs = props.availableDlcs.filter(
+                cdlc => !props.server.activeDLCs.find(searchedDlc => searchedDlc.id === cdlc.id));
+
+        setAvailableMods(newAvailableMods);
+        setAvailableDlcs(newAvailableDlcs);
+
+    }, [props.availableMods, props.availableDlcs]);
+
+    const handleSubmit = (values) => {
+        props.onSubmit(values, selectedMods, selectedDlcs);
+    }
 
     const formik = useFormik({
         initialValues: props.server,
-        onSubmit: props.onSubmit,
+        onSubmit: handleSubmit,
         enableReinitialize: true
     });
 
     const mediaQuery = useMediaQuery('(min-width:600px)');
+
+    const handleModSelect = option => {
+        setAvailableMods((prevState) => {
+            return prevState.filter(item => item !== option);
+
+        });
+        setSelectedMods((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+
+    }
+
+    const handleModDeselect = option => {
+        setSelectedMods((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setAvailableMods((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleDlcSelect = option => {
+        setAvailableDlcs((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setSelectedDlcs((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleDlcDeselect = option => {
+        setSelectedDlcs((prevState) => {
+            return prevState.filter(item => item !== option);
+        });
+
+        setAvailableDlcs((prevState) => {
+            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        });
+    }
+
+    const handleToggleModsModal = () => {
+        setModsModalOpen(prevState => !prevState);
+    }
+
+    const handleToggleDlcsModal = () => {
+        setDlcsModalOpen(prevState => !prevState);
+    }
 
     return (
             <div>
@@ -35,7 +101,6 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.name}
                                     onChange={formik.handleChange}
                                     error={formik.touched.name && Boolean(formik.errors.name)}
-                                    helperText={formik.touched.name && formik.errors.name}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -47,10 +112,9 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.description}
                                     onChange={formik.handleChange}
                                     error={formik.touched.description && Boolean(formik.errors.description)}
-                                    helperText={formik.touched.description && formik.errors.description}
                             />
                         </Grid>
-                        <Grid item xs={12} md={props.server.type === "ARMA3" ? 6 : 4}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                     fullWidth
                                     required
@@ -61,25 +125,9 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.port}
                                     onChange={formik.handleChange}
                                     error={formik.touched.port && Boolean(formik.errors.port)}
-                                    helperText={formik.touched.port && formik.errors.port}
                             />
                         </Grid>
-                        {props.server.type !== "ARMA3" &&
-                                <Grid item xs={12} md={props.server.type === "ARMA3" ? 6 : 4}>
-                                    <TextField
-                                            fullWidth
-                                            required
-                                            id="queryPort"
-                                            name="queryPort"
-                                            label="Query Port"
-                                            type="number"
-                                            value={formik.values.queryPort}
-                                            onChange={formik.handleChange}
-                                            error={formik.touched.queryPort && Boolean(formik.errors.queryPort)}
-                                            helperText={formik.touched.queryPort && formik.errors.queryPort}
-                                    />
-                                </Grid>}
-                        <Grid item xs={12} md={props.server.type === "ARMA3" ? 6 : 4}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                     fullWidth
                                     required
@@ -90,7 +138,6 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.maxPlayers}
                                     onChange={formik.handleChange}
                                     error={formik.touched.maxPlayers && Boolean(formik.errors.maxPlayers)}
-                                    helperText={formik.touched.maxPlayers && formik.errors.maxPlayers}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -102,7 +149,6 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.password}
                                     onChange={formik.handleChange}
                                     error={formik.touched.password && Boolean(formik.errors.password)}
-                                    helperText={formik.touched.password && formik.errors.password}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -114,7 +160,6 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.adminPassword}
                                     onChange={formik.handleChange}
                                     error={formik.touched.adminPassword && Boolean(formik.errors.adminPassword)}
-                                    helperText={formik.touched.adminPassword && formik.errors.adminPassword}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -128,8 +173,6 @@ const EditServerSettingsForm = props => {
                                         label="Client file patching"
                                         error={formik.touched.clientFilePatching && Boolean(
                                                 formik.errors.clientFilePatching)}
-                                        helperText={formik.touched.clientFilePatching
-                                                && formik.errors.clientFilePatching}
                                 />
                                 <FormControlLabel
                                         control={
@@ -140,8 +183,6 @@ const EditServerSettingsForm = props => {
                                         label="Server file patching"
                                         error={formik.touched.serverFilePatching && Boolean(
                                                 formik.errors.serverFilePatching)}
-                                        helperText={formik.touched.serverFilePatching
-                                                && formik.errors.serverFilePatching}
                                 />
                                 <FormControlLabel
                                         control={
@@ -152,7 +193,6 @@ const EditServerSettingsForm = props => {
                                         label="Verify signatures"
                                         error={formik.touched.verifySignatures && Boolean(
                                                 formik.errors.verifySignatures)}
-                                        helperText={formik.touched.verifySignatures && formik.errors.verifySignatures}
                                 />
                             </FormGroup>
                         </Grid>
@@ -160,12 +200,11 @@ const EditServerSettingsForm = props => {
                             <FormGroup>
                                 <FormControlLabel
                                         control={
-                                            <Switch checked={formik.values.von} onChange={formik.handleChange}
-                                                    name="von" id="von"/>
+                                            <Switch checked={formik.values.vonEnabled} onChange={formik.handleChange}
+                                                    name="vonEnabled" id="vonEnabled"/>
                                         }
                                         label="VON enabled"
-                                        error={formik.touched.von && Boolean(formik.errors.von)}
-                                        helperText={formik.touched.von && formik.errors.von}
+                                        error={formik.touched.vonEnabled && Boolean(formik.errors.vonEnabled)}
                                 />
                                 <FormControlLabel
                                         control={
@@ -174,7 +213,6 @@ const EditServerSettingsForm = props => {
                                         }
                                         label="BattlEye enabled"
                                         error={formik.touched.battlEye && Boolean(formik.errors.battlEye)}
-                                        helperText={formik.touched.battlEye && formik.errors.battlEye}
                                 />
                                 <FormControlLabel
                                         control={
@@ -183,7 +221,6 @@ const EditServerSettingsForm = props => {
                                         }
                                         label="Persistent"
                                         error={formik.touched.persistent && Boolean(formik.errors.persistent)}
-                                        helperText={formik.touched.persistent && formik.errors.persistent}
                                 />
                             </FormGroup>
                         </Grid>
@@ -197,12 +234,11 @@ const EditServerSettingsForm = props => {
                                     value={formik.values.additionalOptions}
                                     onChange={formik.handleChange}
                                     error={formik.touched.additionalOptions && Boolean(formik.errors.additionalOptions)}
-                                    helperText={formik.touched.additionalOptions && formik.errors.additionalOptions}
+
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <Button title={props.isServerRunning
-                                    && "Stop the server to be able to update the settings."}
+                            <Button title={props.isServerRunning ? "Stop the server to be able to update the settings." : ""}
                                     fullWidth={!mediaQuery}
                                     color="primary" variant="contained" type="submit" size="large">
                                 Submit
@@ -215,8 +251,24 @@ const EditServerSettingsForm = props => {
                         </Grid>
                     </Grid>
                 </form>
+                <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
+                <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+                    <Box>
+                        <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                     onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                     itemsLabel="mods" showFilter/>
+                    </Box>
+                </Modal>
+                <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
+                    <Box>
+                        <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
+                                     onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                     itemsLabel="DLCs"/>
+                    </Box>
+                </Modal>
             </div>
     );
 };
 
-export default EditServerSettingsForm;
+export default EditArma3ServerSettingsForm;

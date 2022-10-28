@@ -5,7 +5,7 @@ import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.repositories.ServerInstanceInfoRepository;
-import cz.forgottenempire.arma3servergui.server.serverinstance.services.ArmaServerService;
+import cz.forgottenempire.arma3servergui.server.serverinstance.services.ServerInstanceService;
 import java.net.InetSocketAddress;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
@@ -22,12 +22,12 @@ public class CheckServerInstancesStatusCronJob {
 
     private final ServerInstanceInfoRepository instanceInfoRepository;
 
-    private final ArmaServerService serverService;
+    private final ServerInstanceService serverService;
 
 
     @Autowired
     public CheckServerInstancesStatusCronJob(ServerInstanceInfoRepository instanceInfoRepository,
-            ArmaServerService serverService) {
+            ServerInstanceService serverService) {
         this.instanceInfoRepository = instanceInfoRepository;
         this.serverService = serverService;
     }

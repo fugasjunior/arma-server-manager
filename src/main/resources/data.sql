@@ -24,12 +24,14 @@ VALUES (0, 'AVS Code', 'C:\Program Files\Microsoft VS Code', 'C:\Program Files\M
 
 
 
-INSERT INTO workshop_mod (id, name, file_size, last_updated, installation_status)
-VALUES (333310405, 'Enhanced Movement', 628454, '23-10-2022 03:01:15', 'FINISHED'),
-       (450814997, 'CBA_A3', 4006126, '23-10-2022 03:01:15', 'FINISHED'),
-       (2018593688, 'Zeus Enhanced - ACE3 Compatibility', 9788, '23-10-2022 03:01:15', 'FINISHED'),
-       (2174495332, 'ACE Compat - RHS: SAF', 18964, '23-10-2022 03:01:15', 'FINISHED'),
-       (884966711, 'ACE Compat - RHS: GREF', 59658, '23-10-2022 03:01:15', 'FINISHED'),
-       (639837898, 'Advanced Towing', 86378, '23-10-2022 03:01:15', 'FINISHED'),
-       (621650475, 'CUP ACE3 Compatibility Addon - Vehicles', 379976, '23-10-2022 03:01:15', 'FINISHED'),
-       (549676314, 'CUP ACE3 Compatibility Addon - Weapons', 431379, '23-10-2022 03:01:15', 'FINISHED');
+INSERT INTO workshop_mod (id, name, file_size, last_updated, installation_status, server_type)
+VALUES (333310405, 'Enhanced Movement', 628454, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (450814997, 'CBA_A3', 4006126, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (2018593688, 'Zeus Enhanced - ACE3 Compatibility', 9788, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (2174495332, 'ACE Compat - RHS: SAF', 18964, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (884966711, 'ACE Compat - RHS: GREF', 59658, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (639837898, 'Advanced Towing', 86378, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (621650475, 'CUP ACE3 Compatibility Addon - Vehicles', 379976, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (549676314, 'CUP ACE3 Compatibility Addon - Weapons', 431379, '23-10-2022 03:01:15', 'FINISHED', 'ARMA3'),
+       (2872023707, 'SilentZ Particles', 17344, '28-10-2022 13:42:19', 'FINISHED', 'DAYZ'),
+       (2878310242, 'hologram_fix_119', 10076, '28-10-2022 13:42:19', 'FINISHED', 'DAYZ');

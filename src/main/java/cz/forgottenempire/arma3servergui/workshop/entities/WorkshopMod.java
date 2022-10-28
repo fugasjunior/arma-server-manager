@@ -1,6 +1,8 @@
 package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import cz.forgottenempire.arma3servergui.server.ServerType;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import java.util.List;
@@ -33,8 +35,8 @@ public class WorkshopMod {
     @Enumerated(EnumType.STRING)
     private ErrorStatus errorStatus;
 
-    @ManyToMany(mappedBy = "activeMods")
-    private List<Server> servers;
+    @Enumerated(EnumType.STRING)
+    private ServerType serverType;
 
     public WorkshopMod(Long id) {
         this.id = id;
@@ -52,6 +54,7 @@ public class WorkshopMod {
         return retVal;
     }
 
+    // TODO this shouldn't be here, extract to separate enum
     public enum InstallationStatus {
         INSTALLATION_IN_PROGRESS,
         ERROR,

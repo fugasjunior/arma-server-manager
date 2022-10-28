@@ -8,6 +8,7 @@ import ModsErrorAlertMessage from "../components/mods/ModsErrorAlertMessage";
 const ModsPage = () => {
     const [mods, setMods] = useState([]);
     const [selected, setSelected] = useState([]);
+    const [filter, setFilter] = useState("");
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
@@ -94,14 +95,32 @@ const ModsPage = () => {
         setSelected(newSelected);
     };
 
+    const handleFilterChange = (event, newValue) => {
+        setSelected([]);
+        setFilter(newValue);
+    }
+
+    const filterMods = () => {
+        if (!filter) {
+            return mods;
+        }
+        return mods.filter(mod => mod.serverType === filter);
+    }
+
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
+    const filteredMods = filterMods();
+    const arma3ModsCount = mods.filter(mod => mod.serverType === "ARMA3").length;
+    const dayZModsCount = mods.filter(mod => mod.serverType === "DAYZ").length;
 
     return (
             <>
-                {errorOccured && <ModsErrorAlertMessage mods={mods}/>}
-            <ModsTable rows={mods} selected={selected} onClick={handleClick} onSelectAllClick={handleSelectAllClick}
-                onUpdateClicked={handleUpdate} onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
-            />
+                {errorOccured && <ModsErrorAlertMessage mods={filteredMods}/>}
+                <ModsTable rows={filteredMods} selected={selected} filter={filter} arma3ModsCount={arma3ModsCount}
+                           dayZModsCount={dayZModsCount}
+                           onClick={handleClick} onSelectAllClick={handleSelectAllClick} onUpdateClicked={handleUpdate}
+                           onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
+                           onFilterChange={handleFilterChange}
+                />
             </>
     )
 }

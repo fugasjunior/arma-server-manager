@@ -20,6 +20,8 @@ const INSTALLATION_NAMES = {
 
 const SERVER_IMAGE_URLS = {
     "ARMA3": "./img/arma3_logo.jpg",
+    "DAYZ": "./img/dayz_logo.jpg",
+    "DAYZ_EXP": "./img/dayz_exp_logo.jpg",
 }
 
 const ERROR_STATE_MESSAGES = {

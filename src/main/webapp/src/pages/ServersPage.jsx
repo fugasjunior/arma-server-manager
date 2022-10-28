@@ -1,10 +1,12 @@
 import {deleteServer, getServers, restartServer, startServer, stopServer} from "../services/serversService"
 import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
 import {useInterval} from "../hooks/use-interval";
 import ServerListEntry from "../components/servers/ServerListEntry";
-import {Button, Divider, Fab, Stack} from "@mui/material";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import NewServerButton from "../components/servers/NewServerButton";
+import Table from "@mui/material/Table";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
+import TableBody from "@mui/material/TableBody";
 
 const ServersPage = () => {
     const [servers, setServers] = useState([]);
@@ -71,24 +73,23 @@ const ServersPage = () => {
 
     return (
             <>
-                <Button variant="contained" size="large" sx={{mt: 2, mb: 4}}
-                component={Link} to="/servers/new"
-                >
-                    <AddCircleOutlineIcon sx={{mr: 1}}/>
-                    Create new server
-                </Button>
-                <Stack spacing={4} divider={<Divider orientation="horizontal" flexItem />}>
-                    {servers.map(server =>
-                            <ServerListEntry key={server.id}
-                                             server={server}
-                                             onStartServer={handleStartServer}
-                                             onStopServer={handleStopServer}
-                                             onRestartServer={handleRestartServer}
-                                             onDeleteServer={handleDeleteServer}
-                                             serverWithSamePortRunning={isServerWithSamePortRunning(server)}
-                            />
-                    )}
-                </Stack>
+                <NewServerButton/>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableBody>
+                            {servers.map(server =>
+                                    <ServerListEntry key={server.id}
+                                                     server={server}
+                                                     onStartServer={handleStartServer}
+                                                     onStopServer={handleStopServer}
+                                                     onRestartServer={handleRestartServer}
+                                                     onDeleteServer={handleDeleteServer}
+                                                     serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                                    />
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </>
     )
 }

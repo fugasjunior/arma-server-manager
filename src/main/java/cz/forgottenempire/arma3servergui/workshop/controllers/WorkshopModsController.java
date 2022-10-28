@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.workshop.controllers;
 
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
+import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.dtos.CreatorDlcDto;
 import cz.forgottenempire.arma3servergui.workshop.dtos.ModDto;
@@ -36,9 +37,12 @@ public class WorkshopModsController {
     }
 
     @GetMapping
-    public ResponseEntity<ModsDto> getAllMods() {
-        List<CreatorDlcDto> creatorDlcDtos = modMapper.creatorDlcsToCreatorDlcDtos(Arma3CDLC.getAll());
-        List<ModDto> workshopModDtos = modMapper.modsToModDtos(modsFacade.getAllMods());
+    public ResponseEntity<ModsDto> getAllMods(@RequestParam(required = false) ServerType filter) {
+        List<CreatorDlcDto> creatorDlcDtos = Collections.emptyList();
+        if (filter == null || filter == ServerType.ARMA3) {
+             creatorDlcDtos = modMapper.creatorDlcsToCreatorDlcDtos(Arma3CDLC.getAll());
+        }
+        List<ModDto> workshopModDtos = modMapper.modsToModDtos(modsFacade.getAllMods(filter));
         ModsDto modsDto = new ModsDto(workshopModDtos, creatorDlcDtos);
         return ResponseEntity.ok(modsDto);
     }
