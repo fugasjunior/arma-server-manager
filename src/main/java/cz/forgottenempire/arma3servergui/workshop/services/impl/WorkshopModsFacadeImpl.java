@@ -2,7 +2,10 @@ package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
+import cz.forgottenempire.arma3servergui.common.util.SystemUtils;
+import cz.forgottenempire.arma3servergui.common.util.SystemUtils.OSType;
 import cz.forgottenempire.arma3servergui.server.ServerType;
+import cz.forgottenempire.arma3servergui.server.installation.exceptions.ServerUnsupportedOnOsException;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import cz.forgottenempire.arma3servergui.workshop.exceptions.ModNotConsumedByGameException;
 import cz.forgottenempire.arma3servergui.workshop.services.WorkshopFileDetailsService;
@@ -91,6 +94,11 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
             mod.setServerType(ServerType.ARMA3);
         } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
+            if (SystemUtils.getOsType() == OSType.LINUX) {
+                throw new ServerUnsupportedOnOsException("DayZ mod cannot be installed because DayZ is not supported "
+                        + "on Linux servers");
+            }
+
             mod.setServerType(ServerType.DAYZ);
         } else {
             throw new ModNotConsumedByGameException(
