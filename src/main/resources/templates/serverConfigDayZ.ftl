@@ -1,27 +1,27 @@
-<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server" -->
+<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.server.serverinstance.entities.DayZServer" -->
 
 // GLOBAL SETTINGS
 hostname = "${name}";
 password = "${password!}";
 passwordAdmin = "${adminPassword!}";
+steamQueryPort = ${queryPort};
 
 // JOINING RULES
 maxPlayers = ${maxPlayers};
-kickDuplicate = 1;
-verifySignatures = <#if verifySignatures>2<#else>0</#if>;
-allowedFilePatching = <#if clientFilePatching>2<#else>0</#if>;
+allowFilePatching = <#if clientFilePatching>1<#else>0</#if>;
+verifySignatures = 2;
+forceSameBuild = ${forceSameBuild?then('1', '0')};
 
 // INGAME SETTINGS
-disableVoN = ${von?then('0', '1')};
-vonCodec = 1;
+disableVoN = ${vonEnabled?then('0', '1')};
 vonCodecQuality = 30;
-persistent = ${persistent?then('1', '0')};
-timeStampFormat = "short";
-BattlEye = ${battlEye?then('1', '0')};
+serverTimePersistent = ${persistent?then('1', '0')};
+serverTimeAcceleration = ${timeAcceleration}
+serverNightTimeAcceleration = ${nightTimeAcceleration}
+disable3rdPerson = ${thirdPersonViewEnabled?then('0', '1')};
+disableCrosshair = ${crosshairEnabled?then('0', '1')};
+respawnTime = ${respawnTime};
 
-// SIGNATURE VERIFICATION
-onUnsignedData = "kick (_this select 0)";
-onHackedData = "kick (_this select 0)";
-onDifferentData = "";
+instanceId = ${instanceId};
 
 ${additionalOptions!}

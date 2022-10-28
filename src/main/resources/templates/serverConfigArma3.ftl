@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server" -->
+<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server" -->
 
 // GLOBAL SETTINGS
 hostname = "${name}";
@@ -12,7 +12,7 @@ verifySignatures = <#if verifySignatures>2<#else>0</#if>;
 allowedFilePatching = <#if clientFilePatching>2<#else>0</#if>;
 
 // INGAME SETTINGS
-disableVoN = ${von?then('0', '1')};
+disableVoN = ${vonEnabled?then('0', '1')};
 vonCodec = 1;
 vonCodecQuality = 30;
 persistent = ${persistent?then('1', '0')};
