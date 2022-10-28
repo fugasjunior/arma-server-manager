@@ -23,7 +23,12 @@ public class Constants {
             ServerType.DAYZ_EXP, "DayZServer_x64"
     );
 
-    public final static String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
+    public static final Map<ServerType, String> SERVER_CONFIG_TEMPLATES = Map.of(
+            ServerType.ARMA3, "serverConfigArma3.ftl",
+            ServerType.DAYZ, "serverConfigDayZ.ftl",
+            ServerType.DAYZ_EXP, "serverConfigDayZ.ftl"
+    );
 
-    public final static String TEMPLATE_SERVER_CONFIG_ARMA3 = "serverConfigArma3.ftl";
+
+    public final static String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
 }

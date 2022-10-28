@@ -2,7 +2,6 @@ package cz.forgottenempire.arma3servergui.common.services;
 
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.server.ServerType;
-import java.io.File;
 import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +61,7 @@ public class PathsFactory {
     public Path getScenariosBasePath() {
         return Path.of(getServerPath(ServerType.ARMA3).toString(), "mpmissions");
     }
+
     public Path getScenarioPath(String scenarioName) {
         return Path.of(getScenariosBasePath().toString(), scenarioName);
     }
@@ -70,7 +70,7 @@ public class PathsFactory {
         return Path.of(getServerPath(type).toString(), Constants.SERVER_EXECUTABLES.get(type));
     }
 
-    public Path getArma3ServerConfigFile(String configName) {
-        return Path.of(getServerPath(ServerType.ARMA3).toString(), configName);
+    public Path getConfigFile(ServerType type, String configName) {
+        return Path.of(getServerPath(type).toString(), configName);
     }
 }

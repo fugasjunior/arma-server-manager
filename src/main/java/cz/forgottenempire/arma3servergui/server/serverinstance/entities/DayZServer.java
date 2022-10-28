@@ -35,7 +35,7 @@ import lombok.Setter;
 public class DayZServer extends Server {
 
     @Min(1)
-    private int instanceId;
+    private long instanceId;
 
     @Min(0)
     private int respawnTime;

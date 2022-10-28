@@ -9,11 +9,9 @@ import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
 import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters.Builder;
 import cz.forgottenempire.arma3servergui.steamcmd.services.SteamCmdService;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
-import javax.annotation.Nullable;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SteamCmdServiceImpl implements SteamCmdService {
@@ -44,7 +42,9 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         SteamCmdParameters parameters = new Builder()
                 .withLogin()
                 .withInstallDir(pathsFactory.getModsBasePath().toAbsolutePath().toString())
-                .withWorkshopItemInstall(Constants.GAME_IDS.get(ServerType.ARMA3), workshopMod.getId(), true)
+                .withWorkshopItemInstall(
+                        Constants.GAME_IDS.get(workshopMod.getServerType()),
+                        workshopMod.getId(), true)
                 .build();
         return enqueueJob(new SteamCmdJob(workshopMod, parameters));
     }

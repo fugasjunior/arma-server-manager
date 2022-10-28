@@ -8,6 +8,7 @@ import cz.forgottenempire.arma3servergui.common.util.LogUtils;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.DayZServer;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.server.serverinstance.exceptions.PortAlreadyTakenException;
@@ -27,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -65,13 +65,11 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
         this.pathsFactory = pathsFactory;
 
         // Turn off all servers on application shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            instanceInfoRepository.getAll().stream()
-                    .map(ServerInstanceInfo::getProcess)
-                    .filter(Objects::nonNull)
-                    .filter(Process::isAlive)
-                    .forEach(Process::destroy);
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> instanceInfoRepository.getAll().stream()
+                .map(ServerInstanceInfo::getProcess)
+                .filter(Objects::nonNull)
+                .filter(Process::isAlive)
+                .forEach(Process::destroy)));
     }
 
     @Override
@@ -85,10 +83,8 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
 
     @Override
     public Server createServer(Server server) {
-        if (server.getType() == ServerType.ARMA3) {
-            // Arma 3 server doesn't support customizing Steam query port, it's always game port + 1
-            server.setQueryPort(server.getPort() + 1);
-        }
+        setQueryPortForArma3Server(server);
+        setInstanceIdForDayZServer(server);
         return serverRepository.save(server);
     }
 
@@ -123,7 +119,7 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
 
         writeConfig(server);
 
-        Process process = startServerProcess((Arma3Server) server);
+        Process process = startServerProcess(server);
         instanceInfo = ServerInstanceInfo.builder()
                 .id(id)
                 .alive(true)
@@ -158,6 +154,24 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
         return instanceInfoRepository.getServerInstanceInfo(id);
     }
 
+    // Arma 3 server doesn't support customizing Steam query port, it's always game port + 1
+    private void setQueryPortForArma3Server(Server server) {
+        if (server.getType() == ServerType.ARMA3) {
+            server.setQueryPort(server.getPort() + 1);
+        }
+    }
+
+    private void setInstanceIdForDayZServer(Server server) {
+        Long id = server.getId();
+        if (id == null) {
+            id = serverRepository.save(server).getId();
+        }
+
+        if (server.getType() == ServerType.DAYZ || server.getType() == ServerType.DAYZ_EXP) {
+            ((DayZServer) server).setInstanceId(id);
+        }
+    }
+
     private void validatePortsNotTaken(Server server) {
         serverRepository.findAllByPortOrQueryPort(server.getPort(), server.getQueryPort()).stream()
                 .filter(s -> !s.equals(server))
@@ -185,44 +199,18 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
         return isServerInstanceRunning(getServerInstanceInfo(server.getId()));
     }
 
-    private Process startServerProcess(Arma3Server server) {
+    private Process startServerProcess(Server server) {
         Process serverProcess = null;
+        List<String> parameters = getParameters(server);
 
-        List<String> parameters = new ArrayList<>();
-        parameters.add(getServerExecutable());
-        parameters.add("-nosplash");
-        parameters.add("-skipIntro");
-        parameters.add("-world=empty");
-        parameters.add("-config=" + getConfigFile(getConfigFileName(server.getId())).getAbsolutePath());
-        parameters.add("-port=" + server.getPort());
-
-        // TODO support for serverside mods
-        // add enabled mods
-        List<String> mods = getActiveModsListAsParameters(server);
-        if (!mods.isEmpty()) {
-            parameters.addAll(mods);
-        }
-
-        // add additional mods from properties
-        if (additionalMods != null) {
-            Arrays.stream(additionalMods)
-                    .map(mod -> "-mod=" + mod)
-                    .forEach(parameters::add);
-        }
-
-        // add enabled Creator DLCs
-        server.getActiveDLCs().stream()
-                .map(dlc -> "-mod=" + dlc.getId())
-                .forEach(parameters::add);
-
-        File logFile = new File(logDir + File.separatorChar + "out_" + server.getId() + ".log");
+        File logFile = new File(logDir + File.separatorChar + server.getType().name() + "_" + server.getId() + ".log");
         LogUtils.prepareLogFile(logFile);
 
         try {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
 
             ProcessBuilder pb = new ProcessBuilder(parameters)
-                    .directory(pathsFactory.getServerPath(ServerType.ARMA3).toFile());
+                    .directory(pathsFactory.getServerPath(server.getType()).toFile());
 
             if (logFile.exists()) {
                 pb.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
@@ -236,13 +224,49 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
         return serverProcess;
     }
 
-    private String getServerExecutable() {
-        return pathsFactory.getServerExecutable(ServerType.ARMA3).toString();
+    private List<String> getParameters(Server server) {
+        List<String> parameters = new ArrayList<>();
+        ServerType type = server.getType();
+
+        parameters.add(pathsFactory.getServerExecutable(server.getType()).toAbsolutePath().toString());
+        parameters.add("-port=" + server.getPort());
+        parameters.add("-config=" + pathsFactory.getConfigFile(
+                server.getType(), getConfigFileName(server.getType(), server.getId())).toString());
+
+        if (type == ServerType.ARMA3) {
+            parameters.add("-nosplash");
+            parameters.add("-skipIntro");
+            parameters.add("-world=empty");
+            addArma3ModsAndDlcsToParameters(parameters, (Arma3Server) server);
+        } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
+            parameters.add("-limitFPS=60");
+        }
+
+        return parameters;
+    }
+
+    private void addArma3ModsAndDlcsToParameters(List<String> parameters, Arma3Server server) {
+        // add enabled mods
+        server.getActiveMods().stream() // TODO check installation status
+                .map(mod -> "-mod=" + mod.getNormalizedName())
+                .forEach(parameters::add);
+
+        // add additional mods from properties
+        if (additionalMods != null) {
+            Arrays.stream(additionalMods)
+                    .map(mod -> "-mod=" + mod)
+                    .forEach(parameters::add);
+        }
+
+        // add enabled Creator DLCs
+        server.getActiveDLCs().stream()
+                .map(dlc -> "-mod=" + dlc.getId())
+                .forEach(parameters::add);
     }
 
     private void writeConfig(Server server) {
-        String configFileName = getConfigFileName(server.getId());
-        File configFile = getConfigFile(configFileName);
+        String configFileName = getConfigFileName(server.getType(), server.getId());
+        File configFile = pathsFactory.getConfigFile(server.getType(), configFileName).toFile();
 
         // delete old config file
         try {
@@ -258,24 +282,14 @@ public class ServerInstanceServiceImpl implements ServerInstanceService {
         Template configTemplate;
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
             configTemplate = freeMarkerConfigurer.getConfiguration()
-                    .getTemplate(Constants.TEMPLATE_SERVER_CONFIG_ARMA3);
+                    .getTemplate(Constants.SERVER_CONFIG_TEMPLATES.get(server.getType()));
             configTemplate.process(server, writer);
         } catch (IOException | TemplateException e) {
             log.error("Could not write config template due to {}", e.toString());
         }
     }
 
-    private List<String> getActiveModsListAsParameters(Arma3Server server) {
-        return server.getActiveMods().stream() // TODO check installation status
-                .map(mod -> "-mod=" + mod.getNormalizedName())
-                .collect(Collectors.toList());
-    }
-
-    private File getConfigFile(String fileName) {
-        return pathsFactory.getArma3ServerConfigFile(fileName).toFile();
-    }
-
-    private String getConfigFileName(Long serverId) {
-        return "server_" + serverId + ".cfg";
+    private String getConfigFileName(ServerType type, Long serverId) {
+        return type.name() + "_" + serverId + ".cfg";
     }
 }

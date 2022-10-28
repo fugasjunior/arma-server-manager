@@ -12,6 +12,7 @@ import cz.forgottenempire.arma3servergui.workshop.services.WorkshopModsService;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,18 +34,30 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         this.fileDetailsService = fileDetailsService;
     }
 
+    @Override
     public Optional<WorkshopMod> getMod(long id) {
         return modsService.getMod(id);
     }
 
+    @Override
     public Collection<WorkshopMod> getAllMods() {
         return modsService.getAllMods();
     }
 
+    @Override
+    public Collection<WorkshopMod> getAllMods(@Nullable ServerType filter) {
+        if (filter == null) {
+            return getAllMods();
+        }
+        return modsService.getAllMods(filter);
+    }
+
+    @Override
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
+
         List<WorkshopMod> workshopMods = ids.stream()
-                .peek(id -> validateModConsumedByGameId(id, Constants.GAME_IDS.get(ServerType.ARMA3)))
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
+                .peek(this::setModServerType)
                 .toList();
 
         workshopMods.forEach(this::setModNameFromWorkshop);
@@ -73,9 +86,15 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         mod.setName(fileDetailsService.getModName(mod.getId()));
     }
 
-    private void validateModConsumedByGameId(long modId, long gameId) {
-        if (gameId != fileDetailsService.getModAppId(modId)) {
-            throw new ModNotConsumedByGameException("The mod " + modId + " is not consumed by game " + gameId);
+    private void setModServerType(WorkshopMod mod) {
+        Long appId = fileDetailsService.getModAppId(mod.getId());
+        if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
+            mod.setServerType(ServerType.ARMA3);
+        } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
+            mod.setServerType(ServerType.DAYZ);
+        } else {
+            throw new ModNotConsumedByGameException(
+                    "The mod " + mod.getId() + " is not consumed by any supported game");
         }
     }
 }

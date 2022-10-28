@@ -44,7 +44,7 @@ public class Arma3Server extends Server {
 
     @ManyToMany
     @JoinTable(
-            name = "arma3server_mod",
+            name = "server_mod",
             joinColumns = @JoinColumn(name = "server_id"),
             inverseJoinColumns = @JoinColumn(name = "mod_id"))
     private List<WorkshopMod> activeMods;

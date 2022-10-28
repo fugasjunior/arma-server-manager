@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.workshop.services.impl;
 
+import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.repositories.ServerRepository;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
@@ -28,6 +29,11 @@ public class WorkshopModsServiceImpl implements WorkshopModsService {
     @Override
     public Collection<WorkshopMod> getAllMods() {
         return modRepository.findAll();
+    }
+
+    @Override
+    public Collection<WorkshopMod> getAllMods(ServerType filter) {
+        return modRepository.findAllByServerType(filter);
     }
 
     @Override

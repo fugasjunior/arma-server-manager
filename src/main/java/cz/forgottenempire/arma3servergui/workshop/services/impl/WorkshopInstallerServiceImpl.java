@@ -57,7 +57,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
 
     @Override
     public void uninstallMod(WorkshopMod mod) {
-        File modDirectory = pathsFactory.getModInstallationPath(mod.getId(), ServerType.ARMA3).toFile();
+        File modDirectory = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
         try {
             deleteSymlink(mod);
             FileUtils.deleteDirectory(modDirectory);
@@ -75,7 +75,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
                     mod.getName(), mod.getId(), steamCmdJob.getErrorStatus());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(steamCmdJob.getErrorStatus());
-        } else if (!verifyModDirectoryExists(mod.getId())) {
+        } else if (!verifyModDirectoryExists(mod.getId(), mod.getServerType())) {
             log.error("Could not find downloaded mod directory for mod '{}' (id {}) " +
                     "even though download finished successfully", mod.getName(), mod.getId());
             mod.setInstallationStatus(InstallationStatus.ERROR);
@@ -91,7 +91,7 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private void installMod(WorkshopMod mod) {
         try {
             convertModFilesToLowercase(mod);
-            copyBiKeys(mod.getId());
+            copyBiKeys(mod);
             createSymlink(mod);
             updateModInfo(mod);
             mod.setInstallationStatus(InstallationStatus.FINISHED);
@@ -105,26 +105,26 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
 
     private void convertModFilesToLowercase(WorkshopMod mod) throws IOException {
         log.info("Converting mod file names to lowercase");
-        File modDir = pathsFactory.getModInstallationPath(mod.getId(), ServerType.ARMA3).toFile();
+        File modDir = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
         FileSystemUtils.directoryToLowercase(modDir);
         log.info("Converting file names to lowercase done");
     }
 
-    private void copyBiKeys(Long modId) throws IOException {
+    private void copyBiKeys(WorkshopMod mod) throws IOException {
         String[] extensions = new String[]{"bikey"};
-        File modDirectory = pathsFactory.getModInstallationPath(modId, ServerType.ARMA3).toFile();
+        File modDirectory = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
 
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
             log.info("Copying BiKey {} to server", key.getName());
-            FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), ServerType.ARMA3).toFile());
+            FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), mod.getServerType()).toFile());
         }
     }
 
     private void createSymlink(WorkshopMod mod) throws IOException {
         // create symlink to server directory
-        Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), ServerType.ARMA3);
-        Path targetPath = pathsFactory.getModInstallationPath(mod.getId(), ServerType.ARMA3);
+        Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), mod.getServerType());
+        Path targetPath = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType());
 
         log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
         if (!Files.isSymbolicLink(linkPath)) {
@@ -135,27 +135,27 @@ public class WorkshopInstallerServiceImpl implements WorkshopInstallerService {
     private void updateModInfo(WorkshopMod mod) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         mod.setLastUpdated(formatter.format(new Date()));
-        mod.setFileSize(getActualSizeOfMod(mod.getId()));
+        mod.setFileSize(getActualSizeOfMod(mod.getId(), mod.getServerType()));
     }
 
     private void deleteSymlink(WorkshopMod mod) throws IOException {
-        Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), ServerType.ARMA3);
+        Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), mod.getServerType());
         log.info("Deleting symlink {}", linkPath);
         if (Files.isSymbolicLink(linkPath)) {
             Files.delete(linkPath);
         }
     }
 
-    private boolean verifyModDirectoryExists(Long modId) {
-        return pathsFactory.getModInstallationPath(modId, ServerType.ARMA3)
+    private boolean verifyModDirectoryExists(Long modId, ServerType type) {
+        return pathsFactory.getModInstallationPath(modId, type)
                 .toFile()
                 .isDirectory();
     }
 
     // as data about mod size from workshop API are not reliable, find the size of disk instead
-    private Long getActualSizeOfMod(Long modId) {
+    private Long getActualSizeOfMod(Long modId, ServerType type) {
         return FileUtils.sizeOfDirectory(
-                pathsFactory.getModInstallationPath(modId, ServerType.ARMA3).toFile()
+                pathsFactory.getModInstallationPath(modId, type).toFile()
         );
     }
 }
