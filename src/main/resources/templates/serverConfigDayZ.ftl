@@ -4,7 +4,7 @@
 hostname = "${name}";
 password = "${password!}";
 passwordAdmin = "${adminPassword!}";
-steamQueryPort = ${queryPort};
+steamQueryPort = ${queryPort?string.computer};
 
 // JOINING RULES
 maxPlayers = ${maxPlayers};
@@ -16,12 +16,12 @@ forceSameBuild = ${forceSameBuild?then('1', '0')};
 disableVoN = ${vonEnabled?then('0', '1')};
 vonCodecQuality = 30;
 serverTimePersistent = ${persistent?then('1', '0')};
-serverTimeAcceleration = ${timeAcceleration}
-serverNightTimeAcceleration = ${nightTimeAcceleration}
+serverTimeAcceleration = ${timeAcceleration?string.computer}
+serverNightTimeAcceleration = ${nightTimeAcceleration?string.computer}
 disable3rdPerson = ${thirdPersonViewEnabled?then('0', '1')};
 disableCrosshair = ${crosshairEnabled?then('0', '1')};
-respawnTime = ${respawnTime};
+respawnTime = ${respawnTime?string.computer};
 
-instanceId = ${instanceId};
+instanceId = ${instanceId?string.computer};
 
 ${additionalOptions!}

@@ -46,7 +46,7 @@ const ServerSettingsPage = () => {
         const request = {
             ...values,
             type: server.type,
-            queryPort: server.type === "ARMA3" ? server.port + 1 : server.queryPort,
+            queryPort: server.type === "ARMA3" ? values.port + 1 : values.queryPort,
             activeMods: selectedMods,
             activeDLCs: selectedDlcs,
             instanceInfo: null,
