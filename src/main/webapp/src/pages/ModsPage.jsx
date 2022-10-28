@@ -108,13 +108,16 @@ const ModsPage = () => {
     }
 
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
+    const arma3ModsCount = mods.filter(mod => mod.serverType === "ARMA3").length;
+    const dayZModsCount = mods.filter(mod => mod.serverType === "DAYZ").length;
 
     return (
             <>
                 {errorOccured && <ModsErrorAlertMessage mods={filterMods()}/>}
             <ModsTable rows={filterMods()} selected={selected} onClick={handleClick} onSelectAllClick={handleSelectAllClick}
                 onUpdateClicked={handleUpdate} onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
-                       filter={filter} onFilterChange={handleFilterChange}
+                       filter={filter} onFilterChange={handleFilterChange} arma3ModsCount={arma3ModsCount}
+                       dayZModsCount={dayZModsCount}
             />
             </>
     )

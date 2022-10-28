@@ -46,8 +46,8 @@ function ModsTableToolbar(props) {
                 <Box al>
                     <Tabs value={filter} onChange={onFilterChange}>
                         <Tab value="" label="All"/>
-                        <Tab value="ARMA3" label="Arma 3"/>
-                        <Tab value="DAYZ" label="DayZ"/>
+                        <Tab value="ARMA3" label="Arma 3" disabled={props.arma3ModsCount === 0}/>
+                        <Tab value="DAYZ" label="DayZ" disabled={props.dayZModsCount === 0}/>
                     </Tabs>
                 </Box>
 

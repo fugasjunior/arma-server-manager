@@ -125,9 +125,11 @@ const ModsTable = (props) => {
                     <ModsTableToolbar
                             numSelected={selected.length}
                             title="Workshop mods"
+                            filter={props.filter}
+                            arma3ModsCount={props.arma3ModsCount}
+                            dayZModsCount={props.dayZModsCount}
                             onUpdateClicked={props.onUpdateClicked}
                             onUninstallClicked={props.onUninstallClicked}
-                            filter={props.filter}
                             onFilterChange={props.onFilterChange}
                     />
                     {rows.length > 0 &&
