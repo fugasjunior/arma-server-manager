@@ -56,7 +56,9 @@ public class SteamCmdParameters {
         public Builder withAppInstall(@NotNull Long appId, boolean validate, String... args) {
             StringBuilder installParameter = new StringBuilder("+app_update " + appId);
             for (String arg : args) {
-                installParameter.append(" ").append(arg);
+                if (arg != null) {
+                    installParameter.append(" ").append(arg);
+                }
             }
             if (validate) {
                 installParameter.append(" validate");

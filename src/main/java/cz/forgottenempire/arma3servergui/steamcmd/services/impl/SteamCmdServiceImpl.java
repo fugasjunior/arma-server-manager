@@ -30,8 +30,8 @@ public class SteamCmdServiceImpl implements SteamCmdService {
         String betaBranchParameter = serverType == ServerType.ARMA3 ? "-beta creatordlc" : null;
 
         SteamCmdParameters parameters = new Builder()
-                .withLogin()
                 .withInstallDir(pathsFactory.getServerPath(serverType).toAbsolutePath().toString())
+                .withLogin()
                 .withAppInstall(Constants.SERVER_IDS.get(serverType), true, betaBranchParameter)
                 .build();
         return enqueueJob(new SteamCmdJob(serverType, parameters));
@@ -40,8 +40,8 @@ public class SteamCmdServiceImpl implements SteamCmdService {
     @Override
     public CompletableFuture<SteamCmdJob> installOrUpdateWorkshopMod(WorkshopMod workshopMod) {
         SteamCmdParameters parameters = new Builder()
-                .withLogin()
                 .withInstallDir(pathsFactory.getModsBasePath().toAbsolutePath().toString())
+                .withLogin()
                 .withWorkshopItemInstall(
                         Constants.GAME_IDS.get(workshopMod.getServerType()),
                         workshopMod.getId(), true)

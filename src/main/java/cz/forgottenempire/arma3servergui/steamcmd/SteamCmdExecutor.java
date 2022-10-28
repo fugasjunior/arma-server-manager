@@ -6,16 +6,9 @@ import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
 import cz.forgottenempire.arma3servergui.steamcmd.exceptions.SteamAuthNotSetException;
 import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
 import cz.forgottenempire.arma3servergui.system.repositories.SteamAuthRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +16,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -62,9 +60,9 @@ public class SteamCmdExecutor {
 
     private void execute(SteamCmdJob job) {
         try {
-            InputStream resultStream;
             int attempts = 0;
             int exitCode;
+            String output;
 
             do {
                 attempts++;
@@ -72,11 +70,11 @@ public class SteamCmdExecutor {
                         .command(getCommands(job.getSteamCmdParameters()))
                         .start();
 
-                resultStream = process.getInputStream();
+                output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
-            handleProcessResult(resultStream, job);
+            handleProcessResult(output, job);
         } catch (SteamAuthNotSetException e) {
             log.error("SteamAuth is not set up");
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
@@ -107,9 +105,9 @@ public class SteamCmdExecutor {
         return commands;
     }
 
-    private void handleProcessResult(InputStream cmdOutput, SteamCmdJob job) {
+    private void handleProcessResult(String result, SteamCmdJob job) {
         // SteamCMD doesn't provide the user with any proper exit values or standard format for error messages.
-        String errorLine = new BufferedReader(new InputStreamReader(cmdOutput)).lines()
+        String errorLine = result.lines()
                 .map(String::toLowerCase)
                 .map(this::removeParametersFromOutputLine)
                 .filter(this::containsErrorKeyword)
@@ -137,7 +135,7 @@ public class SteamCmdExecutor {
 
     private String getAuthString() {
         SteamAuth steamAuth = steamAuthRepository.findAll().stream()
-                        .findFirst().orElseThrow(SteamAuthNotSetException::new);
+                .findFirst().orElseThrow(SteamAuthNotSetException::new);
         String authString = steamAuth.getUsername() + " " + steamAuth.getPassword();
         if (!Strings.isNullOrEmpty(steamAuth.getSteamGuardToken())) {
             authString += " " + steamAuth.getSteamGuardToken();
