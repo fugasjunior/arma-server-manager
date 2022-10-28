@@ -1,43 +1,28 @@
 package cz.forgottenempire.arma3servergui.server.serverinstance.dtos;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import cz.forgottenempire.arma3servergui.server.ServerType;
-import cz.forgottenempire.arma3servergui.workshop.dtos.CreatorDlcDto;
-import java.util.List;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
 
-@Data
-public class ServerDto {
-    private Long id;
-    @NotEmpty
-    private String name;
-    private String description;
-    @Min(1)
-    private int port;
-    @Min(1)
-    private int queryPort;
-    @Min(1)
-    private int maxPlayers;
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "type",
+        visible = true)
+@JsonSubTypes({
+        @Type(value = Arma3ServerDto.class, name = "ARMA3"),
+        @Type(value = DayZServerDto.class, name = "DAYZ"),
+        @Type(value = DayZServerDto.class, name = "DAYZ_EXP")
+})
+public interface ServerDto {
 
-    @NotNull(message = "must be filled in. Available types: [ARMA3, ARMA4, DAYZ, REFORGER]")
-    private ServerType type;
+    Long getId();
 
-    private String password;
-    private String adminPassword;
+    void setId(Long id);
 
-    private boolean clientFilePatching;
-    private boolean serverFilePatching;
-    private boolean persistent;
-    private boolean battlEye;
-    private boolean von;
-    private boolean verifySignatures;
+    ServerType getType();
 
-    private String additionalOptions;
+    ServerInstanceInfoDto getInstanceInfo();
 
-    private List<ServerWorkshopModDto> activeMods;
-    private List<CreatorDlcDto> activeDLCs;
-
-    private ServerInstanceInfoDto instanceInfo;
+    void setInstanceInfo(ServerInstanceInfoDto instanceInfo);
 }

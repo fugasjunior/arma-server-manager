@@ -4,8 +4,6 @@ import cz.forgottenempire.arma3servergui.server.ServerType;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.entities.WorkshopMod;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -20,7 +18,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -32,33 +31,25 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="type_intern",  discriminatorType = DiscriminatorType.INTEGER)
-@DiscriminatorValue("1")
-public class Server {
+@DiscriminatorValue("3")
+public class DayZServer extends Server {
 
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @Enumerated
-    @NotNull
-    private ServerType type;
-
-    private String description;
-
-    @NotEmpty
-    private String name;
     @Min(1)
-    private int port;
-    @Min(1)
-    private int queryPort;
-    @Min(1)
-    private int maxPlayers;
+    private int instanceId;
 
-    private String password;
-    private String adminPassword;
+    @Min(0)
+    private int respawnTime;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String additionalOptions;
+    private boolean persistent;
+    private boolean vonEnabled;
+    private boolean forceSameBuild;
+    private boolean thirdPersonViewEnabled;
+    private boolean crosshairEnabled;
+    private boolean clientFilePatching;
+
+    @DecimalMin("0.1") @DecimalMax("64")
+    private double timeAcceleration;
+
+    @DecimalMin("0.1") @DecimalMax("64")
+    private double nightTimeAcceleration;
 }

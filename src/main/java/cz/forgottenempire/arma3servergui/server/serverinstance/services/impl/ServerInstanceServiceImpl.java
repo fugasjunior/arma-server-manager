@@ -7,12 +7,13 @@ import cz.forgottenempire.arma3servergui.common.services.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.util.LogUtils;
 import cz.forgottenempire.arma3servergui.server.ServerInstanceInfo;
 import cz.forgottenempire.arma3servergui.server.ServerType;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.server.serverinstance.exceptions.PortAlreadyTakenException;
 import cz.forgottenempire.arma3servergui.server.serverinstance.repositories.ServerInstanceInfoRepository;
 import cz.forgottenempire.arma3servergui.server.serverinstance.repositories.ServerRepository;
-import cz.forgottenempire.arma3servergui.server.serverinstance.services.ArmaServerService;
+import cz.forgottenempire.arma3servergui.server.serverinstance.services.ServerInstanceService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import java.io.BufferedWriter;
@@ -38,7 +39,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 // TODO way too much responsibilities for this class, separate it into different services
 @Service
 @Slf4j
-public class ArmaServerServiceImpl implements ArmaServerService {
+public class ServerInstanceServiceImpl implements ServerInstanceService {
 
     @Value("${arma3server.logDir}")
     private String logDir; // TODO get rid of this, fix for multiple server instances
@@ -52,7 +53,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
     private final PathsFactory pathsFactory;
 
     @Autowired
-    public ArmaServerServiceImpl(
+    public ServerInstanceServiceImpl(
             ServerRepository serverRepository,
             ServerInstanceInfoRepository instanceInfoRepository,
             FreeMarkerConfigurer freeMarkerConfigurer,
@@ -122,7 +123,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
 
         writeConfig(server);
 
-        Process process = startServerProcess(server);
+        Process process = startServerProcess((Arma3Server) server);
         instanceInfo = ServerInstanceInfo.builder()
                 .id(id)
                 .alive(true)
@@ -184,7 +185,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         return isServerInstanceRunning(getServerInstanceInfo(server.getId()));
     }
 
-    private Process startServerProcess(Server server) {
+    private Process startServerProcess(Arma3Server server) {
         Process serverProcess = null;
 
         List<String> parameters = new ArrayList<>();
@@ -264,7 +265,7 @@ public class ArmaServerServiceImpl implements ArmaServerService {
         }
     }
 
-    private List<String> getActiveModsListAsParameters(Server server) {
+    private List<String> getActiveModsListAsParameters(Arma3Server server) {
         return server.getActiveMods().stream() // TODO check installation status
                 .map(mod -> "-mod=" + mod.getNormalizedName())
                 .collect(Collectors.toList());

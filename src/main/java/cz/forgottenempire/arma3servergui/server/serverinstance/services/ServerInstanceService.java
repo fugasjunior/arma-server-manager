@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
-public interface ArmaServerService {
+public interface ServerInstanceService {
 
     List<Server> getAllServers();
 

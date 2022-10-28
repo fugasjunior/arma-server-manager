@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.workshop.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.arma3servergui.server.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import java.util.List;
@@ -34,7 +35,7 @@ public class WorkshopMod {
     private ErrorStatus errorStatus;
 
     @ManyToMany(mappedBy = "activeMods")
-    private List<Server> servers;
+    private List<Arma3Server> servers;
 
     public WorkshopMod(Long id) {
         this.id = id;
