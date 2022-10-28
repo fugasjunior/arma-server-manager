@@ -6,6 +6,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import MapIcon from '@mui/icons-material/Map';
 
+const SERVER_ICON_URLS = {
+    "ARMA3": "./img/arma3_icon.png",
+    "DAYZ": "./img/dayz_icon.png",
+    "DAYZ_EXP": "./img/dayz_icon.png",
+}
+
 const ServerListEntry = (props) => {
     const {server, onStartServer, onStopServer, onRestartServer, onDeleteServer, serverWithSamePortRunning} = props;
 
@@ -15,14 +21,16 @@ const ServerListEntry = (props) => {
             <>
                 <Grid key={server.id} spacing={0} alignItems="center" container>
                     <Grid item xs={1} sx={{display: {xs: 'none', sm: 'none', md: 'block'}}}>
-                        <Avatar src="./img/arma3_icon.png" alt="Arma 3 icon"/>
+                        <Avatar src={SERVER_ICON_URLS[server.type]} alt={`${server.type} icon`}/>
                     </Grid>
                     <Grid item xs={4}>
                         <p>{server.name}</p>
                         <p>Port: {server.port}</p>
                         {server.description && <p>{server.description}</p>}
-                        {server.activeMods.length > 0 && <p>Mods active</p>}
-                        {server.activeDLCs.length > 0 && <p>Creator DLC(s) active</p>}
+                        {server.type === "ARMA3" && <>
+                            {server.activeMods.length > 0 && <p>Mods active</p>}
+                            {server.activeDLCs.length > 0 && <p>Creator DLC(s) active</p>}
+                        </>}
                     </Grid>
                     <Grid item xs={6} md={4}>
                         <Stack direction="row" spacing={1}>

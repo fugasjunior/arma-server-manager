@@ -1,11 +1,58 @@
 import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {createServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../UI/ListBuilder";
-import EditServerSettingsForm from "../components/servers/EditServerSettingsForm";
+import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import {getMods} from "../services/modsService";
 import {Button, Modal, Typography} from "@mui/material";
+import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
+
+const ARMA3_INITIAL_STATE = {
+    type: "ARMA3",
+    name: "",
+    description: "",
+    port: 2302,
+    queryPort: 2303,
+    maxPlayers: 32,
+    password: "",
+    adminPassword: "",
+    clientFilePatching: false,
+    serverFilePatching: false,
+    persistent: true,
+    battlEye: true,
+    vonEnabled: true,
+    verifySignatures: true,
+    additionalOptions: ""
+}
+
+const DAYZ_INITIAL_STATE = {
+    "name": "",
+    "description": "",
+    "port": 2302,
+    "queryPort": 2303,
+    "maxPlayers": 32,
+    "password": "",
+    "adminPassword": "",
+    "clientFilePatching": false,
+    "persistent": true,
+    "verifySignatures": false,
+    "vonEnabled": true,
+    "forceSameBuild": false,
+    "thirdPersonViewEnabled": true,
+    "crosshairEnabled": true,
+    "instanceId": 1,
+    "respawnTime": 0,
+    "timeAcceleration": 1.0,
+    "nightTimeAcceleration": 1.0,
+    "additionalOptions": "",
+}
+
+const SERVER_NAMES = {
+    "ARMA3": "Arma 3",
+    "DAYZ": "DayZ",
+    "DAYZ_EXP": "DayZ Experimental"
+}
 
 const ServerSettingsPage = () => {
     const [availableMods, setAvailableMods] = useState([]);
@@ -15,6 +62,8 @@ const ServerSettingsPage = () => {
     const [loading, setLoading] = useState(true);
     const [modsModalOpen, setModsModalOpen] = useState(false);
     const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
+
+    const {type} = useParams();
 
     const navigate = useNavigate();
 
@@ -38,7 +87,7 @@ const ServerSettingsPage = () => {
     const handleSubmit = async values => {
         const server = {
             ...values,
-            type: "ARMA3",
+            type,
             queryPort: values.port + 1,
             activeMods: selectedMods,
             activeDLCs: selectedDlcs,
@@ -104,27 +153,16 @@ const ServerSettingsPage = () => {
 
     return (
             <>
-                <Typography variant="h4">New server</Typography>
+                <Typography variant="h4" mb={2}>New {SERVER_NAMES[type]} server</Typography>
                 {loading && <h2>Loading server data...</h2>}
                 {!loading &&
                         <>
-                            <EditServerSettingsForm server={{
-                                type: "ARMA3",
-                                name: "",
-                                description: "",
-                                port: 2302,
-                                queryPort: 2303,
-                                maxPlayers: 32,
-                                password: "",
-                                adminPassword: "",
-                                clientFilePatching: false,
-                                serverFilePatching: false,
-                                persistent: false,
-                                battlEye: false,
-                                von: false,
-                                verifySignatures: false,
-                                additionalOptions: ""
-                            }} onSubmit={handleSubmit}/>
+                            {type === "ARMA3" &&
+                                    <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE} onSubmit={handleSubmit}/>
+                            }
+                            {(type === "DAYZ" || type === "DAYZ_EXP") &&
+                                    <EditDayZServerSettingsForm server={DAYZ_INITIAL_STATE} onSubmit={handleSubmit}/>
+                            }
                             <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
                             <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
                             <Modal open={modsModalOpen} onClose={handleToggleModsModal}>

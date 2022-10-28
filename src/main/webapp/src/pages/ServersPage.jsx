@@ -1,10 +1,9 @@
 import {deleteServer, getServers, restartServer, startServer, stopServer} from "../services/serversService"
 import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
 import {useInterval} from "../hooks/use-interval";
 import ServerListEntry from "../components/servers/ServerListEntry";
-import {Button, Divider, Fab, Stack} from "@mui/material";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import {Divider, Stack} from "@mui/material";
+import NewServerButton from "../components/servers/NewServerButton";
 
 const ServersPage = () => {
     const [servers, setServers] = useState([]);
@@ -71,13 +70,8 @@ const ServersPage = () => {
 
     return (
             <>
-                <Button variant="contained" size="large" sx={{mt: 2, mb: 4}}
-                component={Link} to="/servers/new"
-                >
-                    <AddCircleOutlineIcon sx={{mr: 1}}/>
-                    Create new server
-                </Button>
-                <Stack spacing={4} divider={<Divider orientation="horizontal" flexItem />}>
+                <NewServerButton />
+                <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
                     {servers.map(server =>
                             <ServerListEntry key={server.id}
                                              server={server}

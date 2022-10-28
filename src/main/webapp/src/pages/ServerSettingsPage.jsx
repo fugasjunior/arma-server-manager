@@ -3,9 +3,16 @@ import {useNavigate, useParams} from "react-router-dom";
 import {getServer, updateServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../UI/ListBuilder";
-import EditServerSettingsForm from "../components/servers/EditServerSettingsForm";
 import {getMods} from "../services/modsService";
 import {Box, Button, Modal, Typography} from "@mui/material";
+import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
+import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
+
+const SERVER_NAMES = {
+    "ARMA3": "Arma 3",
+    "DAYZ": "DayZ",
+    "DAYZ_EXP": "DayZ Experimental"
+}
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
@@ -121,24 +128,36 @@ const ServerSettingsPage = () => {
 
     return (
             <>
-                <Typography variant="h4">Server Settings</Typography>
+                <Typography variant="h4" mb={2}>Server Settings ({SERVER_NAMES[server.type]})</Typography>
                 {loading && <h2>Loading server data...</h2>}
                 {!loading &&
                         <>
-                            <EditServerSettingsForm server={server} onSubmit={handleSubmit} onCancel={handleCancel}
-                                                    isServerRunning={server.instanceInfo && server.instanceInfo.alive}/>
+                            {server.type === "ARMA3" &&
+                                    <EditArma3ServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                                 onCancel={handleCancel}
+                                                                 isServerRunning={server.instanceInfo
+                                                                         && server.instanceInfo.alive}
+                                    />
+                            }
+                            {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
+                                    <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                                onCancel={handleCancel}
+                                                                isServerRunning={server.instanceInfo
+                                                                        && server.instanceInfo.alive}
+                                    />
+                            }
                             <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
                             <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
                             <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
 
-                                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                                 itemsLabel="mods" showFilter/>
+                                <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                             onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                             itemsLabel="mods" showFilter/>
                             </Modal>
                             <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
-                                    <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
-                                                 onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
-                                                 itemsLabel="DLCs"/>
+                                <ListBuilder selectedOptions={selectedDlcs} availableOptions={availableDlcs}
+                                             onSelect={handleDlcSelect} onDeselect={handleDlcDeselect}
+                                             itemsLabel="DLCs"/>
                             </Modal>
                         </>}
 

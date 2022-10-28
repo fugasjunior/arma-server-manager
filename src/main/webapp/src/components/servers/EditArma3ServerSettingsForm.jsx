@@ -1,17 +1,8 @@
-import {Field, Form, Formik, useFormik} from "formik";
-import {
-    Button,
-    FormControlLabel,
-    FormGroup,
-    Grid,
-    Switch,
-    TextareaAutosize,
-    TextField,
-    useMediaQuery
-} from "@mui/material";
+import {useFormik} from "formik";
+import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
 import React from "react";
 
-const EditServerSettingsForm = props => {
+const EditArma3ServerSettingsForm = props => {
 
     const formik = useFormik({
         initialValues: props.server,
@@ -50,7 +41,7 @@ const EditServerSettingsForm = props => {
                                     helperText={formik.touched.description && formik.errors.description}
                             />
                         </Grid>
-                        <Grid item xs={12} md={props.server.type === "ARMA3" ? 6 : 4}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                     fullWidth
                                     required
@@ -64,22 +55,7 @@ const EditServerSettingsForm = props => {
                                     helperText={formik.touched.port && formik.errors.port}
                             />
                         </Grid>
-                        {props.server.type !== "ARMA3" &&
-                                <Grid item xs={12} md={props.server.type === "ARMA3" ? 6 : 4}>
-                                    <TextField
-                                            fullWidth
-                                            required
-                                            id="queryPort"
-                                            name="queryPort"
-                                            label="Query Port"
-                                            type="number"
-                                            value={formik.values.queryPort}
-                                            onChange={formik.handleChange}
-                                            error={formik.touched.queryPort && Boolean(formik.errors.queryPort)}
-                                            helperText={formik.touched.queryPort && formik.errors.queryPort}
-                                    />
-                                </Grid>}
-                        <Grid item xs={12} md={props.server.type === "ARMA3" ? 6 : 4}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                     fullWidth
                                     required
@@ -160,12 +136,12 @@ const EditServerSettingsForm = props => {
                             <FormGroup>
                                 <FormControlLabel
                                         control={
-                                            <Switch checked={formik.values.von} onChange={formik.handleChange}
-                                                    name="von" id="von"/>
+                                            <Switch checked={formik.values.vonEnabled} onChange={formik.handleChange}
+                                                    name="vonEnabled" id="vonEnabled"/>
                                         }
                                         label="VON enabled"
-                                        error={formik.touched.von && Boolean(formik.errors.von)}
-                                        helperText={formik.touched.von && formik.errors.von}
+                                        error={formik.touched.vonEnabled && Boolean(formik.errors.vonEnabled)}
+                                        helperText={formik.touched.vonEnabled && formik.errors.vonEnabled}
                                 />
                                 <FormControlLabel
                                         control={
@@ -219,4 +195,4 @@ const EditServerSettingsForm = props => {
     );
 };
 
-export default EditServerSettingsForm;
+export default EditArma3ServerSettingsForm;

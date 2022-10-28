@@ -31,7 +31,7 @@ public class Arma3ServerDto implements ServerDto {
     private boolean serverFilePatching;
     private boolean persistent;
     private boolean battlEye;
-    private boolean von;
+    private boolean vonEnabled;
     private boolean verifySignatures;
 
     private String additionalOptions;

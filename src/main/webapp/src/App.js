@@ -31,7 +31,7 @@ const App = () => {
                         <Route path="servers" element={
                             <ProtectedRoute><ServersPage/></ProtectedRoute>
                         }/>
-                        <Route path="servers/new" element={
+                        <Route path="servers/new/:type" element={
                             <ProtectedRoute><NewServerPage/></ProtectedRoute>
                         }/>
                         <Route path="servers/:id" element={

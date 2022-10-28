@@ -20,8 +20,6 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface ServerMapper {
 
-    void updateServerFromDto(ServerDto serverDto, @MappingTarget Server server);
-
     Arma3ServerDto mapArma3ServerToDto(Arma3Server server);
 
     Arma3Server mapArma3ServerDtoToEntity(Arma3ServerDto serverDto);
@@ -68,4 +66,15 @@ public interface ServerMapper {
         }
         throw new IllegalStateException("Unsupported server type");
     }
+
+    default void updateServerFromDto(ServerDto serverDto, @MappingTarget Server server) {
+        if (serverDto.getType() == ServerType.ARMA3) {
+            updateArma3ServerFromDto((Arma3ServerDto) serverDto, (Arma3Server) server);
+        } else if (serverDto.getType() == ServerType.DAYZ || serverDto.getType() == ServerType.DAYZ_EXP) {
+            updateDayZServerFromDto((DayZServerDto) serverDto, (DayZServer) server);
+        } else {
+            throw new IllegalStateException("Unsupported server type");
+        }
+    }
+
 }
