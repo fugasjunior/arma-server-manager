@@ -1,14 +1,5 @@
-import {Field, Form, Formik, useFormik} from "formik";
-import {
-    Button,
-    FormControlLabel,
-    FormGroup,
-    Grid,
-    Switch,
-    TextareaAutosize,
-    TextField,
-    useMediaQuery
-} from "@mui/material";
+import {useFormik} from "formik";
+import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
 import React from "react";
 
 const EditDayZServerSettingsForm = props => {
@@ -36,7 +27,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.name}
                                     onChange={formik.handleChange}
                                     error={formik.touched.name && Boolean(formik.errors.name)}
-                                    helperText={formik.touched.name && formik.errors.name}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -48,7 +38,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.description}
                                     onChange={formik.handleChange}
                                     error={formik.touched.description && Boolean(formik.errors.description)}
-                                    helperText={formik.touched.description && formik.errors.description}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -62,7 +51,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.port}
                                     onChange={formik.handleChange}
                                     error={formik.touched.port && Boolean(formik.errors.port)}
-                                    helperText={formik.touched.port && formik.errors.port}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -76,7 +64,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.queryPort}
                                     onChange={formik.handleChange}
                                     error={formik.touched.queryPort && Boolean(formik.errors.queryPort)}
-                                    helperText={formik.touched.queryPort && formik.errors.queryPort}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -90,7 +77,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.maxPlayers}
                                     onChange={formik.handleChange}
                                     error={formik.touched.maxPlayers && Boolean(formik.errors.maxPlayers)}
-                                    helperText={formik.touched.maxPlayers && formik.errors.maxPlayers}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -102,7 +88,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.password}
                                     onChange={formik.handleChange}
                                     error={formik.touched.password && Boolean(formik.errors.password)}
-                                    helperText={formik.touched.password && formik.errors.password}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -114,47 +99,57 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.adminPassword}
                                     onChange={formik.handleChange}
                                     error={formik.touched.adminPassword && Boolean(formik.errors.adminPassword)}
-                                    helperText={formik.touched.adminPassword && formik.errors.adminPassword}
                             />
                         </Grid>
-                        <Grid item xs={6}>
-                            <FormGroup>
-                                <FormControlLabel
-                                        control={
-                                            <Switch checked={formik.values.clientFilePatching}
-                                                    onChange={formik.handleChange}
-                                                    name="clientFilePatching" id="clientFilePatching"/>
-                                        }
-                                        label="Client file patching"
-                                        error={formik.touched.clientFilePatching && Boolean(
-                                                formik.errors.clientFilePatching)}
-                                        helperText={formik.touched.clientFilePatching
-                                                && formik.errors.clientFilePatching}
-                                />
-                                <FormControlLabel
-                                        control={
-                                            <Switch checked={formik.values.serverFilePatching}
-                                                    onChange={formik.handleChange}
-                                                    name="serverFilePatching" id="serverFilePatching"/>
-                                        }
-                                        label="Server file patching"
-                                        error={formik.touched.serverFilePatching && Boolean(
-                                                formik.errors.serverFilePatching)}
-                                        helperText={formik.touched.serverFilePatching
-                                                && formik.errors.serverFilePatching}
-                                />
-                                <FormControlLabel
-                                        control={
-                                            <Switch checked={formik.values.verifySignatures}
-                                                    onChange={formik.handleChange}
-                                                    name="verifySignatures" id="verifySignatures"/>
-                                        }
-                                        label="Verify signatures"
-                                        error={formik.touched.verifySignatures && Boolean(
-                                                formik.errors.verifySignatures)}
-                                        helperText={formik.touched.verifySignatures && formik.errors.verifySignatures}
-                                />
-                            </FormGroup>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                    fullWidth
+                                    id="respawnTime"
+                                    name="respawnTime"
+                                    label="Respawn time"
+                                    type="number"
+                                    inputProps={{
+                                        min: "0"
+                                    }}
+                                    value={formik.values.respawnTime}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.respawnTime && Boolean(formik.errors.respawnTime)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                    fullWidth
+                                    id="timeAcceleration"
+                                    name="timeAcceleration"
+                                    label="Time acceleration"
+                                    type="number"
+                                    inputProps={{
+                                        step: "0.1",
+                                        min: "0.1",
+                                        max: "64"
+                                    }}
+                                    value={formik.values.timeAcceleration}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.timeAcceleration && Boolean(formik.errors.timeAcceleration)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                    fullWidth
+                                    id="nightTimeAcceleration"
+                                    name="nightTimeAcceleration"
+                                    label="Night time acceleration"
+                                    type="number"
+                                    inputProps={{
+                                        step: "0.1",
+                                        min: "0.1",
+                                        max: "64"
+                                    }}
+                                    value={formik.values.nightTimeAcceleration}
+                                    onChange={formik.handleChange}
+                                    error={formik.touched.nightTimeAcceleration && Boolean(
+                                            formik.errors.nightTimeAcceleration)}
+                            />
                         </Grid>
                         <Grid item xs={6}>
                             <FormGroup>
@@ -165,7 +160,6 @@ const EditDayZServerSettingsForm = props => {
                                         }
                                         label="VON enabled"
                                         error={formik.touched.vonEnabled && Boolean(formik.errors.vonEnabled)}
-                                        helperText={formik.touched.vonEnabled && formik.errors.vonEnabled}
                                 />
                                 <FormControlLabel
                                         control={
@@ -174,7 +168,48 @@ const EditDayZServerSettingsForm = props => {
                                         }
                                         label="Persistent server time"
                                         error={formik.touched.persistent && Boolean(formik.errors.persistent)}
-                                        helperText={formik.touched.persistent && formik.errors.persistent}
+                                />
+                                <FormControlLabel
+                                        control={
+                                            <Switch checked={formik.values.clientFilePatching}
+                                                    onChange={formik.handleChange}
+                                                    name="clientFilePatching" id="clientFilePatching"/>
+                                        }
+                                        label="Client file patching"
+                                        error={formik.touched.clientFilePatching && Boolean(
+                                                formik.errors.clientFilePatching)}
+                                />
+                            </FormGroup>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <FormGroup>
+                                <FormControlLabel
+                                        control={
+                                            <Switch checked={formik.values.forceSameBuild}
+                                                    onChange={formik.handleChange}
+                                                    name="forceSameBuild" id="forceSameBuild"/>
+                                        }
+                                        label="Force same build"
+                                        error={formik.touched.forceSameBuild && Boolean(formik.errors.forceSameBuild)}
+                                />
+                                <FormControlLabel
+                                        control={
+                                            <Switch checked={formik.values.thirdPersonViewEnabled}
+                                                    onChange={formik.handleChange}
+                                                    name="thirdPersonViewEnabled" id="thirdPersonViewEnabled"/>
+                                        }
+                                        label="Third person view enabled"
+                                        error={formik.touched.thirdPersonViewEnabled && Boolean(
+                                                formik.errors.thirdPersonViewEnabled)}
+                                />
+                                <FormControlLabel control={
+                                    <Switch checked={formik.values.crosshairEnabled}
+                                            onChange={formik.handleChange}
+                                            name="crosshairEnabled" id="crosshairEnabled"/>
+                                }
+                                                  label="Crosshair enabled"
+                                                  error={formik.touched.crosshairEnabled && Boolean(
+                                                          formik.errors.crosshairEnabled)}
                                 />
                             </FormGroup>
                         </Grid>
@@ -188,7 +223,6 @@ const EditDayZServerSettingsForm = props => {
                                     value={formik.values.additionalOptions}
                                     onChange={formik.handleChange}
                                     error={formik.touched.additionalOptions && Boolean(formik.errors.additionalOptions)}
-                                    helperText={formik.touched.additionalOptions && formik.errors.additionalOptions}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>

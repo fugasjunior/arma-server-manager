@@ -55,6 +55,7 @@ const ServerSettingsPage = () => {
         try {
             await updateServer(id, request);
             toast.success("Server successfully updated");
+            navigate("/servers");
         } catch (e) {
             console.error(e);
         }

@@ -2,8 +2,11 @@ import {deleteServer, getServers, restartServer, startServer, stopServer} from "
 import {useEffect, useState} from "react";
 import {useInterval} from "../hooks/use-interval";
 import ServerListEntry from "../components/servers/ServerListEntry";
-import {Divider, Stack} from "@mui/material";
 import NewServerButton from "../components/servers/NewServerButton";
+import Table from "@mui/material/Table";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
+import TableBody from "@mui/material/TableBody";
 
 const ServersPage = () => {
     const [servers, setServers] = useState([]);
@@ -70,19 +73,23 @@ const ServersPage = () => {
 
     return (
             <>
-                <NewServerButton />
-                <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
-                    {servers.map(server =>
-                            <ServerListEntry key={server.id}
-                                             server={server}
-                                             onStartServer={handleStartServer}
-                                             onStopServer={handleStopServer}
-                                             onRestartServer={handleRestartServer}
-                                             onDeleteServer={handleDeleteServer}
-                                             serverWithSamePortRunning={isServerWithSamePortRunning(server)}
-                            />
-                    )}
-                </Stack>
+                <NewServerButton/>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableBody>
+                            {servers.map(server =>
+                                    <ServerListEntry key={server.id}
+                                                     server={server}
+                                                     onStartServer={handleStartServer}
+                                                     onStopServer={handleStopServer}
+                                                     onRestartServer={handleRestartServer}
+                                                     onDeleteServer={handleDeleteServer}
+                                                     serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                                    />
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </>
     )
 }
