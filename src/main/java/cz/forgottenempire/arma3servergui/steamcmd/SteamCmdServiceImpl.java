@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SteamCmdServiceImpl implements SteamCmdService {
+class SteamCmdServiceImpl implements SteamCmdService {
 
     private final SteamCmdExecutor steamCmdExecutor;
     private final PathsFactory pathsFactory;

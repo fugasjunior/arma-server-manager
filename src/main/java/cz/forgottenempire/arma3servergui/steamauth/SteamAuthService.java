@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.system;
+package cz.forgottenempire.arma3servergui.steamauth;
 
 import cz.forgottenempire.arma3servergui.workshop.SteamAuthDto;
 

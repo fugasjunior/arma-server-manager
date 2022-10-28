@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Primary
 @Conditional(LinuxEnvironmentCondition.class)
 @Slf4j
-public class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
+class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
 
     @Override
     protected Supplier<Long> memoryLeftSupplier() {

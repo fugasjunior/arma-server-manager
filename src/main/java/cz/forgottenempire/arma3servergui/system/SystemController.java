@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/system")
 @Slf4j
-public class SystemController {
+class SystemController {
 
     private final SystemService systemService;
 

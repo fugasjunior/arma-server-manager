@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.system;
+package cz.forgottenempire.arma3servergui.steamauth;
 
 import cz.forgottenempire.arma3servergui.common.AttributeEncryptor;
 import javax.persistence.Convert;
@@ -28,10 +28,4 @@ public class SteamAuth {
     private String password;
 
     private String steamGuardToken;
-
-    public SteamAuth(String username, String password, String steamGuardToken) {
-        this.username = username;
-        this.password = password;
-        this.steamGuardToken = steamGuardToken;
-    }
 }

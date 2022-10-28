@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.system;
+package cz.forgottenempire.arma3servergui.steamauth;
 
 import cz.forgottenempire.arma3servergui.workshop.SteamAuthDto;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping("/api/config")
-public class ConfigurationController {
+class SteamAuthController {
 
-    private SteamAuthService authService;
+    private final SteamAuthService authService;
+
+    @Autowired
+    public SteamAuthController(SteamAuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/auth")
     public ResponseEntity<?> setAuthAccount(@RequestBody SteamAuthDto auth) {
@@ -32,10 +37,5 @@ public class ConfigurationController {
         dto.setSteamGuardToken(steamAuth.getSteamGuardToken());
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
-    }
-
-    @Autowired
-    public void setAuthService(SteamAuthService authService) {
-        this.authService = authService;
     }
 }

@@ -1,9 +1,9 @@
-package cz.forgottenempire.arma3servergui.system;
+package cz.forgottenempire.arma3servergui.steamauth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SteamAuthRepository extends JpaRepository<SteamAuth, Long> {
+interface SteamAuthRepository extends JpaRepository<SteamAuth, Long> {
 
 }

@@ -1,4 +1,4 @@
-package cz.forgottenempire.arma3servergui.system;
+package cz.forgottenempire.arma3servergui.steamauth;
 
 import cz.forgottenempire.arma3servergui.workshop.SteamAuthDto;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SteamAuthServiceImpl implements SteamAuthService {
 
-    private SteamAuthRepository authRepository;
+    private final SteamAuthRepository authRepository;
+
+    @Autowired
+    public SteamAuthServiceImpl(SteamAuthRepository authRepository) {
+        this.authRepository = authRepository;
+    }
 
     @Override
     public SteamAuth getAuthAccount() {
@@ -32,10 +37,5 @@ public class SteamAuthServiceImpl implements SteamAuthService {
         if (StringUtils.isNotBlank(auth.getPassword())) {
             persistedAuth.setPassword(auth.getPassword());
         }
-    }
-
-    @Autowired
-    public void setAuthRepository(SteamAuthRepository authRepository) {
-        this.authRepository = authRepository;
     }
 }

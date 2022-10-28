@@ -7,9 +7,9 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.lang.NonNull;
 
-public class LinuxEnvironmentCondition implements Condition {
+class LinuxEnvironmentCondition implements Condition {
 
-    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+    public boolean matches(@NonNull ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
         return SystemUtils.getOsType() == OSType.LINUX;
     }
 }

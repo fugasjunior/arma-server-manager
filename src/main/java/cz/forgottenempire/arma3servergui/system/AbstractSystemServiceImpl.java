@@ -7,7 +7,7 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractSystemServiceImpl implements SystemService {
+abstract class AbstractSystemServiceImpl implements SystemService {
 
     protected final OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 

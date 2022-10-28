@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(WindowsEnvironmentCondition.class)
-public class WindowsSystemServiceImpl extends AbstractSystemServiceImpl {
+class WindowsSystemServiceImpl extends AbstractSystemServiceImpl {
 
     @Override
     protected Supplier<Long> memoryLeftSupplier() {

@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.system;
 
-public interface SystemService {
+interface SystemService {
 
     long getDiskSpaceLeft();
 
