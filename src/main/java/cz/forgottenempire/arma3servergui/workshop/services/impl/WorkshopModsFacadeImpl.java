@@ -16,10 +16,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
 
     private final WorkshopModsService modsService;
@@ -94,13 +96,15 @@ public class WorkshopModsFacadeImpl implements WorkshopModsFacade {
         if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
             mod.setServerType(ServerType.ARMA3);
         } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
-            if (SystemUtils.getOsType() == OSType.LINUX) {
+            if (SystemUtils.getOsType() != OSType.LINUX) {
+                log.warn("Tried to install DayZ mod ID {} which is not supported on Linux", mod.getId());
                 throw new ServerUnsupportedOnOsException("DayZ mod cannot be installed because DayZ is not supported "
                         + "on Linux servers");
             }
 
             mod.setServerType(ServerType.DAYZ);
         } else {
+            log.warn("Tried to install mod ID {} which is not consumed by any of the supported servers", mod.getId());
             throw new ModNotConsumedByGameException(
                     "The mod " + mod.getId() + " is not consumed by any supported game");
         }
