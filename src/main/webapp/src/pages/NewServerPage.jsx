@@ -6,6 +6,7 @@ import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSe
 import {getMods} from "../services/modsService";
 import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
+import SERVER_NAMES from "../util/serverNames";
 
 const ARMA3_INITIAL_STATE = {
     type: "ARMA3",
@@ -47,12 +48,6 @@ const DAYZ_INITIAL_STATE = {
     "timeAcceleration": 1.0,
     "nightTimeAcceleration": 1.0,
     "additionalOptions": "",
-}
-
-const SERVER_NAMES = {
-    "ARMA3": "Arma 3",
-    "DAYZ": "DayZ",
-    "DAYZ_EXP": "DayZ Experimental"
 }
 
 const ServerSettingsPage = () => {

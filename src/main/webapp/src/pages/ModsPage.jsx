@@ -8,6 +8,7 @@ import ModsErrorAlertMessage from "../components/mods/ModsErrorAlertMessage";
 const ModsPage = () => {
     const [mods, setMods] = useState([]);
     const [selected, setSelected] = useState([]);
+    const [filter, setFilter] = useState("");
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
@@ -94,13 +95,26 @@ const ModsPage = () => {
         setSelected(newSelected);
     };
 
+    const handleFilterChange = (event, newValue) => {
+        setSelected([]);
+        setFilter(newValue);
+    }
+
+    const filterMods = () => {
+        if (!filter) {
+            return mods;
+        }
+        return mods.filter(mod => mod.serverType === filter);
+    }
+
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
 
     return (
             <>
-                {errorOccured && <ModsErrorAlertMessage mods={mods}/>}
-            <ModsTable rows={mods} selected={selected} onClick={handleClick} onSelectAllClick={handleSelectAllClick}
+                {errorOccured && <ModsErrorAlertMessage mods={filterMods()}/>}
+            <ModsTable rows={filterMods()} selected={selected} onClick={handleClick} onSelectAllClick={handleSelectAllClick}
                 onUpdateClicked={handleUpdate} onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
+                       filter={filter} onFilterChange={handleFilterChange}
             />
             </>
     )

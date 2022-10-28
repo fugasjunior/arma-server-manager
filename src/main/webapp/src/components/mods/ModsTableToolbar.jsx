@@ -6,11 +6,11 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as React from "react";
 import PropTypes from "prop-types";
-import {Divider, Stack} from "@mui/material";
+import {Box, Divider, Stack, Tab, Tabs} from "@mui/material";
 import UpdateIcon from '@mui/icons-material/Update';
 
 function ModsTableToolbar(props) {
-    const {numSelected, title} = props;
+    const {numSelected, title, filter, onFilterChange} = props;
 
     return (
             <Toolbar
@@ -42,6 +42,15 @@ function ModsTableToolbar(props) {
                             {title}
                         </Typography>
                 )}
+
+                <Box al>
+                    <Tabs value={filter} onChange={onFilterChange}>
+                        <Tab value="" label="All"/>
+                        <Tab value="ARMA3" label="Arma 3"/>
+                        <Tab value="DAYZ" label="DayZ"/>
+                    </Tabs>
+                </Box>
+
 
                 <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
                     <Tooltip title="Update">

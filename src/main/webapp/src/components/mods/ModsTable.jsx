@@ -18,6 +18,7 @@ import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
 import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
+import SERVER_NAMES from "../../util/serverNames";
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -43,6 +44,10 @@ const headCells = [
     {
         id: 'name',
         label: 'Name',
+    },
+    {
+        id: 'serverType',
+        label: 'For',
     },
     {
         id: 'fileSize',
@@ -122,6 +127,8 @@ const ModsTable = (props) => {
                             title="Workshop mods"
                             onUpdateClicked={props.onUpdateClicked}
                             onUninstallClicked={props.onUninstallClicked}
+                            filter={props.filter}
+                            onFilterChange={props.onFilterChange}
                     />
                     {rows.length > 0 &&
                             <TableContainer>
@@ -174,6 +181,7 @@ const ModsTable = (props) => {
                                                             {row.id}
                                                         </TableCell>
                                                         <TableCell>{row.name}</TableCell>
+                                                        <TableCell>{SERVER_NAMES[row.serverType]}</TableCell>
                                                         <TableCell>{humanFileSize(row.fileSize)}</TableCell>
                                                         <TableCell>{row.lastUpdated}</TableCell>
                                                         <TableCell>{getInstalledIcon(row)}</TableCell>

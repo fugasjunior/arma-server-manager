@@ -6,12 +6,7 @@ import {getMods} from "../services/modsService";
 import {Typography} from "@mui/material";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
-
-const SERVER_NAMES = {
-    "ARMA3": "Arma 3",
-    "DAYZ": "DayZ",
-    "DAYZ_EXP": "DayZ Experimental"
-}
+import SERVER_NAMES from "../util/serverNames";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
