@@ -13,16 +13,10 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60%;
+  width: 80%;
   height: 90%;
   border: 2px solid #000;
   padding: 4px;
-}
-
-@media only screen and (max-width: 900px) {
-  .box {
-    width: 80%;
-  }
 }
 
 @media only screen and (max-width: 600px) {

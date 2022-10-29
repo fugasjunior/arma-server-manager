@@ -2,14 +2,24 @@ import {useFormik} from "formik";
 import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import ListBuilder from "../../UI/ListBuilder";
+import {getModPresets} from "../../services/modPresetsService";
 
 const EditDayZServerSettingsForm = props => {
 
     const [modsModalOpen, setModsModalOpen] = useState(false);
     const [availableMods, setAvailableMods] = useState([]);
     const [selectedMods, setSelectedMods] = useState([]);
+    const [presets, setPresets] = useState([]);
+    const [selectedPreset, setSelectedPreset] = useState("");
 
     useEffect(() => {
+        async function fetchPresets() {
+            const {data: presetsDto} = await getModPresets("DAYZ");
+            setPresets(presetsDto.presets);
+        }
+
+        fetchPresets();
+
         setSelectedMods(props.server.activeMods);
         const newAvailableMods = props.availableMods.filter(
                 mod => !props.server.activeMods.find(searchedMod => searchedMod.id === mod.id));
@@ -30,6 +40,7 @@ const EditDayZServerSettingsForm = props => {
     const mediaQuery = useMediaQuery('(min-width:600px)');
 
     const handleModSelect = option => {
+        setSelectedPreset("");
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
 
@@ -41,6 +52,7 @@ const EditDayZServerSettingsForm = props => {
     }
 
     const handleModDeselect = option => {
+        setSelectedPreset("");
         setSelectedMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
@@ -52,6 +64,27 @@ const EditDayZServerSettingsForm = props => {
 
     const handleToggleModsModal = () => {
         setModsModalOpen(prevState => !prevState);
+    }
+
+    const handlePresetChange = (e) => {
+        const presetId = e.target.value;
+        const preset = presets.find(preset => preset.id === presetId);
+        if (!preset) {
+            return;
+        }
+
+        const newAvailableMods = [...props.availableMods];
+        const newSelectedMods = [];
+        for (const mod of preset.mods) {
+            const selectedMod = newAvailableMods.find(m => m.id === mod.id);
+            const index = newAvailableMods.indexOf(selectedMod);
+            newSelectedMods.push(selectedMod);
+            newAvailableMods.splice(index, 1);
+        }
+
+        setAvailableMods(newAvailableMods);
+        setSelectedMods(newSelectedMods);
+        setSelectedPreset(presetId);
     }
 
     return (
@@ -289,7 +322,8 @@ const EditDayZServerSettingsForm = props => {
                                 <Box>
                                     <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
                                                  onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                                 itemsLabel="mods" showFilter/>
+                                                 itemsLabel="mods" showFilter selectedPreset={selectedPreset}
+                                                 presets={presets} onPresetChange={handlePresetChange}/>
                                 </Box>
                             </Modal>
                         </>

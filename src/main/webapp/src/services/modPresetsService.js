@@ -7,8 +7,13 @@ export function getModPreset(id) {
     return http.get(apiEndpoint + "/" + id);
 }
 
-export function getModPresets() {
-    return http.get(apiEndpoint);
+export function getModPresets(filter) {
+    let query = ""
+    if (filter) {
+        query = "?filter=" + filter;
+    }
+
+    return http.get(apiEndpoint + query);
 }
 
 export function createModPreset(preset) {

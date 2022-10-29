@@ -2,6 +2,7 @@ import {useFormik} from "formik";
 import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import ListBuilder from "../../UI/ListBuilder";
+import {getModPresets} from "../../services/modPresetsService";
 
 const EditArma3ServerSettingsForm = props => {
 
@@ -11,16 +12,25 @@ const EditArma3ServerSettingsForm = props => {
     const [selectedMods, setSelectedMods] = useState([]);
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [selectedDlcs, setSelectedDlcs] = useState([]);
+    const [presets, setPresets] = useState([]);
+    const [selectedPreset, setSelectedPreset] = useState("");
 
     useEffect(() => {
-        setSelectedMods(props.server.activeMods);
-        setSelectedDlcs(props.server.activeDLCs);
+        async function fetchPresets() {
+            const {data: presetsDto} = await getModPresets("ARMA3");
+            setPresets(presetsDto.presets);
+        }
 
+        fetchPresets();
+
+        setSelectedMods(props.server.activeMods);
+
+        setSelectedDlcs(props.server.activeDLCs);
         const newAvailableMods = props.availableMods.filter(
                 mod => !props.server.activeMods.find(searchedMod => searchedMod.id === mod.id));
+
         const newAvailableDlcs = props.availableDlcs.filter(
                 cdlc => !props.server.activeDLCs.find(searchedDlc => searchedDlc.id === cdlc.id));
-
         setAvailableMods(newAvailableMods);
         setAvailableDlcs(newAvailableDlcs);
 
@@ -39,6 +49,8 @@ const EditArma3ServerSettingsForm = props => {
     const mediaQuery = useMediaQuery('(min-width:600px)');
 
     const handleModSelect = option => {
+        setSelectedPreset("");
+
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
 
@@ -50,6 +62,8 @@ const EditArma3ServerSettingsForm = props => {
     }
 
     const handleModDeselect = option => {
+        setSelectedPreset("");
+
         setSelectedMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
@@ -85,6 +99,27 @@ const EditArma3ServerSettingsForm = props => {
 
     const handleToggleDlcsModal = () => {
         setDlcsModalOpen(prevState => !prevState);
+    }
+
+    const handlePresetChange = (e) => {
+        const presetId = e.target.value;
+        const preset = presets.find(preset => preset.id === presetId);
+        if (!preset) {
+            return;
+        }
+
+        const newAvailableMods = [...props.availableMods];
+        const newSelectedMods = [];
+        for (const mod of preset.mods) {
+            const selectedMod = newAvailableMods.find(m => m.id === mod.id);
+            const index = newAvailableMods.indexOf(selectedMod);
+            newSelectedMods.push(selectedMod);
+            newAvailableMods.splice(index, 1);
+        }
+
+        setAvailableMods(newAvailableMods);
+        setSelectedMods(newSelectedMods);
+        setSelectedPreset(presetId);
     }
 
     return (
@@ -257,7 +292,9 @@ const EditArma3ServerSettingsForm = props => {
                     <Box>
                         <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
                                      onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                     itemsLabel="mods" showFilter/>
+                                     itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presets}
+                                     onPresetChange={handlePresetChange}
+                        />
                     </Box>
                 </Modal>
                 <Modal open={dlcsModalOpen} onClose={handleToggleDlcsModal}>
