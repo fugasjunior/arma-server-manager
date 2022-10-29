@@ -129,7 +129,7 @@ class ServerInstallerServiceImpl implements ServerInstallerService {
 
     private Process startServerForDryRun(ServerType type, int port) throws IOException {
         List<String> parameters = new ArrayList<>();
-        parameters.add(pathsFactory.getServerExecutable(type).toString());
+        parameters.add(pathsFactory.getServerExecutableWithFallback(type).toString());
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
         parameters.add("-world=empty");

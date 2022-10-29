@@ -222,7 +222,7 @@ class ServerInstanceServiceImpl implements ServerInstanceService {
         List<String> parameters = new ArrayList<>();
         ServerType type = server.getType();
 
-        parameters.add(pathsFactory.getServerExecutable(server.getType()).toAbsolutePath().toString());
+        parameters.add(pathsFactory.getServerExecutableWithFallback(server.getType()).toString());
         parameters.add("-port=" + server.getPort());
         parameters.add("-config=" + pathsFactory.getConfigFile(
                 server.getType(), getConfigFileName(server.getType(), server.getId())).toString());

@@ -1,5 +1,9 @@
 package cz.forgottenempire.arma3servergui.common;
 
+import cz.forgottenempire.arma3servergui.util.SystemUtils;
+import cz.forgottenempire.arma3servergui.util.SystemUtils.OSType;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,17 +14,14 @@ public class PathsFactory {
 
     private final Path modsBasePath;
     private final Path serversBasePath;
-    private final boolean use64bitExec;
 
     @Autowired
     public PathsFactory(
             @Value("${directory.servers}") String serversPathString,
-            @Value("${directory.mods}") String modsPathString,
-            @Value("${arma3server.x64}") boolean use64bitExec
+            @Value("${directory.mods}") String modsPathString
     ) {
         serversBasePath = Path.of(serversPathString);
         modsBasePath = Path.of(modsPathString);
-        this.use64bitExec = use64bitExec;
     }
 
     public Path getModsBasePath() {
@@ -64,11 +65,40 @@ public class PathsFactory {
         return Path.of(getScenariosBasePath().toString(), scenarioName);
     }
 
-    public Path getServerExecutable(ServerType type) {
-        return Path.of(getServerPath(type).toString(), Constants.SERVER_EXECUTABLES.get(type));
-    }
-
     public Path getConfigFile(ServerType type, String configName) {
         return Path.of(getServerPath(type).toString(), configName);
+    }
+
+    public File getServerExecutableWithFallback(ServerType type) {
+        File executable;
+        if (SystemUtils.getOsType() == OSType.WINDOWS) {
+            executable = new File(getServerExecutable(type).toAbsolutePath() + ".exe");
+        } else {
+            executable = getServerExecutable(type).toFile();
+        }
+
+        if (executable.isFile()) {
+            return executable;
+        }
+
+        // no x64 executable found, try fallback
+        String pathString = executable.toString();
+        // remove '_x64' suffix
+        pathString = getServerExecutable(type).toAbsolutePath().toString().substring(0, pathString.length() - 4);
+        if (SystemUtils.getOsType() == OSType.WINDOWS) {
+            pathString += ".exe";
+        }
+        executable = new File(pathString);
+        if (executable.isFile()) {
+            return executable;
+        }
+
+        throw new RuntimeException(
+                new FileNotFoundException("Couldn't find any server executable for '" + type + "' server")
+        );
+    }
+
+    private Path getServerExecutable(ServerType type) {
+        return Path.of(getServerPath(type).toString(), Constants.SERVER_EXECUTABLES.get(type));
     }
 }
