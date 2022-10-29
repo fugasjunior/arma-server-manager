@@ -1,12 +1,11 @@
 package cz.forgottenempire.arma3servergui.serverinstance.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import cz.forgottenempire.arma3servergui.common.exceptions.CustomUserErrorException;
 
-@ResponseStatus(value = HttpStatus.CONFLICT, reason = "port already taken")
-public class PortAlreadyTakenException extends RuntimeException {
+public class PortAlreadyTakenException extends CustomUserErrorException {
 
     public PortAlreadyTakenException() {
+        super("The selected port is already in use");
     }
 
     public PortAlreadyTakenException(String message) {

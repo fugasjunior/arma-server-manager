@@ -1,11 +1,9 @@
 package cz.forgottenempire.arma3servergui.modpreset;
 
 import cz.forgottenempire.arma3servergui.common.ServerType;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import cz.forgottenempire.arma3servergui.common.exceptions.CustomUserErrorException;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "mod type differs from preset")
-public class ModTypeDiffersFromPresetException extends RuntimeException {
+public class ModTypeDiffersFromPresetException extends CustomUserErrorException {
 
     public ModTypeDiffersFromPresetException() {
         super("Mod type differs from preset type");

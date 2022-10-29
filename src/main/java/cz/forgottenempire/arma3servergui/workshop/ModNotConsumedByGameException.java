@@ -1,12 +1,11 @@
 package cz.forgottenempire.arma3servergui.workshop;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import cz.forgottenempire.arma3servergui.common.exceptions.CustomUserErrorException;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "mod is not consumed by game")
-class ModNotConsumedByGameException extends RuntimeException {
+class ModNotConsumedByGameException extends CustomUserErrorException {
 
     public ModNotConsumedByGameException() {
+        super("The given mod is not consumed by the selected game");
     }
 
     public ModNotConsumedByGameException(String message) {

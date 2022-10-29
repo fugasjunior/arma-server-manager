@@ -1,8 +1,11 @@
 package cz.forgottenempire.arma3servergui.serverinstance.exceptions;
 
-public class ModifyingRunningServerException extends RuntimeException {
+import cz.forgottenempire.arma3servergui.common.exceptions.CustomUserErrorException;
+
+public class ModifyingRunningServerException extends CustomUserErrorException {
 
     public ModifyingRunningServerException() {
+        super("Cannot modify running server");
     }
 
     public ModifyingRunningServerException(String message) {

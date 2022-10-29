@@ -1,15 +1,18 @@
 package cz.forgottenempire.arma3servergui.common.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import cz.forgottenempire.arma3servergui.common.ServerType;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "server is unsupported on your OS")
-public class ServerUnsupportedOnOsException extends RuntimeException {
+public class ServerUnsupportedOnOsException extends CustomUserErrorException {
 
     public ServerUnsupportedOnOsException() {
+        super("This game is not supported on the server OS");
     }
 
     public ServerUnsupportedOnOsException(String message) {
         super(message);
+    }
+
+    public ServerUnsupportedOnOsException(ServerType serverType) {
+        super("Server '" + serverType + "' is not supported on the server OS");
     }
 }

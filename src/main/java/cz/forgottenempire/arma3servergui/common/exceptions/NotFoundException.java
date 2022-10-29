@@ -1,15 +1,14 @@
 package cz.forgottenempire.arma3servergui.common.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "resource not found")
-public class NotFoundException extends RuntimeException{
+public class NotFoundException extends CustomUserErrorException {
 
     public NotFoundException() {
+        this("Requested item does not exits");
     }
 
     public NotFoundException(String message) {
-        super(message);
+        super(message, HttpStatus.NOT_FOUND);
     }
 }

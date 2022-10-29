@@ -1,14 +1,11 @@
 package cz.forgottenempire.arma3servergui.steamcmd;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import cz.forgottenempire.arma3servergui.common.exceptions.CustomUserErrorException;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "steam auth is not set")
-class SteamAuthNotSetException extends RuntimeException {
+class SteamAuthNotSetException extends CustomUserErrorException {
 
     public SteamAuthNotSetException() {
         super("Steam Auth is not set");
     }
-
 }
 

@@ -1,15 +1,18 @@
 package cz.forgottenempire.arma3servergui.common.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import cz.forgottenempire.arma3servergui.common.ServerType;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "server has not been initalized yet")
-public class ServerNotInitializedException extends RuntimeException {
+public class ServerNotInitializedException extends CustomUserErrorException {
 
     public ServerNotInitializedException() {
+        this("Server is not initialized");
     }
 
     public ServerNotInitializedException(String message) {
         super(message);
+    }
+
+    public ServerNotInitializedException(ServerType serverType) {
+        this("Server '" + serverType + "' is not initialized");
     }
 }
