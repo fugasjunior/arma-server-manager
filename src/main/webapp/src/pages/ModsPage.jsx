@@ -4,11 +4,14 @@ import {toast} from "material-react-toastify";
 import ModsTable from "../components/mods/ModsTable";
 import {useInterval} from "../hooks/use-interval";
 import ModsErrorAlertMessage from "../components/mods/ModsErrorAlertMessage";
+import CreatePresetDialog from "../components/mods/CreatePresetDialog";
+import {createModPreset} from "../services/modPresetsService";
 
 const ModsPage = () => {
     const [mods, setMods] = useState([]);
     const [selected, setSelected] = useState([]);
     const [filter, setFilter] = useState("");
+    const [newPresetDialogOpen, setNewPresetDialogOpen] = useState(false);
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
@@ -107,19 +110,52 @@ const ModsPage = () => {
         return mods.filter(mod => mod.serverType === filter);
     }
 
+    const getSelectedMods = () => {
+        return selected.map(id => mods.find(mod => mod.id === id));
+    }
+
+    const getSelectedModsSorted = () => {
+        return getSelectedMods().sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    const handlePresedDialogOpen = () => {
+        setNewPresetDialogOpen(true);
+    }
+
+    const handlePresedDialogClose = () => {
+        setNewPresetDialogOpen(false);
+    }
+
+    const handleCreateNewPreset = async (presetName) => {
+        setNewPresetDialogOpen(false);
+        const type = mods.find(mod => mod.id === selected[0]).serverType;
+        const request = {
+            name: presetName,
+            mods: selected,
+            type
+        };
+        await createModPreset(request);
+        toast.success(`Preset '${presetName}' successfully created`);
+    }
+
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
     const filteredMods = filterMods();
     const arma3ModsCount = mods.filter(mod => mod.serverType === "ARMA3").length;
     const dayZModsCount = mods.filter(mod => mod.serverType === "DAYZ").length;
+    const mixedModsSelected = getSelectedMods().map(mod => mod.serverType).filter(
+            (v, i, a) => a.indexOf(v) === i).length > 1;
 
     return (
             <>
                 {errorOccured && <ModsErrorAlertMessage mods={filteredMods}/>}
                 <ModsTable rows={filteredMods} selected={selected} filter={filter} arma3ModsCount={arma3ModsCount}
-                           dayZModsCount={dayZModsCount}
+                           dayZModsCount={dayZModsCount} mixedModsSelected={mixedModsSelected}
                            onClick={handleClick} onSelectAllClick={handleSelectAllClick} onUpdateClicked={handleUpdate}
                            onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
-                           onFilterChange={handleFilterChange}
+                           onFilterChange={handleFilterChange} onCreatePresetClicked={handlePresedDialogOpen}
+                />
+                <CreatePresetDialog open={newPresetDialogOpen} onClose={handlePresedDialogClose}
+                                    selectedMods={getSelectedModsSorted()} onConfirmClicked={handleCreateNewPreset}
                 />
             </>
     )

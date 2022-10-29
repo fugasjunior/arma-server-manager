@@ -13,7 +13,7 @@ import ModsTableToolbar from "./ModsTableToolbar";
 import EnhancedTableHead from "../../UI/Table/EnhancedTableHead";
 import {humanFileSize} from "../../util/util";
 import PendingIcon from "@mui/icons-material/Pending";
-import {Button, CircularProgress, Stack, TextField, Typography} from "@mui/material";
+import {Button, CircularProgress, Stack, TextField} from "@mui/material";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
 import Tooltip from "@mui/material/Tooltip";
@@ -128,7 +128,9 @@ const ModsTable = (props) => {
                             filter={props.filter}
                             arma3ModsCount={props.arma3ModsCount}
                             dayZModsCount={props.dayZModsCount}
+                            mixedModsSelected={props.mixedModsSelected}
                             onUpdateClicked={props.onUpdateClicked}
+                            onCreatePresetClicked={props.onCreatePresetClicked}
                             onUninstallClicked={props.onUninstallClicked}
                             onFilterChange={props.onFilterChange}
                     />
