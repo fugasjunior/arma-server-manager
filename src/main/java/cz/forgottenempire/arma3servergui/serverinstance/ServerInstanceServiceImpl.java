@@ -234,6 +234,9 @@ class ServerInstanceServiceImpl implements ServerInstanceService {
             addArma3ModsAndDlcsToParameters(parameters, (Arma3Server) server);
         } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
             parameters.add("-limitFPS=60");
+            parameters.add("-dologs");
+            parameters.add("-adminlog");
+            parameters.add("-freezeCheck");
             addDayZModsToParameters(parameters, (DayZServer) server);
         }
 
