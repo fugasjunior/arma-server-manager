@@ -10,6 +10,9 @@ import {
     Stack,
     Typography
 } from "@mui/material";
+import arma3Logo from "../../img/arma3_logo.jpg";
+import dayZLogo from "../../img/dayz_logo.jpg";
+import dayZExpLogo from "../../img/dayz_exp_logo.jpg";
 
 const INSTALLATION_NAMES = {
     "ARMA3": "Arma 3",
@@ -20,9 +23,9 @@ const INSTALLATION_NAMES = {
 }
 
 const SERVER_IMAGE_URLS = {
-    "ARMA3": `${process.env.PUBLIC_URL}/img/arma3_logo.jpg`,
-    "DAYZ": `${process.env.PUBLIC_URL}/img/dayz_logo.jpg`,
-    "DAYZ_EXP": `${process.env.PUBLIC_URL}/img/dayz_exp_logo.jpg`,
+    "ARMA3": arma3Logo,
+    "DAYZ": dayZLogo,
+    "DAYZ_EXP": dayZExpLogo
 }
 
 const ERROR_STATE_MESSAGES = {
