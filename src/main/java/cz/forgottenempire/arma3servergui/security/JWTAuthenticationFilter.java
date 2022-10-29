@@ -9,9 +9,10 @@ import com.auth0.jwt.JWT;
 import java.io.IOException;
 import java.util.Date;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -29,7 +30,7 @@ class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             HttpServletResponse res,
             FilterChain chain,
             Authentication auth
-    ) throws IOException, ServletException {
+    ) throws IOException {
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -37,6 +38,15 @@ class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        res.getWriter().write("{\"" + HEADER_STRING + "\":\"" + TOKEN_PREFIX + token + "\"}");
+        try {
+            String response = new JSONObject()
+                    .put("token", TOKEN_PREFIX + token)
+                    .put("expiresIn", EXPIRATION_TIME)
+                    .toString();
+            res.getWriter().write(response);
+        } catch (JSONException e) {
+            logger.error("Exception while creating JSON", e); // Why tf is this a checked exception??
+            throw new RuntimeException(e);
+        }
     }
 }
