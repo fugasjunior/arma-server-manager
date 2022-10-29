@@ -13,4 +13,5 @@ interface ModPresetsRepository extends JpaRepository<ModPreset, Long> {
 
     Collection<ModPreset> getAllByType(ServerType serverType);
 
+    boolean existsByName(String name);
 }

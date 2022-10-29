@@ -51,4 +51,9 @@ class ModPresetsServiceImpl implements ModPresetsService {
     public void deletePreset(Long preset) {
         presetsRepository.deleteById(preset);
     }
+
+    @Override
+    public boolean presetWithNameExists(String name) {
+        return presetsRepository.existsByName(name);
+    }
 }

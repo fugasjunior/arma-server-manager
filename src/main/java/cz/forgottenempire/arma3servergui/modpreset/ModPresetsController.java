@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.modpreset;
 
 import cz.forgottenempire.arma3servergui.common.ServerType;
+import cz.forgottenempire.arma3servergui.common.exceptions.NonUniqueNameException;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import cz.forgottenempire.arma3servergui.modpreset.dtos.CreatePresetRequestDto;
 import cz.forgottenempire.arma3servergui.modpreset.dtos.PresetListResponseDto;
@@ -62,6 +63,7 @@ class ModPresetsController {
 
     @PostMapping
     public ResponseEntity<PresetResponseDto> createPreset(@Valid @RequestBody CreatePresetRequestDto requestDto) {
+        validatePresetName(requestDto.getName());
         List<WorkshopMod> mods = validateAndGetMods(requestDto.getMods(), requestDto.getType());
         ModPreset modPreset = new ModPreset(requestDto.getName(), mods, requestDto.getType());
         modPreset = modPresetsService.savePreset(modPreset);
@@ -77,9 +79,13 @@ class ModPresetsController {
                 .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
         List<WorkshopMod> mods = validateAndGetMods(requestDto.getMods(), modPreset.getType());
 
+        if (!modPreset.getName().equals(requestDto.getName())) {
+            validatePresetName(requestDto.getName());
+        }
+
         modPreset.setName(requestDto.getName());
         modPreset.setMods(mods);
-        modPreset = modPresetsService.savePreset(modPreset);
+        modPreset = modPresetsService.updatePreset(modPreset);
         return ResponseEntity.ok(modPresetMapper.mapToModPresetDto(modPreset));
     }
 
@@ -99,5 +105,11 @@ class ModPresetsController {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void validatePresetName(String name) {
+        if (modPresetsService.presetWithNameExists(name)) {
+            throw new NonUniqueNameException("Preset name '" + name + "' is already used");
+        }
     }
 }

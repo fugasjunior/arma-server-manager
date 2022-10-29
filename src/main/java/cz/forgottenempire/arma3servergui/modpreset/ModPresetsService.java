@@ -21,4 +21,5 @@ public interface ModPresetsService {
 
     void deletePreset(Long preset);
 
+    boolean presetWithNameExists(String name);
 }
