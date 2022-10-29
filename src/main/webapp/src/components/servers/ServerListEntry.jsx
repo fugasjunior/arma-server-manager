@@ -9,9 +9,9 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 
 const SERVER_ICON_URLS = {
-    "ARMA3": "./img/arma3_icon.png",
-    "DAYZ": "./img/dayz_icon.png",
-    "DAYZ_EXP": "./img/dayz_icon.png",
+    "ARMA3": `${process.env.PUBLIC_URL}/img/arma3_icon.png`,
+    "DAYZ": `${process.env.PUBLIC_URL}/img/dayz_icon.png`,
+    "DAYZ_EXP": `${process.env.PUBLIC_URL}/img/dayz_icon.png`,
 }
 
 const ServerListEntry = (props) => {

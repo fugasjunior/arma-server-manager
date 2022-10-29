@@ -1,6 +1,7 @@
 import {
     Alert,
-    AlertTitle, Button,
+    AlertTitle,
+    Button,
     Card,
     CardActions,
     CardContent,
@@ -19,9 +20,9 @@ const INSTALLATION_NAMES = {
 }
 
 const SERVER_IMAGE_URLS = {
-    "ARMA3": "./img/arma3_logo.jpg",
-    "DAYZ": "./img/dayz_logo.jpg",
-    "DAYZ_EXP": "./img/dayz_exp_logo.jpg",
+    "ARMA3": `${process.env.PUBLIC_URL}/img/arma3_logo.jpg`,
+    "DAYZ": `${process.env.PUBLIC_URL}/img/dayz_logo.jpg`,
+    "DAYZ_EXP": `${process.env.PUBLIC_URL}/img/dayz_exp_logo.jpg`,
 }
 
 const ERROR_STATE_MESSAGES = {
