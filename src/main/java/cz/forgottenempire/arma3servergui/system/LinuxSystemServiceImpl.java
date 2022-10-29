@@ -21,7 +21,7 @@ class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
 
     @Override
     protected Supplier<Long> memoryTotalSupplier() {
-        return () -> getValueFromMemInfo("MemMotal");
+        return () -> getValueFromMemInfo("MemTotal");
     }
 
     @Override
@@ -34,8 +34,8 @@ class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
             Process process = new ProcessBuilder("/bin/sh", "-c",
                     "cat /proc/meminfo | grep " + key + " | sed 's/[^0-9]//g'")
                     .start();
-            BufferedReader is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             process.waitFor();
+            BufferedReader is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             return Long.parseLong(is.readLine()) * 1024;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
