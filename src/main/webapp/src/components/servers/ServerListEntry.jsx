@@ -8,7 +8,7 @@ import MapIcon from '@mui/icons-material/Map';
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import arma3Icon from "../../img/arma3_icon.png"
-import dayZIcon from "../../img/arma3_icon.png"
+import dayZIcon from "../../img/dayz_icon.png"
 
 const SERVER_ICON_URLS = {
     "ARMA3": arma3Icon,
