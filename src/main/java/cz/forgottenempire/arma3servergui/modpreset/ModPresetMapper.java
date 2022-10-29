@@ -1,5 +1,8 @@
 package cz.forgottenempire.arma3servergui.modpreset;
 
+import cz.forgottenempire.arma3servergui.modpreset.dtos.PresetResponseDto;
+import cz.forgottenempire.arma3servergui.modpreset.dtos.PresetResponseModDto;
+import cz.forgottenempire.arma3servergui.workshop.WorkshopMod;
 import java.util.Collection;
 import java.util.List;
 import org.mapstruct.Mapper;
@@ -8,11 +11,13 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 interface ModPresetMapper {
 
-    ModPresetDto mapToModPresetDto(ModPreset modPreset);
+    PresetResponseDto mapToModPresetDto(ModPreset modPreset);
 
-    ModPreset mapModPresetDtoToEntity(ModPresetDto modPresetDto);
+    List<PresetResponseDto> mapToModPresetDtos(Collection<ModPreset> modPresets);
 
-    List<ModPresetDto> mapToModPresetDtos(Collection<ModPreset> modPresets);
+    PresetResponseModDto mapModToDto(WorkshopMod mod);
 
-    void updateModPresetFromDto(@MappingTarget ModPreset modPreset, ModPresetDto modPresetDto);
+    List<PresetResponseModDto> mapModsToDtos(Collection<WorkshopMod> mods);
+
+    void updateModPresetFromDto(@MappingTarget ModPreset modPreset, PresetResponseDto presetResponseDto);
 }

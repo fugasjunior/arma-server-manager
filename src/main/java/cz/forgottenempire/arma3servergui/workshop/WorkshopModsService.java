@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-interface WorkshopModsService {
+public interface WorkshopModsService {
 
     Collection<WorkshopMod> getAllMods();
 

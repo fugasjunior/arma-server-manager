@@ -24,7 +24,7 @@ class ModPresetsServiceImpl implements ModPresetsService {
 
     @Override
     public Collection<ModPreset> getAllPresetsForServer(ServerType serverType) {
-        return presetsRepository.getAllByServerType(serverType);
+        return presetsRepository.getAllByType(serverType);
     }
 
     @Override

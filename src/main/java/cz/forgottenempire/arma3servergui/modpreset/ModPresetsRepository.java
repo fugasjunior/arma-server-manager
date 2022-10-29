@@ -11,6 +11,6 @@ interface ModPresetsRepository extends JpaRepository<ModPreset, Long> {
 
     Collection<ModPreset> getAllByModsContaining(WorkshopMod mod);
 
-    Collection<ModPreset> getAllByServerType(ServerType serverType);
+    Collection<ModPreset> getAllByType(ServerType serverType);
 
 }
