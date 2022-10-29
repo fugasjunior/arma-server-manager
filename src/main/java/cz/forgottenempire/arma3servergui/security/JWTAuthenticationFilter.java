@@ -6,13 +6,12 @@ import static cz.forgottenempire.arma3servergui.security.SecurityConstants.HEADE
 import static cz.forgottenempire.arma3servergui.security.SecurityConstants.TOKEN_PREFIX;
 
 import com.auth0.jwt.JWT;
+import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.util.Date;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -38,15 +37,10 @@ class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        try {
-            String response = new JSONObject()
-                    .put("token", TOKEN_PREFIX + token)
-                    .put("expiresIn", EXPIRATION_TIME)
-                    .toString();
-            res.getWriter().write(response);
-        } catch (JSONException e) {
-            logger.error("Exception while creating JSON", e); // Why tf is this a checked exception??
-            throw new RuntimeException(e);
-        }
+
+        JsonObject response = new JsonObject();
+        response.addProperty("token", TOKEN_PREFIX + token);
+        response.addProperty("expiresIn", EXPIRATION_TIME);
+        res.getWriter().write(response.toString());
     }
 }
