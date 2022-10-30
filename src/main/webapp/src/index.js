@@ -5,12 +5,18 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextProvider} from "./store/auth-context";
+import {DevSupport} from "@react-buddy/ide-toolbox";
+import {ComponentPreviews, useInitial} from "./dev";
 
 ReactDOM.render(
         <AuthContextProvider>
             <BrowserRouter>
                 <React.StrictMode>
-                    <App/>
+                    <DevSupport ComponentPreviews={ComponentPreviews}
+                                useInitialHook={useInitial}
+                    >
+                        <App/>
+                    </DevSupport>
                 </React.StrictMode>
             </BrowserRouter>
         </AuthContextProvider>,

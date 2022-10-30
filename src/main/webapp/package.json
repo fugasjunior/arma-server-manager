@@ -20,7 +20,9 @@
         "react-scripts": "^5.0.1",
         "react-tooltip": "^4.2.21",
         "react-window": "^1.8.7",
-        "yup": "^0.32.11"
+        "yup": "^0.32.11",
+        "@react-buddy/ide-toolbox": "^2.2.1",
+        "@react-buddy/palette-mui": "^1.2.2"
     },
     "scripts": {
         "start": "react-scripts start",
