@@ -1,7 +1,7 @@
 import {useFormik} from "formik";
 import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
 import React, {useEffect, useState} from "react";
-import ListBuilder from "../../UI/ListBuilder";
+import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getModPresets} from "../../services/modPresetsService";
 
 const EditArma3ServerSettingsForm = props => {
@@ -273,7 +273,8 @@ const EditArma3ServerSettingsForm = props => {
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <Button title={props.isServerRunning ? "Stop the server to be able to update the settings." : ""}
+                            <Button title={props.isServerRunning ? "Stop the server to be able to update the settings."
+                                    : ""}
                                     fullWidth={!mediaQuery}
                                     color="primary" variant="contained" type="submit" size="large">
                                 Submit

@@ -1,7 +1,7 @@
 import {useFormik} from "formik";
 import {Box, Button, FormControlLabel, FormGroup, Grid, Modal, Switch, TextField, useMediaQuery} from "@mui/material";
 import React, {useEffect, useState} from "react";
-import ListBuilder from "../../UI/ListBuilder";
+import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getModPresets} from "../../services/modPresetsService";
 
 const EditDayZServerSettingsForm = props => {
