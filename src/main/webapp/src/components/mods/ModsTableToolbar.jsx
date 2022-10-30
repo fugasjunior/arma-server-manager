@@ -8,6 +8,7 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import {Box, Divider, Stack, Tab, Tabs} from "@mui/material";
 import UpdateIcon from '@mui/icons-material/Update';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 function ModsTableToolbar(props) {
     const {numSelected, title, filter, onFilterChange} = props;
@@ -43,7 +44,7 @@ function ModsTableToolbar(props) {
                         </Typography>
                 )}
 
-                <Box al>
+                <Box>
                     <Tabs value={filter} onChange={onFilterChange}>
                         <Tab value="" label="All"/>
                         <Tab value="ARMA3" label="Arma 3" disabled={props.arma3ModsCount === 0}/>
@@ -57,6 +58,14 @@ function ModsTableToolbar(props) {
                         <span>
                             <IconButton disabled={numSelected === 0} onClick={props.onUpdateClicked}>
                                 <UpdateIcon/>
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title="Save as preset">
+                        <span>
+                            <IconButton disabled={numSelected === 0 || props.mixedModsSelected}
+                                        onClick={props.onCreatePresetClicked}>
+                                <PlaylistAddIcon/>
                             </IconButton>
                         </span>
                     </Tooltip>

@@ -16,7 +16,11 @@ const SteamAuthForm = () => {
 
     const fetchAuth = async () => {
         const {data: auth} = await getAuth();
-        setLoadedAuth(auth);
+        setLoadedAuth({
+            username: auth.username ?? "",
+            password: auth.password ?? "",
+            steamGuardToken: auth.steamGuardToken ?? ""
+        });
         setLoaded(true);
     }
 

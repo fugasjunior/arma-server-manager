@@ -1,6 +1,7 @@
 import {
     Alert,
-    AlertTitle, Button,
+    AlertTitle,
+    Button,
     Card,
     CardActions,
     CardContent,
@@ -9,6 +10,9 @@ import {
     Stack,
     Typography
 } from "@mui/material";
+import arma3Logo from "../../img/arma3_logo.jpg";
+import dayZLogo from "../../img/dayz_logo.jpg";
+import dayZExpLogo from "../../img/dayz_exp_logo.jpg";
 
 const INSTALLATION_NAMES = {
     "ARMA3": "Arma 3",
@@ -19,9 +23,9 @@ const INSTALLATION_NAMES = {
 }
 
 const SERVER_IMAGE_URLS = {
-    "ARMA3": "./img/arma3_logo.jpg",
-    "DAYZ": "./img/dayz_logo.jpg",
-    "DAYZ_EXP": "./img/dayz_exp_logo.jpg",
+    "ARMA3": arma3Logo,
+    "DAYZ": dayZLogo,
+    "DAYZ_EXP": dayZExpLogo
 }
 
 const ERROR_STATE_MESSAGES = {
@@ -56,24 +60,23 @@ const ServerInstallationItem = (props) => {
                                         ?? "Unknown error"}
                             </Alert>
                     }
-                    <Typography gutterBottom variant="h5" component="div">
+                    <Typography gutterBottom variant="h5">
                         {INSTALLATION_NAMES[installation.type]}
                     </Typography>
                     {!isInstalling(installation) ?
-                            <Typography variant="body2" color="text.secondary">
-                                <Stack>
-                                    {installation.version &&
-                                            <p>Version:
-                                                <strong> {installation.version}</strong>
-                                            </p>
-                                    }
-                                    {installation.lastUpdatedAt &&
-                                            <p>Last updated:
-                                                <strong> {installation.lastUpdatedAt}</strong>
-                                            </p>
-                                    }
-                                </Stack>
-                            </Typography>
+                            <Stack>
+                                {installation.version &&
+                                        <Typography variant="body2" color="text.secondary">
+                                            Version: <strong> {installation.version}</strong>
+                                        </Typography>
+                                }
+                                {installation.lastUpdatedAt &&
+                                        <Typography variant="body2" color="text.secondary">
+                                            Last updated: <strong> {installation.lastUpdatedAt}</strong>
+                                        </Typography>
+                                }
+                            </Stack>
+
                             :
                             <LinearProgress/>
                     }

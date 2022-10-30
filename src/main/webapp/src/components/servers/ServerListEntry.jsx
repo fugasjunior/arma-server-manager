@@ -7,11 +7,13 @@ import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import MapIcon from '@mui/icons-material/Map';
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
+import arma3Icon from "../../img/arma3_icon.png"
+import dayZIcon from "../../img/dayz_icon.png"
 
 const SERVER_ICON_URLS = {
-    "ARMA3": "./img/arma3_icon.png",
-    "DAYZ": "./img/dayz_icon.png",
-    "DAYZ_EXP": "./img/dayz_icon.png",
+    "ARMA3": arma3Icon,
+    "DAYZ": dayZIcon,
+    "DAYZ_EXP": dayZIcon
 }
 
 const ServerListEntry = (props) => {
@@ -20,7 +22,7 @@ const ServerListEntry = (props) => {
     const serverRunning = server.instanceInfo && server.instanceInfo.alive;
 
     return (
-            <TableRow direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+            <TableRow>
                 <TableCell>
                     <Avatar src={SERVER_ICON_URLS[server.type]} alt={`${server.type} icon`}/>
                 </TableCell>

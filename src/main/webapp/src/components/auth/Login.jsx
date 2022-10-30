@@ -1,7 +1,8 @@
-import React, {Component, useState} from 'react';
-import {isUserAuthenticated, login} from "../../services/authService";
-import {Navigate, useNavigate} from "react-router-dom";
+import React, {useContext, useState} from 'react';
+import {login} from "../../services/authService";
+import {useNavigate} from "react-router-dom";
 import {Box, Button, Stack, TextField, Typography} from "@mui/material";
+import {AuthContext} from "../../store/auth-context";
 
 const Login = () => {
 
@@ -9,12 +10,16 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
 
+    const authCtx = useContext(AuthContext);
+
     const navigate = useNavigate()
 
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            await login(username, password);
+            const data = await login(username, password);
+            console.log(data);
+            authCtx.login(data.token, data.expiresIn * 1000);
             navigate("/");
         } catch (e) {
             if (e.response && e.response.status === 401) {
@@ -31,8 +36,8 @@ const Login = () => {
         setPassword(e.target.value);
     }
 
-    if(isUserAuthenticated()) {
-        return <Navigate to="/"/>;
+    if (authCtx.isLoggedIn) {
+        navigate("/");
     }
 
     return (

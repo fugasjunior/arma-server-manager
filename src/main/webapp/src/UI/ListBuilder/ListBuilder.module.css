@@ -1,0 +1,28 @@
+.list {
+  max-height: 550px;
+  overflow: auto;
+  user-select: none;
+  background-color: #fafafa;
+  box-shadow: 0 0 5px #888888;
+}
+
+.list__item :hover{
+  background-color: #eaeaea;
+}
+
+.box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 90%;
+  border: 2px solid #000;
+  padding: 4px;
+}
+
+@media only screen and (max-width: 600px) {
+  .box {
+    width: 95%;
+  }
+}

@@ -1,11 +1,8 @@
 package cz.forgottenempire.arma3servergui.steamcmd;
 
 import com.google.common.base.Strings;
-import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdJob;
-import cz.forgottenempire.arma3servergui.steamcmd.entities.SteamCmdParameters;
-import cz.forgottenempire.arma3servergui.steamcmd.exceptions.SteamAuthNotSetException;
-import cz.forgottenempire.arma3servergui.system.entities.SteamAuth;
-import cz.forgottenempire.arma3servergui.system.repositories.SteamAuthRepository;
+import cz.forgottenempire.arma3servergui.steamauth.SteamAuth;
+import cz.forgottenempire.arma3servergui.steamauth.SteamAuthService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class SteamCmdExecutor {
+class SteamCmdExecutor {
 
     private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
     private static final List<String> ERROR_KEYWORDS = Arrays.asList("error", "failure", "failed");
@@ -33,14 +30,14 @@ public class SteamCmdExecutor {
     private static final int MAX_ATTEMPTS = 10;
 
     private final File steamCmdFile;
-    private final SteamAuthRepository steamAuthRepository;
+    private final SteamAuthService steamAuthService;
 
     @Autowired
     public SteamCmdExecutor(
             @Value("${steamcmd.path}") String steamCmdFilePath,
-            SteamAuthRepository steamAuthRepository
+            SteamAuthService steamAuthService
     ) {
-        this.steamAuthRepository = steamAuthRepository;
+        this.steamAuthService = steamAuthService;
 
         steamCmdFile = new File(steamCmdFilePath);
         if (!steamCmdFile.exists()) {
@@ -134,8 +131,11 @@ public class SteamCmdExecutor {
     }
 
     private String getAuthString() {
-        SteamAuth steamAuth = steamAuthRepository.findAll().stream()
-                .findFirst().orElseThrow(SteamAuthNotSetException::new);
+        SteamAuth steamAuth = steamAuthService.getAuthAccount();
+        if (steamAuth.getUsername() == null || steamAuth.getPassword() == null) {
+            throw new SteamAuthNotSetException();
+        }
+
         String authString = steamAuth.getUsername() + " " + steamAuth.getPassword();
         if (!Strings.isNullOrEmpty(steamAuth.getSteamGuardToken())) {
             authString += " " + steamAuth.getSteamGuardToken();

@@ -75,7 +75,7 @@ const ServerSettingsPage = () => {
             console.error(e);
             toast("Error while loading mods");
         }
-    }
+    };
 
     const handleSubmit = async (values, selectedMods, selectedDlcs) => {
         const server = {
@@ -93,7 +93,11 @@ const ServerSettingsPage = () => {
             console.error(e);
             toast.error("Creating server failed");
         }
-    }
+    };
+
+    const handleCancel = () => {
+        navigate("/servers");
+    };
 
     return (
             <>
@@ -105,12 +109,14 @@ const ServerSettingsPage = () => {
                                     <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE}
                                                                  availableMods={availableMods}
                                                                  availableDlcs={availableDlcs}
+                                                                 onCancel={handleCancel}
                                                                  onSubmit={handleSubmit}
                                     />
                             }
                             {(type === "DAYZ" || type === "DAYZ_EXP") &&
                                     <EditDayZServerSettingsForm server={{...DAYZ_INITIAL_STATE, type}}
                                                                 availableMods={availableMods}
+                                                                onCancel={handleCancel}
                                                                 onSubmit={handleSubmit}
                                     />
                             }

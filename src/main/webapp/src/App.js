@@ -5,7 +5,6 @@ import Navbar from "./components/Navbar";
 import {Route, Routes} from "react-router-dom";
 import Login from "./components/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Logout from "./components/auth/Logout";
 import ServersPage from "./pages/ServersPage";
 import ServerSettingsPage from "./pages/ServerSettingsPage";
 import ModsPage from "./pages/ModsPage";
@@ -27,7 +26,6 @@ const App = () => {
                             <ProtectedRoute><DashboardPage/></ProtectedRoute>
                         }/>
                         <Route path="login" exact element={<Login/>}/>
-                        <Route path="logout" exact element={<Logout/>}/>
                         <Route path="servers" element={
                             <ProtectedRoute><ServersPage/></ProtectedRoute>
                         }/>
@@ -39,6 +37,9 @@ const App = () => {
                         }/>
                         <Route path="scenarios" element={
                             <ProtectedRoute><ScenariosPage/></ProtectedRoute>
+                        }/>
+                        <Route path="mods/:section" element={
+                            <ProtectedRoute><ModsPage/></ProtectedRoute>
                         }/>
                         <Route path="mods" element={
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
