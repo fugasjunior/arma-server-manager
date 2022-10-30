@@ -17,8 +17,10 @@ import SERVER_NAMES from "../../util/serverNames";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getMods} from "../../services/modsService";
+import TableGhosts from "../../UI/TableGhosts";
 
 export default function PresetsManagement() {
+    const [initialLoading, setInitialLoading] = useState(true);
     const [presets, setPresets] = useState([]);
     const [editedPreset, setEditedPreset] = useState();
     const [presetModalOpen, setPresetModalOpen] = useState(false);
@@ -29,6 +31,7 @@ export default function PresetsManagement() {
         async function fetchPresets() {
             const {data: presetsDto} = await getModPresets();
             setPresets(presetsDto.presets);
+            setInitialLoading(false);
         }
 
         fetchPresets();
@@ -181,6 +184,7 @@ export default function PresetsManagement() {
                                     ))}
                                 </TableBody>
                             </Table>
+                            <TableGhosts display={initialLoading} count={10}/>
                         </TableContainer>
                     </Paper>
                 </Box>

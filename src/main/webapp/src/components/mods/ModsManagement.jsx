@@ -8,6 +8,7 @@ import {toast} from "material-react-toastify";
 import {createModPreset} from "../../services/modPresetsService";
 
 export default function ModsManagement() {
+    const [initialLoading, setInitialLoading] = useState(true);
     const [mods, setMods] = useState([]);
     const [selected, setSelected] = useState([]);
     const [filter, setFilter] = useState("");
@@ -16,13 +17,14 @@ export default function ModsManagement() {
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
         setMods(modsDto.workshopMods.sort((a, b) => a.name.localeCompare(b.name)));
+        setInitialLoading(false);
     };
 
     useEffect(() => {
         fetchMods();
     }, []);
 
-    useInterval(fetchMods, 2000);
+    useInterval(fetchMods, 5000);
 
     const handleInstall = async (modId) => {
         try {
@@ -147,7 +149,7 @@ export default function ModsManagement() {
 
     return <>
         {errorOccured && <ModsErrorAlertMessage mods={mods}/>}
-        <ModsTable rows={filteredMods} selected={selected} filter={filter}
+        <ModsTable rows={filteredMods} selected={selected} filter={filter} loading={initialLoading}
                    arma3ModsCount={arma3ModsCount}
                    dayZModsCount={dayZModsCount} mixedModsSelected={mixedModsSelected}
                    onClick={handleClick} onSelectAllClick={handleSelectAllClick}

@@ -18,6 +18,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import SERVER_NAMES from "../../util/serverNames";
+import TableGhosts from "../../UI/TableGhosts";
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -130,77 +131,76 @@ const ModsTable = (props) => {
                             onUninstallClicked={props.onUninstallClicked}
                             onFilterChange={props.onFilterChange}
                     />
-                    {rows.length > 0 &&
-                            <TableContainer>
-                                <Table
-                                        sx={{minWidth: 750}}
-                                        aria-labelledby="tableTitle"
-                                        size='small'
-                                >
-                                    <EnhancedTableHead
-                                            numSelected={selected.length}
-                                            order={order}
-                                            orderBy={orderBy}
-                                            onSelectAllClick={props.onSelectAllClick}
-                                            onRequestSort={handleRequestSort}
-                                            rowCount={rows.length}
-                                            headCells={headCells}
-                                    />
-                                    <TableBody>
-                                        {rows.slice().sort(getComparator(order, orderBy))
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                        .map((row, index) => {
-                                            const isItemSelected = isSelected(row.id);
-                                            const labelId = `enhanced-table-checkbox-${index}`;
+                    <TableContainer>
+                        <Table
+                                sx={{minWidth: 750}}
+                                aria-labelledby="tableTitle"
+                                size='small'
+                        >
+                            <EnhancedTableHead
+                                    numSelected={selected.length}
+                                    order={order}
+                                    orderBy={orderBy}
+                                    onSelectAllClick={props.onSelectAllClick}
+                                    onRequestSort={handleRequestSort}
+                                    rowCount={rows.length}
+                                    headCells={headCells}
+                            />
+                            {!props.loading && <TableBody>
+                                {rows.slice().sort(getComparator(order, orderBy))
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((row, index) => {
+                                    const isItemSelected = isSelected(row.id);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                                            return (
-                                                    <TableRow
-                                                            hover
-                                                            onClick={(event) => props.onClick(event, row.id)}
-                                                            role="checkbox"
-                                                            aria-checked={isItemSelected}
-                                                            tabIndex={-1}
-                                                            key={row.id}
-                                                            selected={isItemSelected}
-                                                    >
-                                                        <TableCell padding="checkbox">
-                                                            <Checkbox
-                                                                    color="primary"
-                                                                    checked={isItemSelected}
-                                                                    inputProps={{
-                                                                        'aria-labelledby': labelId,
-                                                                    }}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell
-                                                                component="th"
-                                                                id={labelId}
-                                                                scope="row"
-                                                                padding="none"
-                                                        >
-                                                            {row.id}
-                                                        </TableCell>
-                                                        <TableCell>{row.name}</TableCell>
-                                                        <TableCell>{SERVER_NAMES[row.serverType]}</TableCell>
-                                                        <TableCell>{humanFileSize(row.fileSize)}</TableCell>
-                                                        <TableCell>{row.lastUpdated}</TableCell>
-                                                        <TableCell>{getInstalledIcon(row)}</TableCell>
-                                                    </TableRow>
-                                            );
-                                        })}
-                                        {emptyRows > 0 && (
-                                                <TableRow
-                                                        style={{
-                                                            height: 33 * emptyRows,
-                                                        }}
+                                    return (
+                                            <TableRow
+                                                    hover
+                                                    onClick={(event) => props.onClick(event, row.id)}
+                                                    role="checkbox"
+                                                    aria-checked={isItemSelected}
+                                                    tabIndex={-1}
+                                                    key={row.id}
+                                                    selected={isItemSelected}
+                                            >
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox
+                                                            color="primary"
+                                                            checked={isItemSelected}
+                                                            inputProps={{
+                                                                'aria-labelledby': labelId,
+                                                            }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell
+                                                        component="th"
+                                                        id={labelId}
+                                                        scope="row"
+                                                        padding="none"
                                                 >
-                                                    <TableCell colSpan={6}/>
-                                                </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                    }
+                                                    {row.id}
+                                                </TableCell>
+                                                <TableCell>{row.name}</TableCell>
+                                                <TableCell>{SERVER_NAMES[row.serverType]}</TableCell>
+                                                <TableCell>{humanFileSize(row.fileSize)}</TableCell>
+                                                <TableCell>{row.lastUpdated}</TableCell>
+                                                <TableCell>{getInstalledIcon(row)}</TableCell>
+                                            </TableRow>
+                                    );
+                                })}
+                                {emptyRows > 0 && (
+                                        <TableRow
+                                                style={{
+                                                    height: 33 * emptyRows,
+                                                }}
+                                        >
+                                            <TableCell colSpan={6}/>
+                                        </TableRow>
+                                )}
+                            </TableBody>}
+                        </Table>
+                        <TableGhosts display={props.loading} count={15}/>
+                    </TableContainer>
                     <Stack direction="row" justifyContent="space-between" alignItems="start" m={2}>
                         <Stack direction="row" spacing={1}>
                             <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID" size="small"
