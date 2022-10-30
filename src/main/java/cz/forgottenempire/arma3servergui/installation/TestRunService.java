@@ -140,6 +140,7 @@ class TestRunService {
         parameters.add(configFilePath);
         parameters.add("-backendlog");
         parameters.add("-nothrow");
+        parameters.add("-maxFPS=30");
     }
 
     private String getArma3TestConfig() {

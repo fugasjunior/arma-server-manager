@@ -214,22 +214,33 @@ class ServerInstanceService {
         List<String> parameters = new ArrayList<>();
         ServerType type = server.getType();
 
+        String configFilePath = pathsFactory.getConfigFile(type, getConfigFileName(type, server.getId()))
+                .toAbsolutePath().toString();
+
         parameters.add(pathsFactory.getServerExecutableWithFallback(server.getType()).toString());
-        parameters.add("-port=" + server.getPort());
-        parameters.add("-config=" + pathsFactory.getConfigFile(
-                server.getType(), getConfigFileName(server.getType(), server.getId())).toString());
 
         if (type == ServerType.ARMA3) {
+            parameters.add("-port=" + server.getPort());
+            parameters.add("-config=" + configFilePath);
             parameters.add("-nosplash");
             parameters.add("-skipIntro");
             parameters.add("-world=empty");
             addArma3ModsAndDlcsToParameters(parameters, (Arma3Server) server);
         } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
+            parameters.add("-port=" + server.getPort());
+            parameters.add("-config=" + configFilePath);
             parameters.add("-limitFPS=60");
             parameters.add("-dologs");
             parameters.add("-adminlog");
             parameters.add("-freezeCheck");
             addDayZModsToParameters(parameters, (DayZServer) server);
+        } else if (type == ServerType.REFORGER) {
+            parameters.add("-config");
+            parameters.add(configFilePath);
+            parameters.add("-maxFPS");
+            parameters.add("60");
+            parameters.add("-backendlog");
+            parameters.add("-logAppend");
         }
 
         return parameters;
