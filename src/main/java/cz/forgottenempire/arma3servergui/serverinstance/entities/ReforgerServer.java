@@ -1,6 +1,5 @@
 package cz.forgottenempire.arma3servergui.serverinstance.entities;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("4")
 public class ReforgerServer extends Server {
 
     private String dedicatedServerId;

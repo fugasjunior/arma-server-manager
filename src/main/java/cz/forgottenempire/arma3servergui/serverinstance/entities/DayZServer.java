@@ -3,7 +3,6 @@ package cz.forgottenempire.arma3servergui.serverinstance.entities;
 import cz.forgottenempire.arma3servergui.workshop.WorkshopMod;
 import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -19,7 +18,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("3")
 public class DayZServer extends Server {
 
     @Min(1)
@@ -47,9 +45,5 @@ public class DayZServer extends Server {
     private String additionalOptions;
 
     @ManyToMany
-    @JoinTable(
-            name = "server_mod",
-            joinColumns = @JoinColumn(name = "server_id"),
-            inverseJoinColumns = @JoinColumn(name = "mod_id"))
     private List<WorkshopMod> activeMods;
 }
