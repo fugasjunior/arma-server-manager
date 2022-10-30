@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.serverinstance.entities;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.WorkshopMod;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -30,6 +31,9 @@ public class Arma3Server extends Server {
     private boolean battlEye;
     private boolean vonEnabled;
     private boolean verifySignatures;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String additionalOptions;
 
     @ManyToMany
     @JoinTable(

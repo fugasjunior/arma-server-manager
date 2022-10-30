@@ -1,7 +1,6 @@
 package cz.forgottenempire.arma3servergui.serverinstance.entities;
 
 import cz.forgottenempire.arma3servergui.common.ServerType;
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -48,7 +47,4 @@ public class Server {
 
     private String password;
     private String adminPassword;
-
-    @Column(columnDefinition = "LONGTEXT")
-    private String additionalOptions;
 }

@@ -2,6 +2,7 @@ package cz.forgottenempire.arma3servergui.serverinstance.entities;
 
 import cz.forgottenempire.arma3servergui.workshop.WorkshopMod;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -41,6 +42,9 @@ public class DayZServer extends Server {
     @DecimalMin("0.1")
     @DecimalMax("64")
     private double nightTimeAcceleration;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String additionalOptions;
 
     @ManyToMany
     @JoinTable(

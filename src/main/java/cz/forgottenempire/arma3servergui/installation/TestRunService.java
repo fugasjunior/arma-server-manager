@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ class TestRunService {
         Process serverProcess;
         try {
             configFile = createTestConfigFile(type, port, queryPort);
-            serverProcess = startServerForDryRun(type, port, queryPort);
+            serverProcess = startServerForDryRun(type, port, configFile);
         } catch (IOException e) {
             log.error("Error when launching server executable", e);
             throw new RuntimeException(e);
@@ -52,7 +53,7 @@ class TestRunService {
         int attempts = 0;
         while (attempts < 10) {
             try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
-                InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, port + 1);
+                InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, queryPort);
                 SourceServer queryServerInfo = sourceQueryClient.getServerInfo(serverAddress).get(30, TimeUnit.SECONDS);
                 serverInstallation.setVersion(queryServerInfo.getGameVersion());
                 break;
@@ -74,12 +75,14 @@ class TestRunService {
         configFile.delete();
     }
 
-    private Process startServerForDryRun(ServerType type, int port, int queryPort) throws IOException {
-        List<String> parameters = getLaunchParameters(type, port);
+    private Process startServerForDryRun(ServerType type, int port, File configFile) throws IOException {
+        List<String> parameters = getLaunchParameters(type, port, configFile);
 
         log.info("Starting server '{}' for dry run with parameters: {}", type, parameters);
 
         return new ProcessBuilder(parameters)
+                .redirectOutput(Redirect.DISCARD)
+                .redirectError(Redirect.DISCARD)
                 .directory(pathsFactory.getServerPath(type).toFile())
                 .start();
     }
@@ -96,19 +99,23 @@ class TestRunService {
                 config = getArma3TestConfig();
             } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
                 config = getDayZTestConfig(queryPort);
+            } else if (type == ServerType.REFORGER) {
+                config = getReforgerTestConfig(port, queryPort);
             }
             writer.write(config);
         }
         return testCfgFile;
     }
 
-    private List<String> getLaunchParameters(ServerType type, int port) {
+    private List<String> getLaunchParameters(ServerType type, int port, File configFile) {
         List<String> parameters = new ArrayList<>();
         parameters.add(pathsFactory.getServerExecutableWithFallback(type).getAbsolutePath());
         if (type == ServerType.ARMA3) {
             addArma3LaunchParameters(parameters, port);
         } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
             addDayZLaunchParameters(parameters, port);
+        } else if (type == ServerType.REFORGER) {
+            addReforgerLaunchParameters(parameters, configFile.getAbsolutePath());
         }
         return parameters;
     }
@@ -128,9 +135,9 @@ class TestRunService {
         parameters.add("-port=" + port);
     }
 
-    private void addReforgerLaunchParameters(List<String> parameters) {
+    private void addReforgerLaunchParameters(List<String> parameters, String configFilePath) {
         parameters.add("-config");
-        parameters.add("TEST_CONFIG.cfg");
+        parameters.add(configFilePath);
         parameters.add("-backendlog");
         parameters.add("-nothrow");
     }
@@ -185,10 +192,10 @@ class TestRunService {
                                  "other": "values"
                              }
                          },
-                         "mods": [],
-                         "a2sQueryEnabled": true,
-                         "steamQueryPort": %d
-                     }
+                         "mods": []
+                     },
+                     "a2sQueryEnabled": true,
+                     "steamQueryPort": %d
                 }
                  """.formatted(port, port, queryPort);
     }
