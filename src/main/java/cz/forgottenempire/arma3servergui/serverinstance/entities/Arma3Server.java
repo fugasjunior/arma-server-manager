@@ -4,7 +4,6 @@ import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
 import cz.forgottenempire.arma3servergui.workshop.WorkshopMod;
 import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,7 +19,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("2")
 public class Arma3Server extends Server {
 
     private boolean clientFilePatching;
@@ -36,10 +34,6 @@ public class Arma3Server extends Server {
     private String additionalOptions;
 
     @ManyToMany
-    @JoinTable(
-            name = "server_mod",
-            joinColumns = @JoinColumn(name = "server_id"),
-            inverseJoinColumns = @JoinColumn(name = "mod_id"))
     private List<WorkshopMod> activeMods;
 
     @ElementCollection(targetClass = Arma3CDLC.class)

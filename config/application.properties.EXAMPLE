@@ -37,14 +37,11 @@ arma3server.logDir=/home/arma3gui/logs/server
 # Comma separated list, such as: mod1,mod2,mod3. Can be left blank in most cases.
 additionalMods=
 
-# Use 64bit executable.
-arma3server.x64=true
 
 ### Database settings
 spring.datasource.url=jdbc:mysql://localhost:3306/arma3gui_db
 spring.datasource.username=arma3gui
 spring.datasource.password=example
-spring.jpa.hibernate.ddl-auto=update
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 

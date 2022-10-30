@@ -1,12 +1,10 @@
 package cz.forgottenempire.arma3servergui.serverinstance.entities;
 
 import cz.forgottenempire.arma3servergui.common.ServerType;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -21,13 +19,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type_intern", discriminatorType = DiscriminatorType.INTEGER)
-@DiscriminatorValue("1")
-public class Server {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Server {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated
