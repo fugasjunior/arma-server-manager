@@ -6,14 +6,9 @@ import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
-import * as PropTypes from "prop-types";
 import {Link} from "react-router-dom";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-function AddCircleOutlineIcon(props) {
-    return null;
-}
-
-AddCircleOutlineIcon.propTypes = {sx: PropTypes.shape({mr: PropTypes.number})};
 export default function NewServerButton() {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
@@ -91,6 +86,9 @@ export default function NewServerButton() {
                                         >
                                             <MenuItem component={Link} to="/servers/new/ARMA3">
                                                 Arma 3 server
+                                            </MenuItem>
+                                            <MenuItem component={Link} to="/servers/new/REFORGER">
+                                                Arma Reforger server
                                             </MenuItem>
                                             <MenuItem component={Link} to="/servers/new/DAYZ">
                                                 DayZ server

@@ -13,19 +13,14 @@ import {
 import arma3Logo from "../../img/arma3_logo.jpg";
 import dayZLogo from "../../img/dayz_logo.jpg";
 import dayZExpLogo from "../../img/dayz_exp_logo.jpg";
-
-const INSTALLATION_NAMES = {
-    "ARMA3": "Arma 3",
-    "ARMA4": "Arma 4",
-    "DAYZ": "DayZ",
-    "DAYZ_EXP": "DayZ Experimental",
-    "REGORGER": "Reforger"
-}
+import reforgerLogo from "../../img/reforger_logo.jpg";
+import SERVER_NAMES from "../../util/serverNames";
 
 const SERVER_IMAGE_URLS = {
     "ARMA3": arma3Logo,
     "DAYZ": dayZLogo,
-    "DAYZ_EXP": dayZExpLogo
+    "DAYZ_EXP": dayZExpLogo,
+    "REFORGER": reforgerLogo
 }
 
 const ERROR_STATE_MESSAGES = {
@@ -61,7 +56,7 @@ const ServerInstallationItem = (props) => {
                             </Alert>
                     }
                     <Typography gutterBottom variant="h5">
-                        {INSTALLATION_NAMES[installation.type]}
+                        {SERVER_NAMES[installation.type]}
                     </Typography>
                     {!isInstalling(installation) ?
                             <Stack>

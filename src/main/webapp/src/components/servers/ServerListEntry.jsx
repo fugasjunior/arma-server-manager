@@ -7,13 +7,15 @@ import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import MapIcon from '@mui/icons-material/Map';
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import arma3Icon from "../../img/arma3_icon.png"
-import dayZIcon from "../../img/dayz_icon.png"
+import arma3Icon from "../../img/arma3_icon.png";
+import dayZIcon from "../../img/dayz_icon.png";
+import reforgerIcon from "../../img/reforger_icon.png";
 
 const SERVER_ICON_URLS = {
     "ARMA3": arma3Icon,
     "DAYZ": dayZIcon,
-    "DAYZ_EXP": dayZIcon
+    "DAYZ_EXP": dayZIcon,
+    "REFORGER": reforgerIcon
 }
 
 const ServerListEntry = (props) => {

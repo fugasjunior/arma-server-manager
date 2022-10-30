@@ -65,7 +65,11 @@ public class PathsFactory {
         return Path.of(getScenariosBasePath().toString(), scenarioName);
     }
 
-    public Path getConfigFile(ServerType type, String configName) {
+    public File getConfigFile(ServerType type, String configName) {
+        return Path.of(getServerPath(type).toString(), configName).toAbsolutePath().toFile();
+    }
+
+    public Path getConfigFilePath(ServerType type, String configName) {
         return Path.of(getServerPath(type).toString(), configName);
     }
 

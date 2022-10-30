@@ -7,6 +7,7 @@ import {Typography} from "@mui/material";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
+import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
@@ -81,6 +82,13 @@ const ServerSettingsPage = () => {
                                                                 availableMods={availableMods}
                                                                 isServerRunning={server.instanceInfo
                                                                         && server.instanceInfo.alive}
+                                    />
+                            }
+                            {(server.type === "REFORGER") &&
+                                    <EditReforgerServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                                    onCancel={handleCancel}
+                                                                    isServerRunning={server.instanceInfo
+                                                                            && server.instanceInfo.alive}
                                     />
                             }
                         </>}

@@ -12,7 +12,8 @@ import cz.forgottenempire.arma3servergui.common.ServerType;
 @JsonSubTypes({
         @Type(value = Arma3ServerDto.class, name = "ARMA3"),
         @Type(value = DayZServerDto.class, name = "DAYZ"),
-        @Type(value = DayZServerDto.class, name = "DAYZ_EXP")
+        @Type(value = DayZServerDto.class, name = "DAYZ_EXP"),
+        @Type(value = ReforgerServerDto.class, name = "REFORGER")
 })
 public interface ServerDto {
 

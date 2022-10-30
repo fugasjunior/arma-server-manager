@@ -28,7 +28,7 @@ public class DayZServerDto implements ServerDto {
     @Min(1)
     private int maxPlayers;
 
-    @NotNull(message = "must be filled in. Available types: [ARMA3, DAYZ, DAYZ_EXP]")
+    @NotNull(message = "must be filled in. Available types: [ARMA3, DAYZ, DAYZ_EXP, REFORGER]")
     private ServerType type;
 
     private String password;

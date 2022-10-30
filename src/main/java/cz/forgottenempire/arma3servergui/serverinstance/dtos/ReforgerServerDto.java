@@ -1,15 +1,13 @@
 package cz.forgottenempire.arma3servergui.serverinstance.dtos;
 
 import cz.forgottenempire.arma3servergui.common.ServerType;
-import cz.forgottenempire.arma3servergui.workshop.CreatorDlcDto;
-import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class Arma3ServerDto implements ServerDto {
+public class ReforgerServerDto implements ServerDto {
 
     private Long id;
     @NotEmpty
@@ -27,18 +25,13 @@ public class Arma3ServerDto implements ServerDto {
 
     private String password;
     private String adminPassword;
+    private String dedicatedServerId;
 
-    private boolean clientFilePatching;
-    private boolean serverFilePatching;
-    private boolean persistent;
+    @NotEmpty
+    private String scenarioId;
+
     private boolean battlEye;
-    private boolean vonEnabled;
-    private boolean verifySignatures;
-
-    private String additionalOptions;
-
-    private List<ServerWorkshopModDto> activeMods;
-    private List<CreatorDlcDto> activeDLCs;
+    private boolean thirdPersonViewEnabled;
 
     private ServerInstanceInfoDto instanceInfo;
 }
