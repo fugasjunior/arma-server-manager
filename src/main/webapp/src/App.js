@@ -38,6 +38,9 @@ const App = () => {
                         <Route path="scenarios" element={
                             <ProtectedRoute><ScenariosPage/></ProtectedRoute>
                         }/>
+                        <Route path="mods/:section" element={
+                            <ProtectedRoute><ModsPage/></ProtectedRoute>
+                        }/>
                         <Route path="mods" element={
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
                         }/>

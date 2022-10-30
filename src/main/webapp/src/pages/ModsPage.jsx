@@ -1,23 +1,25 @@
-import React, {useState} from "react";
+import React from "react";
 import {Tab, Tabs} from "@mui/material";
 import ModsManagement from "../components/mods/ModsManagement";
 import PresetsManagement from "../components/mods/PresetsManagement";
+import {useNavigate, useParams} from "react-router-dom";
 
 const ModsPage = () => {
-    const [selectedTab, setSelectedTab] = useState("MODS");
+    const {section} = useParams();
+    const navigate = useNavigate();
 
     const handleTabSelect = (e, newValue) => {
-        setSelectedTab(newValue);
+        navigate("/mods/" + newValue);
     }
 
     return (
             <>
-                <Tabs centered value={selectedTab} onChange={handleTabSelect}>
+                <Tabs centered value={section ?? "MODS"} onChange={handleTabSelect}>
                     <Tab value="MODS" label="Mod management"/>
                     <Tab value="PRESETS" label="Preset management"/>
                 </Tabs>
-                {selectedTab === "MODS" && <ModsManagement/>}
-                {selectedTab === "PRESETS" && <PresetsManagement/>}
+                {(!section || section === "MODS") && <ModsManagement/>}
+                {section === "PRESETS" && <PresetsManagement/>}
             </>
     )
 }
