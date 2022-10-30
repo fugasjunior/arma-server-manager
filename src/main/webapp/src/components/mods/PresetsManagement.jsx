@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {getModPresets} from "../../services/modPresetsService";
+import {deleteModPreset, getModPresets} from "../../services/modPresetsService";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -14,19 +14,34 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SERVER_NAMES from "../../util/serverNames";
+import {toast} from "material-react-toastify";
 
 export default function PresetsManagement() {
     const [presets, setPresets] = useState([]);
 
     useEffect(() => {
-        const fetchPresets = async () => {
+        async function fetchPresets() {
             const {data: presetsDto} = await getModPresets();
             setPresets(presetsDto.presets);
         }
-        fetchPresets();
-    });
 
-    const getSummarizedModsList = (mods) => {
+        fetchPresets();
+    }, []);
+
+    async function handleDelete(id) {
+        const deletedPreset = presets.find(preset => preset.id === id);
+        setPresets(prevState => [...prevState].filter(preset => preset !== deletedPreset));
+
+        try {
+            await deleteModPreset(id);
+        } catch (e) {
+            console.error(e);
+            toast.error(e.response.data || "Could not delete preset");
+            setPresets(prevState => [...prevState, deletedPreset]);
+        }
+    }
+
+    function getSummarizedModsList(mods) {
         const CUTOFF_LENGTH = 55;
         const modNames = mods.map(mod => mod.shortName);
         modNames.sort((a, b) => a.localeCompare(b));
@@ -39,6 +54,10 @@ export default function PresetsManagement() {
             summarizedList += " and " + (modNames.length - i) + " more...";
         }
         return summarizedList;
+    }
+
+    function getSortedPresets() {
+        return presets.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     return (
@@ -62,7 +81,7 @@ export default function PresetsManagement() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {presets.map((preset) => (
+                                {getSortedPresets().map((preset) => (
                                         <TableRow
                                                 key={preset.id}
                                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -85,7 +104,7 @@ export default function PresetsManagement() {
                                                 </IconButton>
                                             </TableCell>
                                             <TableCell>
-                                                <IconButton aria-label="delete">
+                                                <IconButton aria-label="delete" onClick={() => handleDelete(preset.id)}>
                                                     <DeleteIcon color="error"/>
                                                 </IconButton>
                                             </TableCell>

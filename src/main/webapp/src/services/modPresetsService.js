@@ -25,5 +25,5 @@ export function updateModPreset(id, preset) {
 }
 
 export function deleteModPreset(id) {
-    return http.post(apiEndpoint + "/" + id);
+    return http.delete(apiEndpoint + "/" + id);
 }
