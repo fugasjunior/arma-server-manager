@@ -1,6 +1,17 @@
 import {useFormik} from "formik";
-import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
-import React from "react";
+import {
+    Autocomplete,
+    Box,
+    Button,
+    FormControlLabel,
+    FormGroup,
+    Grid,
+    Switch,
+    TextField,
+    useMediaQuery
+} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {getReforgerScenarios} from "../../services/scenarioService";
 
 function renderTextField(name, label, formik, required, type, helperText) {
     return (
@@ -16,6 +27,7 @@ function renderTextField(name, label, formik, required, type, helperText) {
                         onChange={formik.handleChange}
                         helperText={helperText}
                         error={formik.touched[name] && Boolean(formik.errors[name])}
+                        inputProps={{autoComplete: 'new-password'}}
                 />
             </Grid>
     )
@@ -36,6 +48,24 @@ function renderSwitch(name, label, formik) {
 
 export default function EditReforgerServerSettingsForm(props) {
 
+    const [scenarios, setScenarios] = useState([]);
+
+    useEffect(() => {
+        async function fetchScenarios() {
+            const {data: scenariosDto} = await getReforgerScenarios();
+            setScenarios(scenariosDto.scenarios);
+        }
+
+        fetchScenarios();
+    }, []);
+
+    function getScenarioDisplayName(scenario) {
+        if (scenario.name) {
+            return `${scenario.name} (${scenario.value})`;
+        }
+        return scenario.value;
+    }
+
     const mediaQuery = useMediaQuery('(min-width:600px)');
 
     const formik = useFormik({
@@ -54,7 +84,41 @@ export default function EditReforgerServerSettingsForm(props) {
                         {renderTextField("queryPort", "Query port", formik, true, "number")}
                         {renderTextField("dedicatedServerId", "Dedicated server ID", formik, false, "text",
                                 "Leave empty to generate a new ID automatically")}
-                        {renderTextField("scenarioId", "Scenario ID", formik, true)}
+
+                        <Grid item xs={12} md={6}>
+                            <Autocomplete
+                                    id="scenario-select"
+                                    fullWidth
+                                    options={scenarios}
+                                    autoHighlight
+                                    getOptionLabel={(option) => option.value}
+                                    value={{value: formik.values.scenarioId}}
+                                    onChange={(e, value) => formik.setFieldValue("scenarioId", value.value)}
+                                    renderOption={(props, option) => (
+                                            <Box component="li"  {...props}>
+                                                {getScenarioDisplayName(option)}
+                                            </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                            <TextField
+                                                    {...params}
+                                                    required
+                                                    id="scenarioId"
+                                                    name="scenarioId"
+                                                    label="Scenario ID"
+                                                    value={formik.values.scenarioId}
+                                                    error={formik.touched.scenarioId && Boolean(
+                                                            formik.errors.scenarioId)}
+                                                    inputProps={{
+                                                        ...params.inputProps,
+                                                        autoComplete: 'new-password'
+                                                    }}
+                                            />
+                                    )}
+                            />
+                        </Grid>
+
+                        {/*{renderTextField("scenarioId", "Scenario ID", formik, true)}*/}
                         {renderTextField("maxPlayers", "Max players", formik, true, "number")}
                         {renderTextField("password", "Password", formik)}
                         {renderTextField("adminPassword", "Admin password", formik, true)}

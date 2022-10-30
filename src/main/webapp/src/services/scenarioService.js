@@ -7,6 +7,10 @@ export function getScenarios() {
     return http.get(apiEndpoint);
 }
 
+export function getReforgerScenarios() {
+    return http.get(apiEndpoint + "/REFORGER");
+}
+
 export function downloadScenario(name) {
     http.get(apiEndpoint + "/" + name, {responseType: 'blob'})
     .then(response => {
