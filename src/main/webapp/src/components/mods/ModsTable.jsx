@@ -12,7 +12,6 @@ import Checkbox from '@mui/material/Checkbox';
 import ModsTableToolbar from "./ModsTableToolbar";
 import EnhancedTableHead from "../../UI/Table/EnhancedTableHead";
 import {humanFileSize} from "../../util/util";
-import PendingIcon from "@mui/icons-material/Pending";
 import {Button, CircularProgress, Stack, TextField} from "@mui/material";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
@@ -67,9 +66,6 @@ const getInstalledIcon = (mod) => {
     const status = mod.installationStatus;
     const error = mod.errorStatus;
 
-    if (status === "INSTALLATION_QUEUED") {
-        return <Tooltip title="Installation queued"><PendingIcon/></Tooltip>
-    }
     if (status === "INSTALLATION_IN_PROGRESS") {
         return <CircularProgress size={20}/>;
     }
@@ -206,10 +202,10 @@ const ModsTable = (props) => {
                             </TableContainer>
                     }
                     <Stack direction="row" justifyContent="space-between" alignItems="start" m={2}>
-                        <Stack direction="row">
-                            <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
-                                       variant="standard" value={enteredModId} onChange={handleEnteredModIdChange}/>
-                            <Button variant="text" size="small" disabled={enteredModId.length === 0}
+                        <Stack direction="row" spacing={1}>
+                            <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID" size="small"
+                                       variant="filled" value={enteredModId} onChange={handleEnteredModIdChange}/>
+                            <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
                                     onClick={() => props.onInstallClicked(enteredModId)}>Install</Button>
                         </Stack>
                         {rows.length > 0 && <TablePagination

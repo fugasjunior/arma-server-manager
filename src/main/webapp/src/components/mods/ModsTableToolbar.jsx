@@ -44,7 +44,7 @@ function ModsTableToolbar(props) {
                         </Typography>
                 )}
 
-                <Box al>
+                <Box>
                     <Tabs value={filter} onChange={onFilterChange}>
                         <Tab value="" label="All"/>
                         <Tab value="ARMA3" label="Arma 3" disabled={props.arma3ModsCount === 0}/>

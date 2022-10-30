@@ -22,7 +22,7 @@ const ServerListEntry = (props) => {
     const serverRunning = server.instanceInfo && server.instanceInfo.alive;
 
     return (
-            <TableRow direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+            <TableRow>
                 <TableCell>
                     <Avatar src={SERVER_ICON_URLS[server.type]} alt={`${server.type} icon`}/>
                 </TableCell>

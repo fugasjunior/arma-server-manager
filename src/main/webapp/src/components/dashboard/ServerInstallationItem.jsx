@@ -60,24 +60,23 @@ const ServerInstallationItem = (props) => {
                                         ?? "Unknown error"}
                             </Alert>
                     }
-                    <Typography gutterBottom variant="h5" component="div">
+                    <Typography gutterBottom variant="h5">
                         {INSTALLATION_NAMES[installation.type]}
                     </Typography>
                     {!isInstalling(installation) ?
-                            <Typography variant="body2" color="text.secondary">
-                                <Stack>
-                                    {installation.version &&
-                                            <p>Version:
-                                                <strong> {installation.version}</strong>
-                                            </p>
-                                    }
-                                    {installation.lastUpdatedAt &&
-                                            <p>Last updated:
-                                                <strong> {installation.lastUpdatedAt}</strong>
-                                            </p>
-                                    }
-                                </Stack>
-                            </Typography>
+                            <Stack>
+                                {installation.version &&
+                                        <Typography variant="body2" color="text.secondary">
+                                            Version: <strong> {installation.version}</strong>
+                                        </Typography>
+                                }
+                                {installation.lastUpdatedAt &&
+                                        <Typography variant="body2" color="text.secondary">
+                                            Last updated: <strong> {installation.lastUpdatedAt}</strong>
+                                        </Typography>
+                                }
+                            </Stack>
+
                             :
                             <LinearProgress/>
                     }
