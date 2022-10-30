@@ -3,9 +3,12 @@ package cz.forgottenempire.arma3servergui.scenario;
 import static java.time.ZoneId.systemDefault;
 
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
+import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +38,19 @@ class ScenarioService {
         this.pathsFactory = pathsFactory;
     }
 
-    public boolean uploadScenarioToServer(MultipartFile file) {
+    public void uploadScenarioToServer(MultipartFile file) {
         File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
         if (!missionsFolder.isDirectory()) {
             throw new ServerNotInitializedException();
         }
 
         String scenarioName = file.getOriginalFilename();
-        if (scenarioName != null) {
-            // as some files may already be URI-endoded, decode them
-            scenarioName = UriUtils.decode(scenarioName, Charset.defaultCharset());
-        } else {
-            return false;
+        if (scenarioName == null) {
+            return;
         }
+
+        // as some files may already be URI-endoded, decode them
+        scenarioName = UriUtils.decode(scenarioName, Charset.defaultCharset());
 
         log.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
         try {
@@ -55,10 +59,8 @@ class ScenarioService {
             log.info("Successfully downloaded scenario {}", scenarioName);
         } catch (IOException e) {
             log.error("Could not download scenario {} due to {}", scenarioName, e.toString());
-            return false;
+            throw new RuntimeException(e);
         }
-
-        return true;
     }
 
     public List<Scenario> getAllScenarios() {
@@ -90,6 +92,71 @@ class ScenarioService {
             return false;
         }
         return true;
+    }
+
+    public List<ReforgerScenarioDto> getReforgerScenarios() {
+        List<ReforgerScenarioDto> scenarios = new ArrayList<>();
+
+        String executablePath = pathsFactory.getServerExecutableWithFallback(ServerType.REFORGER).getAbsolutePath();
+
+        try {
+            // adding "-logStats 1" makes the process flush it's output and not hang before printing the scenarios table
+            Process process = new ProcessBuilder(executablePath, "-listScenarios", "-logStats", "1")
+                    .directory(pathsFactory.getServerPath(ServerType.REFORGER).toAbsolutePath().toFile())
+                    .start();
+
+            // start a fail-safe in case the process hangs as it likes to do
+            startWatchdogThread(process);
+
+            //delimiter in the process output marks the list of scenarios in process output
+            String delimiter = "--------------------------------------------------";
+            int delimitersFound = 0;
+            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+
+            while ((line = in.readLine()) != null) {
+                if (line.contains(delimiter)) {
+                    delimitersFound++;
+
+                } else if (delimitersFound == 2 || delimitersFound == 4) {
+
+                    // there should be scenarios listed on these lines
+                    boolean isOfficialScenario = delimitersFound == 2;
+                    scenarios.add(parseLineToScenarioDto(line, isOfficialScenario));
+
+                } else if (delimitersFound == 5) {
+                    // we're done, kill it with fire
+                    break;
+                }
+            }
+            process.destroyForcibly();
+        } catch (IOException e) {
+            log.error("Failed to get available Reforger scenarios", e);
+            throw new RuntimeException(e);
+        }
+
+        return scenarios;
+    }
+
+    private void startWatchdogThread(Process process) {
+        new Thread(() -> {
+            try {
+                process.waitFor(30, TimeUnit.SECONDS);
+                process.destroyForcibly();
+            } catch (InterruptedException ignored) {
+            }
+        }).start();
+    }
+
+    private ReforgerScenarioDto parseLineToScenarioDto(String line, boolean official) {
+        line = line.replaceAll(".*\\{", "{"); // remove leading log
+        String[] split = line.split("\\s", 2); // there might be human-readable scenario name after first whitespace
+        String value = split[0];
+        String name = "";
+        if (split.length > 1) {
+            name = split[1].replaceAll("[()]", "");
+        }
+        return new ReforgerScenarioDto(value, name, official);
     }
 
     private void setScenarioFileCreationTime(File scenarioFile, Scenario scenarioDto) {

@@ -42,14 +42,14 @@ class ServerInstallationController {
     }
 
     @GetMapping("/{type}")
-    public ResponseEntity<?> getInstallation(@PathVariable ServerType type) {
+    public ResponseEntity<ServerInstallationDto> getInstallation(@PathVariable ServerType type) {
         checkServerSupportedOnOS(type);
         ServerInstallation installation = installationService.getServerInstallation(type);
         return ResponseEntity.ok(mapper.map(installation));
     }
 
     @PostMapping("/{type}")
-    public ResponseEntity<?> installOrUpdateServer(@PathVariable ServerType type) {
+    public ResponseEntity<ServerInstallationDto> installOrUpdateServer(@PathVariable ServerType type) {
         checkServerSupportedOnOS(type);
         installerService.installServer(type);
         ServerInstallation installation = installationService.getServerInstallation(type);

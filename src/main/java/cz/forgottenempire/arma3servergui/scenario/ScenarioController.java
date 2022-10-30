@@ -1,6 +1,9 @@
 package cz.forgottenempire.arma3servergui.scenario;
 
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
+import cz.forgottenempire.arma3servergui.common.ServerType;
+import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
+import cz.forgottenempire.arma3servergui.installation.ServerInstallationService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,11 +30,17 @@ import org.springframework.web.multipart.MultipartFile;
 class ScenarioController {
 
     private final ScenarioService scenarioService;
+    private final ServerInstallationService serverInstallationService;
     private final PathsFactory pathsFactory;
 
     @Autowired
-    public ScenarioController(ScenarioService scenarioService, PathsFactory pathsFactory) {
+    public ScenarioController(
+            ScenarioService scenarioService,
+            ServerInstallationService serverInstallationService,
+            PathsFactory pathsFactory
+    ) {
         this.scenarioService = scenarioService;
+        this.serverInstallationService = serverInstallationService;
         this.pathsFactory = pathsFactory;
     }
 
@@ -56,6 +65,17 @@ class ScenarioController {
             log.warn("File {} not found", file);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/REFORGER")
+    // TODO rewrite to use cache
+    public ResponseEntity<ReforgerScenariosDto> getReforgerScenarios() {
+        if (!serverInstallationService.isServerInstalled(ServerType.REFORGER)) {
+            throw new ServerNotInitializedException(ServerType.REFORGER);
+        }
+
+        List<ReforgerScenarioDto> reforgerScenarios = scenarioService.getReforgerScenarios();
+        return ResponseEntity.ok(new ReforgerScenariosDto(reforgerScenarios));
     }
 
     @PostMapping

@@ -1,12 +1,13 @@
 package cz.forgottenempire.arma3servergui.installation;
 
+import cz.forgottenempire.arma3servergui.common.InstallationStatus;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-class ServerInstallationService {
+public class ServerInstallationService {
 
     private final ServerInstallationRepository installationRepository;
 
@@ -24,5 +25,9 @@ class ServerInstallationService {
     public ServerInstallation getServerInstallation(ServerType type) {
         return installationRepository.findById(type)
                 .orElseGet(() -> installationRepository.save(new ServerInstallation(type)));
+    }
+
+    public boolean isServerInstalled(ServerType type) {
+        return getServerInstallation(type).getInstallationStatus() == InstallationStatus.FINISHED;
     }
 }
