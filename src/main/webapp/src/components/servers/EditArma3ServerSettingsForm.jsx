@@ -53,12 +53,11 @@ const EditArma3ServerSettingsForm = props => {
 
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
-
         });
+
         setSelectedMods((prevState) => {
             return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
         });
-
     }
 
     const handleModDeselect = option => {
