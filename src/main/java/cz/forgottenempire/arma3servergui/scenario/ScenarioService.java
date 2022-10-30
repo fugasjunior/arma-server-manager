@@ -2,6 +2,8 @@ package cz.forgottenempire.arma3servergui.scenario;
 
 import static java.time.ZoneId.systemDefault;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
@@ -31,7 +33,11 @@ import org.springframework.web.util.UriUtils;
 @Slf4j
 class ScenarioService {
 
+    private final Supplier<List<ReforgerScenarioDto>> memoizedReforgerScenarios = Suppliers.memoizeWithExpiration(
+            this::getReforgerScenariosFromServerExecutable, 5, TimeUnit.MINUTES);
+
     private final PathsFactory pathsFactory;
+
 
     @Autowired
     public ScenarioService(PathsFactory pathsFactory) {
@@ -95,6 +101,10 @@ class ScenarioService {
     }
 
     public List<ReforgerScenarioDto> getReforgerScenarios() {
+        return memoizedReforgerScenarios.get();
+    }
+
+    private List<ReforgerScenarioDto> getReforgerScenariosFromServerExecutable() {
         List<ReforgerScenarioDto> scenarios = new ArrayList<>();
 
         String executablePath = pathsFactory.getServerExecutableWithFallback(ServerType.REFORGER).getAbsolutePath();
