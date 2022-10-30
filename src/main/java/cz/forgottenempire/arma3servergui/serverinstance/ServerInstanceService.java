@@ -1,12 +1,15 @@
 package cz.forgottenempire.arma3servergui.serverinstance;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.DayZServer;
+import cz.forgottenempire.arma3servergui.serverinstance.entities.ReforgerServer;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.serverinstance.exceptions.PortAlreadyTakenException;
@@ -21,7 +24,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
@@ -77,6 +82,7 @@ class ServerInstanceService {
     public Server createServer(Server server) {
         setQueryPortForArma3Server(server);
         setInstanceIdForDayZServer(server);
+        writeConfig(server);
         return serverRepository.save(server);
     }
 
@@ -106,8 +112,6 @@ class ServerInstanceService {
             log.info("Server '{}' (ID {}) is already running", server.getName(), id);
         }
 
-        writeConfig(server);
-
         Process process = startServerProcess(server);
         instanceInfo = ServerInstanceInfo.builder()
                 .id(id)
@@ -129,6 +133,8 @@ class ServerInstanceService {
                 .alive(false)
                 .build();
         instanceInfoRepository.storeServerInstanceInfo(id, instanceInfo);
+
+        readGeneratedReforgerServerId(id);
     }
 
     public void restartServer(Long id) {
@@ -138,6 +144,31 @@ class ServerInstanceService {
 
     public ServerInstanceInfo getServerInstanceInfo(Long id) {
         return instanceInfoRepository.getServerInstanceInfo(id);
+    }
+
+    private void readGeneratedReforgerServerId(Long serverId) {
+        Server server = getServer(serverId).orElseThrow();
+        if (server instanceof ReforgerServer reforgerServer) {
+            if (!Strings.isNullOrEmpty(reforgerServer.getDedicatedServerId())) {
+                return;
+            }
+
+            File configFile = pathsFactory.getConfigFilePath(ServerType.REFORGER,
+                    getConfigFileName(ServerType.REFORGER, serverId)).toFile();
+            if (!configFile.exists()) {
+                return;
+            }
+
+            try {
+                Map<String, Object> values = new ObjectMapper().readValue(configFile, HashMap.class);
+                String dedicatedServerId = (String) values.get("dedicatedServerId");
+                reforgerServer.setDedicatedServerId(dedicatedServerId);
+                serverRepository.save(reforgerServer);
+                log.info("Successfully loaded Reforger server's generated ID: '{}'", dedicatedServerId);
+            } catch (Exception e) {
+                log.error("Couln't load Reforger server's generated ID", e);
+            }
+        }
     }
 
     // Arma 3 server doesn't support customizing Steam query port, it's always game port + 1
@@ -214,8 +245,11 @@ class ServerInstanceService {
         List<String> parameters = new ArrayList<>();
         ServerType type = server.getType();
 
-        String configFilePath = pathsFactory.getConfigFile(type, getConfigFileName(type, server.getId()))
-                .toAbsolutePath().toString();
+        File configFile = pathsFactory.getConfigFile(type, getConfigFileName(type, server.getId()));
+        if (!configFile.exists()) {
+            writeConfig(server);
+        }
+        String configFilePath = configFile.toString();
 
         parameters.add(pathsFactory.getServerExecutableWithFallback(server.getType()).toString());
 
@@ -273,7 +307,7 @@ class ServerInstanceService {
 
     private void writeConfig(Server server) {
         String configFileName = getConfigFileName(server.getType(), server.getId());
-        File configFile = pathsFactory.getConfigFile(server.getType(), configFileName).toFile();
+        File configFile = pathsFactory.getConfigFilePath(server.getType(), configFileName).toFile();
 
         // delete old config file
         try {
