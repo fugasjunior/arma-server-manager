@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.serverinstance.entities.ReforgerServer" -->
 {
-"dedicatedServerId": "",
+"dedicatedServerId": "${dedicatedServerId!}",
 "region": "EU",
 "gameHostBindAddress": "",
 "gameHostBindPort": ${port?string.computer},
@@ -8,9 +8,9 @@
 "gameHostRegisterPort": ${port?string.computer},
 "adminPassword": "${adminPassword!}",
 "game": {
-"name": "${name}",
-"password": "${name}",
-"scenarioId": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
+"name": "${name!}",
+"password": "${password!}",
+"scenarioId": "${scenarioId!}",
 "playerCountLimit": ${maxPlayers?string.computer},
 "autoJoinable": false,
 "visible": true,

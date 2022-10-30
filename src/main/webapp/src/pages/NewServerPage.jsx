@@ -7,6 +7,7 @@ import {getMods} from "../services/modsService";
 import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
+import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
 
 const ARMA3_INITIAL_STATE = {
     type: "ARMA3",
@@ -27,7 +28,6 @@ const ARMA3_INITIAL_STATE = {
     activeDLCs: [],
     additionalOptions: ""
 }
-
 const DAYZ_INITIAL_STATE = {
     name: "",
     description: "",
@@ -49,6 +49,21 @@ const DAYZ_INITIAL_STATE = {
     nightTimeAcceleration: 1.0,
     activeMods: [],
     additionalOptions: "",
+}
+
+const REFORGER_INITIAL_STATE = {
+    type: "REFORGER",
+    name: "",
+    description: "",
+    dedicatedServerId: "",
+    scenarioId: "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
+    port: 2001,
+    queryPort: 17777,
+    maxPlayers: 32,
+    password: "",
+    adminPassword: "",
+    battlEye: true,
+    thirdPersonViewEnabled: true,
 }
 
 const ServerSettingsPage = () => {
@@ -118,6 +133,12 @@ const ServerSettingsPage = () => {
                                                                 availableMods={availableMods}
                                                                 onCancel={handleCancel}
                                                                 onSubmit={handleSubmit}
+                                    />
+                            }
+                            {(type === "REFORGER") &&
+                                    <EditReforgerServerSettingsForm server={REFORGER_INITIAL_STATE}
+                                                                    onCancel={handleCancel}
+                                                                    onSubmit={handleSubmit}
                                     />
                             }
                         </>}
