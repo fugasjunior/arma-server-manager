@@ -16,10 +16,15 @@ public interface ServerRepository extends CrudRepository<Server, Long> {
     @Nonnull
     List<Server> findAllByPortOrQueryPort(int port, int queryPort);
 
-    @Query(value = "SELECT * FROM server s "
-            + "JOIN server_mod sm "
-            + "ON s.id = sm.server_id "
-            + "WHERE sm.mod_id = ?1",
+    @Query(value = """
+            SELECT * FROM server s
+            JOIN arma3server_active_mods a ON s.id = a.arma3server_id
+            WHERE a.active_mods_id = ?1
+            UNION
+            SELECT * FROM server s
+            JOIN dayzserver_active_mods d ON s.id = d.dayzserver_id
+            WHERE d.active_mods_id = ?1
+            """,
             nativeQuery = true)
     List<Server> findAllByActiveMod(Long modId);
 }
