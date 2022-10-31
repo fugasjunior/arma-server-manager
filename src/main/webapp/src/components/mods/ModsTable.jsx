@@ -18,7 +18,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import SERVER_NAMES from "../../util/serverNames";
-import TableGhosts from "../../UI/TableGhosts";
+import TableGhosts from "../../UI/TableSkeletons";
 import config from "../../config";
 
 function getComparator(order, orderBy) {
