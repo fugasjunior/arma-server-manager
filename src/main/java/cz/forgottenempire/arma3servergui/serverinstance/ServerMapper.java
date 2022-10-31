@@ -39,7 +39,7 @@ interface ServerMapper {
 
     void updateReforgerServerFromDto(ReforgerServerDto serverDto, @MappingTarget ReforgerServer server);
 
-    @Mapping(source = "startedAt", target = "startedAt", dateFormat = "yyyy-MM-dd HH:mm")
+    @Mapping(source = "startedAt", target = "startedAt")
     ServerInstanceInfoDto mapServerInstanceInfoToDto(ServerInstanceInfo instanceInfo);
 
     ServerWorkshopModDto mapWorkshopModToDto(WorkshopMod workshopMod);

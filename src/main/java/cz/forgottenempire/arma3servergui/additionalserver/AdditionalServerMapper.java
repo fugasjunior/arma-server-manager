@@ -10,7 +10,7 @@ interface AdditionalServerMapper {
     @Mapping(source = "additionalServer.name", target = "name")
     @Mapping(source = "additionalServer.imageUrl", target = "imageUrl")
     @Mapping(source = "instanceInfo.alive", target = "alive")
-    @Mapping(source = "instanceInfo.startedAt", target = "startedAt", dateFormat = "yyyy-MM-dd HH:mm")
+    @Mapping(source = "instanceInfo.startedAt", target = "startedAt")
     AdditionalServerDto from(AdditionalServer additionalServer, AdditionalServerInstanceInfo instanceInfo);
 
 }

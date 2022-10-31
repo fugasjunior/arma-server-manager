@@ -17,7 +17,7 @@ import SERVER_NAMES from "../../util/serverNames";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getMods} from "../../services/modsService";
-import TableGhosts from "../../UI/TableGhosts";
+import TableGhosts from "../../UI/TableSkeletons";
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);

@@ -29,8 +29,8 @@ const ServerSettingsPage = () => {
             const {data: modsDto} = await getMods(fetchedServer.type);
 
             setServer(fetchedServer);
-            setAvailableMods(modsDto.workshopMods);
-            setAvailableDlcs(modsDto.creatorDlcs);
+            setAvailableMods(modsDto.workshopMods.sort((a, b) => a.name.localeCompare(b.name)));
+            setAvailableDlcs(modsDto.creatorDlcs.sort((a, b) => a.name.localeCompare(b.name)));
             setIsLoading(false);
         } catch (e) {
             console.error(e);
