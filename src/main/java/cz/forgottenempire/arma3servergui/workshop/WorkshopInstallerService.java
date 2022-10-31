@@ -12,9 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -128,8 +127,7 @@ class WorkshopInstallerService {
     }
 
     private void updateModInfo(WorkshopMod mod) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        mod.setLastUpdated(formatter.format(new Date()));
+        mod.setLastUpdated(LocalDateTime.now());
         mod.setFileSize(getActualSizeOfMod(mod.getId(), mod.getServerType()));
     }
 

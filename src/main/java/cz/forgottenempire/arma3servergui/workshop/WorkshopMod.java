@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.forgottenempire.arma3servergui.common.InstallationStatus;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -23,7 +24,7 @@ public class WorkshopMod {
     @Id
     private Long id;
     private String name;
-    private String lastUpdated;
+    private LocalDateTime lastUpdated;
     private Long fileSize;
 
     @Enumerated(EnumType.STRING)

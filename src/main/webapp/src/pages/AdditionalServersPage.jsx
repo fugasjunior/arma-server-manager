@@ -1,14 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {useInterval} from "../hooks/use-interval";
 import {Avatar, Button, Divider, Stack, Typography} from "@mui/material";
-import {
-    getAdditionalServers,
-    getServers, startAdditionalServer,
-    startServer,
-    stopAdditionalServer,
-    stopServer
-} from "../services/additionalServersService";
+import {getAdditionalServers, startAdditionalServer, stopAdditionalServer} from "../services/additionalServersService";
 import Paper from "@mui/material/Paper";
+import config from "../config";
 
 const AdditionalServersPage = () => {
 
@@ -49,7 +44,12 @@ const AdditionalServersPage = () => {
                                         <Avatar src={server.imageUrl} alt={`${server.name} icon`}/>
                                         <p>{server.name}</p>
                                     </Stack>
-                                    {server.startedAt && <div>Started at: {server.startedAt}</div>}
+                                    {server.startedAt &&
+                                            <div>
+                                                Started at: {new Date(server.startedAt).toLocaleString(undefined,
+                                                    config.dateFormat)}
+                                            </div>
+                                    }
                                     {server.alive &&
                                             <Button variant="contained" color="error"
                                                     onClick={() => handleStop(server.id)}>

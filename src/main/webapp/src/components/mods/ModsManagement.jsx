@@ -16,7 +16,13 @@ export default function ModsManagement() {
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
-        setMods(modsDto.workshopMods.sort((a, b) => a.name.localeCompare(b.name)));
+        let mods = modsDto.workshopMods.map(mod => {
+            const lastUpdated = mod.lastUpdated ? new Date(mod.lastUpdated) : "";
+            return {...mod, lastUpdated}
+        });
+        mods.sort((a, b) => a.name.localeCompare(b.name));
+
+        setMods(mods);
         setInitialLoading(false);
     };
 

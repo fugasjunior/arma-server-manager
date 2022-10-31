@@ -19,27 +19,27 @@ import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import SERVER_NAMES from "../../util/serverNames";
 import TableGhosts from "../../UI/TableGhosts";
-
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
+import config from "../../config";
 
 function getComparator(order, orderBy) {
-    return order === 'desc'
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy);
+    const sortByCell = headCells.find(cell => cell.id === orderBy);
+
+    if (sortByCell.type === "number" || sortByCell.type === "date") {
+        return order === "desc"
+                ? (a, b) => a[orderBy] - b[orderBy]
+                : (a, b) => b[orderBy] - a[orderBy];
+    }
+
+    return order === "desc"
+            ? (a, b) => a[orderBy].localeCompare(b[orderBy])
+            : (a, b) => b[orderBy].localeCompare(a[orderBy]);
 }
 
 const headCells = [
     {
         id: 'id',
         label: 'ID',
+        type: 'number'
     },
     {
         id: 'name',
@@ -52,10 +52,12 @@ const headCells = [
     {
         id: 'fileSize',
         label: 'File size',
+        type: 'number'
     },
     {
         id: 'lastUpdated',
         label: 'Last updated',
+        type: 'date'
     },
     {
         id: 'installationStatus',
@@ -147,7 +149,7 @@ const ModsTable = (props) => {
                                     headCells={headCells}
                             />
                             {!props.loading && <TableBody>
-                                {rows.slice().sort(getComparator(order, orderBy))
+                                {rows.sort(getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
                                     const isItemSelected = isSelected(row.id);
@@ -183,7 +185,9 @@ const ModsTable = (props) => {
                                                 <TableCell>{row.name}</TableCell>
                                                 <TableCell>{SERVER_NAMES[row.serverType]}</TableCell>
                                                 <TableCell>{humanFileSize(row.fileSize)}</TableCell>
-                                                <TableCell>{row.lastUpdated}</TableCell>
+                                                <TableCell>
+                                                    {row.lastUpdated.toLocaleDateString(undefined, config.dateFormat)}
+                                                </TableCell>
                                                 <TableCell>{getInstalledIcon(row)}</TableCell>
                                             </TableRow>
                                     );

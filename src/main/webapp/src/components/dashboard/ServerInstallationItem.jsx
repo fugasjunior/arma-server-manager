@@ -15,6 +15,7 @@ import dayZLogo from "../../img/dayz_logo.jpg";
 import dayZExpLogo from "../../img/dayz_exp_logo.jpg";
 import reforgerLogo from "../../img/reforger_logo.jpg";
 import SERVER_NAMES from "../../util/serverNames";
+import config from "../../config";
 
 const SERVER_IMAGE_URLS = {
     "ARMA3": arma3Logo,
@@ -67,7 +68,11 @@ const ServerInstallationItem = (props) => {
                                 }
                                 {installation.lastUpdatedAt &&
                                         <Typography variant="body2" color="text.secondary">
-                                            Last updated: <strong> {installation.lastUpdatedAt}</strong>
+                                            Last updated:&nbsp;
+                                            <strong>
+                                                {new Date(installation.lastUpdatedAt).toLocaleString(undefined,
+                                                        config.dateFormat)}
+                                            </strong>
                                         </Typography>
                                 }
                             </Stack>

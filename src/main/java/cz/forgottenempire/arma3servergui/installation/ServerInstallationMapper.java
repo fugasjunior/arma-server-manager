@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 interface ServerInstallationMapper {
 
-    @Mapping(source = "lastUpdatedAt", target = "lastUpdatedAt", dateFormat = "yyyy-MM-dd HH:mm")
+    @Mapping(source = "lastUpdatedAt", target = "lastUpdatedAt")
     ServerInstallationDto map(ServerInstallation serverInstallation);
 
     List<ServerInstallationDto> map(List<ServerInstallation> serverInstallations);
