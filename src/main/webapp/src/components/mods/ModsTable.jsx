@@ -186,7 +186,8 @@ const ModsTable = (props) => {
                                                 <TableCell>{SERVER_NAMES[row.serverType]}</TableCell>
                                                 <TableCell>{humanFileSize(row.fileSize)}</TableCell>
                                                 <TableCell>
-                                                    {row.lastUpdated.toLocaleDateString(undefined, config.dateFormat)}
+                                                    {row.lastUpdated && row.lastUpdated.toLocaleDateString(undefined,
+                                                            config.dateFormat)}
                                                 </TableCell>
                                                 <TableCell>{getInstalledIcon(row)}</TableCell>
                                             </TableRow>

@@ -33,48 +33,33 @@ export default function ModsManagement() {
     useInterval(fetchMods, 5000);
 
     const handleInstall = async (modId) => {
-        try {
-            const {data: mod} = await installMod(modId);
-            setMods(prevState => {
-                return [mod, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-            })
-        } catch (e) {
-            console.error(e);
-            toast.error("Error during mod install");
-        }
+        const {data: mod} = await installMod(modId);
+        setMods(prevState => {
+            return [mod, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+        })
     };
 
     const handleUpdate = async () => {
-        try {
-            setMods(prevState => {
-                const newMods = [...prevState];
-                for (const selectedModId of selected) {
-                    const selectedMod = newMods.find(mod => mod.id === selectedModId);
-                    selectedMod.installationStatus = "INSTALLATION_IN_PROGRESS";
-                    selectedMod.errorStatus = null;
-                }
-                return newMods;
-            })
-            await updateMods(selected.join(","));
-        } catch (e) {
-            console.error(e);
-            toast.error("Error during mod install");
-        }
+        setMods(prevState => {
+            const newMods = [...prevState];
+            for (const selectedModId of selected) {
+                const selectedMod = newMods.find(mod => mod.id === selectedModId);
+                selectedMod.installationStatus = "INSTALLATION_IN_PROGRESS";
+                selectedMod.errorStatus = null;
+            }
+            return newMods;
+        })
+        await updateMods(selected.join(","));
     };
 
     const handleUninstall = async () => {
-        try {
-            // TODO add confirmation modal
-            setMods(prevState => {
-                return prevState.filter(mod => selected.indexOf(mod.id) === -1);
-            })
-            setSelected([]);
-            await uninstallMods(selected.join(","));
-            toast.success("Mod(s) successfully uninstalled");
-        } catch (e) {
-            console.error(e);
-            toast.error("Error during mod uninstall");
-        }
+        // TODO add confirmation modal
+        setMods(prevState => {
+            return prevState.filter(mod => selected.indexOf(mod.id) === -1);
+        })
+        setSelected([]);
+        await uninstallMods(selected.join(","));
+        toast.success("Mod(s) successfully uninstalled");
     };
 
     const handleSelectAllClick = (event) => {

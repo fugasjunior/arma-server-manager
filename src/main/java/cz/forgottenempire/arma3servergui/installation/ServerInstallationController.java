@@ -33,12 +33,8 @@ class ServerInstallationController {
         this.installerService = installerService;
     }
 
-    @GetMapping
-    public ResponseEntity<ServerInstallationsDto> getAllInstalations() {
-        List<ServerInstallation> installations = installationService.getAllServerInstallations().stream()
-                .filter(i -> SystemUtils.getOsType() != OSType.LINUX || i.getType() != ServerType.DAYZ)
-                .toList();
-        return ResponseEntity.ok(new ServerInstallationsDto(mapper.map(installations)));
+    private static boolean filterUnavailableInstallationsBasedOnOS(ServerInstallation i) {
+        return SystemUtils.getOsType() != OSType.LINUX || i.getType() != ServerType.DAYZ;
     }
 
     @GetMapping("/{type}")
@@ -61,5 +57,13 @@ class ServerInstallationController {
             throw new ServerUnsupportedOnOsException(
                     "DayZ server is not supported on Linux yet. Use DayZ Experimental server instead");
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<ServerInstallationsDto> getAllInstalations() {
+        List<ServerInstallation> installations = installationService.getAllServerInstallations().stream()
+                .filter(ServerInstallationController::filterUnavailableInstallationsBasedOnOS)
+                .toList();
+        return ResponseEntity.ok(new ServerInstallationsDto(mapper.map(installations)));
     }
 }
