@@ -53,7 +53,6 @@ export default function ModsManagement() {
     };
 
     const handleUninstall = async () => {
-        // TODO add confirmation modal
         setMods(prevState => {
             return prevState.filter(mod => selected.indexOf(mod.id) === -1);
         })
