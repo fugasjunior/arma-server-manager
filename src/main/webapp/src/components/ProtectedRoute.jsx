@@ -12,6 +12,10 @@ const ProtectedRoute = ({children}) => {
         }
     }, [authCtx.isLoggedIn]);
 
+    if (!authCtx.isLoggedIn) {
+        return;
+    }
+
     return children;
 };
 
