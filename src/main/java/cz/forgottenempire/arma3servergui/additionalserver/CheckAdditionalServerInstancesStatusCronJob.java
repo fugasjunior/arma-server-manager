@@ -41,7 +41,7 @@ class CheckAdditionalServerInstancesStatusCronJob {
     private void logWarningMessage(AdditionalServerInstanceInfo instance) {
         AdditionalServer server = additionalServersService.getServer(instance.getId())
                 .orElseThrow(() -> new IllegalStateException("Invalid ID " + instance.getId() +
-                        "in additional server instances map"));
+                        " in additional server instances map"));
 
         log.warn("Server '{}' (ID {}) likely crashed or was exited outside the admin UI. "
                         + "Server was started on {} with process ID {}.",
