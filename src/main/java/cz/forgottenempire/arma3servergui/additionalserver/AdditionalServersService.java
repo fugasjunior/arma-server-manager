@@ -19,25 +19,23 @@ import org.springframework.stereotype.Service;
 class AdditionalServersService {
 
     private final AdditionalServerRepository serverRepository;
-
     private final AdditionalServerInstanceInfoRepository instanceInfoRepository;
-
-    @Value("${arma3server.logDir}")
-    private String logDirectory;
+    private final String logDirectory;
 
     @Autowired
     public AdditionalServersService(
             AdditionalServerRepository serverRepository,
-            AdditionalServerInstanceInfoRepository instanceInfoRepository
+            AdditionalServerInstanceInfoRepository instanceInfoRepository,
+            @Value("${arma3server.logDir}") String logDirectory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
+        this.logDirectory = logDirectory;
 
         // add shutdown hook to stop all running servers
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
                 instanceInfoRepository.getAll().forEach(server -> destroyWithTimeout(server.getProcess()))));
     }
-
 
     public Optional<AdditionalServer> getServer(Long id) {
         return serverRepository.findById(id);
