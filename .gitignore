@@ -1,7 +1,6 @@
 ### Project specific files
 config/*
 !config/application.properties.EXAMPLE
-!config/mongo-init.js
 logs/
 
 HELP.md
@@ -38,3 +37,6 @@ out/
 
 ### JPA Buddy ###
 .jpb
+
+# cypress example files
+**/cypress/e2e/examples/
