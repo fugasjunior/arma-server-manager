@@ -35,19 +35,6 @@ class ConfigFileService {
         this.pathsFactory = pathsFactory;
     }
 
-    private static void deleteOldConfigFile(File configFile) {
-        if (!configFile.exists()) {
-            return;
-        }
-
-        try {
-            log.info("Deleting old configuration '{}'", configFile.getName());
-            FileUtils.forceDelete(configFile);
-        } catch (IOException e) {
-            log.error("Could not delete old server config '{}' due to {}", configFile, e.toString());
-        }
-    }
-
     public File getConfigFileForServer(@NotNull Server server) {
         String extension = server.getType() == ServerType.REFORGER ? ".json" : ".cfg";
         String fileName = server.getType() + "_" + server.getId() + extension;
@@ -56,19 +43,8 @@ class ConfigFileService {
 
     public void writeConfig(@NotNull Server server) {
         File configFile = getConfigFileForServer(server);
-
         deleteOldConfigFile(configFile);
-
-        // write new config file
-        log.info("Writing new server config '{}'", configFile.getName());
-        Template configTemplate;
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
-            configTemplate = freeMarkerConfigurer.getConfiguration()
-                    .getTemplate(Constants.SERVER_CONFIG_TEMPLATES.get(server.getType()));
-            configTemplate.process(server, writer);
-        } catch (IOException | TemplateException e) {
-            log.error("Could not write config template", e);
-        }
+        writeNewConfig(server, configFile);
     }
 
     public Optional<String> readOptionFromConfig(@NotNull String key, @NotNull Server server) {
@@ -90,5 +66,30 @@ class ConfigFileService {
             log.error("Couldn't load property from config file {}", configFile.getName(), e);
         }
         return Optional.empty();
+    }
+
+    private static void deleteOldConfigFile(File configFile) {
+        if (!configFile.exists()) {
+            return;
+        }
+
+        try {
+            log.info("Deleting old configuration '{}'", configFile.getName());
+            FileUtils.forceDelete(configFile);
+        } catch (IOException e) {
+            log.error("Could not delete old server config '{}' due to {}", configFile, e.toString());
+        }
+    }
+
+    private void writeNewConfig(Server server, File configFile) {
+        log.info("Writing new server config '{}'", configFile.getName());
+        Template configTemplate;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
+            configTemplate = freeMarkerConfigurer.getConfiguration()
+                    .getTemplate(Constants.SERVER_CONFIG_TEMPLATES.get(server.getType()));
+            configTemplate.process(server, writer);
+        } catch (IOException | TemplateException e) {
+            log.error("Could not write config template", e);
+        }
     }
 }
