@@ -15,7 +15,7 @@ export default function ListBuilderList(props) {
                     <Typography variant="h5">{getHeadingText()}</Typography>
                     {props.showFilter &&
                             <TextField label="Filter" type="search" variant="outlined" size="small" margin="none"
-                                       onChange={props.onFilterChange}/>
+                                       id={`${props.typeLabel}-filter`} onChange={props.onFilterChange}/>
                     }
                 </Stack>
                 <List className={styles.list}>
@@ -23,7 +23,12 @@ export default function ListBuilderList(props) {
                             <Typography m={2}>No {props.itemsLabel} {props.typeLabel.toLowerCase()}</Typography>
                     }
                     {props.selectedOptions.length > 0 && props.selectedOptions.map(opt =>
-                            <ListItemButton key={opt.id} onClick={() => props.onClickItem(opt)} divider>
+                            <ListItemButton
+                                    id={`${props.typeLabel}-${props.itemsLabel}-${opt.id}`}
+                                    className={`${props.typeLabel}-list-item`}
+                                    key={opt.id}
+                                    onClick={() => props.onClickItem(opt)}
+                                    divider>
                                 {opt.name}
                             </ListItemButton>
                     )}
