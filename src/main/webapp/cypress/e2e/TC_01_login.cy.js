@@ -1,6 +1,14 @@
 describe('Login', () => {
+
+    beforeEach(() => {
+        cy.visit(Cypress.env('webAppUrl'));
+    });
+
+    afterEach(() => {
+        cy.clearLocalStorage();
+    })
+
     it('Log in', () => {
-        cy.visit('http://localhost:3000');
         cy.get('header').should('not.exist');
         cy.get('#username').type('test');
         cy.get('#password').type('test');
@@ -9,7 +17,6 @@ describe('Login', () => {
     });
 
     it('Invalid login', () => {
-        cy.visit('http://localhost:3000');
         cy.get('header').should('not.exist');
         cy.get('#username').type('test');
         cy.get('#password').type('wrong_password');

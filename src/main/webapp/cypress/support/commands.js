@@ -23,3 +23,22 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('loginViaAPI', (
+        username = Cypress.env('username'),
+        password = Cypress.env('password')
+) => {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+
+    cy.request('POST', `${Cypress.env('apiUrl')}/login`, formData)
+    .then((resp) => {
+        const bodyString = Cypress.Blob.arrayBufferToBinaryString(resp.body);
+        const body = JSON.parse(bodyString);
+        let date = new Date();
+        date = new Date(+date + body['expiresIn']);
+        localStorage.setItem('token', body['token']);
+        localStorage.setItem('expirationTime', date.toISOString());
+    });
+})

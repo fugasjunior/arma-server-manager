@@ -6,4 +6,10 @@ module.exports = defineConfig({
       // implement node event listeners here
     },
   },
+  env: {
+    username: 'test',
+    password: 'test',
+    apiUrl: 'http://localhost:8080/api',
+    webAppUrl: 'http://localhost:3000'
+  }
 });
