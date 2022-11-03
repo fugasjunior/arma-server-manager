@@ -68,7 +68,6 @@ class ScenarioController {
     }
 
     @GetMapping("/REFORGER")
-    // TODO rewrite to use cache
     public ResponseEntity<ReforgerScenariosDto> getReforgerScenarios() {
         if (!serverInstallationService.isServerInstalled(ServerType.REFORGER)) {
             throw new ServerNotInitializedException(ServerType.REFORGER);

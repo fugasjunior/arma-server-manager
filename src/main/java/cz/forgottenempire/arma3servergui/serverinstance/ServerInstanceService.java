@@ -1,9 +1,6 @@
 package cz.forgottenempire.arma3servergui.serverinstance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import cz.forgottenempire.arma3servergui.common.Constants;
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
@@ -14,28 +11,19 @@ import cz.forgottenempire.arma3servergui.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.arma3servergui.serverinstance.exceptions.PortAlreadyTakenException;
 import cz.forgottenempire.arma3servergui.util.LogUtils;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 // TODO way too much responsibilities for this class, separate it into different services
 @Service
@@ -44,7 +32,7 @@ class ServerInstanceService {
 
     private final ServerRepository serverRepository;
     private final ServerInstanceInfoRepository instanceInfoRepository;
-    private final FreeMarkerConfigurer freeMarkerConfigurer;
+    private final ConfigFileService configFileService;
     private final PathsFactory pathsFactory;
     @Value("${arma3server.logDir}")
     private String logDir; // TODO get rid of this, fix for multiple server instances
@@ -55,12 +43,12 @@ class ServerInstanceService {
     public ServerInstanceService(
             ServerRepository serverRepository,
             ServerInstanceInfoRepository instanceInfoRepository,
-            FreeMarkerConfigurer freeMarkerConfigurer,
+            ConfigFileService configFileService,
             PathsFactory pathsFactory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
-        this.freeMarkerConfigurer = freeMarkerConfigurer;
+        this.configFileService = configFileService;
         this.pathsFactory = pathsFactory;
 
         // Turn off all servers on application shutdown
@@ -82,7 +70,7 @@ class ServerInstanceService {
     public Server createServer(Server server) {
         setQueryPortForArma3Server(server);
         setInstanceIdForDayZServer(server);
-        writeConfig(server);
+        configFileService.writeConfig(server);
         return serverRepository.save(server);
     }
 
@@ -110,6 +98,11 @@ class ServerInstanceService {
         ServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(id);
         if (isServerInstanceRunning(instanceInfo)) {
             log.info("Server '{}' (ID {}) is already running", server.getName(), id);
+        }
+
+        File configFile = configFileService.getConfigFileForServer(server);
+        if (!configFile.exists()) {
+            configFileService.writeConfig(server);
         }
 
         Process process = startServerProcess(server);
@@ -148,26 +141,14 @@ class ServerInstanceService {
 
     private void readGeneratedReforgerServerId(Long serverId) {
         Server server = getServer(serverId).orElseThrow();
+
         if (server instanceof ReforgerServer reforgerServer) {
-            if (!Strings.isNullOrEmpty(reforgerServer.getDedicatedServerId())) {
-                return;
-            }
-
-            File configFile = pathsFactory.getConfigFilePath(ServerType.REFORGER,
-                    getConfigFileName(ServerType.REFORGER, serverId)).toFile();
-            if (!configFile.exists()) {
-                return;
-            }
-
-            try {
-                Map<String, Object> values = new ObjectMapper().readValue(configFile, HashMap.class);
-                String dedicatedServerId = (String) values.get("dedicatedServerId");
-                reforgerServer.setDedicatedServerId(dedicatedServerId);
-                serverRepository.save(reforgerServer);
-                log.info("Successfully loaded Reforger server's generated ID: '{}'", dedicatedServerId);
-            } catch (Exception e) {
-                log.error("Couln't load Reforger server's generated ID", e);
-            }
+            configFileService.readOptionFromConfig("dedicatedServerId", reforgerServer)
+                    .ifPresent(dedicatedServerId -> {
+                        reforgerServer.setDedicatedServerId(dedicatedServerId);
+                        serverRepository.save(reforgerServer);
+                        log.info("Successfully loaded Reforger dedicated ID for server ID {}", serverId);
+                    });
         }
     }
 
@@ -245,11 +226,7 @@ class ServerInstanceService {
         List<String> parameters = new ArrayList<>();
         ServerType type = server.getType();
 
-        File configFile = pathsFactory.getConfigFile(type, getConfigFileName(type, server.getId()));
-        if (!configFile.exists()) {
-            writeConfig(server);
-        }
-        String configFilePath = configFile.toString();
+        String configFilePath = configFileService.getConfigFileForServer(server).getAbsolutePath();
 
         parameters.add(pathsFactory.getServerExecutableWithFallback(server.getType()).toString());
 
@@ -305,32 +282,4 @@ class ServerInstanceService {
                 .forEach(parameters::add);
     }
 
-    private void writeConfig(Server server) {
-        String configFileName = getConfigFileName(server.getType(), server.getId());
-        File configFile = pathsFactory.getConfigFilePath(server.getType(), configFileName).toFile();
-
-        // delete old config file
-        try {
-            log.info("Deleting old configuration '{}'", configFileName);
-            FileUtils.forceDelete(configFile);
-        } catch (FileNotFoundException ignored) {
-        } catch (IOException e) {
-            log.error("Could not delete old server config '{}' due to {}", configFile, e.toString());
-        }
-
-        // write new config file
-        log.info("Writing new server config '{}'", configFileName);
-        Template configTemplate;
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
-            configTemplate = freeMarkerConfigurer.getConfiguration()
-                    .getTemplate(Constants.SERVER_CONFIG_TEMPLATES.get(server.getType()));
-            configTemplate.process(server, writer);
-        } catch (IOException | TemplateException e) {
-            log.error("Could not write config template due to {}", e.toString());
-        }
-    }
-
-    private String getConfigFileName(ServerType type, Long serverId) {
-        return type.name() + "_" + serverId + ".cfg";
-    }
 }
