@@ -1,18 +1,20 @@
 package cz.forgottenempire.arma3servergui.additionalserver;
 
+import cz.forgottenempire.arma3servergui.common.ProcessFactory;
+import cz.forgottenempire.arma3servergui.common.exceptions.NotFoundException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Slf4j
@@ -20,16 +22,18 @@ class AdditionalServersService {
 
     private final AdditionalServerRepository serverRepository;
     private final AdditionalServerInstanceInfoRepository instanceInfoRepository;
+    private final ProcessFactory processFactory;
     private final String logDirectory;
 
     @Autowired
     public AdditionalServersService(
             AdditionalServerRepository serverRepository,
             AdditionalServerInstanceInfoRepository instanceInfoRepository,
-            @Value("${arma3server.logDir}") String logDirectory
+            ProcessFactory processFactory, @Value("${arma3server.logDir}") String logDirectory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
+        this.processFactory = processFactory;
         this.logDirectory = logDirectory;
 
         // add shutdown hook to stop all running servers
@@ -57,23 +61,21 @@ class AdditionalServersService {
 
         AdditionalServer settings = serverRepository
                 .findById(serverId)
-                .orElseThrow(NoSuchElementException::new);
-
-        List<String> commands = Arrays.asList(settings.getCommand().split(" "));
+                .orElseThrow(() -> new NotFoundException("Additional server with ID " + serverId + " not found"));
 
         try {
-            Process process = new ProcessBuilder()
-                    .directory(new File(settings.getServerDir()))
-                    .command(commands)
-                    .redirectOutput(Redirect.appendTo(getLogFile(settings.getName())))
-                    .redirectError(Redirect.appendTo(getLogFile(settings.getName())))
-                    .start();
+            File executable = new File(settings.getCommand());
+            Process process = processFactory.startProcessWithRedirectedOutput(executable, Collections.emptyList(),
+                    getLogFile(settings.getName()));
+
             instanceInfoRepository.storeServerInstanceInfo(serverId,
                     new AdditionalServerInstanceInfo(serverId, true, LocalDateTime.now(), process));
             log.info("Server '{}' started (PID {})", settings.getName(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server {} with command {} in directory {} due to {}",
                     settings.getName(), settings.getCommand(), settings.getServerDir(), e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to start server '" + settings.getName() + "'");
         }
     }
 

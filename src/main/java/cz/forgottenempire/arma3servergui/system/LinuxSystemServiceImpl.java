@@ -1,9 +1,13 @@
 package cz.forgottenempire.arma3servergui.system;
 
 import com.google.common.base.Supplier;
+import cz.forgottenempire.arma3servergui.common.ProcessFactory;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,13 @@ import org.springframework.stereotype.Service;
 @Conditional(LinuxEnvironmentCondition.class)
 @Slf4j
 class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
+
+    private final ProcessFactory processFactory;
+
+    @Autowired
+    public LinuxSystemServiceImpl(ProcessFactory processFactory) {
+        this.processFactory = processFactory;
+    }
 
     @Override
     protected Supplier<Long> memoryLeftSupplier() {
@@ -31,9 +42,8 @@ class LinuxSystemServiceImpl extends AbstractSystemServiceImpl {
 
     private Long getValueFromMemInfo(String key) {
         try {
-            Process process = new ProcessBuilder("/bin/sh", "-c",
-                    "cat /proc/meminfo | grep " + key + " | sed 's/[^0-9]//g'")
-                    .start();
+            Process process = processFactory.startProcess(new File("/bin/sh"),
+                    List.of("-c", "cat /proc/meminfo | grep " + key + " | sed 's/[^0-9]//g'"));
             process.waitFor();
             BufferedReader is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             return Long.parseLong(is.readLine()) * 1024;

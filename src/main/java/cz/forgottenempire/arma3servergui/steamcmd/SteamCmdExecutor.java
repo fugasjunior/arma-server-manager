@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.steamcmd;
 
 import com.google.common.base.Strings;
+import cz.forgottenempire.arma3servergui.common.ProcessFactory;
 import cz.forgottenempire.arma3servergui.steamauth.SteamAuth;
 import cz.forgottenempire.arma3servergui.steamauth.SteamAuthService;
 import java.io.File;
@@ -31,14 +32,15 @@ class SteamCmdExecutor {
 
     private final File steamCmdFile;
     private final SteamAuthService steamAuthService;
+    private final ProcessFactory processFactory;
 
     @Autowired
     public SteamCmdExecutor(
             @Value("${steamcmd.path}") String steamCmdFilePath,
-            SteamAuthService steamAuthService
-    ) {
+            SteamAuthService steamAuthService,
+            ProcessFactory processFactory) {
         this.steamAuthService = steamAuthService;
-
+        this.processFactory = processFactory;
         steamCmdFile = new File(steamCmdFilePath);
         if (!steamCmdFile.exists()) {
             throw new IllegalStateException("Invalid path to SteamCMD executable given");
@@ -63,10 +65,7 @@ class SteamCmdExecutor {
 
             do {
                 attempts++;
-                Process process = new ProcessBuilder()
-                        .command(getCommands(job.getSteamCmdParameters()))
-                        .start();
-
+                Process process = processFactory.startProcess(steamCmdFile, getCommands(job.getSteamCmdParameters()));
                 output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
@@ -90,8 +89,6 @@ class SteamCmdExecutor {
 
     private List<String> getCommands(SteamCmdParameters parameters) {
         List<String> commands = new ArrayList<>();
-        commands.add(steamCmdFile.getAbsolutePath());
-
         parameters.get().forEach(parameter -> {
             if (parameter.contains(STEAM_CREDENTIALS_PLACEHOLDER)) {
                 commands.add(parameter.replace(STEAM_CREDENTIALS_PLACEHOLDER, getAuthString()));

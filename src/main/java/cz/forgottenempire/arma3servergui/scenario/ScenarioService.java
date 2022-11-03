@@ -5,6 +5,7 @@ import static java.time.ZoneId.systemDefault;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
+import cz.forgottenempire.arma3servergui.common.ProcessFactory;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.common.exceptions.ServerNotInitializedException;
 import java.io.BufferedReader;
@@ -36,11 +37,13 @@ class ScenarioService {
     private final Supplier<List<ReforgerScenarioDto>> memoizedReforgerScenarios = Suppliers.memoizeWithExpiration(
             this::getReforgerScenariosFromServerExecutable, 5, TimeUnit.MINUTES);
 
+    private final ProcessFactory processFactory;
     private final PathsFactory pathsFactory;
 
 
     @Autowired
-    public ScenarioService(PathsFactory pathsFactory) {
+    public ScenarioService(ProcessFactory processFactory, PathsFactory pathsFactory) {
+        this.processFactory = processFactory;
         this.pathsFactory = pathsFactory;
     }
 
@@ -107,13 +110,11 @@ class ScenarioService {
     private List<ReforgerScenarioDto> getReforgerScenariosFromServerExecutable() {
         List<ReforgerScenarioDto> scenarios = new ArrayList<>();
 
-        String executablePath = pathsFactory.getServerExecutableWithFallback(ServerType.REFORGER).getAbsolutePath();
+        File executable = pathsFactory.getServerExecutableWithFallback(ServerType.REFORGER);
 
         try {
             // adding "-logStats 1" makes the process flush it's output and not hang before printing the scenarios table
-            Process process = new ProcessBuilder(executablePath, "-listScenarios", "-logStats", "1")
-                    .directory(pathsFactory.getServerPath(ServerType.REFORGER).toAbsolutePath().toFile())
-                    .start();
+            Process process = processFactory.startProcess(executable, List.of("-listScenarios", "-logStats", "1"));
 
             // start a fail-safe in case the process hangs as it likes to do
             startWatchdogThread(process);
