@@ -7,7 +7,7 @@
 ![Main dashboard screenshot](https://imgur.com/LcvCtlk.jpg "Main dashboard screenshot")
 </details>
 
-[More screenshots](https://imgur.com/a/jEkDCkc)
+[More screenshots](https://imgur.com/a/74pWsoO)
 
 ## Features
 
