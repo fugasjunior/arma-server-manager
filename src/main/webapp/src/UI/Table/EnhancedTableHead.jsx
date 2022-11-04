@@ -37,7 +37,7 @@ function EnhancedTableHead(props) {
                                     sortDirection={orderBy === headCell.id ? order : false}
                             >
                                 <TableSortLabel
-                                        active={orderBy === headCell.id}
+                                        active={orderBy === headCell.id && !props.search}
                                         direction={orderBy === headCell.id ? order : 'asc'}
                                         onClick={createSortHandler(headCell.id)}
                                 >

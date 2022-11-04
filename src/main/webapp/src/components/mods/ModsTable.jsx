@@ -20,6 +20,7 @@ import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import SERVER_NAMES from "../../util/serverNames";
 import TableGhosts from "../../UI/TableSkeletons";
 import config from "../../config";
+import Fuse from "fuse.js";
 
 function getComparator(order, orderBy) {
     const sortByCell = headCells.find(cell => cell.id === orderBy);
@@ -89,8 +90,10 @@ const ModsTable = (props) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [enteredModId, setEnteredModId] = useState("");
+    const [search, setSearch] = useState("");
 
     const handleRequestSort = (event, property) => {
+        setSearch("");
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
@@ -113,10 +116,23 @@ const ModsTable = (props) => {
         setPage(0);
     };
 
+    const handleSearchChange = (event) => {
+        setSearch(event.target.value);
+    }
+
     const isSelected = (id) => selected.indexOf(id) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+    const getRows = () => {
+        if (search) {
+            const fuse = new Fuse(props.rows, {keys: ["name"]});
+            const searched = fuse.search(search);
+            return searched.map(o => o.item);
+        }
+        return props.rows.sort(getComparator(order, orderBy));
+    }
 
     return (
             <Box sx={{width: '100%'}}>
@@ -128,10 +144,12 @@ const ModsTable = (props) => {
                             arma3ModsCount={props.arma3ModsCount}
                             dayZModsCount={props.dayZModsCount}
                             mixedModsSelected={props.mixedModsSelected}
+                            search={search}
                             onUpdateClicked={props.onUpdateClicked}
                             onCreatePresetClicked={props.onCreatePresetClicked}
                             onUninstallClicked={props.onUninstallClicked}
                             onFilterChange={props.onFilterChange}
+                            onSearchChange={handleSearchChange}
                     />
                     <TableContainer>
                         <Table
@@ -147,10 +165,10 @@ const ModsTable = (props) => {
                                     onRequestSort={handleRequestSort}
                                     rowCount={rows.length}
                                     headCells={headCells}
+                                    search={search}
                             />
                             {!props.loading && <TableBody>
-                                {rows.sort(getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {getRows().slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
                                     const isItemSelected = isSelected(row.id);
                                     const labelId = `enhanced-table-checkbox-${index}`;

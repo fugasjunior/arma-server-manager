@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as React from "react";
 import PropTypes from "prop-types";
-import {Box, Divider, Stack, Tab, Tabs} from "@mui/material";
+import {Box, Divider, Stack, Tab, Tabs, TextField} from "@mui/material";
 import UpdateIcon from '@mui/icons-material/Update';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
@@ -44,16 +44,19 @@ function ModsTableToolbar(props) {
                         </Typography>
                 )}
 
-                <Box>
-                    <Tabs value={filter} onChange={onFilterChange}>
-                        <Tab value="" label="All"/>
-                        <Tab value="ARMA3" label="Arma 3" disabled={props.arma3ModsCount === 0}/>
-                        <Tab value="DAYZ" label="DayZ" disabled={props.dayZModsCount === 0}/>
-                    </Tabs>
-                </Box>
-
-
                 <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
+                    <TextField label="Search" type="search" variant="standard" value={props.search}
+                               sx={{minWidth: "120px"}} id="search-field" onChange={props.onSearchChange}
+                    />
+
+                    <Box>
+                        <Tabs value={filter} onChange={onFilterChange}>
+                            <Tab value="" label="All"/>
+                            <Tab value="ARMA3" label="Arma 3" disabled={props.arma3ModsCount === 0}/>
+                            <Tab value="DAYZ" label="DayZ" disabled={props.dayZModsCount === 0}/>
+                        </Tabs>
+                    </Box>
+
                     <Tooltip title="Update">
                         <span>
                             <IconButton disabled={numSelected === 0} onClick={props.onUpdateClicked}>
