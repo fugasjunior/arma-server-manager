@@ -51,44 +51,44 @@ const SteamAuthForm = () => {
                     this token in your email upon the first attempt to download any workshop item</p>
                 {loaded && <form onSubmit={formik.handleSubmit}>
 
-                <Stack spacing={2} mt={2}>
+                    <Stack spacing={2} mt={2}>
+                        <TextField
+                                fullWidth
+                                required
+                                id="username"
+                                name="username"
+                                label="Username"
+                                value={formik.values.username || ''}
+                                onChange={formik.handleChange}
+                                error={formik.touched.username && Boolean(formik.errors.username)}
+
+                        />
+                        <Tooltip
+                                title="By leaving the password empty, previously saved password will be used instead"
+                                placement="bottom-start"
+                        >
                             <TextField
                                     fullWidth
-                                    required
-                                    id="username"
-                                    name="username"
-                                    label="Username"
-                                    value={formik.values.username}
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    label="Password"
+                                    value={formik.values.password || ''}
                                     onChange={formik.handleChange}
-                                    error={formik.touched.username && Boolean(formik.errors.username)}
-
+                                    error={formik.touched.password && Boolean(formik.errors.password)}
                             />
-                            <Tooltip
-                                    title="By leaving the password empty, previously saved password will be used instead"
-                                    placement="bottom-start"
-                            >
-                                <TextField
-                                        fullWidth
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        label="Password"
-                                        value={formik.values.password}
-                                        onChange={formik.handleChange}
-                                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        </Tooltip>
+                        <TextField
+                                fullWidth
+                                id="steamGuardToken"
+                                name="steamGuardToken"
+                                label="Steam Guard token"
+                                value={formik.values.steamGuardToken || ''}
+                                onChange={formik.handleChange}
+                                error={formik.touched.steamGuardToken && Boolean(formik.errors.steamGuardToken)}
 
-                                /></Tooltip>
-                            <TextField
-                                    fullWidth
-                                    id="steamGuardToken"
-                                    name="steamGuardToken"
-                                    label="Steam Guard token"
-                                    value={formik.values.steamGuardToken}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.steamGuardToken && Boolean(formik.errors.steamGuardToken)}
-
-                            />
-                            <Button variant="contained" type="submit">Submit</Button>
+                        />
+                        <Button variant="contained" type="submit">Submit</Button>
                     </Stack>
                 </form>}
             </>
