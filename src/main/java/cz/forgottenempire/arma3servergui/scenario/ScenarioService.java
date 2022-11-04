@@ -17,9 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -72,8 +70,8 @@ class ScenarioService {
         }
     }
 
-    public List<Scenario> getAllScenarios() {
-        List<Scenario> scenarios = new ArrayList<>();
+    public List<Arma3ScenarioDto> getAllScenarios() {
+        List<Arma3ScenarioDto> arma3ScenarioDtos = new ArrayList<>();
 
         String[] extensions = new String[]{"pbo"};
         File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
@@ -82,14 +80,13 @@ class ScenarioService {
         }
         for (Iterator<File> it = FileUtils.iterateFiles(missionsFolder, extensions, false); it.hasNext(); ) {
             File scenarioFile = it.next();
-            Scenario scenarioDto = new Scenario();
-            scenarioDto.setName(scenarioFile.getName());
-            scenarioDto.setFileSize(scenarioFile.length());
-            setScenarioFileCreationTime(scenarioFile, scenarioDto);
-            scenarios.add(scenarioDto);
+            Arma3ScenarioDto arma3ScenarioDtoDto = new Arma3ScenarioDto();
+            arma3ScenarioDtoDto.setName(scenarioFile.getName());
+            arma3ScenarioDtoDto.setFileSize(scenarioFile.length());
+            setScenarioFileCreationTime(scenarioFile, arma3ScenarioDtoDto);
+            arma3ScenarioDtos.add(arma3ScenarioDtoDto);
         }
-        scenarios.sort(Comparator.naturalOrder());
-        return scenarios;
+        return arma3ScenarioDtos;
     }
 
     public boolean deleteScenario(String name) {
@@ -170,13 +167,12 @@ class ScenarioService {
         return new ReforgerScenarioDto(value, name, official);
     }
 
-    private void setScenarioFileCreationTime(File scenarioFile, Scenario scenarioDto) {
+    private void setScenarioFileCreationTime(File scenarioFile, Arma3ScenarioDto arma3ScenarioDtoDto) {
         try {
             BasicFileAttributes attr = Files.readAttributes(scenarioFile.toPath(), BasicFileAttributes.class);
             FileTime fileCreationTime = attr.creationTime();
             LocalDateTime dateTime = LocalDateTime.ofInstant(fileCreationTime.toInstant(), systemDefault());
-            String formattedTime = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            scenarioDto.setCreatedOn(formattedTime);
+            arma3ScenarioDtoDto.setCreatedOn(dateTime);
         } catch (IOException e) {
             log.warn("Could not get file creation time for scenario file '{}'", scenarioFile.getName());
         }

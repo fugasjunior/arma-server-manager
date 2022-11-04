@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import ListBuilderList from "./ListBuilderList";
 import ListBuilderContainer from "./ListBuilderContainer";
 import ListBuilderHeader from "./ListBuilderHeader";
+import Fuse from "fuse.js";
 
 export default function ListBuilder(props) {
     const [filter, setFilter] = useState("");
@@ -10,8 +11,12 @@ export default function ListBuilder(props) {
         setFilter(e.target.value);
     }
 
-    const filteredAvailableOptions = props.availableOptions.filter(
-            option => option.name.toLowerCase().startsWith(filter.toLowerCase()));
+    const filterAvailableOptions = () => {
+        if (!filter) {
+            return props.availableOptions;
+        }
+        return new Fuse(props.availableOptions, {keys: ['name']}).search(filter).map(o => o.item);
+    }
 
     const itemsLabel = props.itemsLabel ?? "options";
 
@@ -25,7 +30,7 @@ export default function ListBuilder(props) {
                 />
                 <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="available"
-                        selectedOptions={filteredAvailableOptions} onClickItem={props.onSelect}
+                        selectedOptions={filterAvailableOptions()} onClickItem={props.onSelect}
                         itemsLabel={props.itemsLabel}
                         showFilter onFilterChange={handleFilterChange}
                 />

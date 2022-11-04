@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useContext} from 'react';
 import Button from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Grow from '@mui/material/Grow';
@@ -8,10 +9,13 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import {Link} from "react-router-dom";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import {OSContext} from "../../store/os-context";
 
 export default function NewServerButton() {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
+
+    const osCtx = useContext(OSContext);
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
@@ -92,10 +96,13 @@ export default function NewServerButton() {
                                                       component={Link} to="/servers/new/REFORGER">
                                                 Arma Reforger server
                                             </MenuItem>
-                                            <MenuItem id="new-dayz-server-btn"
-                                                      component={Link} to="/servers/new/DAYZ">
-                                                DayZ server
-                                            </MenuItem>
+                                            {osCtx.os !== "LINUX" &&
+                                                    <MenuItem id="new-dayz-server-btn"
+                                                              component={Link}
+                                                              to="/servers/new/DAYZ">
+                                                        DayZ server
+                                                    </MenuItem>
+                                            }
                                             <MenuItem id="new-dayzexp-server-btn"
                                                       component={Link} to="/servers/new/DAYZ_EXP">
                                                 DayZ Experimental server

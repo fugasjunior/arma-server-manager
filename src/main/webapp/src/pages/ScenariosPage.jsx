@@ -14,7 +14,11 @@ const ScenariosPage = () => {
     }, []);
 
     const refreshScenarios = async () => {
-        const {data: scenarios} = await getScenarios();
+        const {data: scenariosDto} = await getScenarios();
+        const scenarios = scenariosDto.scenarios.map(scenario => {
+            const createdOn = scenario.createdOn ? new Date(scenario.createdOn) : "";
+            return {...scenario, createdOn};
+        });
         setScenarios(scenarios);
     };
 

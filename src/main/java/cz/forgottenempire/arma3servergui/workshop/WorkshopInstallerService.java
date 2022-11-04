@@ -3,6 +3,7 @@ package cz.forgottenempire.arma3servergui.workshop;
 import cz.forgottenempire.arma3servergui.common.InstallationStatus;
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
 import cz.forgottenempire.arma3servergui.common.ServerType;
+import cz.forgottenempire.arma3servergui.installation.ServerInstallationService;
 import cz.forgottenempire.arma3servergui.steamcmd.ErrorStatus;
 import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdJob;
 import cz.forgottenempire.arma3servergui.steamcmd.SteamCmdService;
@@ -14,7 +15,9 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +30,18 @@ class WorkshopInstallerService {
     private final PathsFactory pathsFactory;
     private final WorkshopModsService modsService;
     private final SteamCmdService steamCmdService;
+    private final ServerInstallationService installationService;
 
     @Autowired
     public WorkshopInstallerService(
             PathsFactory pathsFactory,
             WorkshopModsService modsService,
-            SteamCmdService steamCmdService
-    ) {
+            SteamCmdService steamCmdService,
+            ServerInstallationService installationService) {
         this.pathsFactory = pathsFactory;
         this.modsService = modsService;
         this.steamCmdService = steamCmdService;
+        this.installationService = installationService;
     }
 
     public void installOrUpdateMods(Collection<WorkshopMod> mods) {
@@ -110,20 +115,35 @@ class WorkshopInstallerService {
 
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
-            log.info("Copying BiKey {} to server", key.getName());
-            FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), mod.getServerType()).toFile());
+            for (ServerType serverType : getRelevantServerTypes(mod)) {
+                log.info("Copying BiKey {} to server {}", key.getName(), serverType);
+                FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), serverType).toFile());
+            }
         }
     }
 
     private void createSymlink(WorkshopMod mod) throws IOException {
         // create symlink to server directory
-        Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), mod.getServerType());
         Path targetPath = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType());
 
-        log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
-        if (!Files.isSymbolicLink(linkPath)) {
-            Files.createSymbolicLink(linkPath, targetPath);
+        for (ServerType serverType : getRelevantServerTypes(mod)) {
+            Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), serverType);
+            if (!Files.isSymbolicLink(linkPath)) {
+                log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
+                Files.createSymbolicLink(linkPath, targetPath);
+            }
         }
+    }
+
+    private Collection<ServerType> getRelevantServerTypes(WorkshopMod mod) {
+        Set<ServerType> serverTypes = new HashSet<>();
+        if (installationService.isServerInstalled(mod.getServerType())) {
+            serverTypes.add(mod.getServerType());
+        }
+        if (mod.getServerType() == ServerType.DAYZ && installationService.isServerInstalled(ServerType.DAYZ_EXP)) {
+            serverTypes.add(ServerType.DAYZ_EXP);
+        }
+        return serverTypes;
     }
 
     private void updateModInfo(WorkshopMod mod) {

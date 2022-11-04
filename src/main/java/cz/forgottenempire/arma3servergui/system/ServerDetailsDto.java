@@ -1,11 +1,11 @@
-package cz.forgottenempire.arma3servergui.serverinstance.dtos;
+package cz.forgottenempire.arma3servergui.system;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class ServerDetails {
+public class ServerDetailsDto {
 
     private long spaceLeft;
     private long spaceTotal;
