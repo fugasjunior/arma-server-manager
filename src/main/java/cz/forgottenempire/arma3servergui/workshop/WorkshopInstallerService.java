@@ -62,7 +62,7 @@ class WorkshopInstallerService {
             FileUtils.deleteDirectory(modDirectory);
         } catch (NoSuchFileException ignored) {
         } catch (IOException e) {
-            log.error("Could not delete mod (directory {}) due to {}", modDirectory, e.toString());
+            log.error("Could not delete mod (directory {})", modDirectory, e);
             throw new RuntimeException(e);
         }
         log.info("Mod {} ({}) successfully deleted", mod.getName(), mod.getId());

@@ -65,6 +65,7 @@ const REFORGER_INITIAL_STATE = {
     adminPassword: "",
     battlEye: true,
     thirdPersonViewEnabled: true,
+    activeMods: [],
 }
 
 const NewServerPage = () => {
@@ -102,8 +103,8 @@ const NewServerPage = () => {
         const server = {
             ...values,
             type,
-            activeMods: selectedMods ?? [],
-            activeDLCs: selectedDlcs ?? [],
+            activeMods: selectedMods ? selectedMods : [],
+            activeDLCs: selectedDlcs ? selectedDlcs : [],
         }
 
         try {

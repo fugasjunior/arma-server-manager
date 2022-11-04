@@ -166,7 +166,7 @@ class ServerProcessService {
             serverProcess = processFactory.startProcessWithRedirectedOutput(executable, parameters, logFile);
             log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), serverProcess.pid());
         } catch (IOException e) {
-            log.error("Could not start server '{}' (ID {}) due to {}", server.getName(), server.getId(), e.toString());
+            log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
         }
         return serverProcess;
     }

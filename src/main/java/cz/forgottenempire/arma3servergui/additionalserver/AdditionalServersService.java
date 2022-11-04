@@ -72,8 +72,8 @@ class AdditionalServersService {
                     new AdditionalServerInstanceInfo(serverId, true, LocalDateTime.now(), process));
             log.info("Server '{}' started (PID {})", settings.getName(), process.pid());
         } catch (IOException e) {
-            log.error("Could not start server {} with command {} in directory {} due to {}",
-                    settings.getName(), settings.getCommand(), settings.getServerDir(), e.getMessage());
+            log.error("Could not start server {} with command {} in directory {}",
+                    settings.getName(), settings.getCommand(), settings.getServerDir(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Failed to start server '" + settings.getName() + "'");
         }

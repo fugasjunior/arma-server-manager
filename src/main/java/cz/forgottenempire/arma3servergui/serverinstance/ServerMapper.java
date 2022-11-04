@@ -3,12 +3,14 @@ package cz.forgottenempire.arma3servergui.serverinstance;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.serverinstance.dtos.Arma3ServerDto;
 import cz.forgottenempire.arma3servergui.serverinstance.dtos.DayZServerDto;
+import cz.forgottenempire.arma3servergui.serverinstance.dtos.ReforgerModDto;
 import cz.forgottenempire.arma3servergui.serverinstance.dtos.ReforgerServerDto;
 import cz.forgottenempire.arma3servergui.serverinstance.dtos.ServerDto;
 import cz.forgottenempire.arma3servergui.serverinstance.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.arma3servergui.serverinstance.dtos.ServerWorkshopModDto;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.DayZServer;
+import cz.forgottenempire.arma3servergui.serverinstance.entities.ReforgerMod;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.ReforgerServer;
 import cz.forgottenempire.arma3servergui.serverinstance.entities.Server;
 import cz.forgottenempire.arma3servergui.workshop.Arma3CDLC;
@@ -53,6 +55,10 @@ interface ServerMapper {
     default Arma3CDLC mapCreatorDlcDtoToEntity(CreatorDlcDto creatorDlcDto) {
         return Arma3CDLC.fromId(creatorDlcDto.getId());
     }
+
+    ReforgerModDto mapReforgerModToDto(ReforgerMod reforgerMod);
+
+    ReforgerMod mapReforgerModDtoToEntity(ReforgerModDto reforgerModDto);
 
     default ServerDto mapServerToDto(Server server) {
         ServerType type = server.getType();
