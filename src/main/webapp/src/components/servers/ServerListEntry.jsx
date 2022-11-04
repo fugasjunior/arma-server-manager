@@ -24,7 +24,7 @@ const ServerListEntry = (props) => {
     const serverRunning = server.instanceInfo && server.instanceInfo.alive;
 
     return (
-            <TableRow id={`server-${server.id}-list-entry`}>
+            <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
                 <TableCell>
                     <Avatar src={SERVER_ICON_URLS[server.type]} alt={`${server.type} icon`}/>
                 </TableCell>
@@ -43,7 +43,9 @@ const ServerListEntry = (props) => {
                     <Stack direction="row" spacing={1}>
                         {serverRunning ?
                                 <>
-                                    <Button id={`server-${server.id}-stop-btn`} variant="contained" color="error"
+                                    <Button id={`server-${server.id}-stop-btn`}
+                                            className="server-stop-btn"
+                                            variant="contained" color="error"
                                             onClick={() => onStopServer(server.id)}>
                                         Stop
                                     </Button>
@@ -58,6 +60,7 @@ const ServerListEntry = (props) => {
                                 </Button>
                         }
                         <Button id={`server-${server.id}-settings-btn`}
+                                className="server-settings-btn"
                                 component={Link} to={"/servers/" + server.id}
                                 variant="outlined" startIcon={<SettingsIcon/>}
                         >
@@ -92,6 +95,7 @@ const ServerListEntry = (props) => {
                     }
                     {!serverRunning &&
                             <Button id={`server-${server.id}-delete-btn`}
+                                    className="server-delete-btn"
                                     variant="outlined" startIcon={<DeleteIcon/>} color="error"
                                     onClick={() => onDeleteServer(server.id)}>Delete
                             </Button>}
