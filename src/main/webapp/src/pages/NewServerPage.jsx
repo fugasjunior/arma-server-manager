@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {createServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
@@ -8,6 +8,7 @@ import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
+import {OSContext} from "../store/os-context";
 
 const ARMA3_INITIAL_STATE = {
     type: "ARMA3",
@@ -66,16 +67,21 @@ const REFORGER_INITIAL_STATE = {
     thirdPersonViewEnabled: true,
 }
 
-const ServerSettingsPage = () => {
+const NewServerPage = () => {
     const [availableMods, setAvailableMods] = useState([]);
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const {type} = useParams();
-
     const navigate = useNavigate();
+    const osCtx = useContext(OSContext);
 
     useEffect(() => {
+        if (type === "DAYZ" && osCtx.os === "LINUX") {
+            navigate("/servers");
+            toast.error("DayZ server is available only on Windows machines");
+            return;
+        }
         fetchData();
     }, []);
 
@@ -147,4 +153,4 @@ const ServerSettingsPage = () => {
     );
 }
 
-export default ServerSettingsPage;
+export default NewServerPage;

@@ -1,6 +1,6 @@
 package cz.forgottenempire.arma3servergui.system;
 
-import cz.forgottenempire.arma3servergui.serverinstance.dtos.ServerDetails;
+import cz.forgottenempire.arma3servergui.util.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +21,8 @@ class SystemController {
     }
 
     @GetMapping
-    public ResponseEntity<ServerDetails> getServerDetails() {
-        ServerDetails details = ServerDetails.builder()
+    public ResponseEntity<ServerDetailsDto> getServerDetails() {
+        ServerDetailsDto details = ServerDetailsDto.builder()
                 .spaceLeft(systemService.getDiskSpaceLeft())
                 .spaceTotal(systemService.getDiskSpaceTotal())
                 .memoryLeft(systemService.getMemoryLeft())
@@ -35,5 +35,10 @@ class SystemController {
                 .build();
 
         return ResponseEntity.ok(details);
+    }
+
+    @GetMapping("/os")
+    public ResponseEntity<ServerOSDto> getOSType() {
+        return ResponseEntity.ok(new ServerOSDto(SystemUtils.getOsType()));
     }
 }
