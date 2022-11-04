@@ -314,20 +314,17 @@ const EditDayZServerSettingsForm = props => {
                         </Grid>
                     </Grid>
                 </form>
-
-                {props.server.type !== "DAYZ_EXP" &&
-                        <>
-                            <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
-                            <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
-                                <Box>
-                                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                                 itemsLabel="mods" showFilter selectedPreset={selectedPreset}
-                                                 presets={presets} onPresetChange={handlePresetChange}/>
-                                </Box>
-                            </Modal>
-                        </>
-                }
+                <>
+                    <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                    <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+                        <Box>
+                            <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                         onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                         itemsLabel="mods" showFilter selectedPreset={selectedPreset}
+                                         presets={presets} onPresetChange={handlePresetChange}/>
+                        </Box>
+                    </Modal>
+                </>
             </div>
     );
 };

@@ -18,7 +18,7 @@ export default function ListBuilderList(props) {
                                        id={`${props.typeLabel}-filter`} onChange={props.onFilterChange}/>
                     }
                 </Stack>
-                <List className={styles.list}>
+                <List className={styles.list} sx={{p:0}}>
                     {props.selectedOptions.length === 0 &&
                             <Typography m={2}>No {props.itemsLabel} {props.typeLabel.toLowerCase()}</Typography>
                     }
