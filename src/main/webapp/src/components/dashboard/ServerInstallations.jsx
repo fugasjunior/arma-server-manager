@@ -3,6 +3,7 @@ import {Grid} from "@mui/material";
 import {useInterval} from "../../hooks/use-interval";
 import {getServerInstallations, installServer} from "../../services/serverInstallationsService";
 import ServerInstallationItem from "./ServerInstallationItem";
+import SERVER_NAMES from "../../util/serverNames";
 
 const ServerInstallations = () => {
     const [serverInstallations, setServerInstallations] = useState([]);
@@ -15,7 +16,8 @@ const ServerInstallations = () => {
 
     const fetchServerInstallations = async () => {
         const {data: serverInstallationsDto} = await getServerInstallations();
-        const installations = serverInstallationsDto.serverInstallations.sort((a, b) => a.name.localeCompare(b.name));
+        const installations = serverInstallationsDto.serverInstallations
+        .sort((a, b) => SERVER_NAMES[a.type].localeCompare(SERVER_NAMES[a.type]));
         setServerInstallations(installations);
     };
 
