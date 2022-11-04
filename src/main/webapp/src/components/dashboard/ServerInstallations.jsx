@@ -17,7 +17,7 @@ const ServerInstallations = () => {
     const fetchServerInstallations = async () => {
         const {data: serverInstallationsDto} = await getServerInstallations();
         const installations = serverInstallationsDto.serverInstallations
-        .sort((a, b) => SERVER_NAMES[a.type].localeCompare(SERVER_NAMES[a.type]));
+        .sort((a, b) => SERVER_NAMES[a.type].localeCompare(SERVER_NAMES[b.type]));
         setServerInstallations(installations);
     };
 
