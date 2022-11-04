@@ -45,8 +45,8 @@ class ScenarioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Scenario>> getAllScenarios() {
-        return new ResponseEntity<>(scenarioService.getAllScenarios(), HttpStatus.OK);
+    public ResponseEntity<Arma3ScenariosDto> getAllScenarios() {
+        return ResponseEntity.ok(new Arma3ScenariosDto(scenarioService.getAllScenarios()));
     }
 
     @GetMapping("/{name:.+}")
@@ -91,7 +91,7 @@ class ScenarioController {
         }
 
         scenarioService.uploadScenarioToServer(file);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{name:.+}")
@@ -101,6 +101,6 @@ class ScenarioController {
         if (!scenarioService.deleteScenario(name)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 }

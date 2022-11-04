@@ -1,5 +1,6 @@
 package cz.forgottenempire.arma3servergui.scenario;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,14 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class Scenario implements Comparable<Scenario> {
+class Arma3ScenarioDto {
 
     private String name;
     private Long fileSize;
-    private String createdOn;
-
-    @Override
-    public int compareTo(Scenario scenario) {
-        return this.getName().compareTo(scenario.getName());
-    }
+    private LocalDateTime createdOn;
 }

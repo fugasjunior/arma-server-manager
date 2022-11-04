@@ -6,8 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as React from "react";
 import PropTypes from "prop-types";
-import {Button, CircularProgress, Divider, Stack} from "@mui/material";
-import UpdateIcon from '@mui/icons-material/Update';
+import {Button, CircularProgress, Divider, Stack, TextField} from "@mui/material";
 
 function ScenariosTableToolbar(props) {
     const {numSelected, title} = props;
@@ -44,11 +43,14 @@ function ScenariosTableToolbar(props) {
                 )}
 
                 <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
+                    <TextField label="Search" type="search" variant="standard" value={props.search}
+                               sx={{minWidth: "120px"}} id="search-field" onChange={props.onSearchChange}
+                    />
                     {!props.uploadInProgress && <Button variant="contained" component="label">
                         Upload
                         <input hidden multiple type="file" onChange={props.onFileChange}/>
                     </Button>}
-                    {props.uploadInProgress && <CircularProgress variant="determinate" value={props.percentUploaded} />}
+                    {props.uploadInProgress && <CircularProgress variant="determinate" value={props.percentUploaded}/>}
                     <Tooltip title="Delete">
                         <span>
                             <IconButton disabled={numSelected === 0} onClick={props.onDeleteClicked}>

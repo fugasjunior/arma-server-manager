@@ -12,27 +12,22 @@ import Checkbox from '@mui/material/Checkbox';
 import ScenariosTableToolbar from "./ScenariosTableToolbar";
 import EnhancedTableHead from "../../UI/Table/EnhancedTableHead";
 import {humanFileSize} from "../../util/util";
-import PendingIcon from "@mui/icons-material/Pending";
-import {Button, CircularProgress, Link, Stack, TextField} from "@mui/material";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import CheckIcon from "@mui/icons-material/Check";
-import Tooltip from "@mui/material/Tooltip";
-import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
-
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
+import {Button} from "@mui/material";
+import Fuse from "fuse.js";
+import config from "../../config";
 
 function getComparator(order, orderBy) {
-    return order === 'desc'
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy);
+    const sortByCell = headCells.find(cell => cell.id === orderBy);
+
+    if (sortByCell.type === "number" || sortByCell.type === "date") {
+        return order === "desc"
+                ? (a, b) => a[orderBy] - b[orderBy]
+                : (a, b) => b[orderBy] - a[orderBy];
+    }
+
+    return order === "desc"
+            ? (a, b) => b[orderBy].localeCompare(a[orderBy])
+            : (a, b) => a[orderBy].localeCompare(b[orderBy]);
 }
 
 const headCells = [
@@ -43,10 +38,12 @@ const headCells = [
     {
         id: 'fileSize',
         label: 'File size',
+        type: 'number'
     },
     {
         id: 'createdOn',
         label: 'Created on',
+        type: 'date'
     }
 
 ];
@@ -58,8 +55,10 @@ const ScenariosTable = (props) => {
     const [orderBy, setOrderBy] = useState('name');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(15);
+    const [search, setSearch] = useState("");
 
     const handleRequestSort = (event, property) => {
+        setSearch("");
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
@@ -74,10 +73,23 @@ const ScenariosTable = (props) => {
         setPage(0);
     };
 
+    const handleSearchChange = (event) => {
+        setSearch(event.target.value);
+    }
+
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+    const getRows = () => {
+        if (search) {
+            const fuse = new Fuse(props.rows, {keys: ["name"]});
+            const searched = fuse.search(search);
+            return searched.map(o => o.item);
+        }
+        return props.rows.sort(getComparator(order, orderBy));
+    }
 
     return (
             <Box sx={{width: '100%'}}>
@@ -88,7 +100,9 @@ const ScenariosTable = (props) => {
                             onFileChange={props.onFileChange}
                             uploadInProgress={props.uploadInProgress}
                             percentUploaded={props.percentUploaded}
+                            search={search}
                             title="Scenarios"
+                            onSearchChange={handleSearchChange}
                     />
                     <TableContainer>
                         <Table
@@ -106,8 +120,7 @@ const ScenariosTable = (props) => {
                                     headCells={headCells}
                             />
                             <TableBody>
-                                {rows.slice().sort(getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {getRows().slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
                                     const isItemSelected = isSelected(row.name);
                                     const labelId = `enhanced-table-checkbox-${index}`;
@@ -145,7 +158,7 @@ const ScenariosTable = (props) => {
                                                     {humanFileSize(row.fileSize)}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {row.createdOn ?? ""}
+                                                    {row.createdOn.toLocaleString(undefined, config.dateFormat)}
                                                 </TableCell>
                                             </TableRow>
                                     );
