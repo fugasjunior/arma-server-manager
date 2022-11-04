@@ -26,10 +26,12 @@ export default function ListBuilder(props) {
                 <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="available"
                         selectedOptions={filteredAvailableOptions} onClickItem={props.onSelect}
+                        itemsLabel={props.itemsLabel}
                         showFilter onFilterChange={handleFilterChange}
                 />
                 <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="selected"
+                        itemsLabel={props.itemsLabel}
                         selectedOptions={props.selectedOptions} onClickItem={props.onDeselect}
                 />
             </ListBuilderContainer>

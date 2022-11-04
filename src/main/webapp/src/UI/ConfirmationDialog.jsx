@@ -20,8 +20,9 @@ export default function ConfirmationDialog(props) {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={props.onClose}>Cancel</Button>
-                    <Button color={props.actionButtonColor ?? "error"} onClick={props.onConfirm} autoFocus>
+                    <Button id="dialog-cancel-btn" onClick={props.onClose}>Cancel</Button>
+                    <Button id="dialog-confirm-btn"
+                            color={props.actionButtonColor ?? "error"} onClick={props.onConfirm} autoFocus>
                         {props.actionLabel}
                     </Button>
                 </DialogActions>

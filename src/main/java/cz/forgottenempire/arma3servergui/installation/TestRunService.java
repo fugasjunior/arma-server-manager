@@ -3,13 +3,13 @@ package cz.forgottenempire.arma3servergui.installation;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.arma3servergui.common.PathsFactory;
+import cz.forgottenempire.arma3servergui.common.ProcessFactory;
 import cz.forgottenempire.arma3servergui.common.ServerType;
 import cz.forgottenempire.arma3servergui.util.SystemUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.ProcessBuilder.Redirect;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -25,11 +25,13 @@ class TestRunService {
 
     private static final String LOCALHOST = "localhost";
 
+    private final ProcessFactory processFactory;
     private final PathsFactory pathsFactory;
 
     @Autowired
     public TestRunService(
-            PathsFactory pathsFactory) {
+            ProcessFactory processFactory, PathsFactory pathsFactory) {
+        this.processFactory = processFactory;
         this.pathsFactory = pathsFactory;
     }
 
@@ -77,14 +79,9 @@ class TestRunService {
 
     private Process startServerForDryRun(ServerType type, int port, File configFile) throws IOException {
         List<String> parameters = getLaunchParameters(type, port, configFile);
-
+        File executable = pathsFactory.getServerExecutableWithFallback(type);
         log.info("Starting server '{}' for dry run with parameters: {}", type, parameters);
-
-        return new ProcessBuilder(parameters)
-                .redirectOutput(Redirect.DISCARD)
-                .redirectError(Redirect.DISCARD)
-                .directory(pathsFactory.getServerPath(type).toFile())
-                .start();
+        return processFactory.startProcessWithDiscardedOutput(executable, parameters);
     }
 
     private File createTestConfigFile(ServerType type, int port, int queryPort) throws IOException {
@@ -109,7 +106,6 @@ class TestRunService {
 
     private List<String> getLaunchParameters(ServerType type, int port, File configFile) {
         List<String> parameters = new ArrayList<>();
-        parameters.add(pathsFactory.getServerExecutableWithFallback(type).getAbsolutePath());
         if (type == ServerType.ARMA3) {
             addArma3LaunchParameters(parameters, port);
         } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {

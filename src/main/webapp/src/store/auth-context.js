@@ -10,9 +10,9 @@ export const AuthContext = createContext({
     }
 });
 
-const calculateExpirationTime = (seconds) => {
+const calculateExpirationTime = (millis) => {
     let date = new Date();
-    date = new Date(+date + seconds * 1000);
+    date = new Date(+date + millis);
     return date;
 }
 

@@ -48,7 +48,7 @@ export default function NewServerButton() {
             <div>
                 <Button
                         ref={anchorRef}
-                        id="composition-button"
+                        id="new-server-btn"
                         aria-controls={open ? 'composition-menu' : undefined}
                         aria-expanded={open ? 'true' : undefined}
                         aria-haspopup="true"
@@ -84,16 +84,20 @@ export default function NewServerButton() {
                                                 aria-labelledby="composition-button"
                                                 onKeyDown={handleListKeyDown}
                                         >
-                                            <MenuItem component={Link} to="/servers/new/ARMA3">
+                                            <MenuItem id="new-arma3-server-btn"
+                                                      component={Link} to="/servers/new/ARMA3">
                                                 Arma 3 server
                                             </MenuItem>
-                                            <MenuItem component={Link} to="/servers/new/REFORGER">
+                                            <MenuItem id="new-reforger-server-btn"
+                                                      component={Link} to="/servers/new/REFORGER">
                                                 Arma Reforger server
                                             </MenuItem>
-                                            <MenuItem component={Link} to="/servers/new/DAYZ">
+                                            <MenuItem id="new-dayz-server-btn"
+                                                      component={Link} to="/servers/new/DAYZ">
                                                 DayZ server
                                             </MenuItem>
-                                            <MenuItem component={Link} to="/servers/new/DAYZ_EXP">
+                                            <MenuItem id="new-dayzexp-server-btn"
+                                                      component={Link} to="/servers/new/DAYZ_EXP">
                                                 DayZ Experimental server
                                             </MenuItem>
                                         </MenuList>

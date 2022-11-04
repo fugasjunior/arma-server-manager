@@ -24,7 +24,7 @@ const ServerListEntry = (props) => {
     const serverRunning = server.instanceInfo && server.instanceInfo.alive;
 
     return (
-            <TableRow>
+            <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
                 <TableCell>
                     <Avatar src={SERVER_ICON_URLS[server.type]} alt={`${server.type} icon`}/>
                 </TableCell>
@@ -43,20 +43,25 @@ const ServerListEntry = (props) => {
                     <Stack direction="row" spacing={1}>
                         {serverRunning ?
                                 <>
-                                    <Button variant="contained" color="error"
+                                    <Button id={`server-${server.id}-stop-btn`}
+                                            className="server-stop-btn"
+                                            variant="contained" color="error"
                                             onClick={() => onStopServer(server.id)}>
                                         Stop
                                     </Button>
                                     <Button onClick={() => onRestartServer(server.id)}>Restart
                                     </Button>
                                 </>
-                                : <Button variant="contained" startIcon={<PlayCircleFilledIcon/>}
+                                : <Button id={`server-${server.id}-start-btn`}
+                                          variant="contained" startIcon={<PlayCircleFilledIcon/>}
                                           disabled={serverWithSamePortRunning}
                                           onClick={() => onStartServer(server.id)}>
                                     Start
                                 </Button>
                         }
-                        <Button component={Link} to={"/servers/" + server.id}
+                        <Button id={`server-${server.id}-settings-btn`}
+                                className="server-settings-btn"
+                                component={Link} to={"/servers/" + server.id}
                                 variant="outlined" startIcon={<SettingsIcon/>}
                         >
                             Settings
@@ -89,7 +94,9 @@ const ServerListEntry = (props) => {
                             </List>
                     }
                     {!serverRunning &&
-                            <Button variant="outlined" startIcon={<DeleteIcon/>} color="error"
+                            <Button id={`server-${server.id}-delete-btn`}
+                                    className="server-delete-btn"
+                                    variant="outlined" startIcon={<DeleteIcon/>} color="error"
                                     onClick={() => onDeleteServer(server.id)}>Delete
                             </Button>}
                 </TableCell>

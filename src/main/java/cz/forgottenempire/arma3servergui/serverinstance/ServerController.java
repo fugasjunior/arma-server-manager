@@ -27,11 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 class ServerController {
 
     private final ServerInstanceService serverInstanceService;
+    private final ServerProcessService serverProcessService;
     private final ServerMapper serverMapper = Mappers.getMapper(ServerMapper.class);
 
     @Autowired
-    public ServerController(ServerInstanceService serverInstanceService) {
+    public ServerController(ServerInstanceService serverInstanceService, ServerProcessService serverProcessService) {
         this.serverInstanceService = serverInstanceService;
+        this.serverProcessService = serverProcessService;
     }
 
     @GetMapping
@@ -40,7 +42,7 @@ class ServerController {
                 .stream()
                 .map(serverMapper::mapServerToDto).toList();
         serverDtos.forEach(s -> {
-            ServerInstanceInfo instanceInfo = serverInstanceService.getServerInstanceInfo(s.getId());
+            ServerInstanceInfo instanceInfo = serverProcessService.getServerInstanceInfo(s.getId());
             ServerInstanceInfoDto instanceInfoDto = serverMapper.mapServerInstanceInfoToDto(
                     instanceInfo);
             s.setInstanceInfo(instanceInfoDto);
@@ -54,7 +56,7 @@ class ServerController {
                 .orElseThrow(
                         () -> new NotFoundException("Server ID " + id + " doesn't exist"));
         ServerDto serverDto = serverMapper.mapServerToDto(server);
-        ServerInstanceInfo instanceInfo = serverInstanceService.getServerInstanceInfo(id);
+        ServerInstanceInfo instanceInfo = serverProcessService.getServerInstanceInfo(id);
         serverDto.setInstanceInfo(serverMapper.mapServerInstanceInfoToDto(instanceInfo));
         return ResponseEntity.ok(serverDto);
     }
@@ -86,21 +88,21 @@ class ServerController {
     @PostMapping("/{id}/start")
     public ResponseEntity<?> startServer(@PathVariable Long id) {
         log.info("Received request to start server ID {}", id);
-        serverInstanceService.startServer(id);
+        serverProcessService.startServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/stop")
     public ResponseEntity<?> stopServer(@PathVariable Long id) {
         log.info("Received request to stop server ID {}", id);
-        serverInstanceService.shutDownServer(id);
+        serverProcessService.shutDownServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/restart")
     public ResponseEntity<?> restartServer(@PathVariable Long id) {
         log.info("Received request to restart server ID {}", id);
-        serverInstanceService.restartServer(id);
+        serverProcessService.restartServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

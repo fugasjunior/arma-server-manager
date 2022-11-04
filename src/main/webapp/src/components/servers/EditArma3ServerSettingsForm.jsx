@@ -272,13 +272,14 @@ const EditArma3ServerSettingsForm = props => {
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <Button title={props.isServerRunning ? "Stop the server to be able to update the settings."
-                                    : ""}
+                            <Button id="submit-btn"
+                                    title={props.isServerRunning ? "Stop the server to be able to update the settings."
+                                            : ""}
                                     fullWidth={!mediaQuery}
                                     color="primary" variant="contained" type="submit" size="large">
                                 Submit
                             </Button>
-                            <Button color="error" variant="outlined"
+                            <Button id="cancel-btn" color="error" variant="outlined"
                                     fullWidth={!mediaQuery} sx={mediaQuery ? {ml: 1} : {mt: 1}}
                                     onClick={props.onCancel}>
                                 Cancel
@@ -286,8 +287,8 @@ const EditArma3ServerSettingsForm = props => {
                         </Grid>
                     </Grid>
                 </form>
-                <Button onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
-                <Button onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
+                <Button id="manage-mods-btn" onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                <Button id="manage-dlcs-btn" onClick={handleToggleDlcsModal} sx={{mt: 2, ml: 2}}>Manage DLCs</Button>
                 <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
                     <Box>
                         <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}

@@ -31,8 +31,8 @@ function getComparator(order, orderBy) {
     }
 
     return order === "desc"
-            ? (a, b) => a[orderBy].localeCompare(b[orderBy])
-            : (a, b) => b[orderBy].localeCompare(a[orderBy]);
+            ? (a, b) => b[orderBy].localeCompare(a[orderBy])
+            : (a, b) => a[orderBy].localeCompare(b[orderBy]);
 }
 
 const headCells = [
