@@ -63,6 +63,7 @@ class ServerController {
 
     @PostMapping
     public ResponseEntity<ServerDto> createServer(@Valid @RequestBody ServerDto serverDto) {
+        serverDto.setId(null);
         Server server = serverMapper.mapServerDtoToEntity(serverDto);
         server = serverInstanceService.createServer(server);
         return ResponseEntity.status(HttpStatus.CREATED).body(serverMapper.mapServerToDto(server));

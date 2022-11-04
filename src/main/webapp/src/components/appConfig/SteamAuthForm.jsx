@@ -27,10 +27,10 @@ const SteamAuthForm = () => {
     const handleSubmit = async (values) => {
         try {
             await setAuth(values);
-            toast.success("Steam loadedAuth successfully set");
+            toast.success("Steam Auth successfully set");
         } catch (e) {
             console.error(e);
-            toast.error("Setting steam loadedAuth failed");
+            toast.error("Setting Steam Auth failed");
         }
     }
 

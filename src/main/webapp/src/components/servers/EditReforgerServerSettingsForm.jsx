@@ -6,12 +6,23 @@ import {
     FormControlLabel,
     FormGroup,
     Grid,
+    Modal,
+    Stack,
     Switch,
     TextField,
     useMediaQuery
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {getReforgerScenarios} from "../../services/scenarioService";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from '@mui/icons-material/Add';
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
 
 function renderTextField(name, label, formik, required, type, helperText) {
     return (
@@ -46,9 +57,25 @@ function renderSwitch(name, label, formik) {
     )
 }
 
+const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
 export default function EditReforgerServerSettingsForm(props) {
 
     const [scenarios, setScenarios] = useState([]);
+    const [mods, setMods] = useState(props.server.activeMods);
+    const [modsModalOpen, setModsModalOpen] = useState(false);
+    const [newModName, setNewModName] = useState("");
+    const [newModId, setNewModId] = useState("");
 
     useEffect(() => {
         async function fetchScenarios() {
@@ -58,6 +85,34 @@ export default function EditReforgerServerSettingsForm(props) {
 
         fetchScenarios();
     }, []);
+
+    function handleSubmit(values) {
+        props.onSubmit(values, mods);
+    }
+
+    function handleToggleModsModal() {
+        setModsModalOpen(prevState => !prevState);
+    }
+
+    function handleNewModNameChange(event) {
+        setNewModName(event.target.value);
+    }
+
+    function handleNewModIdChange(event) {
+        setNewModId(event.target.value);
+    }
+
+    function handleAddNewMod() {
+        if (!mods.find(mod => mod.id === newModId)) {
+            setMods(prevState => [...prevState, {id: newModId, name: newModName}]);
+        }
+        setNewModId("");
+        setNewModName("");
+    }
+
+    function handleDeleteMod(id) {
+        setMods(prevState => prevState.filter(mod => mod.id !== id));
+    }
 
     function getScenarioDisplayName(scenario) {
         if (scenario.name) {
@@ -70,7 +125,7 @@ export default function EditReforgerServerSettingsForm(props) {
 
     const formik = useFormik({
         initialValues: props.server,
-        onSubmit: props.onSubmit,
+        onSubmit: handleSubmit,
         enableReinitialize: true
     });
 
@@ -118,7 +173,6 @@ export default function EditReforgerServerSettingsForm(props) {
                             />
                         </Grid>
 
-                        {/*{renderTextField("scenarioId", "Scenario ID", formik, true)}*/}
                         {renderTextField("maxPlayers", "Max players", formik, true, "number")}
                         {renderTextField("password", "Password", formik)}
                         {renderTextField("adminPassword", "Admin password", formik, true)}
@@ -143,6 +197,53 @@ export default function EditReforgerServerSettingsForm(props) {
                         </Grid>
                     </Grid>
                 </form>
+                <Button id="manage-mods-btn" onClick={handleToggleModsModal} sx={{mt: 2}}>Manage mods</Button>
+                <Modal open={modsModalOpen} onClose={handleToggleModsModal}>
+                    <Box sx={modalStyle}>
+                        <Stack direction="row" spacing={1} mb={2} justifyItems="center" justifyContent="space-between">
+                            <TextField id="mod-id" label="Mod ID" placeholder="Mod ID" size="small" required
+                                       variant="standard" value={newModId} onChange={handleNewModIdChange}/>
+                            <TextField id="mod-name" label="Mod name" placeholder="Mod name" size="small" required
+                                       variant="standard" value={newModName} onChange={handleNewModNameChange}/>
+                            <Button variant="contained" startIcon={<AddIcon/>}
+                                    onClick={handleAddNewMod}
+                                    disabled={newModId.length === 0 || newModName.length === 0}
+                            >
+                                Add
+                            </Button>
+                        </Stack>
+                        {mods.length > 0 &&
+                                <Box overflow="auto" maxHeight={400}>
+                                    <TableContainer>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>ID</TableCell>
+                                                    <TableCell>Name</TableCell>
+                                                    <TableCell></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {mods.map(mod => (
+                                                        <TableRow key={mod.id} style={{height: 33}}>
+                                                            <TableCell>{mod.id}</TableCell>
+                                                            <TableCell>{mod.name}</TableCell>
+                                                            <TableCell align="right">
+                                                                <IconButton
+                                                                        aria-label="delete"
+                                                                        onClick={() => handleDeleteMod(mod.id)}>
+                                                                    <DeleteIcon color="error"/>
+                                                                </IconButton>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Box>
+                        }
+                    </Box>
+                </Modal>
             </div>
     );
 }

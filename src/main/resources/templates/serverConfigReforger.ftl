@@ -34,7 +34,14 @@
 "other": "values"
 }
 },
-"mods": []
+"mods": [
+<#list activeMods as mod>
+  {
+  "modID": "${mod.id}",
+  "name": "${mod.name}"
+  }<#sep>,</#sep>
+</#list>
+]
 },
 "a2sQueryEnabled": true,
 "steamQueryPort": ${queryPort?string.computer}

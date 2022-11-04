@@ -41,10 +41,6 @@ public class WorkshopFileDetailsService {
         return getValueFromInfo(modId, "title");
     }
 
-    public String getModDescription(Long modId) {
-        return getValueFromInfo(modId, "description");
-    }
-
     public Long getModAppId(Long modId) {
         String value = getValueFromInfo(modId, "consumer_app_id");
         if (value == null) {
@@ -119,7 +115,7 @@ public class WorkshopFileDetailsService {
         try {
             return cache.get(modId);
         } catch (ExecutionException e) {
-            log.error("Could not get mod info for mod id {} due to {}", modId, e.toString());
+            log.error("Could not get mod info for mod id {}", modId, e);
             return null;
         }
     }

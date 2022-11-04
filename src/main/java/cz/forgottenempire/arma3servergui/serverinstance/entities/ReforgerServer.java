@@ -1,5 +1,7 @@
 package cz.forgottenempire.arma3servergui.serverinstance.entities;
 
+import java.util.List;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -19,4 +21,7 @@ public class ReforgerServer extends Server {
 
     private boolean thirdPersonViewEnabled;
     private boolean battlEye;
+
+    @ElementCollection
+    private List<ReforgerMod> activeMods;
 }

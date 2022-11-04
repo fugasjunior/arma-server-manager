@@ -80,6 +80,13 @@ CREATE TABLE reforger_server
     CONSTRAINT pk_reforgerserver PRIMARY KEY (id)
 );
 
+CREATE TABLE reforger_server_active_mods
+(
+    reforger_server_id BIGINT       NOT NULL,
+    name               VARCHAR(255) NULL,
+    id                 VARCHAR(255) NULL
+);
+
 CREATE TABLE server
 (
     id             BIGINT AUTO_INCREMENT NOT NULL,
@@ -117,7 +124,7 @@ CREATE TABLE workshop_mod
 (
     id                  BIGINT       NOT NULL,
     name                VARCHAR(255) NULL,
-    last_updated        VARCHAR(255) NULL,
+    last_updated        datetime     NULL,
     file_size           BIGINT       NULL,
     installation_status VARCHAR(255) NULL,
     error_status        VARCHAR(255) NULL,
@@ -157,3 +164,6 @@ ALTER TABLE preset_mod
 
 ALTER TABLE preset_mod
     ADD CONSTRAINT fk_premod_on_workshop_mod FOREIGN KEY (mod_id) REFERENCES workshop_mod (id);
+
+ALTER TABLE reforger_server_active_mods
+    ADD CONSTRAINT fk_reforgerserver_activemods_on_reforger_server FOREIGN KEY (reforger_server_id) REFERENCES reforger_server (id);

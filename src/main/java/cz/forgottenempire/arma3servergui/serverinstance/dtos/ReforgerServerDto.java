@@ -1,6 +1,7 @@
 package cz.forgottenempire.arma3servergui.serverinstance.dtos;
 
 import cz.forgottenempire.arma3servergui.common.ServerType;
+import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -34,4 +35,6 @@ public class ReforgerServerDto implements ServerDto {
     private boolean thirdPersonViewEnabled;
 
     private ServerInstanceInfoDto instanceInfo;
+
+    private List<ReforgerModDto> activeMods;
 }

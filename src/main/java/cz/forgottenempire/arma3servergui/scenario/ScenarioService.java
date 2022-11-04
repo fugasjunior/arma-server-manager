@@ -65,7 +65,7 @@ class ScenarioService {
             file.transferTo(scenarioFile);
             log.info("Successfully downloaded scenario {}", scenarioName);
         } catch (IOException e) {
-            log.error("Could not download scenario {} due to {}", scenarioName, e.toString());
+            log.error("Could not download scenario {}", scenarioName, e);
             throw new RuntimeException(e);
         }
     }
@@ -94,7 +94,7 @@ class ScenarioService {
             Files.delete(pathsFactory.getScenarioPath(name));
             log.info("Successfully deleted scenario {}", name);
         } catch (IOException e) {
-            log.error("Could not delete scenario {} due to {}", name, e.toString());
+            log.error("Could not delete scenario {}", name, e);
             return false;
         }
         return true;

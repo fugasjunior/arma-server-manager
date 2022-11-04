@@ -79,7 +79,7 @@ class CheckServerInstancesStatusCronJob {
                     .build());
 
         } catch (Exception e) {
-            log.error("Couldn't query server {} (ID {}) on port {} due to {}",
+            log.error("Couldn't query server {} (ID {}) on port {}",
                     server.getName(), instanceInfo.getId(), server.getQueryPort(), e);
         }
     }
