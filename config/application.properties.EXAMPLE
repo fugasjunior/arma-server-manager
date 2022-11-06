@@ -28,8 +28,8 @@ directory.mods=/home/arma3gui/mods
 # Absolute path to servers base folder.
 directory.servers=/home/arma3gui/servers/
 
-# Logs directory for Arma 3 server and additional servers.
-arma3server.logDir=/home/arma3gui/logs/server
+# Logs directory for all servers.
+directory.logs=/home/arma3gui/logs/server
 
 
 ### Server config

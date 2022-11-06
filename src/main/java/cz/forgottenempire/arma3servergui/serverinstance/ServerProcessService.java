@@ -32,7 +32,7 @@ class ServerProcessService {
     private final ConfigFileService configFileService;
     private final ProcessFactory processFactory;
     private final PathsFactory pathsFactory;
-    @Value("${arma3server.logDir}")
+    @Value("${directory.logs}")
     private String logDir; // TODO get rid of this, fix for multiple server instances
     @Value("${additionalMods:#{null}}")
     private String[] additionalMods;

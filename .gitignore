@@ -1,7 +1,9 @@
 ### Project specific files
 config/*
 !config/application.properties.EXAMPLE
+!config/application-docker.properties
 logs/
+.env
 
 HELP.md
 .gradle

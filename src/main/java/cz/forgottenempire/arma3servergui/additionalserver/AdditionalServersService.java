@@ -29,7 +29,7 @@ class AdditionalServersService {
     public AdditionalServersService(
             AdditionalServerRepository serverRepository,
             AdditionalServerInstanceInfoRepository instanceInfoRepository,
-            ProcessFactory processFactory, @Value("${arma3server.logDir}") String logDirectory
+            ProcessFactory processFactory, @Value("${directory.logs}") String logDirectory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
