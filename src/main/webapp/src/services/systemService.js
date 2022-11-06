@@ -3,10 +3,10 @@ import config from "../config";
 
 const apiEndpoint = config.apiUrl + "/system";
 
-export function getFreeSpace() {
-    return http.get(apiEndpoint + "/space");
+export function getSystemInfo() {
+    return http.get(apiEndpoint);
 }
 
-export function getSystemInfo() {
-    return http.get(apiEndpoint + "/info");
+export function getServerOS() {
+    return http.get(apiEndpoint + "/os");
 }

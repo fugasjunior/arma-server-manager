@@ -1,8 +1,9 @@
 ### Project specific files
 config/*
 !config/application.properties.EXAMPLE
-!config/mongo-init.js
+!config/application-docker.properties
 logs/
+.env
 
 HELP.md
 .gradle
@@ -35,3 +36,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### JPA Buddy ###
+.jpb
+
+# cypress example files
+**/cypress/e2e/examples/

@@ -22,35 +22,26 @@ database.encryption.secret=<AES-256 key>
 # Absolute path to SteamCMD executable.
 steamcmd.path=/usr/games/steamcmd
 
-# Absolute path to a directory where the mods are installed.
-installDir=/home/arma3gui/server/mods
+# Absolute path to a directory where the mods (and temporary server files) are installed.
+directory.mods=/home/armaservermanager/mods
 
-# Absolute path to Arma 3 server.
-serverDir=/home/arma3gui/server/serverfiles/
+# Absolute path to servers base folder.
+directory.servers=/home/armaservermanager/servers/
 
-# Logs directory for Arma 3 server and additional servers.
-arma3server.logDir=/home/arma3gui/logs/server
+# Logs directory for all servers.
+directory.logs=/home/armaservermanager/logs/server
 
 
 ### Server config
-# Hostname or server IP to be used in the server system info
-hostName=forgottenEmpire.cz
-
-# Optional branch to be used for Arma 3 server. creatordlc branch recommended for playing with community DLCs.
-betaBranch=creatordlc
-
 # Additional mods to be activated when running the server that are not managed through the UI.
 # Comma separated list, such as: mod1,mod2,mod3. Can be left blank in most cases.
 additionalMods=
 
-# Use 64bit executable.
-arma3server.x64=true
 
 ### Database settings
-spring.datasource.url=jdbc:mysql://localhost:3306/arma3gui_db
-spring.datasource.username=arma3gui
+spring.datasource.url=jdbc:mysql://localhost:3306/armaservermanager_db
+spring.datasource.username=armaservermanager
 spring.datasource.password=example
-spring.jpa.hibernate.ddl-auto=update
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 

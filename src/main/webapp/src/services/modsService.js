@@ -1,28 +1,27 @@
 import http from "./httpService";
 import config from "../config";
 
-const apiEndpoint = config.apiUrl + "/mods";
+const apiEndpoint = config.apiUrl + "/mod";
 
-export function getMods() {
-    return http.get(apiEndpoint);
+export function getMods(filterByServerType) {
+    const query = filterByServerType ? "?filter=" + filterByServerType
+            : ""
+    return http.get(apiEndpoint + query);
 }
 
 export function installMod(modId) {
-    return http.post(apiEndpoint + "/install/" + modId);
+    return http.post(apiEndpoint + "/" + modId);
 }
+
+export function updateMods(modIdsList) {
+    return http.post(apiEndpoint + "?modIds=" + modIdsList);
+}
+
 
 export function uninstallMod(modId) {
-    return http.delete(apiEndpoint + "/uninstall/" + modId);
+    return http.delete(apiEndpoint + "/" + modId);
 }
 
-export function refreshMods() {
-    return http.post(apiEndpoint + "/updateAll");
-}
-
-export function setActive(modId, val) {
-    return http.post(apiEndpoint + "/setActive/" + modId + "/?active=" + val);
-}
-
-export function setMultipleActive(mods) {
-    return http.post(apiEndpoint + "/setMultipleActive", mods);
+export function uninstallMods(modIdsList) {
+    return http.delete(apiEndpoint + "?modIds=" + modIdsList);
 }
