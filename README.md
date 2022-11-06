@@ -16,45 +16,82 @@
 - Download and manage **Steam Workshop mods** for Arma 3 and DayZ
 - Configure, run and monitor multiple servers at once
 - Arma 3 scenarios management
+- Docker image for simplified setup
 - Support for simplified management of additional game servers
 
 ## Installation
 
 ### Prerequisites
-- [JDK 17](https://www.oracle.com/java/technologies/downloads/#java17)
-- [Docker](https://docs.docker.com/engine/install/) or own MySQL database 
 
-### Installing SteamCMD
-Follow [this guide](https://developer.valvesoftware.com/wiki/SteamCMD#Downloading_SteamCMD) to install SteamCMD on your 
-server. After the installation is finished, set the full path to SteamCMD executable in `application.properties`. On Linux,
+- [Docker](https://docs.docker.com/engine/install/)
+- OR
+- [JDK 17](https://www.oracle.com/java/technologies/downloads/#java17) + MySQL database (can also be in Docker)
+
+### Running with Docker
+
+In the repository, you can find two files: `docker-compose.yml` and `.env.EXAMPLE`. Copy them into a desired directory
+on your server.
+
+Then, rename the `.env.EXAMPLE` file to `.env` and open it. Inside, you will find some properties that need
+configuration. If you're unsure what to set, refer to the file `config/application.properties.EXAMPLE` where there is
+a short description of the expected values.
+
+After you've set up the values and saved the file, you can run `docker compose up`, which will automatically bring
+the database and the server manager up. It should then be accessible on port 8080 by default.
+
+### Custom installation (no Docker)
+
+<details><summary>Custom installation steps</summary>
+
+#### Installing SteamCMD
+
+Follow [this guide](https://developer.valvesoftware.com/wiki/SteamCMD#Downloading_SteamCMD) to install SteamCMD on your
+server. After the installation is finished, set the full path to SteamCMD executable in `application.properties`. On
+Linux,
 the default path when installing with package manager is `/usr/games/steamcmd`.
 
-### Getting SteamAuth token
-If you have Steam Guard 2FA enabled on your Steam account, you're going to need to get a SteamAuth token. To do this,
-manually launch SteamCMD with a command line. 
+#### Configuring the Admin UI app
 
-Type `login <your_steam_name>` and input password when prompted. Then you'll be prompted to input Steam token 
-which will be sent into your email. Enter it to successfully login and then type `quit` to exit the SteamCMD interface.
-**Keep the token for later use**.  
-
-### Configuring the Admin UI app
-There is a `config` directory bundled with the .jar executable file. In it, you will find `application.properties.EXAMPLE`
+There is a `config` directory bundled with the .jar executable file. In it, you will
+find `application.properties.EXAMPLE`
 file which contains sample configuration. Copy this file and name it `application.properties`.
 
 Open the new file and set all the required properties as described.
 
-### Setting up MySQL database with Docker
+#### Setting up MySQL database with Docker
 
 In the project you can find `docker-compose.yml` file for the MySQL database Docker container. Edit the environment
-variables to match `application.properties`, **especially the database properties**,
-and then start the container with `docker-compose up -d`.
+variables to match `application.properties`, **especially the database properties**, comment out the `armaservermanager`
+service and then start the container with `docker-compose up -d`.
 
-You can also use your own MySQL database server insted if you prefer do to so.
+You can also use your own MySQL database server instead if you prefer do to so.
 
-### Running the Admin UI app
+#### Running the Admin UI app
 
 Launch the application by running: `java -jar arma3-server-gui.jar`. You should be able to access the GUI through
 `http://localhost:8080` by default.
+
+</details>
+
+## First time setup
+
+### Getting SteamAuth token
+
+If you have Steam Guard 2FA enabled on your Steam account, you're going to need to get a SteamAuth token. To do this,
+either manually launch SteamCMD with a command line and log in, or use the semi-automated approach through UI.
+
+#### Option 1: Obtain Steam Guard token through UI
+
+Upon first start, head to "App config" tab and fill out your Steam username and password. Then, head to "Dashboard" and
+try to download any available server.
+
+After a while, the installation will fail because of invalid credentials. However, at this time, you should have
+received an email with Steam Guard token, which you can now add in the "App Config" tab.
+
+#### Option 2: Manually logging into SteamCMD
+
+Type `login <your_steam_name>` and input password when prompted. Then you'll be prompted to input Steam token
+which will be sent into your email. Enter it to successfully login and then type `quit` to exit the SteamCMD interface.
 
 ### Setting up SteamAuth
 
@@ -107,17 +144,19 @@ of a button.
 
 ## Planned features
 
-- Docker image for the Admin UI
 - In-built headless client support
 - Access to logs
-
-## Credits
-
-This app is heavily based on Dahlgren's [Arma Server Admin](https://github.com/Dahlgren/arma-server-web-admin) project
-and I took a lot of inspiration from it on how to make things work. Check out his project too!
+- Arma 4 support :))
 
 ## Support
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/fugasjunior)
 
 Enjoy my work? You can [_Buy me a coffee_](https://www.buymeacoffee.com/fugasjunior)
+
+## Credits
+
+This app is heavily based on Dahlgren's [Arma Server Admin](https://github.com/Dahlgren/arma-server-web-admin) project
+and I took a lot of inspiration from it on how to make things work. Check out his project too!
+
+
