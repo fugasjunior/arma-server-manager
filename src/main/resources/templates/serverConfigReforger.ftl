@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.serverinstance.entities.ReforgerServer" -->
+<#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer" -->
 {
 "dedicatedServerId": "${dedicatedServerId!}",
 "region": "EU",

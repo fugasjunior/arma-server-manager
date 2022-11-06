@@ -12,7 +12,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - arma3gui-db:/var/lib/mysql
+      - armaservermanager-db:/var/lib/mysql
 
   adminer:
     image: adminer
@@ -20,16 +20,16 @@ services:
     ports:
       - "8090:8080"
 
-  arma3gui:
-    image: "fugasjunior/arma3gui:${VERSION}"
+  armaservermanager:
+    image: "fugasjunior/armaservermanager:${VERSION}"
     restart: always
     #    Not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host
     depends_on:
       - db
     volumes:
-      #      - /home/arma3gui/storage:/home/steam/arma3gui/
-      - arma3gui-storage:/home/steam/arma3gui/
+      #      - /home/armaservermanager/storage:/home/steam/armaservermanager/
+      - armaservermanager-storage:/home/steam/armaservermanager/
     environment:
       AUTH_USERNAME: "${AUTH_USERNAME}"
       AUTH_PASSWORD: "${AUTH_PASSWORD}"
@@ -41,5 +41,5 @@ services:
       DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
 
 volumes:
-  arma3gui-db:
-  arma3gui-storage:
+  armaservermanager-db:
+  armaservermanager-storage:

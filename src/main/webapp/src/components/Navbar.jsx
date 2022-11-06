@@ -1,7 +1,8 @@
 import React, {useContext} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
-import {AppBar, Button, CssBaseline, Stack, Toolbar, Typography} from "@mui/material";
+import {AppBar, Avatar, Button, CssBaseline, Stack, Toolbar, Typography} from "@mui/material";
 import {AuthContext} from "../store/auth-context";
+import logo from "../img/logo_48x48.png"
 
 const Navbar = () => {
     const authCtx = useContext(AuthContext);
@@ -18,14 +19,19 @@ const Navbar = () => {
                 {isLoggedIn && <AppBar position="static" sx={{mb: 4}}>
                     <CssBaseline/>
                     <Toolbar>
-                        <Typography variant="h4">
-                            Arma Server GUI
+                        <Avatar
+                                alt="Forgotten Empire Logo"
+                                src={logo}
+                                sx={{width: 52, height: 52, mr: 2}}
+                        />
+                        <Typography component="h1" variant="h5">
+                            Arma Server Manager
                         </Typography>
                         <Stack marginLeft={4}
                                direction="row"
                                justifyContent="flex-start"
                                alignItems="center"
-                               spacing={2}>
+                               spacing={1}>
                             <Button color="success" component={NavLink} to="/" sx={{color: '#fff'}}>
                                 Dashboard
                             </Button>
@@ -46,7 +52,7 @@ const Navbar = () => {
                             </Button>
                             <Button onClick={handleLogout}
                                     sx={{color: '#fff'}}
-                                    style={{justifySelf: "flex-end"}}>
+                            >
                                 Log out
                             </Button>
                         </Stack>
