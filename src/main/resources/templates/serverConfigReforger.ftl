@@ -14,9 +14,9 @@
 "playerCountLimit": ${maxPlayers?string.computer},
 "autoJoinable": false,
 "visible": true,
+<#--TODO make supported client types configurable-->
 "supportedGameClientTypes": [
-"PLATFORM_PC",
-"PLATFORM_XBL"
+"PLATFORM_PC"
 ],
 "gameProperties": {
 "serverMaxViewDistance": 2500,
