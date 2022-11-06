@@ -112,8 +112,10 @@ class SteamCmdExecutor {
             return;
         }
 
+        log.error("SteamCmd failed due to: '{}'", errorLine);
         job.setErrorStatus(ErrorStatus.GENERIC);
-        if (errorLine.contains("login")) {
+        if (errorLine.contains("login") || errorLine.contains("expired") || errorLine.contains(
+                "account logon denied")) {
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
         }
         if (errorLine.contains("no subscription")) {
@@ -122,7 +124,7 @@ class SteamCmdExecutor {
         if (errorLine.contains("no match")) {
             job.setErrorStatus(ErrorStatus.NO_MATCH);
         }
-        if (errorLine.contains("i/o operation")) {
+        if (errorLine.contains("i/o operation") || errorLine.contains("failed to write file")) {
             job.setErrorStatus(ErrorStatus.IO);
         }
     }
