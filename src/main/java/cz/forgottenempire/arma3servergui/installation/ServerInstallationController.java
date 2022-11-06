@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +34,12 @@ class ServerInstallationController {
         this.installerService = installerService;
     }
 
-    private static boolean filterUnavailableInstallationsBasedOnOS(ServerInstallation i) {
-        return SystemUtils.getOsType() != OSType.LINUX || i.getType() != ServerType.DAYZ;
+    @GetMapping
+    @Cacheable("serverInstallationsResponse")
+    public ResponseEntity<ServerInstallationsDto> getAllInstalations() {
+        log.info("Getting server installations");
+        List<ServerInstallation> installations = installationService.getAvailableServerInstallations();
+        return ResponseEntity.ok(new ServerInstallationsDto(mapper.map(installations)));
     }
 
     @GetMapping("/{type}")
@@ -57,13 +62,5 @@ class ServerInstallationController {
             throw new ServerUnsupportedOnOsException(
                     "DayZ server is not supported on Linux yet. Use DayZ Experimental server instead");
         }
-    }
-
-    @GetMapping
-    public ResponseEntity<ServerInstallationsDto> getAllInstalations() {
-        List<ServerInstallation> installations = installationService.getAllServerInstallations().stream()
-                .filter(ServerInstallationController::filterUnavailableInstallationsBasedOnOS)
-                .toList();
-        return ResponseEntity.ok(new ServerInstallationsDto(mapper.map(installations)));
     }
 }

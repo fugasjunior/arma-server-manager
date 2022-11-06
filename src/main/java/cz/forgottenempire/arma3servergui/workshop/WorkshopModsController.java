@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,9 @@ class WorkshopModsController {
     }
 
     @GetMapping
+    @Cacheable("workshopModsResponse")
     public ResponseEntity<ModsDto> getAllMods(@RequestParam(required = false) ServerType filter) {
+        log.info("Getting all mods");
         List<CreatorDlcDto> creatorDlcDtos = Collections.emptyList();
         if (filter == null || filter == ServerType.ARMA3) {
             creatorDlcDtos = modMapper.creatorDlcsToCreatorDlcDtos(Arma3CDLC.getAll());
