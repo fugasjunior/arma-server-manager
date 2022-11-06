@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="" type="cz.forgottenempire.arma3servergui.serverinstance.entities.DayZServer" -->
+<#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.DayZServer" -->
 
 // GLOBAL SETTINGS
 hostname = "${name}";

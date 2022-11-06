@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
     <property name="LOGS" value="./logs"/>
 
     <appender name="Console"
@@ -12,12 +11,6 @@
         </layout>
     </appender>
 
-    <root level="info">
-        <appender-ref ref="RollingFile"/>
-        <appender-ref ref="Console"/>
-    </root>
-
-    <!-- LOG everything at INFO level -->
     <springProfile name="!docker">
         <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
                 name="RollingFile">
@@ -40,4 +33,11 @@
         </appender>
     </springProfile>
 
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="Console"/>
+        <springProfile name="!docker">
+            <appender-ref ref="RollingFile"/>
+        </springProfile>
+    </root>
 </configuration>

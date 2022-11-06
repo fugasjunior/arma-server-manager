@@ -1,4 +1,4 @@
-# Arma Server GUI
+# [-FE-] Arma Server Manager
 
 **An administration web app for managing your Arma and DayZ servers**
 
