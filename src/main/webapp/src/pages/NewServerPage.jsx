@@ -45,11 +45,18 @@ const DAYZ_INITIAL_STATE = {
     thirdPersonViewEnabled: true,
     crosshairEnabled: true,
     instanceId: 1,
-    respawnTime: 0,
+    respawnTime: 5,
     timeAcceleration: 1.0,
     nightTimeAcceleration: 1.0,
     activeMods: [],
-    additionalOptions: "",
+    additionalOptions: `
+        class Missions 
+        {
+            class DayZ
+            {
+                template = "dayzOffline.chernarusplus";
+            };
+        };`,
 }
 
 const REFORGER_INITIAL_STATE = {
