@@ -58,9 +58,9 @@ ENV LANGUAGE="en_US.UTF-8"
 ENV LC_ALL="en_US.UTF-8"
 
 ENV STEAMCMD_PATH=/home/steam/steamcmd/steamcmd.sh
-ENV DIRECTORY_SERVERS=/home/steam/arma3gui/servers
-ENV DIRECTORY_MODS=/home/steam/arma3gui/mods
-ENV DIRECTORY_LOGS=/home/steam/arma3gui/logs
+ENV DIRECTORY_SERVERS=/home/steam/armaservermanager/servers
+ENV DIRECTORY_MODS=/home/steam/armaservermanager/mods
+ENV DIRECTORY_LOGS=/home/steam/armaservermanager/logs
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["java"]

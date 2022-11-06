@@ -23,13 +23,13 @@ database.encryption.secret=<AES-256 key>
 steamcmd.path=/usr/games/steamcmd
 
 # Absolute path to a directory where the mods (and temporary server files) are installed.
-directory.mods=/home/arma3gui/mods
+directory.mods=/home/armaservermanager/mods
 
 # Absolute path to servers base folder.
-directory.servers=/home/arma3gui/servers/
+directory.servers=/home/armaservermanager/servers/
 
 # Logs directory for all servers.
-directory.logs=/home/arma3gui/logs/server
+directory.logs=/home/armaservermanager/logs/server
 
 
 ### Server config
@@ -39,8 +39,8 @@ additionalMods=
 
 
 ### Database settings
-spring.datasource.url=jdbc:mysql://localhost:3306/arma3gui_db
-spring.datasource.username=arma3gui
+spring.datasource.url=jdbc:mysql://localhost:3306/armaservermanager_db
+spring.datasource.username=armaservermanager
 spring.datasource.password=example
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
