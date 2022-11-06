@@ -26,7 +26,11 @@ const SteamAuthForm = () => {
 
     const handleSubmit = async (values) => {
         try {
-            await setAuth(values);
+            await setAuth({
+                username: values.username,
+                password: values.password,
+                steamGuardToken: values.steamGuardToken.trim()
+            });
             toast.success("Steam Auth successfully set");
         } catch (e) {
             console.error(e);
