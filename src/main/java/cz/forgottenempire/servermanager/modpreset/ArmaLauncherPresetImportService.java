@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class ArmaLauncherPresetService {
+public class ArmaLauncherPresetImportService {
 
     public static final String MODS_HREF_CSS_QUERY = ".mod-list a[href]";
     public static final String LINK_DELETE_REGEX = ".*\\?id=";
@@ -21,7 +21,7 @@ public class ArmaLauncherPresetService {
     private final ModPresetsService modPresetsService;
 
     @Autowired
-    public ArmaLauncherPresetService(WorkshopModsFacade modsFacade, ModPresetsService modPresetsService) {
+    public ArmaLauncherPresetImportService(WorkshopModsFacade modsFacade, ModPresetsService modPresetsService) {
         this.modsFacade = modsFacade;
         this.modPresetsService = modPresetsService;
     }

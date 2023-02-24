@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-public class ArmaLauncherPresetServiceTest {
+public class ArmaLauncherPresetImportServiceTest {
 
     public static final long ACE_MOD_ID = 463939057L;
     public static final long CBA3_MOD_ID = 450814997L;
@@ -27,7 +27,7 @@ public class ArmaLauncherPresetServiceTest {
     private WorkshopMod cba3WorkshopMod;
     private WorkshopModsFacade modsFacade;
     private ModPresetsService modPresetsService;
-    private ArmaLauncherPresetService launcherPresetService;
+    private ArmaLauncherPresetImportService presetImportService;
 
     @BeforeEach
     void setUp() {
@@ -43,13 +43,13 @@ public class ArmaLauncherPresetServiceTest {
         when(modsFacade.saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID))))
                 .thenReturn(List.of(aceWorkshopMod, cba3WorkshopMod));
 
-        launcherPresetService = new ArmaLauncherPresetService(modsFacade, modPresetsService);
+        presetImportService = new ArmaLauncherPresetImportService(modsFacade, modPresetsService);
     }
 
     @Test
     void whenImportPresetCalled_thenListOfWorkshopModsReturned() {
 
-        List<WorkshopMod> mods = launcherPresetService.importPreset(htmlPresetDocument);
+        List<WorkshopMod> mods = presetImportService.importPreset(htmlPresetDocument);
 
         verify(modsFacade).saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID)));
         assertThat(mods).hasSize(2);
@@ -58,7 +58,7 @@ public class ArmaLauncherPresetServiceTest {
 
     @Test
     void whenImportPresetCalled_thenModPresetCreated() {
-        launcherPresetService.importPreset(htmlPresetDocument);
+        presetImportService.importPreset(htmlPresetDocument);
 
         ModPreset expectedPreset = new ModPreset(PRESET_NAME_1, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
         verify(modPresetsService).savePreset(eq(expectedPreset));
@@ -68,7 +68,7 @@ public class ArmaLauncherPresetServiceTest {
     void whenImportPresetCalledAndPresetWithSameNameAlreadyExists_thenNewNameIsChosen() {
         when(modPresetsService.presetWithNameExists(PRESET_NAME_1)).thenReturn(true);
 
-        launcherPresetService.importPreset(htmlPresetDocument);
+        presetImportService.importPreset(htmlPresetDocument);
 
         ModPreset expectedPreset = new ModPreset(PRESET_NAME_2, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
         InOrder inOrder = inOrder(modPresetsService);
@@ -93,7 +93,7 @@ public class ArmaLauncherPresetServiceTest {
                 """
         );
 
-        assertThatThrownBy(() -> launcherPresetService.importPreset(documentWithInvalidModLink))
+        assertThatThrownBy(() -> presetImportService.importPreset(documentWithInvalidModLink))
                 .isInstanceOf(MalformedLauncherModPresetFileException.class)
                 .hasMessage("Invalid workshop mod ID 'INVALID_ID' found in preset HTML file");
     }
@@ -113,7 +113,7 @@ public class ArmaLauncherPresetServiceTest {
                 """
         );
 
-        List<WorkshopMod> mods = launcherPresetService.importPreset(documentWithNoModLinks);
+        List<WorkshopMod> mods = presetImportService.importPreset(documentWithNoModLinks);
 
         verifyNoInteractions(modsFacade);
         verifyNoInteractions(modPresetsService);
