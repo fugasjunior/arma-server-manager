@@ -6,6 +6,7 @@ import cz.forgottenempire.servermanager.workshop.WorkshopModsFacade;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 import java.util.List;
 
@@ -17,7 +18,8 @@ public class ArmaLauncherPresetServiceTest {
 
     public static final long ACE_MOD_ID = 463939057L;
     public static final long CBA3_MOD_ID = 450814997L;
-    public static final String PRESET_NAME = "Imported preset 1";
+    public static final String PRESET_NAME_1 = "Imported preset 1";
+    public static final String PRESET_NAME_2 = "Imported preset 2";
 
     private Document htmlPresetDocument;
     private WorkshopMod aceWorkshopMod;
@@ -57,8 +59,21 @@ public class ArmaLauncherPresetServiceTest {
     void whenImportPresetCalled_thenModPresetCreated() {
         launcherPresetService.importPreset(htmlPresetDocument);
 
-        ModPreset expectedPreset = new ModPreset(PRESET_NAME, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
+        ModPreset expectedPreset = new ModPreset(PRESET_NAME_1, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
         verify(modPresetsService).savePreset(eq(expectedPreset));
+    }
+
+    @Test
+    void whenImportPresetCalledAndPresetWithSameNameAlreadyExists_thenNewNameIsChosen() {
+        when(modPresetsService.presetWithNameExists(PRESET_NAME_1)).thenReturn(true);
+
+        launcherPresetService.importPreset(htmlPresetDocument);
+
+        ModPreset expectedPreset = new ModPreset(PRESET_NAME_2, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
+        InOrder inOrder = inOrder(modPresetsService);
+        inOrder.verify(modPresetsService).presetWithNameExists(PRESET_NAME_1);
+        inOrder.verify(modPresetsService).presetWithNameExists(PRESET_NAME_2);
+        inOrder.verify(modPresetsService).savePreset(eq(expectedPreset));
     }
 
     private String getTestPresetHtml() {
