@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.modpreset;
 
+import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsFacade;
 import org.jsoup.nodes.Document;
@@ -14,11 +15,14 @@ public class ArmaLauncherPresetService {
 
     public static final String MODS_HREF_CSS_QUERY = ".mod-list a[href]";
     public static final String LINK_DELETE_REGEX = ".*\\?id=";
+
     private final WorkshopModsFacade modsFacade;
+    private final ModPresetsService modPresetsService;
 
     @Autowired
-    public ArmaLauncherPresetService(WorkshopModsFacade modsFacade) {
+    public ArmaLauncherPresetService(WorkshopModsFacade modsFacade, ModPresetsService modPresetsService) {
         this.modsFacade = modsFacade;
+        this.modPresetsService = modPresetsService;
     }
 
     public List<WorkshopMod> importPreset(Document htmlPresetDocument) {
@@ -28,6 +32,17 @@ public class ArmaLauncherPresetService {
                 .map(Long::parseLong)
                 .toList();
 
-        return modsFacade.saveAndInstallMods(modIds);
+        List<WorkshopMod> importedMods = modsFacade.saveAndInstallMods(modIds);
+
+        int modPresetId = 1;
+        String modPresetName = "Imported preset " + modPresetId;
+        while (modPresetsService.presetWithNameExists(modPresetName)) {
+            modPresetId++;
+            modPresetName = "Imported preset " + modPresetId;
+        }
+        ModPreset modPreset = new ModPreset(modPresetName, importedMods, ServerType.ARMA3);
+        modPresetsService.savePreset(modPreset);
+
+        return importedMods;
     }
 }

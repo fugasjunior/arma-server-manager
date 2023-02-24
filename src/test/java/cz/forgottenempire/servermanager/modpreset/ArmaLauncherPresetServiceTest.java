@@ -1,8 +1,10 @@
 package cz.forgottenempire.servermanager.modpreset;
 
+import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsFacade;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,23 +17,48 @@ public class ArmaLauncherPresetServiceTest {
 
     public static final long ACE_MOD_ID = 463939057L;
     public static final long CBA3_MOD_ID = 450814997L;
+    public static final String PRESET_NAME = "Imported preset 1";
+
+    private Document htmlPresetDocument;
+    private WorkshopMod aceWorkshopMod;
+    private WorkshopMod cba3WorkshopMod;
+    private WorkshopModsFacade modsFacade;
+    private ModPresetsService modPresetsService;
+    private ArmaLauncherPresetService launcherPresetService;
+
+    @BeforeEach
+    void setUp() {
+        htmlPresetDocument = new Document("/");
+        htmlPresetDocument.html(getTestPresetHtml());
+
+        modsFacade = mock(WorkshopModsFacade.class);
+        modPresetsService = mock(ModPresetsService.class);
+
+        aceWorkshopMod = new WorkshopMod(ACE_MOD_ID);
+        cba3WorkshopMod = new WorkshopMod(CBA3_MOD_ID);
+
+        when(modsFacade.saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID))))
+                .thenReturn(List.of(aceWorkshopMod, cba3WorkshopMod));
+
+        launcherPresetService = new ArmaLauncherPresetService(modsFacade, modPresetsService);
+    }
 
     @Test
     void whenImportPresetCalled_thenListOfWorkshopModsReturned() {
-        WorkshopModsFacade modsFacade = mock(WorkshopModsFacade.class);
-        WorkshopMod aceWorkshopMod = new WorkshopMod(ACE_MOD_ID);
-        WorkshopMod cba3WorkshopMod = new WorkshopMod(CBA3_MOD_ID);
-        when(modsFacade.saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID))))
-                .thenReturn(List.of(aceWorkshopMod, cba3WorkshopMod));
-        ArmaLauncherPresetService launcherPresetService = new ArmaLauncherPresetService(modsFacade);
-        Document htmlPresetDocument = new Document("/");
-        htmlPresetDocument.html(getTestPresetHtml());
 
         List<WorkshopMod> mods = launcherPresetService.importPreset(htmlPresetDocument);
 
         verify(modsFacade).saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID)));
         assertThat(mods).hasSize(2);
         assertThat(mods).contains(aceWorkshopMod, cba3WorkshopMod);
+    }
+
+    @Test
+    void whenImportPresetCalled_thenModPresetCreated() {
+        launcherPresetService.importPreset(htmlPresetDocument);
+
+        ModPreset expectedPreset = new ModPreset(PRESET_NAME, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
+        verify(modPresetsService).savePreset(eq(expectedPreset));
     }
 
     private String getTestPresetHtml() {
