@@ -11,6 +11,7 @@ import org.mockito.InOrder;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -74,6 +75,27 @@ public class ArmaLauncherPresetServiceTest {
         inOrder.verify(modPresetsService).presetWithNameExists(PRESET_NAME_1);
         inOrder.verify(modPresetsService).presetWithNameExists(PRESET_NAME_2);
         inOrder.verify(modPresetsService).savePreset(eq(expectedPreset));
+    }
+
+    @Test
+    void whenModIdCannotBeExtractedFromLink_thenThrowException() {
+        Document documentWithInvalidModLink = new Document("/");
+        documentWithInvalidModLink.html(
+                """
+                <html>
+                  </head>
+                  <body>
+                    <div class="mod-list">
+                      <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=INVALID_ID" data-type="Link">...</a>
+                    </div>
+                  </body>
+                </html>
+                """
+        );
+
+        assertThatThrownBy(() -> launcherPresetService.importPreset(documentWithInvalidModLink))
+                .isInstanceOf(MalformedLauncherModPresetFileException.class)
+                .hasMessage("Invalid workshop mod ID 'INVALID_ID' found in preset HTML file");
     }
 
     private String getTestPresetHtml() {

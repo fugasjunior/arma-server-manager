@@ -29,7 +29,7 @@ public class ArmaLauncherPresetService {
         Elements links = htmlPresetDocument.select(MODS_HREF_CSS_QUERY);
         List<Long> modIds = links.stream()
                 .map(link -> link.attr("href").replaceFirst(LINK_DELETE_REGEX, ""))
-                .map(Long::parseLong)
+                .map(this::convertModIdToLong)
                 .toList();
 
         List<WorkshopMod> importedMods = modsFacade.saveAndInstallMods(modIds);
@@ -44,5 +44,15 @@ public class ArmaLauncherPresetService {
         modPresetsService.savePreset(modPreset);
 
         return importedMods;
+    }
+
+    private Long convertModIdToLong(String modId) {
+        try {
+            return Long.parseLong(modId);
+        } catch (NumberFormatException e) {
+            throw new MalformedLauncherModPresetFileException(
+                    "Invalid workshop mod ID '" + modId + "' found in preset HTML file"
+            );
+        }
     }
 }
