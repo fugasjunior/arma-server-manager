@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,6 +22,7 @@ public class ArmaLauncherPresetImportServiceTest {
     public static final long CBA3_MOD_ID = 450814997L;
     public static final String PRESET_NAME_1 = "Imported preset 1";
     public static final String PRESET_NAME_2 = "Imported preset 2";
+    public static final long MOD_PRESET_ID = 1L;
 
     private Document htmlPresetDocument;
     private WorkshopMod aceWorkshopMod;
@@ -28,6 +30,7 @@ public class ArmaLauncherPresetImportServiceTest {
     private WorkshopModsFacade modsFacade;
     private ModPresetsService modPresetsService;
     private ArmaLauncherPresetImportService presetImportService;
+    private ModPreset expectedModPreset;
 
     @BeforeEach
     void setUp() {
@@ -40,6 +43,9 @@ public class ArmaLauncherPresetImportServiceTest {
         aceWorkshopMod = new WorkshopMod(ACE_MOD_ID);
         cba3WorkshopMod = new WorkshopMod(CBA3_MOD_ID);
 
+        expectedModPreset = new ModPreset(PRESET_NAME_1, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
+        expectedModPreset.setId(MOD_PRESET_ID);
+
         when(modsFacade.saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID))))
                 .thenReturn(List.of(aceWorkshopMod, cba3WorkshopMod));
 
@@ -48,16 +54,21 @@ public class ArmaLauncherPresetImportServiceTest {
 
     @Test
     void whenImportPresetCalled_thenListOfWorkshopModsReturned() {
+        when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
 
-        List<WorkshopMod> mods = presetImportService.importPreset(htmlPresetDocument);
+        Optional<ModPreset> modPreset = presetImportService.importPreset(htmlPresetDocument);
 
         verify(modsFacade).saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID)));
-        assertThat(mods).hasSize(2);
-        assertThat(mods).contains(aceWorkshopMod, cba3WorkshopMod);
+        assertThat(modPreset).isPresent();
+        assertThat(modPreset).hasValue(expectedModPreset);
+        assertThat(modPreset.get().getMods()).hasSize(2);
+        assertThat(modPreset.get().getMods()).contains(aceWorkshopMod, cba3WorkshopMod);
     }
 
     @Test
     void whenImportPresetCalled_thenModPresetCreated() {
+        when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
+
         presetImportService.importPreset(htmlPresetDocument);
 
         ModPreset expectedPreset = new ModPreset(PRESET_NAME_1, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
@@ -67,6 +78,8 @@ public class ArmaLauncherPresetImportServiceTest {
     @Test
     void whenImportPresetCalledAndPresetWithSameNameAlreadyExists_thenNewNameIsChosen() {
         when(modPresetsService.presetWithNameExists(PRESET_NAME_1)).thenReturn(true);
+        expectedModPreset.setName(PRESET_NAME_2);
+        when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
 
         presetImportService.importPreset(htmlPresetDocument);
 
@@ -82,15 +95,15 @@ public class ArmaLauncherPresetImportServiceTest {
         Document documentWithInvalidModLink = new Document("/");
         documentWithInvalidModLink.html(
                 """
-                <html>
-                  </head>
-                  <body>
-                    <div class="mod-list">
-                      <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=INVALID_ID" data-type="Link">...</a>
-                    </div>
-                  </body>
-                </html>
-                """
+                        <html>
+                          </head>
+                          <body>
+                            <div class="mod-list">
+                              <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=INVALID_ID" data-type="Link">...</a>
+                            </div>
+                          </body>
+                        </html>
+                        """
         );
 
         assertThatThrownBy(() -> presetImportService.importPreset(documentWithInvalidModLink))
@@ -103,23 +116,22 @@ public class ArmaLauncherPresetImportServiceTest {
         Document documentWithNoModLinks = new Document("/");
         documentWithNoModLinks.html(
                 """
-                <html>
-                  </head>
-                  <body>
-                    <div class="mod-list">
-                    </div>
-                  </body>
-                </html>
-                """
+                        <html>
+                          </head>
+                          <body>
+                            <div class="mod-list">
+                            </div>
+                          </body>
+                        </html>
+                        """
         );
 
-        List<WorkshopMod> mods = presetImportService.importPreset(documentWithNoModLinks);
+        Optional<ModPreset> modPreset = presetImportService.importPreset(documentWithNoModLinks);
 
         verifyNoInteractions(modsFacade);
         verifyNoInteractions(modPresetsService);
-        assertThat(mods).isEmpty();
+        assertThat(modPreset).isEmpty();
     }
-
 
 
     private String getTestPresetHtml() {

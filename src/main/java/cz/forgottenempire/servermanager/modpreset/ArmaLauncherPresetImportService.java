@@ -8,8 +8,8 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ArmaLauncherPresetImportService {
@@ -26,7 +26,7 @@ public class ArmaLauncherPresetImportService {
         this.modPresetsService = modPresetsService;
     }
 
-    public List<WorkshopMod> importPreset(Document htmlPresetDocument) {
+    public Optional<ModPreset> importPreset(Document htmlPresetDocument) {
         Elements links = htmlPresetDocument.select(MODS_HREF_CSS_QUERY);
         List<Long> modIds = links.stream()
                 .map(link -> link.attr("href").replaceFirst(LINK_DELETE_REGEX, ""))
@@ -34,7 +34,7 @@ public class ArmaLauncherPresetImportService {
                 .toList();
 
         if (modIds.isEmpty()) {
-            return Collections.emptyList();
+            return Optional.empty();
         }
 
         List<WorkshopMod> importedMods = modsFacade.saveAndInstallMods(modIds);
@@ -46,9 +46,9 @@ public class ArmaLauncherPresetImportService {
             modPresetName = "Imported preset " + modPresetId;
         }
         ModPreset modPreset = new ModPreset(modPresetName, importedMods, ServerType.ARMA3);
-        modPresetsService.savePreset(modPreset);
+        modPreset = modPresetsService.savePreset(modPreset);
 
-        return importedMods;
+        return Optional.of(modPreset);
     }
 
     private Long convertModIdToLong(String modId) {
