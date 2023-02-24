@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,6 +32,10 @@ public class ArmaLauncherPresetService {
                 .map(link -> link.attr("href").replaceFirst(LINK_DELETE_REGEX, ""))
                 .map(this::convertModIdToLong)
                 .toList();
+
+        if (modIds.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         List<WorkshopMod> importedMods = modsFacade.saveAndInstallMods(modIds);
 

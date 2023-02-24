@@ -98,6 +98,30 @@ public class ArmaLauncherPresetServiceTest {
                 .hasMessage("Invalid workshop mod ID 'INVALID_ID' found in preset HTML file");
     }
 
+    @Test
+    void whenPresetFileWithNoModsIsProvided_thenEmptyListIsReturned() {
+        Document documentWithNoModLinks = new Document("/");
+        documentWithNoModLinks.html(
+                """
+                <html>
+                  </head>
+                  <body>
+                    <div class="mod-list">
+                    </div>
+                  </body>
+                </html>
+                """
+        );
+
+        List<WorkshopMod> mods = launcherPresetService.importPreset(documentWithNoModLinks);
+
+        verifyNoInteractions(modsFacade);
+        verifyNoInteractions(modPresetsService);
+        assertThat(mods).isEmpty();
+    }
+
+
+
     private String getTestPresetHtml() {
         return """
                 <?xml version="1.0" encoding="utf-8"?>
