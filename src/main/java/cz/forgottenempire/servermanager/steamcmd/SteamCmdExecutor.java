@@ -114,8 +114,9 @@ class SteamCmdExecutor {
 
         log.error("SteamCmd failed due to: '{}'", errorLine);
         job.setErrorStatus(ErrorStatus.GENERIC);
-        if (errorLine.contains("login") || errorLine.contains("expired") || errorLine.contains(
-                "account logon denied")) {
+
+        String[] loginRelatedErrors = new String[]{"login", "expired", "account logon denied", "two-factor code mismatch"};
+        if (Arrays.stream(loginRelatedErrors).anyMatch(errorLine::contains)) {
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
         }
         if (errorLine.contains("no subscription")) {
