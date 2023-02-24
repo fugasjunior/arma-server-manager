@@ -133,7 +133,6 @@ public class ArmaLauncherPresetImportServiceTest {
         assertThat(modPreset).isEmpty();
     }
 
-
     private String getTestPresetHtml() {
         return """
                 <?xml version="1.0" encoding="utf-8"?>

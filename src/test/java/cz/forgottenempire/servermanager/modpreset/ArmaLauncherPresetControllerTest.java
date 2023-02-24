@@ -22,8 +22,10 @@ import static org.mockito.Mockito.*;
 
 class ArmaLauncherPresetControllerTest {
 
-    public static final long MOD_PRESET_ID = 1L;
-    public static final String MOD_PRESET_NAME = "Test Preset";
+    private static final long MOD_PRESET_ID = 1L;
+    private static final String MOD_PRESET_NAME = "Test Preset";
+    private static final String INVALID_FILE_NAME = "invalidfile.bin";
+    private static final String VALID_FILE_NAME = "preset.html";
     private ArmaLauncherPresetExportService exportService;
     private ModPresetsService modPresetsService;
     private ArmaLauncherPresetController controller;
@@ -89,6 +91,7 @@ class ArmaLauncherPresetControllerTest {
     @Test
     void whenImportModPreset_thenCreatedModPresetIsReturned() throws IOException {
         MultipartFile file = mock(MultipartFile.class);
+        when(file.getName()).thenReturn(VALID_FILE_NAME);
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
         ModPreset preset = new ModPreset(MOD_PRESET_NAME, Collections.emptyList(), ServerType.ARMA3);
         preset.setId(MOD_PRESET_ID);
@@ -109,6 +112,7 @@ class ArmaLauncherPresetControllerTest {
     @Test
     void whenImportModPresetWithNoMods_thenNoContentIsReturned() throws IOException {
         MultipartFile file = mock(MultipartFile.class);
+        when(file.getName()).thenReturn(VALID_FILE_NAME);
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
         when(importService.importPreset(any())).thenReturn(Optional.empty());
 
@@ -117,5 +121,16 @@ class ArmaLauncherPresetControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(response.getBody()).isNull();
+    }
+
+    @Test
+    void whenImportingInvalidFileExtension_thenUnsupportedFileExtensionThrown() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getName()).thenReturn(INVALID_FILE_NAME);
+
+        assertThatThrownBy(() -> controller.uploadModPreset(file))
+                .isInstanceOf(UnsupportedFileExtension.class)
+                .hasMessage("Only HTML files are allowed");
+        verifyNoInteractions(importService);
     }
 }

@@ -54,6 +54,10 @@ class ArmaLauncherPresetController {
 
     @PostMapping
     public ResponseEntity<PresetResponseDto> uploadModPreset(@RequestParam("preset") MultipartFile presetFile) throws IOException {
+        if (!presetFile.getName().toLowerCase().endsWith(".html")) {
+            throw new UnsupportedFileExtension();
+        }
+
         byte[] fileBytes = presetFile.getBytes();
         String fileContent = new String(fileBytes);
         Optional<ModPreset> modPreset = importService.importPreset(Jsoup.parse(fileContent));
