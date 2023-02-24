@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.modpreset;
 
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.modpreset.dtos.PresetResponseDto;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -20,21 +23,25 @@ import static org.mockito.Mockito.*;
 class ArmaLauncherPresetControllerTest {
 
     public static final long MOD_PRESET_ID = 1L;
+    public static final String MOD_PRESET_NAME = "Test Preset";
     private ArmaLauncherPresetExportService exportService;
     private ModPresetsService modPresetsService;
     private ArmaLauncherPresetController controller;
+    private String SAMPLE_HTML_CONTENT;
+    private ArmaLauncherPresetImportService importService;
 
     @BeforeEach
     void setUp() {
-        ArmaLauncherPresetImportService importService = mock(ArmaLauncherPresetImportService.class, withSettings().stubOnly());
+        importService = mock(ArmaLauncherPresetImportService.class);
         exportService = mock(ArmaLauncherPresetExportService.class);
         modPresetsService = mock(ModPresetsService.class);
         controller = new ArmaLauncherPresetController(modPresetsService, importService, exportService);
+        SAMPLE_HTML_CONTENT = "<html></html>";
     }
 
     @Test
     void whenExportModPreset_thenResponseEntityWithModPresetReturned() {
-        ModPreset preset = new ModPreset("Test Preset", Collections.emptyList(), ServerType.ARMA3);
+        ModPreset preset = new ModPreset(MOD_PRESET_NAME, Collections.emptyList(), ServerType.ARMA3);
         when(modPresetsService.getModPreset(MOD_PRESET_ID)).thenReturn(Optional.of(preset));
         byte[] expectedFile = new byte[]{'h', 't', 'm', 'l'};
         when(exportService.exportModPresetToFile(preset)).thenReturn(expectedFile);
@@ -77,5 +84,38 @@ class ArmaLauncherPresetControllerTest {
         verify(modPresetsService).getModPreset(MOD_PRESET_ID);
         verifyNoMoreInteractions(modPresetsService);
         verifyNoInteractions(exportService);
+    }
+
+    @Test
+    void whenImportModPreset_thenCreatedModPresetIsReturned() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
+        ModPreset preset = new ModPreset(MOD_PRESET_NAME, Collections.emptyList(), ServerType.ARMA3);
+        preset.setId(MOD_PRESET_ID);
+        when(importService.importPreset(any())).thenReturn(Optional.of(preset));
+
+        ResponseEntity<PresetResponseDto> response = controller.uploadModPreset(file);
+
+        PresetResponseDto expectedResponseDto = new PresetResponseDto();
+        expectedResponseDto.setId(MOD_PRESET_ID);
+        expectedResponseDto.setName(MOD_PRESET_NAME);
+        expectedResponseDto.setMods(Collections.emptyList());
+        expectedResponseDto.setType(ServerType.ARMA3);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(expectedResponseDto);
+    }
+
+    @Test
+    void whenImportModPresetWithNoMods_thenNoContentIsReturned() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
+        when(importService.importPreset(any())).thenReturn(Optional.empty());
+
+        ResponseEntity<PresetResponseDto> response = controller.uploadModPreset(file);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
     }
 }
