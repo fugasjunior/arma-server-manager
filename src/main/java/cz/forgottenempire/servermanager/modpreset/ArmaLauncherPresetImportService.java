@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsFacade;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,12 +40,7 @@ public class ArmaLauncherPresetImportService {
 
         List<WorkshopMod> importedMods = modsFacade.saveAndInstallMods(modIds);
 
-        int modPresetId = 1;
-        String modPresetName = "Imported preset " + modPresetId;
-        while (modPresetsService.presetWithNameExists(modPresetName)) {
-            modPresetId++;
-            modPresetName = "Imported preset " + modPresetId;
-        }
+        String modPresetName = determinePresetName(htmlPresetDocument);
         ModPreset modPreset = new ModPreset(modPresetName, importedMods, ServerType.ARMA3);
         modPreset = modPresetsService.savePreset(modPreset);
 
@@ -59,5 +55,26 @@ public class ArmaLauncherPresetImportService {
                     "Invalid workshop mod ID '" + modId + "' found in preset HTML file"
             );
         }
+    }
+
+    private String determinePresetName(Document htmlPresetDocument) {
+        Element element = htmlPresetDocument.selectFirst("meta[name=arma:PresetName]");
+        String modPresetName;
+        if (element != null && !modPresetsService.presetWithNameExists(element.attr("content"))) {
+            modPresetName = element.attr("content");
+        } else {
+            modPresetName = generateImportedPresetName();
+        }
+        return modPresetName;
+    }
+
+    private String generateImportedPresetName() {
+        int modPresetNumber = 1;
+        String modPresetName = "Imported preset " + modPresetNumber;
+        while (modPresetsService.presetWithNameExists(modPresetName)) {
+            modPresetNumber++;
+            modPresetName = "Imported preset " + modPresetNumber;
+        }
+        return modPresetName;
     }
 }

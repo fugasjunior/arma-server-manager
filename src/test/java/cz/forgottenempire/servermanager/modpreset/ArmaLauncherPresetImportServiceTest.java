@@ -20,6 +20,7 @@ public class ArmaLauncherPresetImportServiceTest {
 
     public static final long ACE_MOD_ID = 463939057L;
     public static final long CBA3_MOD_ID = 450814997L;
+    public static final String TEST_PRESET_NAME = "Test Preset";
     public static final String PRESET_NAME_1 = "Imported preset 1";
     public static final String PRESET_NAME_2 = "Imported preset 2";
     public static final long MOD_PRESET_ID = 1L;
@@ -96,6 +97,7 @@ public class ArmaLauncherPresetImportServiceTest {
         documentWithInvalidModLink.html(
                 """
                         <html>
+                          <head>
                           </head>
                           <body>
                             <div class="mod-list">
@@ -117,6 +119,7 @@ public class ArmaLauncherPresetImportServiceTest {
         documentWithNoModLinks.html(
                 """
                         <html>
+                          <head>
                           </head>
                           <body>
                             <div class="mod-list">
@@ -131,6 +134,34 @@ public class ArmaLauncherPresetImportServiceTest {
         verifyNoInteractions(modsFacade);
         verifyNoInteractions(modPresetsService);
         assertThat(modPreset).isEmpty();
+    }
+
+    @Test
+    void whenPresetFileWithNameMetaTagGivenAndNoNameConflicts_thenPresetSavedWithSpecifiedName() {
+        when(modPresetsService.presetWithNameExists(TEST_PRESET_NAME)).thenReturn(false);
+        expectedModPreset.setName(TEST_PRESET_NAME);
+        when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
+        Document documentWithSpecifiedName = new Document("/");
+        documentWithSpecifiedName.html(
+                """
+                        <html>
+                          <head>
+                            <meta name="arma:PresetName" content="Test Preset" />
+                          </head>
+                          <body>
+                            <div class="mod-list">
+                              <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=463939057"></a>
+                              <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=450814997"></a>
+                            </div>
+                          </body>
+                        </html>
+                        """
+        );
+
+        Optional<ModPreset> modPreset = presetImportService.importPreset(documentWithSpecifiedName);
+
+        assertThat(modPreset).isNotEmpty();
+        assertThat(modPreset.get().getName()).isEqualTo(TEST_PRESET_NAME);
     }
 
     private String getTestPresetHtml() {
