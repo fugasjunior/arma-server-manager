@@ -1,10 +1,9 @@
-<#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.modpreset.ModPreset" -->
-
 <?xml version="1.0" encoding="utf-8"?>
 <html>
 <!--Created by Arma Server Manager - https://github.com/fugasjunior/arma-server-manager-->
 <head>
     <meta name="arma:Type" content="list"/>
+    <meta name="arma:PresetName" content="${presetName}" />
     <meta name="generator" content="Arma Server Manager - https://github.com/fugasjunior/arma-server-manager"/>
     <title>Arma 3</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css"/>
@@ -69,22 +68,22 @@
     </style>
 </head>
 <body>
-<h1>Arma 3 Mods - ${name}</h1>
+<h1>Arma 3  - Preset <strong>${preset.name}</strong></h1>
 <p class="before-list">
     <em>To import this preset, drag this file onto the Launcher window. Or click the MODS tab, then PRESET in the top
         right, then IMPORT at the bottom, and finally select this file.</em>
 </p>
 <div class="mod-list">
     <table>
-        <#list mods as mod>
+        <#list preset.mods as mod>
             <tr data-type="ModContainer">
                 <td data-type="DisplayName">${mod.name}</td>
                 <td>
                     <span class="from-steam">Steam</span>
                 </td>
                 <td>
-                    <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}" data-type="Link">
-                        http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}
+                    <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id?string.computer}" data-type="Link">
+                        http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id?string.computer}
                     </a>
                 </td>
             </tr>
@@ -92,7 +91,7 @@
     </table>
 </div>
 <div class="footer">
-    <span>Created by <a href="https://github.com/fugasjunior/arma-server-manager">Arma Server Manager</a> by fugasjunior.</span>
+    <span>Created with <a href="https://github.com/fugasjunior/arma-server-manager">Arma Server Manager</a> by fugasjunior.</span>
 </div>
 </body>
 </html>

@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class ArmaLauncherPresetExportService {
@@ -23,11 +25,15 @@ public class ArmaLauncherPresetExportService {
     }
 
     public byte[] exportModPresetToFile(ModPreset modPreset) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("preset", modPreset);
+        model.put("presetName", modPreset.getName().replaceAll("[^a-zA-Z0-9_ ]", ""));
+
         try {
             Template template = freeMarkerConfigurer.getConfiguration().getTemplate(TEMPLATE_FILE_NAME);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Writer writer = new OutputStreamWriter(outputStream);
-            template.process(modPreset, writer);
+            template.process(model, writer);
             writer.flush();
             return outputStream.toByteArray();
         } catch (TemplateException | IOException e) {
