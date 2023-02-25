@@ -1,3 +1,4 @@
+<#ftl output_format="HTML">
 <?xml version="1.0" encoding="utf-8"?>
 <html>
 <!--Created by Arma Server Manager - https://github.com/fugasjunior/arma-server-manager-->
