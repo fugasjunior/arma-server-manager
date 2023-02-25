@@ -18,12 +18,12 @@ import static org.mockito.Mockito.*;
 
 public class ArmaLauncherPresetImportServiceTest {
 
-    public static final long ACE_MOD_ID = 463939057L;
-    public static final long CBA3_MOD_ID = 450814997L;
-    public static final String TEST_PRESET_NAME = "Test Preset";
-    public static final String PRESET_NAME_1 = "Imported preset 1";
-    public static final String PRESET_NAME_2 = "Imported preset 2";
-    public static final long MOD_PRESET_ID = 1L;
+    private static final long ACE_MOD_ID = 463939057L;
+    private static final long CBA3_MOD_ID = 450814997L;
+    private static final String TEST_PRESET_NAME = "Test Preset";
+    private static final String PRESET_NAME_1 = "Imported preset 1";
+    private static final String PRESET_NAME_2 = "Imported preset 2";
+    private static final long MOD_PRESET_ID = 1L;
 
     private Document htmlPresetDocument;
     private WorkshopMod aceWorkshopMod;

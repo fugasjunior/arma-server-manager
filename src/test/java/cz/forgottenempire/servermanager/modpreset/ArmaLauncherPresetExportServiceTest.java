@@ -18,8 +18,8 @@ import static org.mockito.Mockito.*;
 
 public class ArmaLauncherPresetExportServiceTest {
 
-    public static final String TEMPLATE_FILE_NAME = "exportedModPresetHtml.ftl";
-    public static final String PRESET_NAME = "Mod Preset";
+    private static final String TEMPLATE_FILE_NAME = "exportedModPresetHtml.ftl";
+    private static final String PRESET_NAME = "Mod Preset";
 
     @Test
     void whenExportModPresetToFile_thenCorrectByteArrayReturned() throws IOException, TemplateException {

@@ -13,21 +13,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ArmaLauncherPresetImportService {
+class ArmaLauncherPresetImportService {
 
-    public static final String MODS_HREF_CSS_QUERY = ".mod-list a[href]";
-    public static final String LINK_DELETE_REGEX = ".*\\?id=";
+    private static final String MODS_HREF_CSS_QUERY = ".mod-list a[href]";
+    private static final String LINK_DELETE_REGEX = ".*\\?id=";
 
     private final WorkshopModsFacade modsFacade;
     private final ModPresetsService modPresetsService;
 
     @Autowired
-    public ArmaLauncherPresetImportService(WorkshopModsFacade modsFacade, ModPresetsService modPresetsService) {
+    ArmaLauncherPresetImportService(WorkshopModsFacade modsFacade, ModPresetsService modPresetsService) {
         this.modsFacade = modsFacade;
         this.modPresetsService = modPresetsService;
     }
 
-    public Optional<ModPreset> importPreset(Document htmlPresetDocument) {
+    Optional<ModPreset> importPreset(Document htmlPresetDocument) {
         Elements links = htmlPresetDocument.select(MODS_HREF_CSS_QUERY);
         List<Long> modIds = links.stream()
                 .map(link -> link.attr("href").replaceFirst(LINK_DELETE_REGEX, ""))
