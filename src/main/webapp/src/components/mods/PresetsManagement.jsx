@@ -1,6 +1,11 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {deleteModPreset, getModPresets, updateModPreset} from "../../services/modPresetsService";
+import {
+    deleteModPreset,
+    downloadExportedPreset,
+    getModPresets,
+    updateModPreset, uploadImportedPreset
+} from "../../services/modPresetsService";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -8,7 +13,7 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import {Box, Modal, Toolbar} from "@mui/material";
+import {Box, Divider, Modal, Stack, Toolbar} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,6 +23,9 @@ import {toast} from "material-react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getMods} from "../../services/modsService";
 import TableGhosts from "../../UI/TableSkeletons";
+import Tooltip from "@mui/material/Tooltip";
+import UploadIcon from '@mui/icons-material/Upload';
+import DownloadIcon from '@mui/icons-material/Download';
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
@@ -129,14 +137,44 @@ export default function PresetsManagement() {
         });
     }
 
+    async function handleFileInput(e) {
+        try {
+            const {data: importedPreset} = await uploadImportedPreset(e.target.files[0]);
+            setPresets(prevState => [...prevState, importedPreset]);
+            toast.success(`Preset '${importedPreset.name}' successfully imported`);
+        } catch (e) {
+            console.error(e);
+            toast.error(e.response.data || "Error during mod import");
+        }
+    }
+
+    function handleDownload(presetId) {
+        try {
+            downloadExportedPreset(presetId);
+        } catch (e) {
+            console.error(e);
+            toast.error(e.response.data || "Error during mod export");
+        }
+    }
+
     return (
             <>
+                <input type="file" id="fileInput" onChange={handleFileInput} style={{display: 'none'}} />
                 <Box sx={{width: '100%'}}>
                     <Paper sx={{width: '100%'}}>
                         <Toolbar sx={{pl: {sm: 2}, pr: {xs: 1, sm: 1}}}>
                             <Typography sx={{flex: '1 1 100%'}} variant="h6" id="tableTitle" component="div">
                                 Presets
                             </Typography>
+                            <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
+                                <Tooltip title="Import preset">
+                                    <label htmlFor="fileInput">
+                                        <IconButton component="span">
+                                            <UploadIcon />
+                                        </IconButton>
+                                    </label>
+                                </Tooltip>
+                            </Stack>
                         </Toolbar>
                         <TableContainer component={Paper}>
                             <Table sx={{minWidth: 650}} aria-label="simple table">
@@ -146,6 +184,7 @@ export default function PresetsManagement() {
                                         <TableCell>Type</TableCell>
                                         <TableCell>Mods</TableCell>
                                         <TableCell align="right">Mods count</TableCell>
+                                        <TableCell></TableCell>
                                         <TableCell></TableCell>
                                         <TableCell></TableCell>
                                     </TableRow>
@@ -172,6 +211,12 @@ export default function PresetsManagement() {
                                                     <IconButton aria-label="edit"
                                                                 onClick={() => handleOpenEdit(preset)}>
                                                         <EditIcon color="primary"/>
+                                                    </IconButton>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton aria-label="export"
+                                                                onClick={() => handleDownload(preset.id)}>
+                                                        <DownloadIcon color="primary"/>
                                                     </IconButton>
                                                 </TableCell>
                                                 <TableCell>
