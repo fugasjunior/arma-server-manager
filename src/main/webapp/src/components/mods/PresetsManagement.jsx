@@ -13,7 +13,7 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import {Box, Divider, Modal, Stack, Toolbar} from "@mui/material";
+import {Backdrop, Box, CircularProgress, Divider, Modal, Stack, Toolbar} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,6 +34,7 @@ export default function PresetsManagement() {
     const [presetModalOpen, setPresetModalOpen] = useState(false);
     const [selectedMods, setSelectedMods] = useState([]);
     const [availableMods, setAvailableMods] = useState();
+    const [isUploadInProgress, setIsUploadInProgress] = useState(false);
 
     useEffect(() => {
         async function fetchPresets() {
@@ -139,10 +140,13 @@ export default function PresetsManagement() {
 
     async function handleFileInput(e) {
         try {
+            setIsUploadInProgress(true);
             const {data: importedPreset} = await uploadImportedPreset(e.target.files[0]);
             setPresets(prevState => [...prevState, importedPreset]);
+            setIsUploadInProgress(false);
             toast.success(`Preset '${importedPreset.name}' successfully imported`);
         } catch (e) {
+            setIsUploadInProgress(false);
             console.error(e);
             toast.error(e.response.data || "Error during mod import");
         }
@@ -159,6 +163,9 @@ export default function PresetsManagement() {
 
     return (
             <>
+                <Backdrop open={isUploadInProgress}>
+                    <CircularProgress color="inherit" />
+                </Backdrop>
                 <input type="file" id="fileInput" onChange={handleFileInput} style={{display: 'none'}} />
                 <Box sx={{width: '100%'}}>
                     <Paper sx={{width: '100%'}}>
