@@ -91,7 +91,7 @@ class ArmaLauncherPresetControllerTest {
     @Test
     void whenImportModPreset_thenCreatedModPresetIsReturned() throws IOException {
         MultipartFile file = mock(MultipartFile.class);
-        when(file.getName()).thenReturn(VALID_FILE_NAME);
+        when(file.getOriginalFilename()).thenReturn(VALID_FILE_NAME);
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
         ModPreset preset = new ModPreset(MOD_PRESET_NAME, Collections.emptyList(), ServerType.ARMA3);
         preset.setId(MOD_PRESET_ID);
@@ -112,7 +112,7 @@ class ArmaLauncherPresetControllerTest {
     @Test
     void whenImportModPresetWithNoMods_thenNoContentIsReturned() throws IOException {
         MultipartFile file = mock(MultipartFile.class);
-        when(file.getName()).thenReturn(VALID_FILE_NAME);
+        when(file.getOriginalFilename()).thenReturn(VALID_FILE_NAME);
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
         when(importService.importPreset(any())).thenReturn(Optional.empty());
 
@@ -126,7 +126,18 @@ class ArmaLauncherPresetControllerTest {
     @Test
     void whenImportingInvalidFileExtension_thenUnsupportedFileExtensionThrown() {
         MultipartFile file = mock(MultipartFile.class);
-        when(file.getName()).thenReturn(INVALID_FILE_NAME);
+        when(file.getOriginalFilename()).thenReturn(INVALID_FILE_NAME);
+
+        assertThatThrownBy(() -> controller.uploadModPreset(file))
+                .isInstanceOf(UnsupportedFileExtension.class)
+                .hasMessage("Only HTML files are allowed");
+        verifyNoInteractions(importService);
+    }
+
+    @Test
+    void whenImportingFileWithFileNameNull_thenUnsupportedFileExtensionThrown() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn(null);
 
         assertThatThrownBy(() -> controller.uploadModPreset(file))
                 .isInstanceOf(UnsupportedFileExtension.class)

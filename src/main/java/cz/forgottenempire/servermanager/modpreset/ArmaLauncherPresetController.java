@@ -54,7 +54,8 @@ class ArmaLauncherPresetController {
 
     @PostMapping
     public ResponseEntity<PresetResponseDto> uploadModPreset(@RequestParam("preset") MultipartFile presetFile) throws IOException {
-        if (!presetFile.getName().toLowerCase().endsWith(".html")) {
+        String filename = presetFile.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".html")) {
             throw new UnsupportedFileExtension();
         }
 
