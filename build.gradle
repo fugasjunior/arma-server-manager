@@ -68,6 +68,7 @@ dependencies {
 	implementation group: 'com.google.guava', name: 'guava', version: '30.0-android'
 	implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.5.2.Final'
 	implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.6.0'
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.4'
 	implementation 'org.flywaydb:flyway-mysql'
 
 	compileOnly 'org.projectlombok:lombok'

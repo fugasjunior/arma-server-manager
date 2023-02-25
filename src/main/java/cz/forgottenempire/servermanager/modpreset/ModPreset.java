@@ -2,22 +2,15 @@ package cz.forgottenempire.servermanager.modpreset;
 
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
-import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -48,5 +41,18 @@ public class ModPreset {
         this.name = name;
         this.mods = mods;
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ModPreset modPreset = (ModPreset) o;
+        return name.equals(modPreset.name) && mods.equals(modPreset.mods) && type == modPreset.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, mods, type);
     }
 }

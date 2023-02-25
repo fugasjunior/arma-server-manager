@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-class WorkshopModsFacade {
+public class WorkshopModsFacade {
 
     private final WorkshopModsService modsService;
     private final WorkshopInstallerService installerService;
