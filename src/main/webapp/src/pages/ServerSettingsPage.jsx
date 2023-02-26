@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {getServer, updateServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
-import {getMods} from "../services/modsService";
 import {Typography} from "@mui/material";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
@@ -13,8 +12,6 @@ const ServerSettingsPage = () => {
     const {id} = useParams();
     const [server, setServer] = useState({});
     const [isLoading, setIsLoading] = useState(true);
-    const [availableMods, setAvailableMods] = useState([]);
-    const [availableDlcs, setAvailableDlcs] = useState([]);
 
     const navigate = useNavigate();
 
@@ -26,11 +23,8 @@ const ServerSettingsPage = () => {
         try {
             setIsLoading(true);
             const {data: fetchedServer} = await getServer(id);
-            const {data: modsDto} = await getMods(fetchedServer.type);
 
             setServer(fetchedServer);
-            setAvailableMods(modsDto.workshopMods.sort((a, b) => a.name.localeCompare(b.name)));
-            setAvailableDlcs(modsDto.creatorDlcs.sort((a, b) => a.name.localeCompare(b.name)));
             setIsLoading(false);
         } catch (e) {
             console.error(e);
@@ -38,13 +32,12 @@ const ServerSettingsPage = () => {
         }
     }
 
-    const handleSubmit = async (values, selectedMods, selectedDlcs) => {
+    const handleSubmit = async (values) => {
         const request = {
+            ...server,
             ...values,
             type: server.type,
             queryPort: server.type === "ARMA3" ? values.port + 1 : values.queryPort,
-            activeMods: selectedMods,
-            activeDLCs: selectedDlcs,
             instanceInfo: null,
         }
 
@@ -69,8 +62,6 @@ const ServerSettingsPage = () => {
                         <>
                             {server.type === "ARMA3" &&
                                     <EditArma3ServerSettingsForm server={server} onSubmit={handleSubmit}
-                                                                 availableMods={availableMods}
-                                                                 availableDlcs={availableDlcs}
                                                                  onCancel={handleCancel}
                                                                  isServerRunning={server.instanceInfo
                                                                          && server.instanceInfo.alive}
@@ -79,7 +70,6 @@ const ServerSettingsPage = () => {
                             {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
                                     <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
                                                                 onCancel={handleCancel}
-                                                                availableMods={availableMods}
                                                                 isServerRunning={server.instanceInfo
                                                                         && server.instanceInfo.alive}
                                     />
