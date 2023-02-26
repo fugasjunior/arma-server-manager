@@ -10,6 +10,8 @@ import TableCell from "@mui/material/TableCell";
 import arma3Icon from "../../img/arma3_icon.png";
 import dayZIcon from "../../img/dayz_icon.png";
 import reforgerIcon from "../../img/reforger_icon.png";
+import React from "react";
+import Arma3ModEdit from "./Arma3ModEdit";
 
 const SERVER_ICON_URLS = {
     "ARMA3": arma3Icon,
@@ -59,14 +61,22 @@ const ServerListEntry = (props) => {
                                     Start
                                 </Button>
                         }
-                        <Button id={`server-${server.id}-settings-btn`}
-                                className="server-settings-btn"
-                                component={Link} to={"/servers/" + server.id}
-                                variant="outlined" startIcon={<SettingsIcon/>}
-                        >
-                            Settings
-                        </Button>
                     </Stack>
+                </TableCell>
+                <TableCell>
+                    <Button id={`server-${server.id}-settings-btn`}
+                            className="server-settings-btn"
+                            component={Link} to={"/servers/" + server.id}
+                            variant="outlined" startIcon={<SettingsIcon/>}
+                    >
+                        Settings
+                    </Button>
+                </TableCell>
+                <TableCell>
+                    {!serverRunning && <Arma3ModEdit serverId={server.id}/>}
+                </TableCell>
+                <TableCell>
+                    {!serverRunning && server.type === "" && <Button id="manage-dlcs-btn" onClick={() => {}} >Manage DLCs</Button>}
                 </TableCell>
                 <TableCell>
                     {serverRunning && server.instanceInfo.maxPlayers &&

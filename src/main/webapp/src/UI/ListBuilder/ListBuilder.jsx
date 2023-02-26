@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import ListBuilderList from "./ListBuilderList";
-import ListBuilderContainer from "./ListBuilderContainer";
 import ListBuilderHeader from "./ListBuilderHeader";
 import Fuse from "fuse.js";
+import {Box, Button, Grid, Stack} from "@mui/material";
+import styles from "./ListBuilder.module.css";
 
 export default function ListBuilder(props) {
     const [filter, setFilter] = useState("");
@@ -21,24 +22,42 @@ export default function ListBuilder(props) {
     const itemsLabel = props.itemsLabel ?? "options";
 
     return (
-            <ListBuilderContainer>
-                <ListBuilderHeader
+        <Box className={styles.box} overflow="auto" sx={{
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+        }}>
+            <Grid container spacing={4} p={4}>
+                <Grid item xs={12}>
+                    <ListBuilderHeader
                         presets={props.presets}
                         itemsLabel={props.itemsLabel}
                         selectedPreset={props.selectedPreset}
                         onPresetChange={props.onPresetChange}
-                />
-                <ListBuilderList
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="available"
                         selectedOptions={filterAvailableOptions()} onClickItem={props.onSelect}
                         itemsLabel={props.itemsLabel}
                         showFilter onFilterChange={handleFilterChange}
-                />
-                <ListBuilderList
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="selected"
                         itemsLabel={props.itemsLabel}
                         selectedOptions={props.selectedOptions} onClickItem={props.onDeselect}
-                />
-            </ListBuilderContainer>
+                    />
+                </Grid>
+            </Grid>
+            {props.withControls &&
+                <Stack>
+                    <Button onClick={props.onConfirm}>Confirm</Button>
+                    <Button onClick={props.onCancel}>Cancel</Button>
+                </Stack>
+            }
+        </Box>
     );
 }
