@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -91,12 +92,23 @@ class ServerLogsServiceTest {
     }
 
     @Test
-    void whenGetLogFileAsResourceAndLogExists_thenResourceReturned() throws IOException {
-        Resource logFileResource = serverLogsService.getLogFileAsResource(server);
+    void whenGetLogFileAsResourceAndLogExists_thenOptionalWithResourceReturned() throws IOException {
+        Optional<Resource> logFileResource = serverLogsService.getLogFileAsResource(server);
 
-        assertThat(logFileResource).isNotNull();
-        assertThat(logFileResource.exists()).isTrue();
-        assertThat(logFileResource.getFile()).isEqualTo(testLogFile);
+        assertThat(logFileResource).isPresent();
+        assertThat(logFileResource.get().exists()).isTrue();
+        assertThat(logFileResource.get().getFile()).isEqualTo(testLogFile);
+    }
+
+    @Test
+    void whenGetLogFileAsResourceAndLogDoesNotExists_thenEmptyOptionalReturned() {
+        File mockedFile = mock(File.class);
+        when(mockedFile.exists()).thenReturn(false);
+        when(pathsFactory.getServerLogFile(ServerType.ARMA3, SERVER_ID)).thenReturn(mockedFile);
+
+        Optional<Resource> logFileResource = serverLogsService.getLogFileAsResource(server);
+
+        assertThat(logFileResource).isEmpty();
     }
 
     private String getTestLog() {

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
+import java.util.Optional;
 
 @Service
 public class ServerLogsService {
@@ -33,10 +34,15 @@ public class ServerLogsService {
         }
     }
 
-    public Resource getLogFileAsResource(Server server) {
+    public Optional<Resource> getLogFileAsResource(Server server) {
         File serverLogFile = pathsFactory.getServerLogFile(server.getType(), server.getId());
+
+        if (!serverLogFile.exists()) {
+            return Optional.empty();
+        }
+
         try {
-            return new FileUrlResource(serverLogFile.getAbsolutePath());
+            return Optional.of(new FileUrlResource(serverLogFile.getAbsolutePath()));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
