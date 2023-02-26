@@ -37,8 +37,7 @@ public class ServerLogsService {
      */
     private String getLastNLines(File file, int n) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "r");
-        long fileLength = raf.length();
-        long filePointer = fileLength;
+        long filePointer = raf.length();
         int lines = 0;
         StringBuilder result = new StringBuilder();
 
@@ -46,7 +45,7 @@ public class ServerLogsService {
             raf.seek(filePointer);
             if (filePointer == 0) {
                 // If we're at the beginning of the file, read the last line and exit
-                result.insert(0, raf.readLine());
+                result.insert(0, raf.readLine() + '\n');
                 break;
             } else {
                 // Otherwise, read the current character and move back one byte

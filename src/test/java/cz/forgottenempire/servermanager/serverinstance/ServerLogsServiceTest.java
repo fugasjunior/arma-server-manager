@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -13,33 +14,41 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 class ServerLogsServiceTest {
     private static final int LINES_COUNT = 10;
     public static final String LOG_NAME = "ARMA3_1.log";
     public static final long SERVER_ID = 1L;
+    public static final int LINES_COUNT_OVER_LOG_SIZE = 15;
 
     @TempDir
     private Path tempDir;
+    private PathsFactory pathsFactory;
+    private ServerLogsService serverLogsService;
+    private Server server;
 
-    @Test
-    void whenGetLastLinesFromServerLog_thenLastLinesReturned() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
+        server = new Arma3Server();
+        server.setId(SERVER_ID);
+        server.setType(ServerType.ARMA3);
+
         File testLogFile = tempDir.resolve(LOG_NAME).toFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(testLogFile));
         writer.write(getTestLog());
         writer.close();
 
-        PathsFactory pathsFactory = mock(PathsFactory.class);
+        pathsFactory = mock(PathsFactory.class);
         when(pathsFactory.getServerLogFile(ServerType.ARMA3, SERVER_ID)).thenReturn(testLogFile);
 
-        ServerLogsService serverLogsService = new ServerLogsService(pathsFactory);
-        Server server = new Arma3Server();
-        server.setId(SERVER_ID);
-        server.setType(ServerType.ARMA3);
+        serverLogsService = new ServerLogsService(pathsFactory);
+    }
+
+    @Test
+    void whenGetLastLinesFromServerLog_thenLastLinesReturned() {
         String log = serverLogsService.getLastLinesFromServerLog(server, LINES_COUNT);
 
         assertThat(log).isNotEmpty();
@@ -58,6 +67,14 @@ class ServerLogsServiceTest {
                         Line 13
                         """
         );
+    }
+    @Test
+    void whenGetLastLinesFromServerLogAndMoreLinesRequestedThanInLog_thenWholeLogReturned() {
+        String log = serverLogsService.getLastLinesFromServerLog(server, LINES_COUNT_OVER_LOG_SIZE);
+
+        assertThat(log).isNotEmpty();
+        assertThat(log.lines().toList()).hasSize(getTestLog().lines().toList().size());
+        assertThat(log).isEqualTo(getTestLog() + "\n");
     }
 
     private String getTestLog() {
