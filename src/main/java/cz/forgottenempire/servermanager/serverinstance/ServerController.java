@@ -116,11 +116,11 @@ class ServerController {
                 .orElseThrow(() -> new NotFoundException("Log file for server '" + server.getName() + "' doesn't exist"));
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFile().getName());
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(resource.contentLength())
-                .contentType(MediaType.APPLICATION_PDF)
+                .contentType(MediaType.TEXT_PLAIN)
                 .body(resource);
     }
 

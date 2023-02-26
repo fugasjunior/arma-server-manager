@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Box, Modal, Typography} from "@mui/material";
-import {getServerLogs} from "../../services/serverLogService";
+import {downloadLogFile, getServerLogs} from "../../services/serverLogService";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -30,7 +30,7 @@ const ServerLogs = (props) => {
     }
 
     async function handleDownloadLogFile() {
-
+        downloadLogFile(props.serverId);
     }
 
     function isLogEmpty() {
@@ -49,7 +49,7 @@ const ServerLogs = (props) => {
                     <RefreshIcon/>
                 </IconButton>
                 <IconButton color="primary" aria-label="download log file" component="label"
-                            onClick={handleDownloadLogFile} disabled={isLogEmpty}
+                            onClick={handleDownloadLogFile} disabled={isLogEmpty()}
                 >
                     <FileDownloadIcon/>
                 </IconButton>
