@@ -55,7 +55,8 @@ public class ServerLogsService {
      */
     private String getLastNLines(File file, int n) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "r");
-        long filePointer = raf.length();
+
+        long filePointer = raf.length() > 2 ? raf.length() - 2 : 0; // offset so there's no null at the end of log
         int lines = 0;
         StringBuilder result = new StringBuilder();
 
