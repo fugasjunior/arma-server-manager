@@ -11,7 +11,7 @@ import arma3Icon from "../../img/arma3_icon.png";
 import dayZIcon from "../../img/dayz_icon.png";
 import reforgerIcon from "../../img/reforger_icon.png";
 import React from "react";
-import Arma3ModEdit from "./Arma3ModEdit";
+import ModEditButton from "./ModEditButton";
 
 const SERVER_ICON_URLS = {
     "ARMA3": arma3Icon,
@@ -73,7 +73,7 @@ const ServerListEntry = (props) => {
                     </Button>
                 </TableCell>
                 <TableCell>
-                    {!serverRunning && <Arma3ModEdit serverId={server.id}/>}
+                    {!serverRunning && <ModEditButton server={server}/>}
                 </TableCell>
                 <TableCell>
                     {!serverRunning && server.type === "" && <Button id="manage-dlcs-btn" onClick={() => {}} >Manage DLCs</Button>}
