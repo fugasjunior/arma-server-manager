@@ -6,7 +6,7 @@ import {getServer, updateServer} from "../../services/serversService";
 import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
 
-const Arma3ModEdit = props => {
+const ListBuilderModEdit = props => {
     const [server, setServer] = useState();
     const [isOpen, setIsOpen] = useState(false);
     const [availableMods, setAvailableMods] = useState([]);
@@ -19,9 +19,9 @@ const Arma3ModEdit = props => {
         setIsLoading(true);
         setIsOpen(false);
         try {
-            const {data: presetsDto} = await getModPresets("ARMA3");
-            const {data: serverDto} = await getServer(props.serverId);
-            const {data: modsDto} = await getMods("ARMA3");
+            const {data: presetsDto} = await getModPresets(props.server.type);
+            const {data: serverDto} = await getServer(props.server.id);
+            const {data: modsDto} = await getMods(props.server.type);
             setPresets(presetsDto.presets);
             setServer(serverDto);
             setSelectedMods(serverDto.activeMods);
@@ -85,7 +85,7 @@ const Arma3ModEdit = props => {
     async function handleConfirm() {
         setIsOpen(false);
         try {
-            await updateServer(props.serverId, {...server, activeMods: selectedMods});
+            await updateServer(props.server.id, {...server, activeMods: selectedMods});
             toast.success("Mods successfully set");
         } catch (e) {
             console.error(e);
@@ -117,4 +117,4 @@ const Arma3ModEdit = props => {
     )
 }
 
-export default Arma3ModEdit;
+export default ListBuilderModEdit;

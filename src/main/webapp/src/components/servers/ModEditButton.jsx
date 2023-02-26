@@ -1,14 +1,12 @@
 import React from "react";
-import Arma3ModEditButton from "./Arma3ModEdit";
+import ListBuilderModEdit from "./ListBuilderModEdit";
 
 const ModEditButton = (props) => {
     const server = props.server;
-    if (server.type === "ARMA3") {
-        return <Arma3ModEditButton serverId={props.server.id}/>;
-    } else if (server.type === "DAYZ" || server.type === "DAYZ_EXP") {
+    if (server.type === "REFORGER") {
         // TODO
-    } else if (server.type === "REFORGER") {
-        // TODO
+    } else {
+        return <ListBuilderModEdit server={props.server}/>;
     }
 }
 
