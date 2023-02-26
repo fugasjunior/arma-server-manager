@@ -1,13 +1,14 @@
 package cz.forgottenempire.servermanager.common;
 
+import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.util.SystemUtils.OSType;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.nio.file.Path;
 
 @Component
 public class PathsFactory {
@@ -93,9 +94,7 @@ public class PathsFactory {
             return executable;
         }
 
-        throw new RuntimeException(
-                new FileNotFoundException("Couldn't find any server executable for '" + type + "' server")
-        );
+        throw new ServerNotInitializedException("Couldn't find any server executable for " + type + " server");
     }
 
     private Path getServerExecutable(ServerType type) {
