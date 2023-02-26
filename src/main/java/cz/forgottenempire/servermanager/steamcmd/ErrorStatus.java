@@ -6,6 +6,7 @@ public enum ErrorStatus {
     TIMEOUT,
     NO_MATCH,
     NO_SUBSCRIPTION,
+    RATE_LIMIT,
     GENERIC,
     INTERRUPTED
 }

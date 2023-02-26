@@ -130,6 +130,9 @@ class SteamCmdExecutor {
         if (errorLine.contains("i/o operation") || errorLine.contains("failed to write file")) {
             job.setErrorStatus(ErrorStatus.IO);
         }
+        if (errorLine.contains("rate limit exceeded")) {
+            job.setErrorStatus(ErrorStatus.RATE_LIMIT);
+        }
     }
 
     private void dumpErrorOutputToLog(String result) {

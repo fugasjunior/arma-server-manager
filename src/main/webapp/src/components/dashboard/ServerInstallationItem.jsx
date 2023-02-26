@@ -16,20 +16,13 @@ import dayZExpLogo from "../../img/dayz_exp_logo.jpg";
 import reforgerLogo from "../../img/reforger_logo.jpg";
 import SERVER_NAMES from "../../util/serverNames";
 import config from "../../config";
+import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 
 const SERVER_IMAGE_URLS = {
     "ARMA3": arma3Logo,
     "DAYZ": dayZLogo,
     "DAYZ_EXP": dayZExpLogo,
     "REFORGER": reforgerLogo
-}
-
-const ERROR_STATE_MESSAGES = {
-    GENERIC: "Unidentified error. Please contact the system administrator.",
-    IO: "File system I/O error. Please contact the system administrator.",
-    NO_SUBSCRIPTION: "The given Steam account doesn't have correct subscription and cannot download the server.",
-    TIMEOUT: "The request timed out, please retry.",
-    WRONG_AUTH: "Incorrect Steam authorization. Please check username, password and Steam Guard token."
 }
 
 const isInstalling = (installation) => {
@@ -52,7 +45,7 @@ const ServerInstallationItem = (props) => {
                     {installation.errorStatus &&
                             <Alert severity="error" sx={{mb: 2}}>
                                 <AlertTitle>Error</AlertTitle>
-                                {ERROR_STATE_MESSAGES[installation.errorStatus]
+                                {workshopErrorStatusMap[installation.errorStatus]
                                         ?? "Unknown error"}
                             </Alert>
                     }
