@@ -42,7 +42,7 @@ class ArmaLauncherPresetController {
         byte[] modPresetHtml = exportService.exportModPresetToFile(modPreset);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentType(MediaType.TEXT_HTML);
         headers.setContentDisposition(
                 ContentDisposition.builder("attachment")
                         .filename(getPresetFileName(modPreset))
