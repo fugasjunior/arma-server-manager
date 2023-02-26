@@ -6,13 +6,10 @@ import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 const EditArma3ServerSettingsForm = props => {
 
     const [dlcsModalOpen, setDlcsModalOpen] = useState(false);
-    const [selectedMods, setSelectedMods] = useState([]);
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [selectedDlcs, setSelectedDlcs] = useState([]);
 
     useEffect(() => {
-        setSelectedMods(props.server.activeMods);
-
         setSelectedDlcs(props.server.activeDLCs);
 
         const newAvailableDlcs = props.availableDlcs.filter(
@@ -21,7 +18,7 @@ const EditArma3ServerSettingsForm = props => {
     }, [props.availableMods, props.availableDlcs]);
 
     const handleSubmit = (values) => {
-        props.onSubmit(values, selectedMods, selectedDlcs);
+        props.onSubmit(values, selectedDlcs);
     }
 
     const formik = useFormik({

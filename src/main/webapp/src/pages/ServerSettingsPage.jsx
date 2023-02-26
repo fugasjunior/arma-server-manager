@@ -13,7 +13,6 @@ const ServerSettingsPage = () => {
     const {id} = useParams();
     const [server, setServer] = useState({});
     const [isLoading, setIsLoading] = useState(true);
-    const [availableMods, setAvailableMods] = useState([]);
     const [availableDlcs, setAvailableDlcs] = useState([]);
 
     const navigate = useNavigate();
@@ -29,7 +28,6 @@ const ServerSettingsPage = () => {
             const {data: modsDto} = await getMods(fetchedServer.type);
 
             setServer(fetchedServer);
-            setAvailableMods(modsDto.workshopMods.sort((a, b) => a.name.localeCompare(b.name)));
             setAvailableDlcs(modsDto.creatorDlcs.sort((a, b) => a.name.localeCompare(b.name)));
             setIsLoading(false);
         } catch (e) {
@@ -38,12 +36,12 @@ const ServerSettingsPage = () => {
         }
     }
 
-    const handleSubmit = async (values, selectedMods, selectedDlcs) => {
+    const handleSubmit = async (values, selectedDlcs) => {
         const request = {
+            ...server,
             ...values,
             type: server.type,
             queryPort: server.type === "ARMA3" ? values.port + 1 : values.queryPort,
-            activeMods: selectedMods,
             activeDLCs: selectedDlcs,
             instanceInfo: null,
         }
@@ -69,7 +67,6 @@ const ServerSettingsPage = () => {
                         <>
                             {server.type === "ARMA3" &&
                                     <EditArma3ServerSettingsForm server={server} onSubmit={handleSubmit}
-                                                                 availableMods={availableMods}
                                                                  availableDlcs={availableDlcs}
                                                                  onCancel={handleCancel}
                                                                  isServerRunning={server.instanceInfo
@@ -79,7 +76,6 @@ const ServerSettingsPage = () => {
                             {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
                                     <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
                                                                 onCancel={handleCancel}
-                                                                availableMods={availableMods}
                                                                 isServerRunning={server.instanceInfo
                                                                         && server.instanceInfo.alive}
                                     />

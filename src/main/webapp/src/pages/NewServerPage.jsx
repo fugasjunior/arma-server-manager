@@ -76,7 +76,6 @@ const REFORGER_INITIAL_STATE = {
 }
 
 const NewServerPage = () => {
-    const [availableMods, setAvailableMods] = useState([]);
     const [availableDlcs, setAvailableDlcs] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -97,7 +96,6 @@ const NewServerPage = () => {
         try {
             setLoading(true);
             const {data: modsDto} = await getMods(type);
-            setAvailableMods(modsDto.workshopMods.sort((a, b) => a.name.localeCompare(b.name)));
             setAvailableDlcs(modsDto.creatorDlcs.sort((a, b) => a.name.localeCompare(b.name)));
             setLoading(false);
         } catch (e) {
@@ -106,11 +104,11 @@ const NewServerPage = () => {
         }
     };
 
-    const handleSubmit = async (values, selectedMods, selectedDlcs) => {
+    const handleSubmit = async (values, selectedDlcs) => {
         const server = {
             ...values,
             type,
-            activeMods: selectedMods ? selectedMods : [],
+            activeMods: [],
             activeDLCs: selectedDlcs ? selectedDlcs : [],
         }
 
@@ -136,7 +134,6 @@ const NewServerPage = () => {
                         <>
                             {type === "ARMA3" &&
                                     <EditArma3ServerSettingsForm server={ARMA3_INITIAL_STATE}
-                                                                 availableMods={availableMods}
                                                                  availableDlcs={availableDlcs}
                                                                  onCancel={handleCancel}
                                                                  onSubmit={handleSubmit}
@@ -144,7 +141,6 @@ const NewServerPage = () => {
                             }
                             {(type === "DAYZ" || type === "DAYZ_EXP") &&
                                     <EditDayZServerSettingsForm server={{...DAYZ_INITIAL_STATE, type}}
-                                                                availableMods={availableMods}
                                                                 onCancel={handleCancel}
                                                                 onSubmit={handleSubmit}
                                     />
