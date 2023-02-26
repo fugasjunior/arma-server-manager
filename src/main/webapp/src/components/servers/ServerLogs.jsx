@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Modal} from "@mui/material";
+import {Box, Modal, Typography} from "@mui/material";
 import {getServerLogs} from "../../services/serverLogService";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -33,15 +33,23 @@ const ServerLogs = (props) => {
 
     }
 
+    function isLogEmpty() {
+        return !logs || logs.length === 0;
+    }
+
     return (
         <Modal open onClose={props.onClose}>
             <Box sx={modalStyle}>
-                <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}}/>
+                {isLogEmpty() ?
+                    <Typography m={2}>No logs available for this server</Typography>
+                    :
+                    <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}}/>
+                }
                 <IconButton color="primary" aria-label="refresh logs" component="label" onClick={fetchLogs}>
                     <RefreshIcon/>
                 </IconButton>
                 <IconButton color="primary" aria-label="download log file" component="label"
-                            onClick={handleDownloadLogFile}
+                            onClick={handleDownloadLogFile} disabled={isLogEmpty}
                 >
                     <FileDownloadIcon/>
                 </IconButton>
