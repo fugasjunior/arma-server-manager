@@ -68,6 +68,17 @@ class ServerLogsServiceTest {
                         """
         );
     }
+
+    @Test
+    void whenLogFileDoesNotExist_thenEmptyStringReturned() {
+        File mockedFile = mock(File.class);
+        when(mockedFile.exists()).thenReturn(false);
+        when(pathsFactory.getServerLogFile(ServerType.ARMA3, SERVER_ID)).thenReturn(mockedFile);
+
+        String log = serverLogsService.getLastLinesFromServerLog(server, LINES_COUNT);
+
+        assertThat(log).isEmpty();
+    }
     @Test
     void whenGetLastLinesFromServerLogAndMoreLinesRequestedThanInLog_thenWholeLogReturned() {
         String log = serverLogsService.getLastLinesFromServerLog(server, LINES_COUNT_OVER_LOG_SIZE);
