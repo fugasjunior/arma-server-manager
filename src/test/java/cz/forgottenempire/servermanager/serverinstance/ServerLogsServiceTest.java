@@ -7,6 +7,7 @@ import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.core.io.Resource;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +30,7 @@ class ServerLogsServiceTest {
     private PathsFactory pathsFactory;
     private ServerLogsService serverLogsService;
     private Server server;
+    private File testLogFile;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -36,7 +38,7 @@ class ServerLogsServiceTest {
         server.setId(SERVER_ID);
         server.setType(ServerType.ARMA3);
 
-        File testLogFile = tempDir.resolve(LOG_NAME).toFile();
+        testLogFile = tempDir.resolve(LOG_NAME).toFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(testLogFile));
         writer.write(getTestLog());
         writer.close();
@@ -86,6 +88,15 @@ class ServerLogsServiceTest {
         assertThat(log).isNotEmpty();
         assertThat(log.lines().toList()).hasSize(getTestLog().lines().toList().size());
         assertThat(log).isEqualTo(getTestLog() + "\n");
+    }
+
+    @Test
+    void whenGetLogFileAsResourceAndLogExists_thenResourceReturned() throws IOException {
+        Resource logFileResource = serverLogsService.getLogFileAsResource(server);
+
+        assertThat(logFileResource).isNotNull();
+        assertThat(logFileResource.exists()).isTrue();
+        assertThat(logFileResource.getFile()).isEqualTo(testLogFile);
     }
 
     private String getTestLog() {

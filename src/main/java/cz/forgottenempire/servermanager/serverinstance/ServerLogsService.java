@@ -2,11 +2,14 @@ package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import org.springframework.core.io.FileUrlResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.MalformedURLException;
 
 @Service
 public class ServerLogsService {
@@ -26,6 +29,15 @@ public class ServerLogsService {
         try {
             return getLastNLines(serverLogFile, count);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Resource getLogFileAsResource(Server server) {
+        File serverLogFile = pathsFactory.getServerLogFile(server.getType(), server.getId());
+        try {
+            return new FileUrlResource(serverLogFile.getAbsolutePath());
+        } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
