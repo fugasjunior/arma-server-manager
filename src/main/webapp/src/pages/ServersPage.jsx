@@ -9,11 +9,14 @@ import Paper from "@mui/material/Paper";
 import TableBody from "@mui/material/TableBody";
 import {toast} from "material-react-toastify";
 import ConfirmationDialog from "../UI/ConfirmationDialog";
+import ServerLogs from "../components/servers/ServerLogs";
 
 const ServersPage = () => {
     const [servers, setServers] = useState([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [serverToDelete, setServerToDelete] = useState({});
+    const [logServerId, setLogServerId] = useState();
+    const [isLogOpen, setIsLogOpen] = useState(false);
 
     useEffect(() => {
         fetchServers()
@@ -30,8 +33,8 @@ const ServersPage = () => {
 
     const isServerWithSamePortRunning = server => {
         const activeServerWithSamePort = servers.filter(s => s !== server)
-        .filter(s => s.instanceInfo && s.instanceInfo.alive)
-        .filter(s => s.port === server.port || s.queryPort === server.queryPort);
+            .filter(s => s.instanceInfo && s.instanceInfo.alive)
+            .filter(s => s.port === server.port || s.queryPort === server.queryPort);
         if (activeServerWithSamePort[0]) {
             return activeServerWithSamePort[0];
         }
@@ -86,31 +89,42 @@ const ServersPage = () => {
         setServerToDelete({});
     }
 
+    const handleOpenLogs = serverId => {
+        setIsLogOpen(true);
+        setLogServerId(serverId);
+    }
+
+    const handleCloseLogs = () => {
+        setIsLogOpen(false);
+    }
+
     return (
-            <>
-                <NewServerButton/>
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableBody>
-                            {servers.map(server =>
-                                    <ServerListEntry key={server.id}
-                                                     server={server}
-                                                     onStartServer={handleStartServer}
-                                                     onStopServer={handleStopServer}
-                                                     onRestartServer={handleRestartServer}
-                                                     onDeleteServer={() => handleDeleteServerClicked(server)}
-                                                     serverWithSamePortRunning={isServerWithSamePortRunning(server)}
-                                    />
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <ConfirmationDialog
-                        open={deleteDialogOpen} title={`Delete server '${serverToDelete.name}'?`}
-                        description={"Deleting the server will cause all of its configuration to be permanently lost."}
-                        onConfirm={handleDeleteServer} onClose={handleDeleteDialogClose} actionLabel="Delete"
-                />
-            </>
+        <>
+            <NewServerButton/>
+            {isLogOpen && <ServerLogs onClose={handleCloseLogs} serverId={logServerId}/>}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableBody>
+                        {servers.map(server =>
+                            <ServerListEntry key={server.id}
+                                             server={server}
+                                             onStartServer={handleStartServer}
+                                             onStopServer={handleStopServer}
+                                             onRestartServer={handleRestartServer}
+                                             onOpenLogs={handleOpenLogs}
+                                             onDeleteServer={() => handleDeleteServerClicked(server)}
+                                             serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                            />
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <ConfirmationDialog
+                open={deleteDialogOpen} title={`Delete server '${serverToDelete.name}'?`}
+                description={"Deleting the server will cause all of its configuration to be permanently lost."}
+                onConfirm={handleDeleteServer} onClose={handleDeleteDialogClose} actionLabel="Delete"
+            />
+        </>
     );
 }
 

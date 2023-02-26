@@ -56,7 +56,7 @@ class ArmaLauncherPresetControllerTest {
         softly.assertThat(response.getBody()).isEqualTo(expectedFile);
         HttpHeaders headers = response.getHeaders();
         softly.assertThat(headers).isNotNull();
-        softly.assertThat(headers.getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
+        softly.assertThat(headers.getContentType()).isEqualTo(MediaType.TEXT_HTML);
         softly.assertThat(headers.getContentDisposition().getFilename()).isEqualTo("Test_Preset.html");
         softly.assertAll();
     }
