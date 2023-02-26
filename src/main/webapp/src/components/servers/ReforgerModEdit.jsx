@@ -11,6 +11,7 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import MemoryIcon from '@mui/icons-material/Memory';
 
 const modalStyle = {
     position: 'absolute',
@@ -87,7 +88,9 @@ const ReforgerModEdit = props => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button id="manage-mods-btn" onClick={handleManageModsButtonClick}>Manage mods</Button>
+            <Button id="manage-mods-btn" onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>}>
+                Mods
+            </Button>
             <Modal open={isOpen} onClose={handleClose}>
                 <Box sx={modalStyle}>
                     <Stack direction="row" spacing={1} mb={2} justifyItems="center" justifyContent="space-between">

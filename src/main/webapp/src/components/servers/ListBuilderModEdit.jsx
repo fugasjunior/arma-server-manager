@@ -5,6 +5,7 @@ import {getModPresets} from "../../services/modPresetsService";
 import {getServer, updateServer} from "../../services/serversService";
 import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
+import MemoryIcon from "@mui/icons-material/Memory";
 
 const ListBuilderModEdit = props => {
     const [server, setServer] = useState();
@@ -102,7 +103,9 @@ const ListBuilderModEdit = props => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button id="manage-mods-btn" onClick={handleManageModsButtonClick}>Manage mods</Button>
+            <Button id="manage-mods-btn" onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>}>
+                Mods
+            </Button>
             <Modal open={isOpen} onClose={handleClose}>
                 <Box>
                     <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}

@@ -4,6 +4,7 @@ import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getServer, updateServer} from "../../services/serversService";
 import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
+import ApartmentIcon from '@mui/icons-material/Apartment';
 
 const ListBuilderDLCsEdit = props => {
     const [server, setServer] = useState();
@@ -70,7 +71,9 @@ const ListBuilderDLCsEdit = props => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button id="manage-dlcs-btn" onClick={handleManageDLCsButtonClick}>Manage DLCs</Button>
+            <Button id="manage-dlcs-btn" onClick={handleManageDLCsButtonClick} startIcon={<ApartmentIcon/>}>
+                DLCs
+            </Button>
             <Modal open={isOpen} onClose={handleClose}>
                 <Box>
                     <ListBuilder selectedOptions={selectedDLCs} availableOptions={availableDLCs}
