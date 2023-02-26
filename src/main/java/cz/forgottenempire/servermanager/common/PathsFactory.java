@@ -101,7 +101,7 @@ public class PathsFactory {
     }
 
     public File getServerLogFile(ServerType type, long id) {
-        return Path.of(logsBasePath.toString(), type.name() + "_" + id).toFile();
+        return Path.of(logsBasePath.toString(), type.name() + "_" + id + ".log").toFile();
     }
 
     private Path getServerExecutable(ServerType type) {
