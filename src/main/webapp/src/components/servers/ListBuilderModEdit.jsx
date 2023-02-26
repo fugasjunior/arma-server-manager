@@ -26,7 +26,7 @@ const ListBuilderModEdit = props => {
             setPresets(presetsDto.presets);
             setServer(serverDto);
             setSelectedMods(serverDto.activeMods);
-            setAvailableMods(modsDto.workshopMods.filter(mod => !selectedMods.find(searchedMod => searchedMod.id === mod.id))
+            setAvailableMods(modsDto.workshopMods.filter(mod => !serverDto.activeMods.find(searchedMod => searchedMod.id === mod.id))
                 .sort((a, b) => a.name.localeCompare(b.name)));
             setSelectedPreset("");
             setIsOpen(true);

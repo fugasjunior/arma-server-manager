@@ -21,7 +21,7 @@ const ListBuilderDLCsEdit = props => {
             const {data: dlcsDto} = await getMods(props.server.type);
             setServer(serverDto);
             setSelectedDLCs(serverDto.activeDLCs);
-            setAvailableDLCs(dlcsDto.creatorDlcs.filter(mod => !selectedDLCs.find(searchedDlc => searchedDlc.id === mod.id))
+            setAvailableDLCs(dlcsDto.creatorDlcs.filter(mod => !serverDto.activeDLCs.find(searchedDlc => searchedDlc.id === mod.id))
                 .sort((a, b) => a.name.localeCompare(b.name)));
             setIsOpen(true);
         } catch (e) {
@@ -71,7 +71,7 @@ const ListBuilderDLCsEdit = props => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button id="manage-dlcs-btn" onClick={handleManageDLCsButtonClick} startIcon={<ApartmentIcon/>}>
+            <Button onClick={handleManageDLCsButtonClick} startIcon={<ApartmentIcon/>}>
                 DLCs
             </Button>
             <Modal open={isOpen} onClose={handleClose}>
