@@ -10,35 +10,6 @@ export const AuthContext = createContext({
     }
 });
 
-const calculateExpirationTime = (millis) => {
-    let date = new Date();
-    date = new Date(+date + millis);
-    return date;
-}
-
-const calculateRemainingTime = (time) => {
-    const currentDate = new Date();
-    return +time - +currentDate;
-}
-
-const retrieveStoredToken = () => {
-    const storedToken = localStorage.getItem('token');
-    const expirationTime = localStorage.getItem('expirationTime');
-
-    if (!storedToken || !expirationTime) {
-        return null;
-    }
-
-    const remainingTime = calculateRemainingTime(new Date(expirationTime));
-    if (remainingTime < 60000) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('expirationTime');
-        return null;
-    }
-
-    return {storedToken, remainingTime};
-}
-
 export const AuthContextProvider = (props) => {
     const tokenData = retrieveStoredToken();
     let initialToken;
@@ -71,4 +42,33 @@ export const AuthContextProvider = (props) => {
     };
 
     return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;
+}
+
+const retrieveStoredToken = () => {
+    const storedToken = localStorage.getItem('token');
+    const expirationTime = localStorage.getItem('expirationTime');
+
+    if (!storedToken || !expirationTime) {
+        return null;
+    }
+
+    const remainingTime = calculateRemainingTime(new Date(expirationTime));
+    if (remainingTime < 60000) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('expirationTime');
+        return null;
+    }
+
+    return {storedToken, remainingTime};
+}
+
+const calculateRemainingTime = (time) => {
+    const currentDate = new Date();
+    return +time - +currentDate;
+}
+
+const calculateExpirationTime = (millis) => {
+    let date = new Date();
+    date = new Date(+date + (millis/1000));
+    return date;
 }
