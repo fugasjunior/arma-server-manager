@@ -1,6 +1,8 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3DifficultySettings;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
@@ -39,6 +41,7 @@ class ServerInstanceService {
 
     public Server createServer(Server server) {
         setQueryPortForArma3Server(server);
+        setDifficultySettingsForArma3Server(server);
         setInstanceIdForDayZServer(server);
         configFileService.writeConfig(server);
         return serverRepository.save(server);
@@ -62,6 +65,17 @@ class ServerInstanceService {
         // Arma 3 server doesn't support customizing Steam query port, it's always game port + 1
         if (server.getType() == ServerType.ARMA3) {
             server.setQueryPort(server.getPort() + 1);
+        }
+    }
+
+    private void setDifficultySettingsForArma3Server(Server server) {
+        // TODO debug purposes only, remove afterwards
+        if (server.getType() == ServerType.ARMA3) {
+            Arma3Server arma3Server = (Arma3Server) server;
+            Arma3DifficultySettings difficultySettings = new Arma3DifficultySettings();
+            difficultySettings.setServer(arma3Server);
+            arma3Server.setDifficultySettings(difficultySettings);
+            serverRepository.save(arma3Server);
         }
     }
 
