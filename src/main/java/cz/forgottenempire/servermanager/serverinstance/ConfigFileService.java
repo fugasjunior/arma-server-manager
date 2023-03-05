@@ -5,9 +5,18 @@ import com.google.common.base.Strings;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3DifficultySettings;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import javax.validation.constraints.NotNull;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,12 +24,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 @Service
 @Slf4j
@@ -41,10 +44,22 @@ class ConfigFileService {
         return pathsFactory.getConfigFilePath(server.getType(), fileName).toFile();
     }
 
+    public File getProfileFileForServer(@NotNull Arma3Server server) {
+        String fileName = server.getType() + "_" + server.getId() + ".armaprofile";
+        return pathsFactory.getConfigFilePath(server.getType(), fileName).toFile();
+    }
+
     public void writeConfig(@NotNull Server server) {
         File configFile = getConfigFileForServer(server);
         deleteOldConfigFile(configFile);
         writeNewConfig(server, configFile);
+
+        if (server.getType() == ServerType.ARMA3) {
+            Arma3Server arma3Server = (Arma3Server) server;
+            File profileFile = getProfileFileForServer(arma3Server);
+            deleteOldConfigFile(profileFile);
+            writeNewProfile(arma3Server.getDifficultySettings(), profileFile);
+        }
     }
 
     public Optional<String> readOptionFromConfig(@NotNull String key, @NotNull Server server) {
@@ -89,7 +104,18 @@ class ConfigFileService {
                     .getTemplate(Constants.SERVER_CONFIG_TEMPLATES.get(server.getType()));
             configTemplate.process(server, writer);
         } catch (IOException | TemplateException e) {
-            log.error("Could not write config template", e);
+            log.error("Could not write config file", e);
+        }
+    }
+
+    private void writeNewProfile(Arma3DifficultySettings difficultySettings, File configFile) {
+        log.info("Writing new server profile '{}'", configFile.getName());
+        Template configTemplate;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
+            configTemplate = freeMarkerConfigurer.getConfiguration().getTemplate(Constants.ARMA3_PROFILE_TEMPLATE);
+            configTemplate.process(difficultySettings, writer);
+        } catch (IOException | TemplateException e) {
+            log.error("Could not write profile file", e);
         }
     }
 }

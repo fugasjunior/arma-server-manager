@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Box, Modal, Typography} from "@mui/material";
 import {downloadLogFile, getServerLogs} from "../../services/serverLogService";
 import IconButton from "@mui/material/IconButton";
@@ -19,6 +19,7 @@ const modalStyle = {
 
 const ServerLogs = (props) => {
     const [logs, setLogs] = useState("");
+    let logTextArea = useRef();
 
     useEffect(() => {
         fetchLogs();
@@ -27,6 +28,7 @@ const ServerLogs = (props) => {
     async function fetchLogs() {
         const {data: downloadedLogs} = await getServerLogs(props.serverId);
         setLogs(downloadedLogs);
+        logTextArea.current.scrollTop = logTextArea.current.scrollHeight;
     }
 
     async function handleDownloadLogFile() {
@@ -43,7 +45,7 @@ const ServerLogs = (props) => {
                 {isLogEmpty() ?
                     <Typography m={2}>No logs available for this server</Typography>
                     :
-                    <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}}/>
+                    <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}} ref={logTextArea}/>
                 }
                 <IconButton color="primary" aria-label="refresh logs" component="label" onClick={fetchLogs}>
                     <RefreshIcon/>

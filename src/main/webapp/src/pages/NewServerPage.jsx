@@ -26,7 +26,32 @@ const ARMA3_INITIAL_STATE = {
     verifySignatures: true,
     activeMods: [],
     activeDLCs: [],
-    additionalOptions: ""
+    additionalOptions: "",
+    difficultySettings: {
+        groupIndicators: 0,
+        friendlyTags: 0,
+        enemyTags: 0,
+        detectedMines: 0,
+        commands: 1,
+        waypoints: 1,
+        weaponInfo: 2,
+        stanceIndicator: 2,
+        thirdPersonView: 0,
+        reducedDamage: false,
+        tacticalPing: false,
+        staminaBar: false,
+        weaponCrosshair: false,
+        visionAid: false,
+        scoreTable: true,
+        deathMessages: true,
+        vonID: true,
+        mapContent: false,
+        autoReport: false,
+        cameraShake: true,
+        aiLevelPreset: 3,
+        skillAI: 0.5,
+        precisionAI: 0.5
+    },
 }
 const DAYZ_INITIAL_STATE = {
     name: "",

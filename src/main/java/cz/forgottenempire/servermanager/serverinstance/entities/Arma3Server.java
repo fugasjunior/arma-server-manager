@@ -3,12 +3,8 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,4 +33,7 @@ public class Arma3Server extends Server {
     @ElementCollection(targetClass = Arma3CDLC.class)
     @Enumerated(EnumType.STRING)
     private List<Arma3CDLC> activeDLCs;
+
+    @OneToOne(mappedBy = "server", cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    private Arma3DifficultySettings difficultySettings;
 }

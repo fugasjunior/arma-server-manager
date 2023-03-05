@@ -1,6 +1,7 @@
 import {useFormik} from "formik";
 import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
 import React from "react";
+import Arma3DifficultySettingsForm from "./Arma3DifficultySettingsForm";
 
 const EditArma3ServerSettingsForm = props => {
 
@@ -163,9 +164,13 @@ const EditArma3ServerSettingsForm = props => {
                             value={formik.values.additionalOptions}
                             onChange={formik.handleChange}
                             error={formik.touched.additionalOptions && Boolean(formik.errors.additionalOptions)}
-
                         />
                     </Grid>
+
+                    <Grid item xs={12}>
+                        <Arma3DifficultySettingsForm formik={formik}/>
+                    </Grid>
+
                     <Grid item xs={12} md={6}>
                         <Button id="submit-btn"
                                 title={props.isServerRunning ? "Stop the server to be able to update the settings."

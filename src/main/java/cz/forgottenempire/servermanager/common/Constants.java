@@ -32,5 +32,7 @@ public class Constants {
             ServerType.REFORGER, "serverConfigReforger.ftl"
     );
 
+    public static final String ARMA3_PROFILE_TEMPLATE = "arma3ServerProfile.ftl";
+
     public final static String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
 }

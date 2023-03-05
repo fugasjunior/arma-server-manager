@@ -178,8 +178,12 @@ class ServerProcessService {
         String configFilePath = configFileService.getConfigFileForServer(server).getAbsolutePath();
 
         if (type == ServerType.ARMA3) {
+            File profileFile = configFileService.getProfileFileForServer((Arma3Server) server);
+
             parameters.add("-port=" + server.getPort());
             parameters.add("-config=" + configFilePath);
+            parameters.add("-profiles=" + profileFile.getParentFile().getAbsolutePath());
+            parameters.add("-name=" + ServerType.ARMA3 + "_" + server.getId());
             parameters.add("-nosplash");
             parameters.add("-skipIntro");
             parameters.add("-world=empty");

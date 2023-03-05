@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.dtos.Arma3DifficultySettingsDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.Arma3ServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.DayZServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ReforgerModDto;
@@ -8,6 +9,7 @@ import cz.forgottenempire.servermanager.serverinstance.dtos.ReforgerServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerWorkshopModDto;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3DifficultySettings;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerMod;
@@ -47,6 +49,10 @@ interface ServerMapper {
     ServerWorkshopModDto mapWorkshopModToDto(WorkshopMod workshopMod);
 
     WorkshopMod mapSteamWorkshopModDtoToEntity(ServerWorkshopModDto serverWorkshopModDto);
+
+    Arma3DifficultySettingsDto mapDifficultySettingsToDto(Arma3DifficultySettings settings);
+
+    Arma3DifficultySettings mapDifficultySettingsDtoToEntity(Arma3DifficultySettingsDto difficultySettingsDto);
 
     default CreatorDlcDto mapCreatorDlcToDto(Arma3CDLC cdlc) {
         return new CreatorDlcDto(cdlc.getId(), cdlc.getName());
