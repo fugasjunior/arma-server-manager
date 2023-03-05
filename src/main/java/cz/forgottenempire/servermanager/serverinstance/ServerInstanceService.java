@@ -1,17 +1,17 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.serverinstance.entities.Arma3DifficultySettings;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -69,12 +69,9 @@ class ServerInstanceService {
     }
 
     private void setDifficultySettingsForArma3Server(Server server) {
-        // TODO debug purposes only, remove afterwards
         if (server.getType() == ServerType.ARMA3) {
             Arma3Server arma3Server = (Arma3Server) server;
-            Arma3DifficultySettings difficultySettings = new Arma3DifficultySettings();
-            difficultySettings.setServer(arma3Server);
-            arma3Server.setDifficultySettings(difficultySettings);
+            arma3Server.getDifficultySettings().setServer(arma3Server);
             serverRepository.save(arma3Server);
         }
     }
