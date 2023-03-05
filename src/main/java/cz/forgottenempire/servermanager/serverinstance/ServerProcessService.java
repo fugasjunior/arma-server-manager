@@ -233,7 +233,7 @@ class ServerProcessService {
     private void writeConfigFiles(Server server) {
         boolean configRegenerationNeeded = !configFileService.getConfigFileForServer(server).exists();
         if (server.getType() == ServerType.ARMA3) {
-            configRegenerationNeeded = configRegenerationNeeded || pathsFactory.getServerProfileFile(server.getId()).exists();
+            configRegenerationNeeded = configRegenerationNeeded || !pathsFactory.getServerProfileFile(server.getId()).exists();
         }
         if (configRegenerationNeeded) {
             configFileService.writeConfig(server);
