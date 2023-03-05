@@ -1,11 +1,16 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
+import com.ibasco.agql.core.exceptions.ReadTimeoutException;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+
 import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +29,7 @@ class CheckServerInstancesStatusCronJob {
 
     @Autowired
     public CheckServerInstancesStatusCronJob(ServerInstanceInfoRepository instanceInfoRepository,
-            ServerInstanceService serverService) {
+                                             ServerInstanceService serverService) {
         this.instanceInfoRepository = instanceInfoRepository;
         this.serverService = serverService;
     }
@@ -77,7 +82,15 @@ class CheckServerInstancesStatusCronJob {
                     .version(queryServerInfo.getGameVersion())
                     .description(queryServerInfo.getGameDescription())
                     .build());
-
+        } catch (ReadTimeoutException e) {
+            // ignore any timeouts that happen during the first minute of starting the server
+            LocalDateTime startedAt = instanceInfo.getStartedAt();
+            if (startedAt.isBefore(LocalDateTime.now().minus(1, ChronoUnit.MINUTES))) {
+                log.warn("Timeout happened during querying the status of server {} (ID {}) on port {}. " +
+                                "It may not have finished initialization yet. If this message keeps occurring, " +
+                                "there's likely a problem with the server.",
+                        server.getName(), instanceInfo.getId(), server.getQueryPort());
+            }
         } catch (Exception e) {
             log.error("Couldn't query server {} (ID {}) on port {}",
                     server.getName(), instanceInfo.getId(), server.getQueryPort(), e);
