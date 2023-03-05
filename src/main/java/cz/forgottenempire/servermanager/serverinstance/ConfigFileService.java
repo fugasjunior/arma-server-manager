@@ -45,8 +45,7 @@ class ConfigFileService {
     }
 
     public File getProfileFileForServer(@NotNull Arma3Server server) {
-        String fileName = server.getType() + "_" + server.getId() + ".armaprofile";
-        return pathsFactory.getConfigFilePath(server.getType(), fileName).toFile();
+        return pathsFactory.getServerProfileFile(server.getId());
     }
 
     public void writeConfig(@NotNull Server server) {
@@ -108,10 +107,17 @@ class ConfigFileService {
         }
     }
 
-    private void writeNewProfile(Arma3DifficultySettings difficultySettings, File configFile) {
-        log.info("Writing new server profile '{}'", configFile.getName());
+    private void writeNewProfile(Arma3DifficultySettings difficultySettings, File profileFile) {
+        try {
+            FileUtils.forceMkdirParent(profileFile);
+        } catch (IOException e) {
+            log.error("Could not create directory structure for profile '{}'", profileFile.getAbsolutePath());
+            throw new RuntimeException(e);
+        }
+
+        log.info("Writing new server profile '{}'", profileFile.getName());
         Template configTemplate;
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(profileFile))) {
             configTemplate = freeMarkerConfigurer.getConfiguration().getTemplate(Constants.ARMA3_PROFILE_TEMPLATE);
             configTemplate.process(difficultySettings, writer);
         } catch (IOException | TemplateException e) {

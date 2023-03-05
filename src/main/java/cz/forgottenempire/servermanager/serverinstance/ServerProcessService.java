@@ -11,6 +11,7 @@ import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
 import cz.forgottenempire.servermanager.util.LogUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,10 +67,7 @@ class ServerProcessService {
             log.info("Server '{}' (ID {}) is already running", server.getName(), id);
         }
 
-        File configFile = configFileService.getConfigFileForServer(server);
-        if (!configFile.exists()) {
-            configFileService.writeConfig(server);
-        }
+        writeConfigFiles(server);
 
         Process process = startServerProcess(server);
         instanceInfo = ServerInstanceInfo.builder()
@@ -178,11 +177,9 @@ class ServerProcessService {
         String configFilePath = configFileService.getConfigFileForServer(server).getAbsolutePath();
 
         if (type == ServerType.ARMA3) {
-            File profileFile = configFileService.getProfileFileForServer((Arma3Server) server);
-
             parameters.add("-port=" + server.getPort());
             parameters.add("-config=" + configFilePath);
-            parameters.add("-profiles=" + profileFile.getParentFile().getAbsolutePath());
+            parameters.add("-profiles=\"" + pathsFactory.getProfilesDirectoryPath().toAbsolutePath() + "\"");
             parameters.add("-name=" + ServerType.ARMA3 + "_" + server.getId());
             parameters.add("-nosplash");
             parameters.add("-skipIntro");
@@ -231,5 +228,15 @@ class ServerProcessService {
         server.getActiveMods().stream() // TODO check installation status
                 .map(mod -> "-mod=" + mod.getNormalizedName())
                 .forEach(parameters::add);
+    }
+
+    private void writeConfigFiles(Server server) {
+        boolean configRegenerationNeeded = !configFileService.getConfigFileForServer(server).exists();
+        if (server.getType() == ServerType.ARMA3) {
+            configRegenerationNeeded = configRegenerationNeeded || pathsFactory.getServerProfileFile(server.getId()).exists();
+        }
+        if (configRegenerationNeeded) {
+            configFileService.writeConfig(server);
+        }
     }
 }
