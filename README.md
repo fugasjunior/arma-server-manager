@@ -1,4 +1,4 @@
-# [-FE-] Arma Server Manager
+# Arma Server Manager
 
 **An administration web app for managing your Arma and DayZ servers**
 
@@ -14,7 +14,9 @@
 - Support for **Arma 3**, **Arma Reforger**, **DayZ** and **DayZ Experimental** servers
 - Automatically install and update server installations
 - Download and manage **Steam Workshop mods** for Arma 3 and DayZ
+- Import and export lauchher HTML mod presets
 - Configure, run and monitor multiple servers at once
+- Configure custom server difficulty
 - Arma 3 scenarios management
 - Docker image for simplified setup
 - Support for simplified management of additional game servers
@@ -38,6 +40,9 @@ a short description of the expected values.
 
 After you've set up the values and saved the file, you can run `docker compose up`, which will automatically bring
 the database and the server manager up. It should then be accessible on port 8080 by default.
+
+**NOTE:** Some users were reporting issues when running this app with Portainer. Before this is resolved, I recommend
+using just the provided `docker-compose.yml` file.
 
 ### Custom installation (no Docker)
 
@@ -79,6 +84,8 @@ Launch the application by running: `java -jar arma3-server-gui.jar`. You should 
 
 If you have Steam Guard 2FA enabled on your Steam account, you're going to need to get a SteamAuth token. To do this,
 either manually launch SteamCMD with a command line and log in, or use the semi-automated approach through UI.
+
+**NOTE:** Currently, there is no support for 2FA authentication with Steam mobile application.     
 
 #### Option 1: Obtain Steam Guard token through UI
 
@@ -144,8 +151,7 @@ of a button.
 
 ## Planned features
 
-- In-built headless client support
-- Access to logs
+- Built-in headless client support
 - Arma 4 support :))
 
 ## Support
