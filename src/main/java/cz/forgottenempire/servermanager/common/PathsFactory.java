@@ -75,17 +75,13 @@ public class PathsFactory {
 
     public File getServerProfileFile(long serverId) {
         String serverProfile = ServerType.ARMA3 + "_" + serverId;
-        return Path.of(getProfilesDirectoryPath().toString(), serverProfile, serverProfile + ".Arma3Profile").toFile();
+        String profileSubdirectory = SystemUtils.getOsType() == OSType.WINDOWS ? "Users" : "home";
+        return Path.of(getProfilesDirectoryPath().toString(), profileSubdirectory,
+                serverProfile, serverProfile + ".Arma3Profile").toFile();
     }
 
     public Path getProfilesDirectoryPath() {
-        if (SystemUtils.getOsType() == OSType.WINDOWS) {
-            return Path.of(getServerPath(ServerType.ARMA3).toString(), "custom_profiles");
-        } else {
-            // -profiles argument doesn't work on Linux, so the default path has to be used instead
-            // https://community.bistudio.com/wiki/Arma_3:_Server_Profile#Linux)
-            return Path.of(System.getProperty("user.home"), ".local", "share", "Arma 3 - Other Profiles");
-        }
+        return Path.of(getServerPath(ServerType.ARMA3).toString(), "custom_profiles");
     }
 
     public File getServerExecutableWithFallback(ServerType type) {
