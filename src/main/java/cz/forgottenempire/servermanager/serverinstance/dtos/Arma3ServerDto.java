@@ -39,6 +39,7 @@ public class Arma3ServerDto implements ServerDto {
 
     private List<ServerWorkshopModDto> activeMods;
     private List<CreatorDlcDto> activeDLCs;
+    private Arma3DifficultySettingsDto difficultySettings;
 
     private ServerInstanceInfoDto instanceInfo;
 }
