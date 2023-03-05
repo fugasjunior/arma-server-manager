@@ -34,7 +34,15 @@ export function downloadExportedPreset(id) {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', "exported_preset.html");
+
+            let fileName = response.headers['content-disposition']
+                .split('filename=')[1]
+                .replace(/"/g, '');
+            if (!fileName || fileName.length === 0) {
+                fileName = "exported_preset.html";
+            }
+
+            link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);

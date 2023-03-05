@@ -13,6 +13,7 @@ import reforgerIcon from "../../img/reforger_icon.png";
 import React from "react";
 import ModEditButton from "./ModEditButton";
 import ListBuilderDLCsEdit from "./ListBuilderDLCsEdit";
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 
 const SERVER_ICON_URLS = {
     "ARMA3": arma3Icon,
@@ -78,6 +79,11 @@ const ServerListEntry = (props) => {
                 </TableCell>
                 <TableCell>
                     {!serverRunning && server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
+                </TableCell>
+                <TableCell>
+                    <Button startIcon={<TextSnippetIcon/>} onClick={() => props.onOpenLogs(server.id)} color="info">
+                        Logs
+                    </Button>
                 </TableCell>
                 <TableCell>
                     {serverRunning && server.instanceInfo.maxPlayers &&

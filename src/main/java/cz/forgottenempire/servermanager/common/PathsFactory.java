@@ -15,14 +15,17 @@ public class PathsFactory {
 
     private final Path modsBasePath;
     private final Path serversBasePath;
+    private final Path logsBasePath;
 
     @Autowired
     public PathsFactory(
             @Value("${directory.servers}") String serversPathString,
-            @Value("${directory.mods}") String modsPathString
+            @Value("${directory.mods}") String modsPathString,
+            @Value("${directory.logs}") String logsPathString
     ) {
         serversBasePath = Path.of(serversPathString);
         modsBasePath = Path.of(modsPathString);
+        logsBasePath = Path.of(logsPathString);
     }
 
     public Path getModsBasePath() {
@@ -95,6 +98,10 @@ public class PathsFactory {
         }
 
         throw new ServerNotInitializedException("Couldn't find any server executable for " + type + " server");
+    }
+
+    public File getServerLogFile(ServerType type, long id) {
+        return Path.of(logsBasePath.toString(), type.name() + "_" + id + ".log").toFile();
     }
 
     private Path getServerExecutable(ServerType type) {
