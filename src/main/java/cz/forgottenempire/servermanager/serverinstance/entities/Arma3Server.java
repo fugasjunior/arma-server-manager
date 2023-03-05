@@ -34,6 +34,6 @@ public class Arma3Server extends Server {
     @Enumerated(EnumType.STRING)
     private List<Arma3CDLC> activeDLCs;
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "server", optional = false, orphanRemoval = true)
     private Arma3DifficultySettings difficultySettings;
 }
