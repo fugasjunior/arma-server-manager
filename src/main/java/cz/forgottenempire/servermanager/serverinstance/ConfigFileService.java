@@ -44,10 +44,6 @@ class ConfigFileService {
         return pathsFactory.getConfigFilePath(server.getType(), fileName).toFile();
     }
 
-    public File getProfileFileForServer(@NotNull Arma3Server server) {
-        return pathsFactory.getServerProfileFile(server.getId());
-    }
-
     public void writeConfig(@NotNull Server server) {
         File configFile = getConfigFileForServer(server);
         deleteOldConfigFile(configFile);
@@ -55,7 +51,7 @@ class ConfigFileService {
 
         if (server.getType() == ServerType.ARMA3) {
             Arma3Server arma3Server = (Arma3Server) server;
-            File profileFile = getProfileFileForServer(arma3Server);
+            File profileFile = pathsFactory.getServerProfileFile(arma3Server.getId());
             deleteOldConfigFile(profileFile);
             writeNewProfile(arma3Server.getDifficultySettings(), profileFile);
         }
