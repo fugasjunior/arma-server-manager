@@ -1,4 +1,17 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.Arma3DifficultySettings" -->
+version=1;
+blood=1;
+singleVoice=0;
+gamma=1;
+brightness=1;
+volumeCD=5;
+volumeFX=5;
+volumeSpeech=5;
+volumeVoN=5;
+soundEnableEAX=1;
+soundEnableHW=0;
+volumeMapDucking=1;
+volumeUI=1;
 class DifficultyPresets
 {
     class CustomDifficulty
