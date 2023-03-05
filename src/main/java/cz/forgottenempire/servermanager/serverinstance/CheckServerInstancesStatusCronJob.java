@@ -87,7 +87,7 @@ class CheckServerInstancesStatusCronJob {
             LocalDateTime startedAt = instanceInfo.getStartedAt();
             if (startedAt.isBefore(LocalDateTime.now().minus(1, ChronoUnit.MINUTES))) {
                 log.warn("Timeout happened during querying the status of server {} (ID {}) on port {}. " +
-                                "I may not have finished initialization yet. If this message keeps occurring, " +
+                                "It may not have finished initialization yet. If this message keeps occurring, " +
                                 "there's likely a problem with the server.",
                         server.getName(), instanceInfo.getId(), server.getQueryPort());
             }
