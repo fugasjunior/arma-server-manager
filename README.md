@@ -35,8 +35,7 @@ In the repository, you can find two files: `docker-compose.yml` and `.env.EXAMPL
 on your server.
 
 Then, rename the `.env.EXAMPLE` file to `.env` and open it. Inside, you will find some properties that need
-configuration. If you're unsure what to set, refer to the file `config/application.properties.EXAMPLE` where there is
-a short description of the expected values.
+configuration. There are comments for each property that will help you with the setup.
 
 After you've set up the values and saved the file, you can run `docker compose up`, which will automatically bring
 the database and the server manager up. It should then be accessible on port 8080 by default.
