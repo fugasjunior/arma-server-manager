@@ -9,6 +9,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,19 +19,26 @@ import org.springframework.stereotype.Component;
 @Component
 @Converter
 @Configurable
+@Slf4j
 public class AttributeEncryptor implements AttributeConverter<String, String> {
 
-    private final boolean encryptionEnabled;
+    private boolean encryptionEnabled;
     private Key key;
     private Cipher cipher;
 
     public AttributeEncryptor(@Value("${database.encryption.secret:#{null}}") String secret) throws Exception {
-        if (!StringUtils.isBlank(secret)) {
-            encryptionEnabled = true;
-            key = new SecretKeySpec(secret.getBytes(), "AES");
-            cipher = Cipher.getInstance("AES");
-        } else {
-            encryptionEnabled = false;
+        if (StringUtils.isNotBlank(secret)) {
+            try {
+                key = new SecretKeySpec(secret.getBytes(), "AES");
+                cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.ENCRYPT_MODE, key);
+                cipher.init(Cipher.DECRYPT_MODE, key);
+                encryptionEnabled = true;
+            } catch (InvalidKeyException e) {
+                log.error("The provided AES database encryption key is not invalid, proceeding without encryption. " +
+                        "(Cause: {})", e.getMessage());
+                encryptionEnabled = false;
+            }
         }
     }
 
