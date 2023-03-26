@@ -72,6 +72,7 @@ const SteamAuthForm = () => {
         formik.resetForm();
         setClearDialogOpen(false);
         await clearAuth();
+        toast.success("Steam Auth successfully cleared");
     }
 
     return (
