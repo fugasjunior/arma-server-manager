@@ -33,6 +33,11 @@ public class SteamAuthService {
         authRepository.save(persistedAuth);
     }
 
+    @CacheEvict(value = "steamAuthAccount", allEntries = true)
+    public void clearAuthAccount() {
+        authRepository.deleteAll();
+    }
+
     private void populateAuth(SteamAuthDto auth, SteamAuth persistedAuth) {
         persistedAuth.setUsername(auth.getUsername());
         persistedAuth.setSteamGuardToken(auth.getSteamGuardToken());
