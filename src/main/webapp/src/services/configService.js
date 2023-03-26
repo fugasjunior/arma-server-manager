@@ -10,3 +10,7 @@ export function getAuth() {
 export function setAuth(auth) {
     return http.post(apiEndpoint + "/auth", auth);
 }
+
+export function clearAuth() {
+    return http.delete(apiEndpoint + "/auth");
+}
