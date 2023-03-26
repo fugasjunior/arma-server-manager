@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.steamauth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
@@ -70,5 +71,12 @@ class SteamAuthServiceUnitTest {
         assertThat(actualAuthAccount.getUsername()).isEqualTo("new_username");
         assertThat(actualAuthAccount.getPassword()).isEqualTo("hunter2");
         assertThat(actualAuthAccount.getSteamGuardToken()).isEqualTo("FGHIJ");
+    }
+
+    @Test
+    void whenClearAccount_thenRepositoryDeleteAllMethodCalled() {
+        service.clearAuthAccount();
+
+        verify(steamAuthRepository).deleteAll();
     }
 }

@@ -1,15 +1,14 @@
 package cz.forgottenempire.servermanager.steamauth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SteamAuthControllerUnitTest {
 
@@ -35,7 +34,6 @@ class SteamAuthControllerUnitTest {
         assertThat(response.getBody().getPassword()).isNull();
     }
 
-
     @Test
     void whenSetAuthAccount_thenSteamAuthServiceCalled() {
         SteamAuthDto dto = new SteamAuthDto();
@@ -45,8 +43,17 @@ class SteamAuthControllerUnitTest {
 
         ResponseEntity<?> response = controller.setAuthAccount(dto);
 
-        verify(steamAuthService, times(1)).setAuthAccount(dto);
+        verify(steamAuthService).setAuthAccount(dto);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
+    void whenClearAuthAccount_thenAuthServiceClearMethodCalledAndNoContentResponseEntityReturned() {
+        ResponseEntity<?> response = controller.clearAuthAccount();
+
+        verify(steamAuthService).clearAuthAccount();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(response.getBody()).isNull();
     }
 }
