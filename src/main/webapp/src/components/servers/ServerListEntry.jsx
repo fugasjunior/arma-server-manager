@@ -78,7 +78,7 @@ const ServerListEntry = (props) => {
                     <ModEditButton server={server}/>
                 </TableCell>
                 <TableCell>
-                    {!serverRunning && server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
+                    {server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
                 </TableCell>
                 <TableCell>
                     <Button startIcon={<TextSnippetIcon/>} onClick={() => props.onOpenLogs(server.id)} color="info">
