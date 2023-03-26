@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import ListBuilderList from "./ListBuilderList";
 import ListBuilderHeader from "./ListBuilderHeader";
 import Fuse from "fuse.js";
-import {Box, Button, Grid, Stack} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import styles from "./ListBuilder.module.css";
 
 export default function ListBuilder(props) {
@@ -34,6 +34,10 @@ export default function ListBuilder(props) {
                         itemsLabel={props.itemsLabel}
                         selectedPreset={props.selectedPreset}
                         onPresetChange={props.onPresetChange}
+                        onConfirm={props.onConfirm}
+                        onCancel={props.onCancel}
+                        withControls={props.withControls}
+                        confirmDisabled={props.confirmDisabled}
                     />
                 </Grid>
                 <Grid item xs={6}>
@@ -52,12 +56,6 @@ export default function ListBuilder(props) {
                     />
                 </Grid>
             </Grid>
-            {props.withControls &&
-                <Stack>
-                    <Button onClick={props.onConfirm}>Confirm</Button>
-                    <Button onClick={props.onCancel}>Cancel</Button>
-                </Stack>
-            }
         </Box>
     );
 }

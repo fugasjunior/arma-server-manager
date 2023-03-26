@@ -16,6 +16,8 @@ const ListBuilderModEdit = props => {
     const [selectedPreset, setSelectedPreset] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
+
     async function handleManageModsButtonClick() {
         setIsLoading(true);
         setIsOpen(false);
@@ -113,6 +115,7 @@ const ListBuilderModEdit = props => {
                                  itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presets}
                                  onPresetChange={handlePresetChange} withControls
                                  onConfirm={handleConfirm} onCancel={handleClose}
+                                 confirmDisabled={serverRunning}
                     />
                 </Box>
             </Modal>
