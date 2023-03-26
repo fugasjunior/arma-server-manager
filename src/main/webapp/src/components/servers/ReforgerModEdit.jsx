@@ -33,6 +33,8 @@ const ReforgerModEdit = props => {
     const [newModId, setNewModId] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
+
     async function handleManageModsButtonClick() {
         setIsLoading(true);
         setIsOpen(false);
@@ -98,7 +100,7 @@ const ReforgerModEdit = props => {
                                    variant="standard" value={newModId} onChange={handleNewModIdChange}/>
                         <TextField id="mod-name" label="Mod name" placeholder="Mod name" size="small" required
                                    variant="standard" value={newModName} onChange={handleNewModNameChange}/>
-                        <Button variant="contained" startIcon={<AddIcon/>}
+                        <Button variant="contained" startIcon={<AddIcon/>} color="success"
                                 onClick={handleAddNewMod}
                                 disabled={newModId.length === 0 || newModName.length === 0}
                         >
@@ -133,12 +135,14 @@ const ReforgerModEdit = props => {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            <Stack>
-                                <Button onClick={handleConfirm}>Confirm</Button>
-                                <Button onClick={handleClose}>Cancel</Button>
-                            </Stack>
                         </Box>
                     }
+                    <Stack>
+                        <Button onClick={handleConfirm} variant="contained" color="primary"
+                                sx={{mt: 1, mb: 1}}
+                                disabled={serverRunning}>Confirm</Button>
+                        <Button onClick={handleClose} variant="outlined" color="error">Cancel</Button>
+                    </Stack>
                 </Box>
             </Modal>
         </>

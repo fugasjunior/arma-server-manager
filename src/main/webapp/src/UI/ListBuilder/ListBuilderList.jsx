@@ -11,7 +11,7 @@ export default function ListBuilderList(props) {
 
     return (
             <Stack>
-                <Stack direction="row" spacing={4} mb={2} alignItems="flex-end">
+                <Stack direction="row" spacing={4} mb={2} alignItems="flex-end" minHeight={40}>
                     <Typography variant="h5">{getHeadingText()}</Typography>
                     {props.showFilter &&
                             <TextField label="Filter" type="search" variant="outlined" size="small" margin="none"

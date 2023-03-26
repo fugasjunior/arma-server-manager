@@ -13,6 +13,8 @@ const ListBuilderDLCsEdit = props => {
     const [selectedDLCs, setSelectedDLCs] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
+
     async function handleManageDLCsButtonClick() {
         setIsLoading(true);
         setIsOpen(false);
@@ -80,6 +82,7 @@ const ListBuilderDLCsEdit = props => {
                                  onSelect={handleDLCSelect} onDeselect={handleDLCDeselect}
                                  itemsLabel="DLCs" withControls
                                  onConfirm={handleConfirm} onCancel={handleClose}
+                                 confirmDisabled={serverRunning}
                     />
                 </Box>
             </Modal>
