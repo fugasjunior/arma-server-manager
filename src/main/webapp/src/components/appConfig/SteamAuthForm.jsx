@@ -4,6 +4,7 @@ import {useFormik} from "formik";
 import Tooltip from "@mui/material/Tooltip";
 import {clearAuth, getAuth, setAuth} from "../../services/configService";
 import {toast} from "material-react-toastify";
+import ConfirmationDialog from "../../UI/ConfirmationDialog";
 
 const SteamAuthForm = () => {
 
@@ -12,6 +13,7 @@ const SteamAuthForm = () => {
         password: "",
         steamGuardToken: ""
     });
+    const [clearDialogOpen, setClearDialogOpen] = useState(false);
     const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
@@ -51,11 +53,16 @@ const SteamAuthForm = () => {
         }
     }
 
+    const handleToggleClearDialog = () => {
+        setClearDialogOpen(prevState => !prevState);
+    }
+
     const formik = useFormik({
         initialValues: loadedAuth,
         onSubmit: handleSubmit,
         enableReinitialize: true
     });
+
     const handleClear = async () => {
         setLoadedAuth({
             username: "",
@@ -63,11 +70,19 @@ const SteamAuthForm = () => {
             steamGuardToken: ""
         });
         formik.resetForm();
+        setClearDialogOpen(false);
         await clearAuth();
     }
 
     return (
         <>
+            <ConfirmationDialog
+                open={clearDialogOpen} title={`Clear Steam Auth credentials?`}
+                description={"Clearing the credentials will make it impossible to update servers or workshop mods " +
+                    "until it's set up again."}
+                onConfirm={handleClear} onClose={handleToggleClearDialog} actionLabel="Confirm"
+            />
+
             <Typography variant="h5" component="h3">Steam Auth</Typography>
 
             <p>Steam account with a copy of Arma 3 is needed for downloading workshop mods and keeping
@@ -115,7 +130,7 @@ const SteamAuthForm = () => {
 
                     />
                     <Button variant="contained" type="submit">Submit</Button>
-                    <Button variant="outlined" color="error" onClick={handleClear}>Clear</Button>
+                    <Button variant="outlined" color="error" onClick={handleToggleClearDialog}>Clear</Button>
                 </Stack>
             </form>}
         </>
