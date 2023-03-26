@@ -8,6 +8,11 @@ import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
 import cz.forgottenempire.servermanager.util.FileSystemUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,10 +23,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -51,8 +52,10 @@ class WorkshopInstallerService {
             modsService.saveMod(mod);
         });
 
-        mods.forEach(mod -> steamCmdService.installOrUpdateWorkshopMod(mod)
-                .thenAcceptAsync(steamCmdJob -> handleInstallation(mod, steamCmdJob)));
+        steamCmdService.installOrUpdateWorkshopMods(mods)
+                .thenAcceptAsync(steamCmdJob -> steamCmdJob.getRelatedWorkshopMods().forEach(
+                        mod -> handleInstallation(mod, steamCmdJob)
+                ));
     }
 
     public void uninstallMod(WorkshopMod mod) {
@@ -103,10 +106,8 @@ class WorkshopInstallerService {
     }
 
     private void convertModFilesToLowercase(WorkshopMod mod) throws IOException {
-        log.info("Converting mod file names to lowercase");
         File modDir = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
         FileSystemUtils.directoryToLowercase(modDir);
-        log.info("Converting file names to lowercase done");
     }
 
     private void copyBiKeys(WorkshopMod mod) throws IOException {
