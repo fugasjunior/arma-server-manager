@@ -3,11 +3,12 @@ package cz.forgottenempire.servermanager.steamcmd;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.steamcmd.SteamCmdParameters.Builder;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SteamCmdService {
@@ -24,7 +25,7 @@ public class SteamCmdService {
     public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType) {
         String betaBranchParameter = serverType == ServerType.ARMA3 ? "-beta creatordlc" : null;
 
-        SteamCmdParameters parameters = new Builder()
+        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
                 .withInstallDir(pathsFactory.getServerPath(serverType).toAbsolutePath().toString())
                 .withLogin()
                 .withAppInstall(Constants.SERVER_IDS.get(serverType), true, betaBranchParameter)
@@ -32,15 +33,19 @@ public class SteamCmdService {
         return enqueueJob(new SteamCmdJob(serverType, parameters));
     }
 
-    public CompletableFuture<SteamCmdJob> installOrUpdateWorkshopMod(WorkshopMod workshopMod) {
-        SteamCmdParameters parameters = new Builder()
+    public CompletableFuture<SteamCmdJob> installOrUpdateWorkshopMods(Collection<WorkshopMod> workshopMods) {
+        SteamCmdParameters.Builder parameters = new SteamCmdParameters.Builder()
                 .withInstallDir(pathsFactory.getModsBasePath().toAbsolutePath().toString())
-                .withLogin()
-                .withWorkshopItemInstall(
-                        Constants.GAME_IDS.get(workshopMod.getServerType()),
-                        workshopMod.getId(), true)
-                .build();
-        return enqueueJob(new SteamCmdJob(workshopMod, parameters));
+                .withLogin();
+
+        workshopMods.forEach(mod ->
+                parameters.withWorkshopItemInstall(
+                        Constants.GAME_IDS.get(mod.getServerType()),
+                        mod.getId(), true
+                )
+        );
+
+        return enqueueJob(new SteamCmdJob(workshopMods, parameters.build()));
     }
 
     private CompletableFuture<SteamCmdJob> enqueueJob(SteamCmdJob job) {
