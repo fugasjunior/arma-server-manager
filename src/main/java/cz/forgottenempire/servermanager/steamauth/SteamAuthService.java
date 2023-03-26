@@ -26,11 +26,17 @@ public class SteamAuthService {
 
     @CacheEvict(value = "steamAuthAccount", allEntries = true)
     public void setAuthAccount(SteamAuthDto auth) {
-        log.info("Setting new Steam Auth account: username '{}', token '{}'",
-                auth.getUsername(), auth.getSteamGuardToken());
+        log.info("Setting new Steam Auth account: username '{}'",
+                auth.getUsername());
         SteamAuth persistedAuth = getAuthAccount();
         populateAuth(auth, persistedAuth);
         authRepository.save(persistedAuth);
+    }
+
+    @CacheEvict(value = "steamAuthAccount", allEntries = true)
+    public void clearAuthAccount() {
+        log.info("Clearing Steam Auth");
+        authRepository.deleteAll();
     }
 
     private void populateAuth(SteamAuthDto auth, SteamAuth persistedAuth) {
