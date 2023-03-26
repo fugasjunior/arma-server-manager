@@ -113,6 +113,7 @@ const ListBuilderModEdit = props => {
                                  itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presets}
                                  onPresetChange={handlePresetChange} withControls
                                  onConfirm={handleConfirm} onCancel={handleClose}
+                                 confirmDisabled={props.confirmDisabled}
                     />
                 </Box>
             </Modal>

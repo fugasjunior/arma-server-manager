@@ -75,7 +75,7 @@ const ServerListEntry = (props) => {
                     </Button>
                 </TableCell>
                 <TableCell>
-                    {!serverRunning && <ModEditButton server={server}/>}
+                    <ModEditButton server={server}/>
                 </TableCell>
                 <TableCell>
                     {!serverRunning && server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
