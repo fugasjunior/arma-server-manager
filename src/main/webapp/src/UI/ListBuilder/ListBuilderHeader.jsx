@@ -8,9 +8,14 @@ export default function ListBuilderHeader(props) {
 
     return (
         <Stack direction="row" justifyContent="space-between">
-            <Typography id="transition-modal-title" variant="h4">
-                Select {props.itemsLabel}
-            </Typography>
+            <Stack>
+                <Typography id="transition-modal-title" variant="h4">
+                    Select {props.itemsLabel}
+                </Typography>
+                <Typography variant="p">
+                    Click an item to move it into the second column
+                </Typography>
+            </Stack>
             <Stack direction="row" alignItems="center">
                 {props.withControls &&
                     <>
