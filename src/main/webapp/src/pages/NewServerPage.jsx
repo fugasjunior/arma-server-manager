@@ -7,7 +7,7 @@ import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
-import {OSContext} from "../store/os-context";
+import {OsContext} from "../store/os-context";
 
 const ARMA3_INITIAL_STATE = {
     type: "ARMA3",
@@ -102,7 +102,7 @@ const REFORGER_INITIAL_STATE = {
 const NewServerPage = () => {
     const {type} = useParams();
     const navigate = useNavigate();
-    const osCtx = useContext(OSContext);
+    const osCtx = useContext(OsContext);
 
     useEffect(() => {
         if (type === "DAYZ" && osCtx.os === "LINUX") {

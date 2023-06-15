@@ -1,7 +1,7 @@
 import {createContext, useEffect, useState} from "react";
 import {getServerOS} from "../services/systemService";
 
-export const OSContext = createContext({
+export const OsContext = createContext({
     os: '',
 });
 
@@ -20,5 +20,5 @@ export const OSContextProvider = (props) => {
 
     const contextValue = {os};
 
-    return <OSContext.Provider value={contextValue}>{props.children}</OSContext.Provider>;
+    return <OsContext.Provider value={contextValue}>{props.children}</OsContext.Provider>;
 }

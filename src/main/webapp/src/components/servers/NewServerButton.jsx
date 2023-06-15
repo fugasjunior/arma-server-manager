@@ -9,13 +9,13 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import {Link} from "react-router-dom";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import {OSContext} from "../../store/os-context";
+import {OsContext} from "../../store/os-context";
 
 export default function NewServerButton() {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
 
-    const osCtx = useContext(OSContext);
+    const osCtx = useContext(OsContext);
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
