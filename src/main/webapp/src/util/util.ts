@@ -1,4 +1,4 @@
-export const humanFileSize = bytes => {
+export function humanFileSize(bytes: number): string {
     if (!bytes) {
         return "N/A";
     }

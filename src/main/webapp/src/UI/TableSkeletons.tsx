@@ -1,7 +1,12 @@
 import {Skeleton, Stack} from "@mui/material";
-import * as React from "react";
 
-export default function TableSkeletons(props) {
+type Props = {
+    display: boolean,
+    count: number,
+    spacing?: number,
+}
+
+export default function TableSkeletons(props: Props) {
 
     if (!props.display) {
         return;
