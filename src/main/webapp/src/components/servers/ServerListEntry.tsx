@@ -10,7 +10,7 @@ import TableCell from "@mui/material/TableCell";
 import arma3Icon from "../../img/arma3_icon.png";
 import dayZIcon from "../../img/dayz_icon.png";
 import reforgerIcon from "../../img/reforger_icon.png";
-import React from "react";
+
 import ModEditButton from "./ModEditButton";
 import ListBuilderDLCsEdit from "./ListBuilderDLCsEdit";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';

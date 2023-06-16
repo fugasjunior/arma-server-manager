@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import {useContext} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
 import {AppBar, Avatar, Button, CssBaseline, Stack, Toolbar, Typography} from "@mui/material";
 import {AuthContext} from "../store/auth-context";

@@ -1,4 +1,4 @@
-import React from "react";
+
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import {Alert, AlertTitle} from "@mui/material";
 

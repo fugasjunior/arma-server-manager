@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {deleteScenario, downloadScenario, getScenarios, uploadScenario} from "../services/scenarioService";
 import {toast} from "material-react-toastify";
 import ScenariosTable from "../components/scenarios/ScenariosTable";
@@ -84,7 +84,7 @@ const ScenariosPage = () => {
         setSelected([]);
     };
 
-    const handleClick = (event, name) => {
+    const handleClick = (_, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
 

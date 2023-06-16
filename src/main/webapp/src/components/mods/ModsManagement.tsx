@@ -1,7 +1,7 @@
 import ModsErrorAlertMessage from "./ModsErrorAlertMessage";
 import ModsTable from "./ModsTable";
 import CreatePresetDialog from "./CreatePresetDialog";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {getMods, installMod, uninstallMods, updateMods} from "../../services/modsService";
 import {useInterval} from "../../hooks/use-interval";
 import {toast} from "material-react-toastify";
@@ -70,7 +70,7 @@ export default function ModsManagement() {
         setSelected([]);
     };
 
-    const handleClick = (event, id) => {
+    const handleClick = (_, id) => {
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
@@ -90,7 +90,7 @@ export default function ModsManagement() {
         setSelected(newSelected);
     };
 
-    const handleFilterChange = (event, newValue) => {
+    const handleFilterChange = (_, newValue) => {
         setSelected([]);
         setFilter(newValue);
     }

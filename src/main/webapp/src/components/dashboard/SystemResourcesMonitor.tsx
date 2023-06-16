@@ -5,6 +5,7 @@ import CircularProgressWithLabel from "../../UI/CircularProgressWithLabel";
 import {getSystemInfo} from "../../services/systemService";
 import {useInterval} from "../../hooks/use-interval";
 import {humanFileSize} from "../../util/util";
+import {CircularProgressProps} from "@mui/material/CircularProgress/CircularProgress";
 
 const SystemResourcesMonitor = () => {
     const [infoLoaded, setInfoLoaded] = useState(false);
@@ -37,7 +38,7 @@ const SystemResourcesMonitor = () => {
     const memoryUsedPercent = Math.round(((memoryTotal - memoryLeft) / memoryTotal) * 100);
     const storageUsedPercent = Math.round(((storageTotal - storageLeft) / storageTotal) * 100);
 
-    const evaluateColor = (percent) => {
+    const evaluateColor = (percent: number): CircularProgressProps["color"] => {
         if (percent < 70) {
             return "primary";
         }

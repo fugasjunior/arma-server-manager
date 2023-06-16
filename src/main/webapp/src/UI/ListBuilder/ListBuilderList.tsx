@@ -1,6 +1,5 @@
 import {List, ListItemButton, Stack, TextField, Typography} from "@mui/material";
 import styles from "./ListBuilder.module.css";
-import React from "react";
 
 export default function ListBuilderList(props) {
 

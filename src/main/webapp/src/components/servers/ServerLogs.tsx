@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Box, Modal, Typography} from "@mui/material";
 import {downloadLogFile, getServerLogs} from "../../services/serverLogService";
 import IconButton from "@mui/material/IconButton";
@@ -45,7 +45,8 @@ const ServerLogs = (props) => {
                 {isLogEmpty() ?
                     <Typography m={2}>No logs available for this server</Typography>
                     :
-                    <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}} ref={logTextArea}/>
+                    <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}}
+                              ref={logTextArea}/>
                 }
                 <IconButton color="primary" aria-label="refresh logs" component="label" onClick={fetchLogs}>
                     <RefreshIcon/>

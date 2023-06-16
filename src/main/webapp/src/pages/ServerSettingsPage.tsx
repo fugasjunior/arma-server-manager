@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {getServer, updateServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
@@ -7,10 +7,11 @@ import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSe
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
+import {ServerDto} from "../dtos/ServerDto";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
-    const [server, setServer] = useState({});
+    const [server, setServer] = useState<ServerDto>();
     const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
@@ -53,37 +54,37 @@ const ServerSettingsPage = () => {
     const handleCancel = () => {
         navigate("/servers");
     }
-    
-    return (
-            <>
-                <Typography variant="h4" mb={2}>Server Settings ({SERVER_NAMES[server.type]})</Typography>
-                {isLoading && <h2>Loading server data...</h2>}
-                {!isLoading &&
-                        <>
-                            {server.type === "ARMA3" &&
-                                    <EditArma3ServerSettingsForm server={server} onSubmit={handleSubmit}
-                                                                 onCancel={handleCancel}
-                                                                 isServerRunning={server.instanceInfo
-                                                                         && server.instanceInfo.alive}
-                                    />
-                            }
-                            {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
-                                    <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
-                                                                onCancel={handleCancel}
-                                                                isServerRunning={server.instanceInfo
-                                                                        && server.instanceInfo.alive}
-                                    />
-                            }
-                            {(server.type === "REFORGER") &&
-                                    <EditReforgerServerSettingsForm server={server} onSubmit={handleSubmit}
-                                                                    onCancel={handleCancel}
-                                                                    isServerRunning={server.instanceInfo
-                                                                            && server.instanceInfo.alive}
-                                    />
-                            }
-                        </>}
 
-            </>
+    return (
+        <>
+            <Typography variant="h4" mb={2}>Server Settings ({SERVER_NAMES[server.type]})</Typography>
+            {isLoading && <h2>Loading server data...</h2>}
+            {!isLoading &&
+                <>
+                    {server.type === "ARMA3" &&
+                        <EditArma3ServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                     onCancel={handleCancel}
+                                                     isServerRunning={server.instanceInfo
+                                                         && server.instanceInfo.alive}
+                        />
+                    }
+                    {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
+                        <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                    onCancel={handleCancel}
+                                                    isServerRunning={server.instanceInfo
+                                                        && server.instanceInfo.alive}
+                        />
+                    }
+                    {(server.type === "REFORGER") &&
+                        <EditReforgerServerSettingsForm server={server} onSubmit={handleSubmit}
+                                                        onCancel={handleCancel}
+                                                        isServerRunning={server.instanceInfo
+                                                            && server.instanceInfo.alive}
+                        />
+                    }
+                </>}
+
+        </>
     );
 }
 

@@ -1,13 +1,14 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal} from "@mui/material";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getServer, updateServer} from "../../services/serversService";
 import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import {ServerDto} from "../../dtos/ServerDto";
 
 const ListBuilderDLCsEdit = props => {
-    const [server, setServer] = useState();
+    const [server, setServer] = useState<ServerDto>();
     const [isOpen, setIsOpen] = useState(false);
     const [availableDLCs, setAvailableDLCs] = useState([]);
     const [selectedDLCs, setSelectedDLCs] = useState([]);

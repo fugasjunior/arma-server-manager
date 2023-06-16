@@ -1,5 +1,4 @@
 import {Button, FormControl, InputLabel, Select, Stack, Typography} from "@mui/material";
-import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 
 export default function ListBuilderHeader(props) {
@@ -12,7 +11,7 @@ export default function ListBuilderHeader(props) {
                 <Typography id="transition-modal-title" variant="h4">
                     Select {props.itemsLabel}
                 </Typography>
-                <Typography variant="p">
+                <Typography variant="body1">
                     Click an item to move it into the second column
                 </Typography>
             </Stack>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import ListBuilderList from "./ListBuilderList";
 import ListBuilderHeader from "./ListBuilderHeader";
 import Fuse from "fuse.js";

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal, Stack, TextField} from "@mui/material";
 import {getServer, updateServer} from "../../services/serversService";
 import {toast} from "material-react-toastify";
@@ -12,6 +12,7 @@ import TableBody from "@mui/material/TableBody";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MemoryIcon from '@mui/icons-material/Memory';
+import {ReforgerServerDto} from "../../dtos/ServerDto";
 
 const modalStyle = {
     position: 'absolute',
@@ -26,7 +27,7 @@ const modalStyle = {
 };
 
 const ReforgerModEdit = props => {
-    const [server, setServer] = useState();
+    const [server, setServer] = useState<ReforgerServerDto>();
     const [isOpen, setIsOpen] = useState(false);
     const [mods, setMods] = useState(props.server.activeMods);
     const [newModName, setNewModName] = useState("");

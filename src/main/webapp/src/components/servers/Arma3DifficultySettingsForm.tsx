@@ -13,7 +13,7 @@ import {
     Switch,
     Typography
 } from "@mui/material";
-import React from "react";
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import SchoolIcon from '@mui/icons-material/School';
@@ -39,7 +39,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         id="difficultySettings.reducedDamage"/>
                             }
                             label="Reduced damage"
-                            error={formik.touched.reducedDamage && Boolean(formik.errors.reducedDamage)}
                         />
                         <FormControlLabel
                             control={
@@ -48,7 +47,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.staminaBar" id="difficultySettings.staminaBar"/>
                             }
                             label="Stamina bar"
-                            error={formik.touched.staminaBar && Boolean(formik.errors.staminaBar)}
                         />
                         <FormControlLabel
                             control={
@@ -58,7 +56,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         id="difficultySettings.weaponCrosshair"/>
                             }
                             label="Crosshair"
-                            error={formik.touched.weaponCrosshair && Boolean(formik.errors.weaponCrosshair)}
                         />
                         <FormControlLabel
                             control={
@@ -67,7 +64,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.visionAid" id="difficultySettings.visionAid"/>
                             }
                             label="Vision aid"
-                            error={formik.touched.visionAid && Boolean(formik.errors.visionAid)}
                         />
                         <FormControlLabel
                             control={
@@ -76,7 +72,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.cameraShake" id="difficultySettings.cameraShake"/>
                             }
                             label="Camera shake"
-                            error={formik.touched.cameraShake && Boolean(formik.errors.cameraShake)}
                         />
                         <FormControlLabel
                             control={
@@ -85,7 +80,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.scoreTable" id="difficultySettings.scoreTable"/>
                             }
                             label="Score table"
-                            error={formik.touched.scoreTable && Boolean(formik.errors.scoreTable)}
                         />
                         <FormControlLabel
                             control={
@@ -95,7 +89,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         id="difficultySettings.deathMessages"/>
                             }
                             label="Killed By"
-                            error={formik.touched.deathMessages && Boolean(formik.errors.deathMessages)}
                         />
                         <FormControlLabel
                             control={
@@ -104,7 +97,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.vonID" id="difficultySettings.vonID"/>
                             }
                             label="VON ID"
-                            error={formik.touched.vonID && Boolean(formik.errors.vonID)}
                         />
                         <FormControlLabel
                             control={
@@ -114,7 +106,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         id="difficultySettings.tacticalPing"/>
                             }
                             label="Tactical ping"
-                            error={formik.touched.tacticalPing && Boolean(formik.errors.tacticalPing)}
                         />
                         <FormControlLabel
                             control={
@@ -123,7 +114,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.mapContent" id="difficultySettings.mapContent"/>
                             }
                             label="Extended map content"
-                            error={formik.touched.mapContent && Boolean(formik.errors.mapContent)}
                         />
                         <FormControlLabel
                             control={
@@ -132,7 +122,6 @@ const Arma3DifficultySettingsForm = ({formik}) => {
                                         name="difficultySettings.autoReport" id="difficultySettings.autoReport"/>
                             }
                             label="Automatic reporting"
-                            error={formik.touched.autoReport && Boolean(formik.errors.autoReport)}
                         />
                     </FormGroup>
                 </Grid>

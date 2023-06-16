@@ -10,12 +10,13 @@ import TableBody from "@mui/material/TableBody";
 import {toast} from "material-react-toastify";
 import ConfirmationDialog from "../UI/ConfirmationDialog";
 import ServerLogs from "../components/servers/ServerLogs";
+import {ServerDto} from "../dtos/ServerDto";
 
 const ServersPage = () => {
-    const [servers, setServers] = useState([]);
+    const [servers, setServers] = useState<ServerDto[]>([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [serverToDelete, setServerToDelete] = useState({});
-    const [logServerId, setLogServerId] = useState();
+    const [serverToDelete, setServerToDelete] = useState<ServerDto | null>();
+    const [logServerId, setLogServerId] = useState<number>();
     const [isLogOpen, setIsLogOpen] = useState(false);
 
     useEffect(() => {
@@ -80,13 +81,13 @@ const ServersPage = () => {
         setServers(prevState => [...prevState].filter(server => server.id !== serverToDelete.id));
         await deleteServer(serverToDelete.id);
         toast.success(`Server '${serverToDelete.name}' successfully deleted`);
-        setServerToDelete({});
+        setServerToDelete(null);
         setDeleteDialogOpen(false);
     }
 
     const handleDeleteDialogClose = () => {
         setDeleteDialogOpen(false);
-        setServerToDelete({});
+        setServerToDelete(null);
     }
 
     const handleOpenLogs = serverId => {
@@ -119,11 +120,11 @@ const ServersPage = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <ConfirmationDialog
+            {serverToDelete && <ConfirmationDialog
                 open={deleteDialogOpen} title={`Delete server '${serverToDelete.name}'?`}
                 description={"Deleting the server will cause all of its configuration to be permanently lost."}
                 onConfirm={handleDeleteServer} onClose={handleDeleteDialogClose} actionLabel="Delete"
-            />
+            />}
         </>
     );
 }

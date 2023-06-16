@@ -1,6 +1,6 @@
 import {useFormik} from "formik";
 import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
-import React from "react";
+
 import Arma3DifficultySettingsForm from "./Arma3DifficultySettingsForm";
 
 const EditArma3ServerSettingsForm = props => {
@@ -30,7 +30,6 @@ const EditArma3ServerSettingsForm = props => {
                             label="Server name"
                             value={formik.values.name}
                             onChange={formik.handleChange}
-                            error={formik.touched.name && Boolean(formik.errors.name)}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -41,7 +40,6 @@ const EditArma3ServerSettingsForm = props => {
                             label="Description"
                             value={formik.values.description}
                             onChange={formik.handleChange}
-                            error={formik.touched.description && Boolean(formik.errors.description)}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -54,7 +52,6 @@ const EditArma3ServerSettingsForm = props => {
                             type="number"
                             value={formik.values.port}
                             onChange={formik.handleChange}
-                            error={formik.touched.port && Boolean(formik.errors.port)}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -67,7 +64,6 @@ const EditArma3ServerSettingsForm = props => {
                             type="number"
                             value={formik.values.maxPlayers}
                             onChange={formik.handleChange}
-                            error={formik.touched.maxPlayers && Boolean(formik.errors.maxPlayers)}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -78,7 +74,6 @@ const EditArma3ServerSettingsForm = props => {
                             label="Server password"
                             value={formik.values.password}
                             onChange={formik.handleChange}
-                            error={formik.touched.password && Boolean(formik.errors.password)}
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -89,7 +84,6 @@ const EditArma3ServerSettingsForm = props => {
                             label="Admin password"
                             value={formik.values.adminPassword}
                             onChange={formik.handleChange}
-                            error={formik.touched.adminPassword && Boolean(formik.errors.adminPassword)}
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -101,8 +95,6 @@ const EditArma3ServerSettingsForm = props => {
                                             name="clientFilePatching" id="clientFilePatching"/>
                                 }
                                 label="Client file patching"
-                                error={formik.touched.clientFilePatching && Boolean(
-                                    formik.errors.clientFilePatching)}
                             />
                             <FormControlLabel
                                 control={
@@ -111,8 +103,6 @@ const EditArma3ServerSettingsForm = props => {
                                             name="serverFilePatching" id="serverFilePatching"/>
                                 }
                                 label="Server file patching"
-                                error={formik.touched.serverFilePatching && Boolean(
-                                    formik.errors.serverFilePatching)}
                             />
                             <FormControlLabel
                                 control={
@@ -121,8 +111,6 @@ const EditArma3ServerSettingsForm = props => {
                                             name="verifySignatures" id="verifySignatures"/>
                                 }
                                 label="Verify signatures"
-                                error={formik.touched.verifySignatures && Boolean(
-                                    formik.errors.verifySignatures)}
                             />
                         </FormGroup>
                     </Grid>
@@ -134,7 +122,6 @@ const EditArma3ServerSettingsForm = props => {
                                             name="vonEnabled" id="vonEnabled"/>
                                 }
                                 label="VON enabled"
-                                error={formik.touched.vonEnabled && Boolean(formik.errors.vonEnabled)}
                             />
                             <FormControlLabel
                                 control={
@@ -142,7 +129,6 @@ const EditArma3ServerSettingsForm = props => {
                                             name="battlEye" id="battlEye"/>
                                 }
                                 label="BattlEye enabled"
-                                error={formik.touched.battlEye && Boolean(formik.errors.battlEye)}
                             />
                             <FormControlLabel
                                 control={
@@ -150,7 +136,6 @@ const EditArma3ServerSettingsForm = props => {
                                             name="persistent" id="persistent"/>
                                 }
                                 label="Persistent"
-                                error={formik.touched.persistent && Boolean(formik.errors.persistent)}
                             />
                         </FormGroup>
                     </Grid>
@@ -163,7 +148,6 @@ const EditArma3ServerSettingsForm = props => {
                             multiline
                             value={formik.values.additionalOptions}
                             onChange={formik.handleChange}
-                            error={formik.touched.additionalOptions && Boolean(formik.errors.additionalOptions)}
                         />
                     </Grid>
 

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {useState} from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -85,14 +84,14 @@ const getInstalledIcon = (mod) => {
 const ModsTable = (props) => {
     const {rows, selected} = props;
 
-    const [order, setOrder] = useState('asc');
+    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
     const [orderBy, setOrderBy] = useState('name');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [enteredModId, setEnteredModId] = useState("");
     const [search, setSearch] = useState("");
 
-    const handleRequestSort = (event, property) => {
+    const handleRequestSort = (_, property) => {
         setSearch("");
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -107,7 +106,7 @@ const ModsTable = (props) => {
         setEnteredModId(e.target.value);
     }
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (_, newPage) => {
         setPage(newPage);
     };
 
