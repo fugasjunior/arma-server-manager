@@ -5,20 +5,21 @@ import Checkbox from "@mui/material/Checkbox";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Box from "@mui/material/Box";
 import {visuallyHidden} from "@mui/utils";
+import {ChangeEvent} from "react";
 
 type EnhancedTableHeadProps = {
     numSelected: number,
     onRequestSort: (event, property) => void,
-    onSelectAllClick: () => void,
+    onSelectAllClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
     order: 'asc' | 'desc',
     orderBy: string,
     rowCount: number,
-    search: string,
+    search?: string,
     headCells: Array<{
         id: string,
         label: string,
-        numeric: boolean,
-        disablePadding: boolean
+        numeric?: boolean,
+        disablePadding?: boolean,
     }>
 };
 

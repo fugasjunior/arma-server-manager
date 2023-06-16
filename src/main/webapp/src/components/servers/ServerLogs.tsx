@@ -19,7 +19,7 @@ const modalStyle = {
 
 const ServerLogs = (props) => {
     const [logs, setLogs] = useState("");
-    const logTextArea = useRef();
+    const logTextArea = useRef<HTMLTextAreaElement>();
 
     useEffect(() => {
         fetchLogs();

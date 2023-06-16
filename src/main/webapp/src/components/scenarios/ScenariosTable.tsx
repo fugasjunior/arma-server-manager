@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {ChangeEvent, ChangeEventHandler, MouseEventHandler, useState} from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -20,16 +20,16 @@ function getComparator(order, orderBy) {
 
     if (sortByCell.type === "number" || sortByCell.type === "date") {
         return order === "desc"
-                ? (a, b) => a[orderBy] - b[orderBy]
-                : (a, b) => b[orderBy] - a[orderBy];
+            ? (a, b) => a[orderBy] - b[orderBy]
+            : (a, b) => b[orderBy] - a[orderBy];
     }
 
     return order === "desc"
-            ? (a, b) => b[orderBy].localeCompare(a[orderBy])
-            : (a, b) => a[orderBy].localeCompare(b[orderBy]);
+        ? (a, b) => b[orderBy].localeCompare(a[orderBy])
+        : (a, b) => a[orderBy].localeCompare(b[orderBy]);
 }
 
-const headCells = [
+const headCells: Array<{id: string, label: string, type?: string}> = [
     {
         id: 'name',
         label: 'Name',
@@ -44,10 +44,21 @@ const headCells = [
         label: 'Created on',
         type: 'date'
     }
-
 ];
 
-const ScenariosTable = (props) => {
+type ScenariosTableProps = {
+    rows: Array<{name: string, fileSize: number, createdOn: Date}>,
+    selected: Array<any>,
+    onDeleteClicked: MouseEventHandler,
+    onSelectAllClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
+    onFileChange: ChangeEventHandler,
+    onDownloadClicked: (name: string, event: any) => void,
+    onClick: (event: any, name: string) => void,
+    uploadInProgress: boolean,
+    percentUploaded: number
+}
+
+const ScenariosTable = (props: ScenariosTableProps) => {
     const {rows, selected} = props;
 
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -91,100 +102,100 @@ const ScenariosTable = (props) => {
     }
 
     return (
-            <Box sx={{width: '100%'}}>
-                <Paper sx={{width: '100%', mb: 2}}>
-                    <ScenariosTableToolbar
+        <Box sx={{width: '100%'}}>
+            <Paper sx={{width: '100%', mb: 2}}>
+                <ScenariosTableToolbar
+                    numSelected={selected.length}
+                    onDeleteClicked={props.onDeleteClicked}
+                    onFileChange={props.onFileChange}
+                    uploadInProgress={props.uploadInProgress}
+                    percentUploaded={props.percentUploaded}
+                    search={search}
+                    title="Scenarios"
+                    onSearchChange={handleSearchChange}
+                />
+                <TableContainer>
+                    <Table
+                        sx={{minWidth: 750}}
+                        aria-labelledby="tableTitle"
+                        size='small'
+                    >
+                        <EnhancedTableHead
                             numSelected={selected.length}
-                            onDeleteClicked={props.onDeleteClicked}
-                            onFileChange={props.onFileChange}
-                            uploadInProgress={props.uploadInProgress}
-                            percentUploaded={props.percentUploaded}
-                            search={search}
-                            title="Scenarios"
-                            onSearchChange={handleSearchChange}
-                    />
-                    <TableContainer>
-                        <Table
-                                sx={{minWidth: 750}}
-                                aria-labelledby="tableTitle"
-                                size='small'
-                        >
-                            <EnhancedTableHead
-                                    numSelected={selected.length}
-                                    order={order}
-                                    orderBy={orderBy}
-                                    onSelectAllClick={props.onSelectAllClick}
-                                    onRequestSort={handleRequestSort}
-                                    rowCount={rows.length}
-                                    headCells={headCells}
-                            />
-                            <TableBody>
-                                {getRows().slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={props.onSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                            rowCount={rows.length}
+                            headCells={headCells}
+                        />
+                        <TableBody>
+                            {getRows().slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
                                     const isItemSelected = isSelected(row.name);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
-                                            <TableRow
-                                                    hover
-                                                    onClick={(event) => props.onClick(event, row.name)}
-                                                    role="checkbox"
-                                                    aria-checked={isItemSelected}
-                                                    tabIndex={-1}
-                                                    key={row.name}
-                                                    selected={isItemSelected}
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => props.onClick(event, row.name)}
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.name}
+                                            selected={isItemSelected}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': labelId,
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell
+                                                component="th"
+                                                id={labelId}
+                                                scope="row"
+                                                padding="none"
                                             >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                            color="primary"
-                                                            checked={isItemSelected}
-                                                            inputProps={{
-                                                                'aria-labelledby': labelId,
-                                                            }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell
-                                                        component="th"
-                                                        id={labelId}
-                                                        scope="row"
-                                                        padding="none"
-                                                >
-                                                    <Button onClick={(e) => props.onDownloadClicked(row.name, e)}>
-                                                        {row.name}
-                                                    </Button>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {humanFileSize(row.fileSize)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.createdOn.toLocaleString(undefined, config.dateFormat)}
-                                                </TableCell>
-                                            </TableRow>
+                                                <Button onClick={(e) => props.onDownloadClicked(row.name, e)}>
+                                                    {row.name}
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell>
+                                                {humanFileSize(row.fileSize)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {row.createdOn.toLocaleString(undefined, config.dateFormat)}
+                                            </TableCell>
+                                        </TableRow>
                                     );
                                 })}
-                                {emptyRows > 0 && (
-                                        <TableRow
-                                                style={{
-                                                    height: 33 * emptyRows,
-                                                }}
-                                        >
-                                            <TableCell colSpan={6}/>
-                                        </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <TablePagination
-                            rowsPerPageOptions={[10, 15, 25, 50]}
-                            component="div"
-                            count={rows.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </Paper>
-            </Box>
+                            {emptyRows > 0 && (
+                                <TableRow
+                                    style={{
+                                        height: 33 * emptyRows,
+                                    }}
+                                >
+                                    <TableCell colSpan={6}/>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[10, 15, 25, 50]}
+                    component="div"
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </Paper>
+        </Box>
     );
 }
 

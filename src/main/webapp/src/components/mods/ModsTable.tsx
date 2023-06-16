@@ -35,7 +35,7 @@ function getComparator(order, orderBy) {
             : (a, b) => a[orderBy].localeCompare(b[orderBy]);
 }
 
-const headCells = [
+const headCells: {id: string, label: string, type?: string}[] = [
     {
         id: 'id',
         label: 'ID',

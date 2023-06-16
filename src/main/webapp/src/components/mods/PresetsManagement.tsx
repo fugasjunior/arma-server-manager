@@ -25,14 +25,15 @@ import TableGhosts from "../../UI/TableSkeletons";
 import Tooltip from "@mui/material/Tooltip";
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
+import {ModPresetDto, ModPresetModDto} from "../../dtos/ModPresetDto";
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
-    const [presets, setPresets] = useState([]);
-    const [editedPreset, setEditedPreset] = useState();
+    const [presets, setPresets] = useState<Array<ModPresetDto>>([]);
+    const [editedPreset, setEditedPreset] = useState<ModPresetDto>();
     const [presetModalOpen, setPresetModalOpen] = useState(false);
-    const [selectedMods, setSelectedMods] = useState([]);
-    const [availableMods, setAvailableMods] = useState();
+    const [selectedMods, setSelectedMods] = useState<Array<ModPresetModDto>>([]);
+    const [availableMods, setAvailableMods] = useState<Array<ModPresetModDto>>();
     const [isUploadInProgress, setIsUploadInProgress] = useState(false);
 
     useEffect(() => {
