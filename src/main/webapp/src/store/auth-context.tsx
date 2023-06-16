@@ -1,18 +1,24 @@
 import {createContext, useState} from "react";
 import http from "../services/httpService";
 
-export const AuthContext = createContext({
-    token: '',
-    isLoggedIn: false,
-    login: (token) => {
-    },
-    logout: () => {
+interface AuthContextType {
+    token: string,
+    isLoggedIn: boolean,
+    login: (token: string, expiresIn?: number) => void,
+    logout: () => void,
+}
+
+export const AuthContext = createContext<AuthContextType>({
+        token: "",
+        isLoggedIn: false,
+        login: () => undefined,
+        logout: () => undefined
     }
-});
+);
 
 export const AuthContextProvider = (props) => {
     const tokenData = retrieveStoredToken();
-    let initialToken;
+    let initialToken: string;
     if (tokenData) {
         initialToken = tokenData.storedToken;
     }
@@ -21,7 +27,7 @@ export const AuthContextProvider = (props) => {
 
     const userIsLoggedIn = !!token;
 
-    const loginHandler = (token, expiresIn) => {
+    const loginHandler = (token: string, expiresIn: number) => {
         localStorage.setItem('token', token);
         localStorage.setItem('expirationTime', calculateExpirationTime(expiresIn).toISOString());
         setToken(token);
@@ -34,7 +40,7 @@ export const AuthContextProvider = (props) => {
         localStorage.removeItem('expirationTime');
     };
 
-    const contextValue = {
+    const contextValue: AuthContextType = {
         token,
         isLoggedIn: userIsLoggedIn,
         login: loginHandler,
@@ -69,6 +75,6 @@ const calculateRemainingTime = (time) => {
 
 const calculateExpirationTime = (millis) => {
     let date = new Date();
-    date = new Date(+date + (millis/1000));
+    date = new Date(+date + (millis / 1000));
     return date;
 }

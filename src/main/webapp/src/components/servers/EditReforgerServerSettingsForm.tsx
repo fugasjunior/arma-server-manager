@@ -22,7 +22,7 @@ function renderTextField(name, label, formik, required, type, helperText) {
                         id={name}
                         name={name}
                         label={label}
-                        type={!!type ? type : "text"}
+                        type={type ?? "text"}
                         value={formik.values[name]}
                         onChange={formik.handleChange}
                         helperText={helperText}

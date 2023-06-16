@@ -16,7 +16,7 @@ export default function ModsManagement() {
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
-        let mods = modsDto.workshopMods.map(mod => {
+        const mods = modsDto.workshopMods.map(mod => {
             const lastUpdated = mod.lastUpdated ? new Date(mod.lastUpdated) : "";
             return {...mod, lastUpdated}
         });
