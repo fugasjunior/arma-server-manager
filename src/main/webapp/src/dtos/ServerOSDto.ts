@@ -5,5 +5,5 @@ export enum OSType {
 }
 
 export interface ServerOSDto {
-    osType: OSType
+    osType: string
 }

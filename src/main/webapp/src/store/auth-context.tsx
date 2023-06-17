@@ -15,8 +15,7 @@ export const AuthContext = createContext<AuthContextType>({
         logout: () => undefined
     }
 );
-
-export const AuthContextProvider = (props) => {
+export const AuthContextProvider = (props: any) => {
     const tokenData = retrieveStoredToken();
     let initialToken: string;
     if (tokenData) {
@@ -68,12 +67,12 @@ const retrieveStoredToken = () => {
     return {storedToken, remainingTime};
 }
 
-const calculateRemainingTime = (time) => {
+const calculateRemainingTime = (time: Date) => {
     const currentDate = new Date();
     return +time - +currentDate;
 }
 
-const calculateExpirationTime = (millis) => {
+const calculateExpirationTime = (millis: number) => {
     let date = new Date();
     date = new Date(+date + (millis / 1000));
     return date;

@@ -5,7 +5,7 @@ export const OsContext = createContext({
     os: '',
 });
 
-export const OSContextProvider = (props) => {
+export const OSContextProvider = (props: any) => {
 
     const [os, setOs] = useState("");
 

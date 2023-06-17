@@ -1,9 +1,10 @@
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {
     deleteModPreset,
     downloadExportedPreset,
     getModPresets,
-    updateModPreset, uploadImportedPreset
+    updateModPreset,
+    uploadImportedPreset
 } from "../../services/modPresetsService";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
@@ -26,6 +27,8 @@ import Tooltip from "@mui/material/Tooltip";
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import {ModPresetDto, ModPresetModDto} from "../../dtos/ModPresetDto";
+import {ModDto} from "../../dtos/ModDto.ts";
+import {ServerType} from "../../dtos/ServerDto.ts";
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
@@ -46,7 +49,7 @@ export default function PresetsManagement() {
         fetchPresets();
     }, []);
 
-    async function handleDelete(id) {
+    async function handleDelete(id: string) {
         const deletedPreset = presets.find(preset => preset.id === id);
         setPresets(prevState => [...prevState].filter(preset => preset !== deletedPreset));
 
@@ -60,7 +63,7 @@ export default function PresetsManagement() {
         }
     }
 
-    function getSummarizedModsList(mods) {
+    function getSummarizedModsList(mods: Array<ModPresetModDto>) {
         const CUTOFF_LENGTH = 55;
         const modNames = mods.map(mod => mod.shortName);
         modNames.sort((a, b) => a.localeCompare(b));
@@ -79,10 +82,10 @@ export default function PresetsManagement() {
         return presets.sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    async function handleOpenEdit(preset) {
+    async function handleOpenEdit(preset: ModPresetDto) {
         const {data: modsDto} = await getMods(preset.type);
         let availableMods = modsDto.workshopMods;
-        availableMods = availableMods.filter(mod => !preset.mods.find(searchedMod => searchedMod.id === mod.id))
+        availableMods = availableMods.filter((mod: ModDto) => !preset.mods.find(searchedMod => searchedMod.id === mod.id))
 
         setEditedPreset(preset);
         setSelectedMods(preset.mods);
@@ -119,7 +122,7 @@ export default function PresetsManagement() {
         setPresetModalOpen(false);
     }
 
-    function handleModSelect(option) {
+    function handleModSelect(option: ModPresetModDto) {
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
@@ -128,7 +131,7 @@ export default function PresetsManagement() {
         });
     }
 
-    function handleModDeselect(option) {
+    function handleModDeselect(option: ModPresetModDto) {
         setSelectedMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
@@ -138,7 +141,7 @@ export default function PresetsManagement() {
         });
     }
 
-    async function handleFileInput(e) {
+    async function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
         try {
             setIsUploadInProgress(true);
             const {data: importedPreset} = await uploadImportedPreset(e.target.files[0]);
@@ -152,7 +155,7 @@ export default function PresetsManagement() {
         }
     }
 
-    function handleDownload(presetId) {
+    function handleDownload(presetId: string) {
         try {
             downloadExportedPreset(presetId);
         } catch (e) {
@@ -162,92 +165,92 @@ export default function PresetsManagement() {
     }
 
     return (
-            <>
-                <Backdrop open={isUploadInProgress}>
-                    <CircularProgress color="inherit" />
-                </Backdrop>
-                <input type="file" id="fileInput" onChange={handleFileInput} style={{display: 'none'}} />
-                <Box sx={{width: '100%'}}>
-                    <Paper sx={{width: '100%'}}>
-                        <Toolbar sx={{pl: {sm: 2}, pr: {xs: 1, sm: 1}}}>
-                            <Typography sx={{flex: '1 1 100%'}} variant="h6" id="tableTitle" component="div">
-                                Presets
-                            </Typography>
-                            <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
-                                <Tooltip title="Import preset">
-                                    <label htmlFor="fileInput">
-                                        <IconButton component="span">
-                                            <UploadIcon />
-                                        </IconButton>
-                                    </label>
-                                </Tooltip>
-                            </Stack>
-                        </Toolbar>
-                        <TableContainer component={Paper}>
-                            <Table sx={{minWidth: 650}} aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>Mods</TableCell>
-                                        <TableCell align="right">Mods count</TableCell>
-                                        <TableCell></TableCell>
-                                        <TableCell></TableCell>
-                                        <TableCell></TableCell>
+        <>
+            <Backdrop open={isUploadInProgress}>
+                <CircularProgress color="inherit"/>
+            </Backdrop>
+            <input type="file" id="fileInput" onChange={handleFileInput} style={{display: 'none'}}/>
+            <Box sx={{width: '100%'}}>
+                <Paper sx={{width: '100%'}}>
+                    <Toolbar sx={{pl: {sm: 2}, pr: {xs: 1, sm: 1}}}>
+                        <Typography sx={{flex: '1 1 100%'}} variant="h6" id="tableTitle" component="div">
+                            Presets
+                        </Typography>
+                        <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
+                            <Tooltip title="Import preset">
+                                <label htmlFor="fileInput">
+                                    <IconButton component="span">
+                                        <UploadIcon/>
+                                    </IconButton>
+                                </label>
+                            </Tooltip>
+                        </Stack>
+                    </Toolbar>
+                    <TableContainer component={Paper}>
+                        <Table sx={{minWidth: 650}} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Type</TableCell>
+                                    <TableCell>Mods</TableCell>
+                                    <TableCell align="right">Mods count</TableCell>
+                                    <TableCell></TableCell>
+                                    <TableCell></TableCell>
+                                    <TableCell></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {getSortedPresets().map((preset) => (
+                                    <TableRow
+                                        key={preset.id}
+                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            {preset.name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {SERVER_NAMES.get(ServerType[preset.type as keyof typeof ServerType])}
+                                        </TableCell>
+                                        <TableCell>
+                                            {getSummarizedModsList(preset.mods)}
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            {preset.mods.length}
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton aria-label="edit"
+                                                        onClick={() => handleOpenEdit(preset)}>
+                                                <EditIcon color="primary"/>
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton aria-label="export"
+                                                        onClick={() => handleDownload(preset.id)}>
+                                                <DownloadIcon color="primary"/>
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton aria-label="delete"
+                                                        onClick={() => handleDelete(preset.id)}>
+                                                <DeleteIcon color="error"/>
+                                            </IconButton>
+                                        </TableCell>
                                     </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {getSortedPresets().map((preset) => (
-                                            <TableRow
-                                                    key={preset.id}
-                                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                            >
-                                                <TableCell component="th" scope="row">
-                                                    {preset.name}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {SERVER_NAMES[preset.type]}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {getSummarizedModsList(preset.mods)}
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    {preset.mods.length}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <IconButton aria-label="edit"
-                                                                onClick={() => handleOpenEdit(preset)}>
-                                                        <EditIcon color="primary"/>
-                                                    </IconButton>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <IconButton aria-label="export"
-                                                                onClick={() => handleDownload(preset.id)}>
-                                                        <DownloadIcon color="primary"/>
-                                                    </IconButton>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <IconButton aria-label="delete"
-                                                                onClick={() => handleDelete(preset.id)}>
-                                                        <DeleteIcon color="error"/>
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <TableGhosts display={initialLoading} count={10}/>
-                        </TableContainer>
-                    </Paper>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <TableGhosts display={initialLoading} count={10}/>
+                    </TableContainer>
+                </Paper>
+            </Box>
+            <Modal open={presetModalOpen} onClose={handlePresetModalClosed}>
+                <Box>
+                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                 itemsLabel="mods" showFilter
+                    />
                 </Box>
-                <Modal open={presetModalOpen} onClose={handlePresetModalClosed}>
-                    <Box>
-                        <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                     onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                     itemsLabel="mods" showFilter
-                        />
-                    </Box>
-                </Modal>
-            </>
+            </Modal>
+        </>
     )
 }

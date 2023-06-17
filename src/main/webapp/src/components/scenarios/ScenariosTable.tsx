@@ -15,21 +15,21 @@ import {Button} from "@mui/material";
 import Fuse from "fuse.js";
 import config from "../../config";
 
-function getComparator(order, orderBy) {
+function getComparator(order: 'asc' | 'desc', orderBy: string) {
     const sortByCell = headCells.find(cell => cell.id === orderBy);
 
     if (sortByCell.type === "number" || sortByCell.type === "date") {
         return order === "desc"
-            ? (a, b) => a[orderBy] - b[orderBy]
-            : (a, b) => b[orderBy] - a[orderBy];
+            ? (a: any, b: any) => a[orderBy] - b[orderBy]
+            : (a: any, b: any) => b[orderBy] - a[orderBy];
     }
 
     return order === "desc"
-        ? (a, b) => b[orderBy].localeCompare(a[orderBy])
-        : (a, b) => a[orderBy].localeCompare(b[orderBy]);
+        ? (a: any, b: any) => b[orderBy].localeCompare(a[orderBy])
+        : (a: any, b: any) => a[orderBy].localeCompare(b[orderBy]);
 }
 
-const headCells: Array<{id: string, label: string, type?: string}> = [
+const headCells: Array<{ id: string, label: string, type?: string }> = [
     {
         id: 'name',
         label: 'Name',
@@ -47,7 +47,7 @@ const headCells: Array<{id: string, label: string, type?: string}> = [
 ];
 
 type ScenariosTableProps = {
-    rows: Array<{name: string, fileSize: number, createdOn: Date}>,
+    rows: Array<{ name: string, fileSize: number, createdOn: Date }>,
     selected: Array<any>,
     onDeleteClicked: MouseEventHandler,
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
@@ -67,27 +67,27 @@ const ScenariosTable = (props: ScenariosTableProps) => {
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [search, setSearch] = useState("");
 
-    const handleRequestSort = (_, property) => {
+    const handleRequestSort = (_: any, property: string) => {
         setSearch("");
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
 
-    const handleChangePage = (_, newPage) => {
+    const handleChangePage = (_: any, newPage: number) => {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const handleSearchChange = (event) => {
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
     }
 
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;

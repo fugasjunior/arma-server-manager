@@ -50,9 +50,9 @@ task copyWebApp(type: Copy) {
 }
 
 // uncomment for prod build
-appNpmBuild.dependsOn appNpmInstall
-copyWebApp.dependsOn appNpmBuild
-compileJava.dependsOn copyWebApp
+//appNpmBuild.dependsOn appNpmInstall
+//copyWebApp.dependsOn appNpmBuild
+//compileJava.dependsOn copyWebApp
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'

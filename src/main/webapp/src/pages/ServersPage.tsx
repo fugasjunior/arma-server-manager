@@ -32,47 +32,47 @@ const ServersPage = () => {
         setServers(servers.servers);
     }
 
-    const isServerWithSamePortRunning = server => {
+    const isServerWithSamePortRunning = (server: ServerDto) => {
         const activeServerWithSamePort = servers.filter(s => s !== server)
             .filter(s => s.instanceInfo && s.instanceInfo.alive)
             .filter(s => s.port === server.port || s.queryPort === server.queryPort);
-        if (activeServerWithSamePort[0]) {
-            return activeServerWithSamePort[0];
-        }
-        return null;
+        return !!activeServerWithSamePort[0];
     }
 
-    const handleStartServer = async id => {
+    const handleStartServer = async (id: number) => {
         const newServers = [...servers];
         const server = newServers.find(s => s.id === id);
         server.instanceInfo = {
+            ...server.instanceInfo,
             alive: true
         }
         setServers(newServers);
         await startServer(id);
     };
 
-    const handleStopServer = async id => {
+    const handleStopServer = async (id: number) => {
         const newServers = [...servers];
         const server = newServers.find(s => s.id === id);
         server.instanceInfo = {
+            ...server.instanceInfo,
             alive: false
         }
         setServers(newServers);
         await stopServer(id);
     };
 
-    const handleRestartServer = async id => {
+    const handleRestartServer = async (id: number) => {
         const newServers = [...servers];
         const server = newServers.find(s => s.id === id);
         server.instanceInfo = {
+            ...server.instanceInfo,
             alive: true
         }
         setServers(newServers);
         await restartServer(id);
     };
 
-    const handleDeleteServerClicked = server => {
+    const handleDeleteServerClicked = (server: ServerDto) => {
         setServerToDelete(server);
         setDeleteDialogOpen(true);
     }
@@ -90,7 +90,7 @@ const ServersPage = () => {
         setServerToDelete(null);
     }
 
-    const handleOpenLogs = serverId => {
+    const handleOpenLogs = (serverId: number) => {
         setIsLogOpen(true);
         setLogServerId(serverId);
     }

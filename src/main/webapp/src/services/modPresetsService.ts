@@ -1,9 +1,10 @@
 import http from "./httpService";
 import config from "../config";
+import {ModPresetRequestDto} from "../dtos/ModPresetDto.ts";
 
 const apiEndpoint = config.apiUrl + "/mod/preset";
 
-export function getModPreset(id) {
+export function getModPreset(id: string) {
     return http.get(apiEndpoint + "/" + id);
 }
 
@@ -16,19 +17,19 @@ export function getModPresets(filter?: string) {
     return http.get(apiEndpoint + query);
 }
 
-export function createModPreset(preset) {
+export function createModPreset(preset: ModPresetRequestDto) {
     return http.post(apiEndpoint, preset);
 }
 
-export function updateModPreset(id, preset) {
+export function updateModPreset(id: string, preset: ModPresetRequestDto) {
     return http.put(apiEndpoint + "/" + id, preset);
 }
 
-export function deleteModPreset(id) {
+export function deleteModPreset(id: string) {
     return http.delete(apiEndpoint + "/" + id);
 }
 
-export function downloadExportedPreset(id) {
+export function downloadExportedPreset(id: string) {
     http.get(config.apiUrl + "/mod/launcher_preset/" + id, {responseType: 'blob'})
         .then(response => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -49,7 +50,7 @@ export function downloadExportedPreset(id) {
         })
 }
 
-export function uploadImportedPreset(file) {
+export function uploadImportedPreset(file: File) {
     const formData = new FormData();
     formData.append('preset', file);
     return http.post(config.apiUrl + "/mod/launcher_preset/", formData);

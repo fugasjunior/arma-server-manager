@@ -3,12 +3,11 @@ import SystemResourcesMonitor from "../components/dashboard/SystemResourcesMonit
 import ServerInstallations from "../components/dashboard/ServerInstallations";
 
 const DashboardPage = () => {
-
     return (
-            <Stack spacing={4}>
-                <SystemResourcesMonitor/>
-                <ServerInstallations/>
-            </Stack>
+        <Stack spacing={4}>
+            <SystemResourcesMonitor/>
+            <ServerInstallations/>
+        </Stack>
     )
 }
 

@@ -1,7 +1,20 @@
 import {Button, FormControl, InputLabel, Select, Stack, Typography} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
+import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
+import {ChangeEvent} from "react";
 
-export default function ListBuilderHeader(props) {
+type ListBuilderHeaderProps = {
+    itemsLabel: string,
+    withControls: boolean,
+    confirmDisabled: boolean,
+    selectedPreset: string,
+    presets?: Array<ModPresetDto>,
+    onPresetChange: (event: ChangeEvent<HTMLInputElement>) => void
+    onConfirm: () => void,
+    onCancel: () => void,
+}
+
+export default function ListBuilderHeader(props: ListBuilderHeaderProps) {
 
     const presetAvailable = !!props.presets && props.presets.length > 0;
 

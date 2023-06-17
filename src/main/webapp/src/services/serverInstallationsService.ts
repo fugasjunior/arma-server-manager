@@ -7,11 +7,11 @@ export function getServerInstallations() {
     return http.get(apiEndpoint);
 }
 
-export function getServerInstallation(type) {
+export function getServerInstallation(type: string) {
     return http.get(apiEndpoint + "/" + type);
 }
 
-export function installServer(type) {
+export function installServer(type: string) {
     return http.post(apiEndpoint + "/" + type);
 }
 

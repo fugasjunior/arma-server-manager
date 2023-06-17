@@ -25,7 +25,7 @@ const AdditionalServersPage = () => {
         setIsLoading(false);
     }
 
-    const handleStart = async (id) => {
+    const handleStart = async (id: number) => {
         await startAdditionalServer(id);
         setAdditionalServers(prevState => {
             const newServers = [...prevState];
@@ -35,7 +35,7 @@ const AdditionalServersPage = () => {
         })
     };
 
-    const handleStop = async (id) => {
+    const handleStop = async (id: number) => {
         await stopAdditionalServer(id);
         setAdditionalServers(prevState => {
             const newServers = [...prevState];

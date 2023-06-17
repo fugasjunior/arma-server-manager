@@ -11,23 +11,23 @@ export function getReforgerScenarios() {
     return http.get(apiEndpoint + "/REFORGER");
 }
 
-export function downloadScenario(name) {
+export function downloadScenario(name: string) {
     http.get(apiEndpoint + "/" + name, {responseType: 'blob'})
-    .then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', name);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-    })
+        .then(response => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', name);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        })
 }
 
-export function uploadScenario(formData, config) {
+export function uploadScenario(formData: FormData, config: any) {
     return http.post(apiEndpoint, formData, config);
 }
 
-export function deleteScenario(name) {
+export function deleteScenario(name: string) {
     return http.delete(apiEndpoint + "/" + name);
 }

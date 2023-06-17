@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import {ChangeEvent, FormEvent, useContext, useState} from 'react';
 import {login} from "../../services/authService";
 import {useNavigate} from "react-router-dom";
 import {Box, Button, Stack, TextField, Typography} from "@mui/material";
@@ -13,18 +13,18 @@ const Login = () => {
 
     const navigate = useNavigate()
 
-    const handleSubmit = async e => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const data = await login(username, password);
         authCtx.login(data.token, data.expiresIn * 1000);
         navigate("/");
     };
 
-    const handleUsernameChange = (e) => {
+    const handleUsernameChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setUsername(e.target.value);
     }
 
-    const handlePasswordChange = (e) => {
+    const handlePasswordChange = (e : ChangeEvent<HTMLTextAreaElement>) => {
         setPassword(e.target.value);
     }
 

@@ -7,7 +7,7 @@ const ModsPage = () => {
     const {section} = useParams();
     const navigate = useNavigate();
 
-    const handleTabSelect = (_, newValue) => {
+    const handleTabSelect = (_: any, newValue: string) => {
         navigate("/mods/" + newValue);
     }
 

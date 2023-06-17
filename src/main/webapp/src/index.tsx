@@ -11,19 +11,19 @@ import {OSContextProvider} from "./store/os-context";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-        <AuthContextProvider>
-            <OSContextProvider>
-                <BrowserRouter>
-                    <React.StrictMode>
-                        <DevSupport ComponentPreviews={ComponentPreviews}
-                                    useInitialHook={useInitial}
-                        >
-                            <App/>
-                        </DevSupport>
-                    </React.StrictMode>
-                </BrowserRouter>
-            </OSContextProvider>
-        </AuthContextProvider>
+    <AuthContextProvider>
+        <OSContextProvider>
+            <BrowserRouter>
+                <React.StrictMode>
+                    <DevSupport ComponentPreviews={ComponentPreviews}
+                                useInitialHook={useInitial}
+                    >
+                        <App/>
+                    </DevSupport>
+                </React.StrictMode>
+            </BrowserRouter>
+        </OSContextProvider>
+    </AuthContextProvider>
 );
 
 // If you want your app to work offline and load faster, you can change

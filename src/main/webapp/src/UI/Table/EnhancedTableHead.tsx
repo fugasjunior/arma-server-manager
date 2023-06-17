@@ -9,7 +9,7 @@ import {ChangeEvent} from "react";
 
 type EnhancedTableHeadProps = {
     numSelected: number,
-    onRequestSort: (event, property) => void,
+    onRequestSort: (_: any, property: string) => void,
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
     order: 'asc' | 'desc',
     orderBy: string,
@@ -26,8 +26,8 @@ type EnhancedTableHeadProps = {
 function EnhancedTableHead(props: EnhancedTableHeadProps) {
     const {onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells, search} =
         props;
-    const createSortHandler = (property) => (event) => {
-        onRequestSort(event, property);
+    const createSortHandler = (property: string) => (_: any) => {
+        onRequestSort(_, property);
     };
 
     return (

@@ -14,110 +14,122 @@ import reforgerIcon from "../../img/reforger_icon.png";
 import ModEditButton from "./ModEditButton";
 import ListBuilderDLCsEdit from "./ListBuilderDLCsEdit";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {Arma3ServerDto, ServerDto, ServerType} from "../../dtos/ServerDto.ts";
 
-const SERVER_ICON_URLS = {
-    "ARMA3": arma3Icon,
-    "DAYZ": dayZIcon,
-    "DAYZ_EXP": dayZIcon,
-    "REFORGER": reforgerIcon
+const SERVER_ICON_URLS = new Map<ServerType, string>([
+    [ServerType.ARMA3, arma3Icon],
+    [ServerType.DAYZ, dayZIcon],
+    [ServerType.DAYZ_EXP, dayZIcon],
+    [ServerType.REFORGER, reforgerIcon]
+]);
+
+type ServerListEntryProps = {
+    server: ServerDto,
+    serverWithSamePortRunning: boolean
+    onStartServer: (id: number) => void,
+    onStopServer: (id: number) => void,
+    onRestartServer: (id: number) => void,
+    onDeleteServer: (id: number) => void,
+    onOpenLogs: (id: number) => void
 }
 
-const ServerListEntry = (props) => {
+const ServerListEntry = (props: ServerListEntryProps) => {
     const {server, onStartServer, onStopServer, onRestartServer, onDeleteServer, serverWithSamePortRunning} = props;
 
     const serverRunning = server.instanceInfo && server.instanceInfo.alive;
 
     return (
-            <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
-                <TableCell>
-                    <Avatar src={SERVER_ICON_URLS[server.type]} alt={`${server.type} icon`}/>
-                </TableCell>
-                <TableCell>
-                    <Stack>
-                        <p>{server.name}</p>
-                        <p>Port: {server.port}</p>
-                        {server.description && <p>{server.description}</p>}
-                        {server.type === "ARMA3" && <>
-                            {server.activeMods.length > 0 && <p>Mods active</p>}
-                            {server.activeDLCs.length > 0 && <p>Creator DLC(s) active</p>}
-                        </>}
-                    </Stack>
-                </TableCell>
-                <TableCell>
-                    <Stack direction="row" spacing={1}>
-                        {serverRunning ?
-                                <>
-                                    <Button id={`server-${server.id}-stop-btn`}
-                                            className="server-stop-btn"
-                                            variant="contained" color="error"
-                                            onClick={() => onStopServer(server.id)}>
-                                        Stop
-                                    </Button>
-                                    <Button onClick={() => onRestartServer(server.id)}>Restart
-                                    </Button>
-                                </>
-                                : <Button id={`server-${server.id}-start-btn`}
-                                          variant="contained" startIcon={<PlayCircleFilledIcon/>}
-                                          disabled={serverWithSamePortRunning}
-                                          onClick={() => onStartServer(server.id)}>
-                                    Start
-                                </Button>
-                        }
-                    </Stack>
-                </TableCell>
-                <TableCell>
-                    <Button id={`server-${server.id}-settings-btn`}
-                            className="server-settings-btn"
-                            component={Link} to={"/servers/" + server.id}
-                            variant="outlined" startIcon={<SettingsIcon/>}
-                    >
-                        Settings
-                    </Button>
-                </TableCell>
-                <TableCell>
-                    <ModEditButton server={server}/>
-                </TableCell>
-                <TableCell>
-                    {server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
-                </TableCell>
-                <TableCell>
-                    <Button startIcon={<TextSnippetIcon/>} onClick={() => props.onOpenLogs(server.id)} color="info">
-                        Logs
-                    </Button>
-                </TableCell>
-                <TableCell>
-                    {serverRunning && server.instanceInfo.maxPlayers &&
-                            <List>
-                                <ListItem>
-                                    <ListItemAvatar>
-                                        <Avatar>
-                                            <DirectionsRunIcon/>
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText primary="Players"
-                                                  secondary={`${server.instanceInfo.playersOnline} / ${server.instanceInfo.maxPlayers}`}/>
-                                </ListItem>
-                                {server.instanceInfo.map &&
-                                        <ListItem>
-                                            <ListItemAvatar>
-                                                <Avatar>
-                                                    <MapIcon/>
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText primary="Map"
-                                                          secondary={`${server.instanceInfo.map}`}/>
-                                        </ListItem>
-                                }
-                            </List>
+        <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
+            <TableCell>
+                <Avatar src={SERVER_ICON_URLS.get(ServerType[server.type as keyof typeof ServerType])}
+                        alt={`${server.type} icon`}/>
+            </TableCell>
+            <TableCell>
+                <Stack>
+                    <p>{server.name}</p>
+                    <p>Port: {server.port}</p>
+                    {server.description && <p>{server.description}</p>}
+                    {server.type === "ARMA3" && <>
+                        {(server as Arma3ServerDto).activeMods.length > 0 && <p>Mods active</p>}
+                        {(server as Arma3ServerDto).activeDLCs.length > 0 && <p>Creator DLC(s) active</p>}
+                    </>}
+                </Stack>
+            </TableCell>
+            <TableCell>
+                <Stack direction="row" spacing={1}>
+                    {serverRunning ?
+                        <>
+                            <Button id={`server-${server.id}-stop-btn`}
+                                    className="server-stop-btn"
+                                    variant="contained" color="error"
+                                    onClick={() => onStopServer(server.id)}>
+                                Stop
+                            </Button>
+                            <Button onClick={() => onRestartServer(server.id)}>Restart
+                            </Button>
+                        </>
+                        : <Button id={`server-${server.id}-start-btn`}
+                                  variant="contained" startIcon={<PlayCircleFilledIcon/>}
+                                  disabled={serverWithSamePortRunning}
+                                  onClick={() => onStartServer(server.id)}>
+                            Start
+                        </Button>
                     }
-                    {!serverRunning &&
-                            <Button id={`server-${server.id}-delete-btn`}
-                                    className="server-delete-btn"
-                                    variant="outlined" startIcon={<DeleteIcon/>} color="error"
-                                    onClick={() => onDeleteServer(server.id)}>Delete
-                            </Button>}
-                </TableCell>
-            </TableRow>
+                </Stack>
+            </TableCell>
+            <TableCell>
+                <Button id={`server-${server.id}-settings-btn`}
+                        className="server-settings-btn"
+                        component={Link} to={"/servers/" + server.id}
+                        variant="outlined" startIcon={<SettingsIcon/>}
+                >
+                    Settings
+                </Button>
+            </TableCell>
+            <TableCell>
+                <ModEditButton server={server}/>
+            </TableCell>
+            <TableCell>
+                {server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
+            </TableCell>
+            <TableCell>
+                <Button startIcon={<TextSnippetIcon/>} onClick={() => props.onOpenLogs(server.id)} color="info">
+                    Logs
+                </Button>
+            </TableCell>
+            <TableCell>
+                {serverRunning && server.instanceInfo.maxPlayers &&
+                    <List>
+                        <ListItem>
+                            <ListItemAvatar>
+                                <Avatar>
+                                    <DirectionsRunIcon/>
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary="Players"
+                                          secondary={`${server.instanceInfo.playersOnline} / ${server.instanceInfo.maxPlayers}`}/>
+                        </ListItem>
+                        {server.instanceInfo.map &&
+                            <ListItem>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <MapIcon/>
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary="Map"
+                                              secondary={`${server.instanceInfo.map}`}/>
+                            </ListItem>
+                        }
+                    </List>
+                }
+                {!serverRunning &&
+                    <Button id={`server-${server.id}-delete-btn`}
+                            className="server-delete-btn"
+                            variant="outlined" startIcon={<DeleteIcon/>} color="error"
+                            onClick={() => onDeleteServer(server.id)}>Delete
+                    </Button>}
+            </TableCell>
+        </TableRow>
     );
 };
 

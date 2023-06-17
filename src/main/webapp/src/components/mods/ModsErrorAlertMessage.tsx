@@ -1,28 +1,31 @@
-
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import {Alert, AlertTitle} from "@mui/material";
+import {ModDto} from "../../dtos/ModDto.ts";
+import {ErrorStatus} from "../../dtos/Status.ts";
 
-const ModsErrorAlertMessage = (props) => {
-    const {mods} = props;
+type ModsErrorAlertMessageProps = {
+    mods: Array<ModDto>
+}
 
-    const onlyUnique = (value, index, self) => self.indexOf(value) === index;
+const ModsErrorAlertMessage = ({mods}: ModsErrorAlertMessageProps) => {
+    const onlyUnique = (value: string, index: number, self: Array<string>) => self.indexOf(value) === index;
 
-    const errors = mods.filter(mod => mod.installationStatus === "ERROR").map(mod => mod.errorStatus).filter(
-            onlyUnique);
+    const errors = mods.filter(mod => mod.installationStatus === "ERROR")
+        .map(mod => mod.errorStatus).filter(onlyUnique);
 
     return (
-            <Alert severity="error" sx={{mb: 2}}>
-                <AlertTitle>Some mods could not be installed</AlertTitle>
-                <p className="m-0 p-1">
-                    Installation of some mods failed. Review the errors below:
-                </p>
-                <ul>
-                    {errors.map(error =>
-                            <li key={error}>{workshopErrorStatusMap[error]}</li>
-                    )}
-                </ul>
-            </Alert>
+        <Alert severity="error" sx={{mb: 2}}>
+            <AlertTitle>Some mods could not be installed</AlertTitle>
+            <p className="m-0 p-1">
+                Installation of some mods failed. Review the errors below:
+            </p>
+            <ul>
+                {errors.map(error =>
+                    <li key={error}>{workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}</li>
+                )}
+            </ul>
+        </Alert>
     )
-}
+};
 
 export default ModsErrorAlertMessage;

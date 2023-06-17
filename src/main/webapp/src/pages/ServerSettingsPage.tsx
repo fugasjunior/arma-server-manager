@@ -7,7 +7,7 @@ import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSe
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
-import {ServerDto} from "../dtos/ServerDto";
+import {Arma3ServerDto, DayZServerDto, ReforgerServerDto, ServerDto, ServerType} from "../dtos/ServerDto";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
@@ -23,7 +23,7 @@ const ServerSettingsPage = () => {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const {data: fetchedServer} = await getServer(id);
+            const {data: fetchedServer} = await getServer(Number(id));
 
             setServer(fetchedServer);
             setIsLoading(false);
@@ -33,17 +33,16 @@ const ServerSettingsPage = () => {
         }
     }
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values: ServerDto) => {
         const request = {
             ...server,
             ...values,
             type: server.type,
-            queryPort: server.type === "ARMA3" ? values.port + 1 : values.queryPort,
-            instanceInfo: null,
+            queryPort: server.type === "ARMA3" ? values.port + 1 : values.queryPort
         }
 
         try {
-            await updateServer(id, request);
+            await updateServer(Number(id), request);
             toast.success("Server successfully updated");
             navigate("/servers");
         } catch (e) {
@@ -57,26 +56,27 @@ const ServerSettingsPage = () => {
 
     return (
         <>
-            <Typography variant="h4" mb={2}>Server Settings ({SERVER_NAMES[server.type]})</Typography>
             {isLoading && <h2>Loading server data...</h2>}
             {!isLoading &&
                 <>
+                    <Typography variant="h4" mb={2}>Server Settings
+                        ({SERVER_NAMES.get(ServerType[server.type as keyof typeof ServerType])})</Typography>
                     {server.type === "ARMA3" &&
-                        <EditArma3ServerSettingsForm server={server} onSubmit={handleSubmit}
+                        <EditArma3ServerSettingsForm server={server as Arma3ServerDto} onSubmit={handleSubmit}
                                                      onCancel={handleCancel}
                                                      isServerRunning={server.instanceInfo
                                                          && server.instanceInfo.alive}
                         />
                     }
                     {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
-                        <EditDayZServerSettingsForm server={server} onSubmit={handleSubmit}
+                        <EditDayZServerSettingsForm server={server as DayZServerDto} onSubmit={handleSubmit}
                                                     onCancel={handleCancel}
                                                     isServerRunning={server.instanceInfo
                                                         && server.instanceInfo.alive}
                         />
                     }
                     {(server.type === "REFORGER") &&
-                        <EditReforgerServerSettingsForm server={server} onSubmit={handleSubmit}
+                        <EditReforgerServerSettingsForm server={server as ReforgerServerDto} onSubmit={handleSubmit}
                                                         onCancel={handleCancel}
                                                         isServerRunning={server.instanceInfo
                                                             && server.instanceInfo.alive}

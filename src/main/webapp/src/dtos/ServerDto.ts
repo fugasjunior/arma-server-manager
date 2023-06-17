@@ -1,3 +1,7 @@
+import {ReforgerModDto} from "./ReforgerModDto.ts";
+import {ServerWorkshopModDto} from "./ServerWorkshopModDto.ts";
+import {CreatorDlcDto} from "./CreatorDlcDto.ts";
+
 export enum ServerType {
     ARMA3 = 'ARMA3',
     REFORGER = 'REFORGER',
@@ -6,7 +10,7 @@ export enum ServerType {
 }
 
 export interface ServerDto {
-    type: ServerType,
+    type: string,
     id?: number,
     name: string,
     description: string,
@@ -25,8 +29,8 @@ export interface Arma3ServerDto extends ServerDto {
     battlEye: boolean,
     vonEnabled: boolean,
     verifySignatures: boolean,
-    activeMods: any[], // TODO
-    activeDLCs: any[], // TODO
+    activeMods: Array<ServerWorkshopModDto>,
+    activeDLCs: Array<CreatorDlcDto>,
     additionalOptions: string,
     difficultySettings: Arma3DifficultySettings
 }
@@ -69,7 +73,7 @@ export interface DayZServerDto extends ServerDto {
     respawnTime: number,
     timeAcceleration: number,
     nightTimeAcceleration: number,
-    activeMods: any[], // TODO
+    activeMods: Array<ServerWorkshopModDto>,
     additionalOptions: string
 }
 
@@ -78,5 +82,5 @@ export interface ReforgerServerDto extends ServerDto {
     scenarioId: string,
     battlEye: boolean,
     thirdPersonViewEnabled: boolean,
-    activeMods: any[] // TODO
+    activeMods: Array<ReforgerModDto>
 }

@@ -1,10 +1,13 @@
-import {ServerType} from "./ServerDto";
-
 export interface ModPresetDto {
-    id: number,
+    id?: string,
     name: string,
     mods: Array<ModPresetModDto>,
-    type: ServerType
+    type: string
+}
+
+export interface ModPresetRequestDto {
+    name: string,
+    mods: Array<number>,
 }
 
 export interface ModPresetModDto {

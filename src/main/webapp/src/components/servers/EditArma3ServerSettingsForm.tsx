@@ -1,15 +1,22 @@
 import {useFormik} from "formik";
 import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
-
 import Arma3DifficultySettingsForm from "./Arma3DifficultySettingsForm";
+import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 
-const EditArma3ServerSettingsForm = props => {
+type EditArma3ServerSettingsFormProps = {
+    server: Arma3ServerDto,
+    isServerRunning?: boolean
+    onSubmit: (values: Arma3ServerDto) => void,
+    onCancel: () => void
+}
 
-    const handleSubmit = (values) => {
+const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) => {
+
+    const handleSubmit = (values: Arma3ServerDto) => {
         props.onSubmit(values);
     }
 
-    const formik = useFormik({
+    const formik = useFormik<Arma3ServerDto>({
         initialValues: props.server,
         onSubmit: handleSubmit,
         enableReinitialize: true

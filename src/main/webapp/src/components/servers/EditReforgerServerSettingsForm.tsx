@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import {useEffect, useState} from "react";
 import {getReforgerScenarios} from "../../services/scenarioService";
+import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
+import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
 
 function renderTextField(name: string, label: string, formik: any, required?: boolean, type?: string, helperText?: string) {
     return (
@@ -44,7 +46,14 @@ function renderSwitch(name: string, label: string, formik: any) {
     )
 }
 
-export default function EditReforgerServerSettingsForm(props) {
+type EditReforgerServerSettingsFormProps = {
+    server: ReforgerServerDto,
+    isServerRunning?: boolean,
+    onSubmit: (values: ReforgerServerDto) => void,
+    onCancel: () => void
+}
+
+export default function EditReforgerServerSettingsForm(props: EditReforgerServerSettingsFormProps) {
 
     const [scenarios, setScenarios] = useState([]);
 
@@ -57,11 +66,11 @@ export default function EditReforgerServerSettingsForm(props) {
         fetchScenarios();
     }, []);
 
-    function handleSubmit(values) {
+    function handleSubmit(values: ReforgerServerDto) {
         props.onSubmit(values);
     }
 
-    function getScenarioDisplayName(scenario) {
+    function getScenarioDisplayName(scenario: ReforgerScenarioDto) {
         if (scenario.name) {
             return `${scenario.name} (${scenario.value})`;
         }
@@ -70,7 +79,7 @@ export default function EditReforgerServerSettingsForm(props) {
 
     const mediaQuery = useMediaQuery('(min-width:600px)');
 
-    const formik = useFormik({
+    const formik = useFormik<ReforgerServerDto>({
         initialValues: props.server,
         onSubmit: handleSubmit,
         enableReinitialize: true

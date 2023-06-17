@@ -8,14 +8,14 @@ export function getMods(filterByServerType?: string) {
     return http.get(apiEndpoint + query);
 }
 
-export function installMod(modId) {
+export function installMod(modId: number) {
     return http.post(apiEndpoint + "/" + modId);
 }
 
-export function updateMods(modIdsList) {
+export function updateMods(modIdsList: string) {
     return http.post(apiEndpoint + "?modIds=" + modIdsList);
 }
 
-export function uninstallMods(modIdsList) {
+export function uninstallMods(modIdsList: string) {
     return http.delete(apiEndpoint + "?modIds=" + modIdsList);
 }

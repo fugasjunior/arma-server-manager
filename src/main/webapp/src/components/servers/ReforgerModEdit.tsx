@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {ChangeEvent, useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal, Stack, TextField} from "@mui/material";
 import {getServer, updateServer} from "../../services/serversService";
 import {toast} from "material-react-toastify";
@@ -26,7 +26,11 @@ const modalStyle = {
     p: 4,
 };
 
-const ReforgerModEdit = props => {
+type ReforgerModEditProps = {
+    server: ReforgerServerDto
+}
+
+const ReforgerModEdit = (props: ReforgerModEditProps) => {
     const [server, setServer] = useState<ReforgerServerDto>();
     const [isOpen, setIsOpen] = useState(false);
     const [mods, setMods] = useState(props.server.activeMods);
@@ -51,23 +55,23 @@ const ReforgerModEdit = props => {
         setIsLoading(false);
     }
 
-    function handleNewModNameChange(event) {
+    function handleNewModNameChange(event: ChangeEvent<HTMLInputElement>) {
         setNewModName(event.target.value);
     }
 
-    function handleNewModIdChange(event) {
+    function handleNewModIdChange(event: ChangeEvent<HTMLInputElement>) {
         setNewModId(event.target.value);
     }
 
     function handleAddNewMod() {
-        if (!mods.find(mod => mod.id === newModId)) {
-            setMods(prevState => [...prevState, {id: newModId, name: newModName}]);
+        if (!mods.find(mod => mod.id === Number(newModId))) {
+            setMods(prevState => [...prevState, {id: Number(newModId), name: newModName}]);
         }
         setNewModId("");
         setNewModName("");
     }
 
-    function handleDeleteMod(id) {
+    function handleDeleteMod(id: number) {
         setMods(prevState => prevState.filter(mod => mod.id !== id));
     }
 

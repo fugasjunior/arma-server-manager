@@ -5,13 +5,14 @@ import Tooltip from "@mui/material/Tooltip";
 import {clearAuth, getAuth, setAuth} from "../../services/configService";
 import {toast} from "material-react-toastify";
 import ConfirmationDialog from "../../UI/ConfirmationDialog";
+import {SteamAuthDto} from "../../dtos/SteamAuthDto.ts";
 
 const SteamAuthForm = () => {
 
-    const [loadedAuth, setLoadedAuth] = useState({
-        username: "",
-        password: "",
-        steamGuardToken: ""
+    const [loadedAuth, setLoadedAuth] = useState<SteamAuthDto>({
+        username: '',
+        password: '',
+        steamGuardToken: ''
     });
     const [clearDialogOpen, setClearDialogOpen] = useState(false);
     const [loaded, setLoaded] = useState(false);
@@ -35,7 +36,7 @@ const SteamAuthForm = () => {
         setLoaded(true);
     }
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values: SteamAuthDto) => {
         try {
             await setAuth({
                 username: values.username,
@@ -103,7 +104,6 @@ const SteamAuthForm = () => {
                         value={formik.values.username || ''}
                         onChange={formik.handleChange}
                         error={formik.touched.username && Boolean(formik.errors.username)}
-
                     />
                     <Tooltip
                         title="By leaving the password empty, previously saved password will be used instead"

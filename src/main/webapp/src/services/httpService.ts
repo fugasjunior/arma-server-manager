@@ -17,7 +17,7 @@ axios.interceptors.response.use(null, error => {
     return Promise.reject(error);
 });
 
-function setJwt(jwt) {
+function setJwt(jwt: string) {
     axios.defaults.headers.common['Authorization'] = jwt;
 }
 

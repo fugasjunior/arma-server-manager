@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {KeyboardEvent} from 'react';
 import {useContext} from 'react';
 import Button from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -21,7 +21,7 @@ export default function NewServerButton() {
         setOpen((prevOpen) => !prevOpen);
     };
 
-    const handleClose = (event) => {
+    const handleClose = (event: Event) => {
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
             return;
         }
@@ -29,7 +29,7 @@ export default function NewServerButton() {
         setOpen(false);
     };
 
-    function handleListKeyDown(event) {
+    function handleListKeyDown(event: KeyboardEvent<HTMLUListElement>) {
         if (event.key === 'Tab') {
             event.preventDefault();
             setOpen(false);

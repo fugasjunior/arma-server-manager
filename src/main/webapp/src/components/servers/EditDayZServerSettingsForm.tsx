@@ -1,14 +1,20 @@
 import {useFormik} from "formik";
 import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
+import {DayZServerDto} from "../../dtos/ServerDto.ts";
 
+type EditDayZServerSettingsFormProps = {
+    server: DayZServerDto,
+    isServerRunning?: boolean,
+    onSubmit: (values: DayZServerDto) => void,
+    onCancel: () => void
+}
+const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
 
-const EditDayZServerSettingsForm = props => {
-
-    const handleSubmit = (values) => {
+    const handleSubmit = (values: DayZServerDto) => {
         props.onSubmit(values);
     }
 
-    const formik = useFormik({
+    const formik = useFormik<DayZServerDto>({
         initialValues: props.server,
         onSubmit: handleSubmit,
         enableReinitialize: true,

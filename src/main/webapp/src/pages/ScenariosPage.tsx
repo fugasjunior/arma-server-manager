@@ -1,10 +1,11 @@
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {deleteScenario, downloadScenario, getScenarios, uploadScenario} from "../services/scenarioService";
 import {toast} from "material-react-toastify";
 import ScenariosTable from "../components/scenarios/ScenariosTable";
+import {Arma3ScenarioDto} from "../dtos/Arma3ScenarioDto.ts";
 
 const ScenariosPage = () => {
-    const [scenarios, setScenarios] = useState([]);
+    const [scenarios, setScenarios] = useState<Array<Arma3ScenarioDto>>([]);
     const [selected, setSelected] = useState([]);
     const [uploadInProgress, setUploadInProgress] = useState(false);
     const [percentUploaded, setPercentUploaded] = useState(0);
@@ -15,20 +16,20 @@ const ScenariosPage = () => {
 
     const refreshScenarios = async () => {
         const {data: scenariosDto} = await getScenarios();
-        const scenarios = scenariosDto.scenarios.map(scenario => {
+        const scenarios = scenariosDto.scenarios.map((scenario: Arma3ScenarioDto) => {
             const createdOn = scenario.createdOn ? new Date(scenario.createdOn) : "";
             return {...scenario, createdOn};
         });
         setScenarios(scenarios);
     };
 
-    const handleProgress = e => {
+    const handleProgress = (e: ProgressEvent) => {
         const percentCompleted = Math.round((e.loaded * 100) / e.total);
         console.log(percentCompleted);
         setPercentUploaded(percentCompleted);
     }
 
-    const handleFileChange = async e => {
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         const file = e.target.files[0];
         try {
@@ -47,8 +48,8 @@ const ScenariosPage = () => {
         setPercentUploaded(0);
     };
 
-    const handleDownload = async (name, e) => {
-        e.stopPropagation();
+    const handleDownload = async (name: string, event: Event) => {
+        event.stopPropagation();
         try {
             downloadScenario(name);
         } catch (e) {
@@ -60,8 +61,8 @@ const ScenariosPage = () => {
     const handleDelete = async () => {
         try {
             setScenarios(prevState => {
-                        return prevState.filter(scenario => selected.indexOf(scenario.name) === -1)
-                    }
+                    return prevState.filter(scenario => selected.indexOf(scenario.name) === -1)
+                }
             );
 
             for (const scenario of selected) {
@@ -75,7 +76,7 @@ const ScenariosPage = () => {
         }
     }
 
-    const handleSelectAllClick = (event) => {
+    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             const newSelected = scenarios.map((n) => n.name);
             setSelected(newSelected);
@@ -84,9 +85,9 @@ const ScenariosPage = () => {
         setSelected([]);
     };
 
-    const handleClick = (_, name) => {
+    const handleClick = (_: any, name: string) => {
         const selectedIndex = selected.indexOf(name);
-        let newSelected = [];
+        let newSelected: Array<string> = [];
 
         if (selectedIndex === -1) {
             newSelected = newSelected.concat(selected, name);
@@ -96,8 +97,8 @@ const ScenariosPage = () => {
             newSelected = newSelected.concat(selected.slice(0, -1));
         } else if (selectedIndex > 0) {
             newSelected = newSelected.concat(
-                    selected.slice(0, selectedIndex),
-                    selected.slice(selectedIndex + 1),
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1),
             );
         }
 
@@ -105,11 +106,11 @@ const ScenariosPage = () => {
     };
 
     return (
-            <ScenariosTable rows={scenarios} selected={selected} onSelectAllClick={handleSelectAllClick}
-                            onClick={handleClick} onDeleteClicked={handleDelete} onFileChange={handleFileChange}
-                            percentUploaded={percentUploaded} uploadInProgress={uploadInProgress}
-                            onDownloadClicked={handleDownload}
-            />
+        <ScenariosTable rows={scenarios} selected={selected} onSelectAllClick={handleSelectAllClick}
+                        onClick={handleClick} onDeleteClicked={handleDelete} onFileChange={handleFileChange}
+                        percentUploaded={percentUploaded} uploadInProgress={uploadInProgress}
+                        onDownloadClicked={handleDownload}
+        />
     )
 }
 

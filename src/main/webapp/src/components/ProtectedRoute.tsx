@@ -2,7 +2,7 @@ import {useContext, useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../store/auth-context";
 
-const ProtectedRoute = ({children}) => {
+const ProtectedRoute = ({children}: any) => {
     const authCtx = useContext(AuthContext);
     const navigate = useNavigate();
 

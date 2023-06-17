@@ -12,7 +12,6 @@
         "axios": "^0.27.2",
         "font-awesome": "^4.7.0",
         "formik": "^2.2.9",
-        "fuse.js": "^6.6.2",
         "jwt-decode": "^3.1.2",
         "lodash": "^4.17.21",
         "material-react-toastify": "1.0.3",
@@ -45,6 +44,7 @@
         ]
     },
     "devDependencies": {
+        "@types/fuse": "^2.6.0",
         "@types/lodash": "^4.14.195",
         "@types/react": "^18.2.0",
         "@types/react-dom": "^18.2.0",

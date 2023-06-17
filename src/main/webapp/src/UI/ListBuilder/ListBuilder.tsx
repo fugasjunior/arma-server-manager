@@ -1,14 +1,33 @@
-import {useState} from "react";
+import {ChangeEvent, useState} from "react";
 import ListBuilderList from "./ListBuilderList";
 import ListBuilderHeader from "./ListBuilderHeader";
 import Fuse from "fuse.js";
 import {Box, Grid} from "@mui/material";
 import styles from "./ListBuilder.module.css";
+import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
 
-export default function ListBuilder(props) {
+export type ListBuilderElement = { id: number | string, name: string };
+
+type ListBuilderProps<T> = {
+    availableOptions: Array<T>,
+    selectedOptions: Array<T>,
+    itemsLabel: string,
+    withControls?: boolean,
+    confirmDisabled?: boolean,
+    showFilter?: boolean,
+    presets?: Array<ModPresetDto>
+    selectedPreset?: string,
+    onPresetChange?: (event: ChangeEvent<HTMLInputElement>) => void,
+    onSelect: (element: T) => void,
+    onDeselect: (element: T) => void,
+    onConfirm?: () => void,
+    onCancel?: () => void
+}
+
+export default function ListBuilder<T extends ListBuilderElement>(props: ListBuilderProps<T>) {
     const [filter, setFilter] = useState("");
 
-    function handleFilterChange(e) {
+    function handleFilterChange(e: ChangeEvent<HTMLInputElement>) {
         setFilter(e.target.value);
     }
 
@@ -16,7 +35,7 @@ export default function ListBuilder(props) {
         if (!filter) {
             return props.availableOptions;
         }
-        return new Fuse(props.availableOptions, {keys: ['name']}).search(filter).map(o => o.item);
+        return new Fuse<ListBuilderElement>(props.availableOptions, {keys: ['name']}).search(filter).map(o => o.item);
     }
 
     const itemsLabel = props.itemsLabel ?? "options";

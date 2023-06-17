@@ -13,18 +13,20 @@ import {ServerType} from "../dtos/ServerDto";
 
 
 const NewServerPage = () => {
-    const {type} = useParams<{ type: ServerType }>();
+    const {type} = useParams<{ type: string }>();
     const navigate = useNavigate();
     const osCtx = useContext(OsContext);
 
     useEffect(() => {
-        if (type === ServerType.DAYZ && osCtx.os === "LINUX") {
+        if (type === "DAYZ" && osCtx.os === "LINUX") {
             navigate("/servers");
             toast.error("DayZ server is available only on Windows machines");
         }
     }, []);
 
-    const handleSubmit = async (values) => {
+    type FixMeLater = any;
+
+    const handleSubmit = async (values: FixMeLater) => {
         const server = {
             ...values,
             type,
@@ -48,7 +50,7 @@ const NewServerPage = () => {
 
     return (
         <>
-            <Typography variant="h4" mb={2}>New {SERVER_NAMES[type]} server</Typography>
+            <Typography variant="h4" mb={2}>New {SERVER_NAMES.get(ServerType[type as keyof typeof ServerType])} server</Typography>
             {type === ServerType.ARMA3 &&
                 <EditArma3ServerSettingsForm server={arma3ServerInitialState()}
                                              onCancel={handleCancel}

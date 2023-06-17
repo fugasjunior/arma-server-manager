@@ -17,7 +17,12 @@ const modalStyle = {
     p: 4,
 };
 
-const ServerLogs = (props) => {
+type ServerLogsProps = {
+    serverId: number,
+    onClose: () => void
+}
+
+const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
     const [logs, setLogs] = useState("");
     const logTextArea = useRef<HTMLTextAreaElement>();
 
@@ -26,13 +31,13 @@ const ServerLogs = (props) => {
     }, []);
 
     async function fetchLogs() {
-        const {data: downloadedLogs} = await getServerLogs(props.serverId);
+        const {data: downloadedLogs} = await getServerLogs(serverId);
         setLogs(downloadedLogs);
         logTextArea.current.scrollTop = logTextArea.current.scrollHeight;
     }
 
     async function handleDownloadLogFile() {
-        downloadLogFile(props.serverId);
+        downloadLogFile(serverId);
     }
 
     function isLogEmpty() {
@@ -40,7 +45,7 @@ const ServerLogs = (props) => {
     }
 
     return (
-        <Modal open onClose={props.onClose}>
+        <Modal open onClose={onClose}>
             <Box sx={modalStyle}>
                 {isLogEmpty() ?
                     <Typography m={2}>No logs available for this server</Typography>

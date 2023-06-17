@@ -17,8 +17,14 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import SchoolIcon from '@mui/icons-material/School';
+import {FormikProps} from "formik";
+import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 
-const Arma3DifficultySettingsForm = ({formik}) => {
+type Arma3DifficultySettingsFormProps = {
+    formik: FormikProps<Arma3ServerDto>
+}
+
+const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps) => {
     return <Accordion>
         <AccordionSummary
             expandIcon={<ExpandMoreIcon/>}

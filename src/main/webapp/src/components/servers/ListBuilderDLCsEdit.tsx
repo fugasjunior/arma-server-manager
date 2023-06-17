@@ -6,12 +6,17 @@ import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import {ServerDto} from "../../dtos/ServerDto";
+import {CreatorDlcDto} from "../../dtos/CreatorDlcDto.ts";
 
-const ListBuilderDLCsEdit = props => {
+type ListBuilderDLCsEditProps = {
+    server: ServerDto
+}
+
+const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
     const [server, setServer] = useState<ServerDto>();
     const [isOpen, setIsOpen] = useState(false);
-    const [availableDLCs, setAvailableDLCs] = useState([]);
-    const [selectedDLCs, setSelectedDLCs] = useState([]);
+    const [availableDLCs, setAvailableDLCs] = useState<Array<CreatorDlcDto>>([]);
+    const [selectedDLCs, setSelectedDLCs] = useState<Array<CreatorDlcDto>>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
@@ -24,8 +29,8 @@ const ListBuilderDLCsEdit = props => {
             const {data: dlcsDto} = await getMods(props.server.type);
             setServer(serverDto);
             setSelectedDLCs(serverDto.activeDLCs);
-            setAvailableDLCs(dlcsDto.creatorDlcs.filter(mod => !serverDto.activeDLCs.find(searchedDlc => searchedDlc.id === mod.id))
-                .sort((a, b) => a.name.localeCompare(b.name)));
+            setAvailableDLCs(dlcsDto.creatorDlcs.filter((mod: CreatorDlcDto) => !serverDto.activeDLCs.find((searchedDlc: CreatorDlcDto) => searchedDlc.id === mod.id))
+                .sort((a: CreatorDlcDto, b: CreatorDlcDto) => a.name.localeCompare(b.name)));
             setIsOpen(true);
         } catch (e) {
             console.error(e);
@@ -34,7 +39,7 @@ const ListBuilderDLCsEdit = props => {
         setIsLoading(false);
     }
 
-    function handleDLCSelect(option) {
+    function handleDLCSelect(option: CreatorDlcDto) {
         setAvailableDLCs((prevState) => {
             return prevState.filter(item => item !== option);
         });
@@ -44,7 +49,7 @@ const ListBuilderDLCsEdit = props => {
         });
     }
 
-    function handleDLCDeselect(option) {
+    function handleDLCDeselect(option: CreatorDlcDto) {
         setSelectedDLCs((prevState) => {
             return prevState.filter(item => item !== option);
         });

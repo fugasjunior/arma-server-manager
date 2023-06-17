@@ -20,7 +20,7 @@ type ModsTableToolbarProps = {
     onUpdateClicked: () => void,
     onCreatePresetClicked: () => void,
     onUninstallClicked: () => void,
-    onFilterChange: () => void,
+    onFilterChange: (_: any, newValue: string) => void,
     onSearchChange: StandardInputProps['onChange']
 }
 

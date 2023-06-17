@@ -3,11 +3,11 @@ import config from "../config";
 
 const apiEndpoint = config.apiUrl + "/server";
 
-export function getServerLogs(id) {
+export function getServerLogs(id: number) {
     return http.get(apiEndpoint + "/" + id + "/log");
 }
 
-export function downloadLogFile(id) {
+export function downloadLogFile(id: number) {
     http.get(apiEndpoint + "/" + id + "/log/download", {responseType: 'blob'})
         .then(response => {
             console.log(response);

@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {ChangeEvent, useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal} from "@mui/material";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getModPresets} from "../../services/modPresetsService";
@@ -7,13 +7,20 @@ import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
 import MemoryIcon from "@mui/icons-material/Memory";
 import {ServerDto} from "../../dtos/ServerDto";
+import {ModDto} from "../../dtos/ModDto.ts";
+import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
+import {ServerWorkshopModDto} from "../../dtos/ServerWorkshopModDto.ts";
 
-const ListBuilderModEdit = props => {
+type ListBuilderModEditProps = {
+    server: ServerDto
+}
+
+const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     const [server, setServer] = useState<ServerDto>();
     const [isOpen, setIsOpen] = useState(false);
-    const [availableMods, setAvailableMods] = useState([]);
-    const [selectedMods, setSelectedMods] = useState([]);
-    const [presets, setPresets] = useState([]);
+    const [availableMods, setAvailableMods] = useState<Array<ServerWorkshopModDto>>([]);
+    const [selectedMods, setSelectedMods] = useState<Array<ServerWorkshopModDto>>([]);
+    const [presets, setPresets] = useState<Array<ModPresetDto>>([]);
     const [selectedPreset, setSelectedPreset] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -29,8 +36,8 @@ const ListBuilderModEdit = props => {
             setPresets(presetsDto.presets);
             setServer(serverDto);
             setSelectedMods(serverDto.activeMods);
-            setAvailableMods(modsDto.workshopMods.filter(mod => !serverDto.activeMods.find(searchedMod => searchedMod.id === mod.id))
-                .sort((a, b) => a.name.localeCompare(b.name)));
+            setAvailableMods(modsDto.workshopMods.filter((mod: ModDto) => !serverDto.activeMods.find((searchedMod: ModDto) => searchedMod.id === mod.id))
+                .sort((a: ModDto, b: ModDto) => a.name.localeCompare(b.name)));
             setSelectedPreset("");
             setIsOpen(true);
         } catch (e) {
@@ -40,7 +47,7 @@ const ListBuilderModEdit = props => {
         setIsLoading(false);
     }
 
-    function handleModSelect(option) {
+    function handleModSelect(option: ModDto) {
         setSelectedPreset("");
 
         setAvailableMods((prevState) => {
@@ -52,7 +59,7 @@ const ListBuilderModEdit = props => {
         });
     }
 
-    function handleModDeselect(option) {
+    function handleModDeselect(option: ModDto) {
         setSelectedPreset("");
 
         setSelectedMods((prevState) => {
@@ -64,7 +71,7 @@ const ListBuilderModEdit = props => {
         });
     }
 
-    function handlePresetChange(e) {
+    function handlePresetChange(e: ChangeEvent<HTMLInputElement>) {
         const presetId = e.target.value;
         const preset = presets.find(preset => preset.id === presetId);
         if (!preset) {

@@ -3,8 +3,8 @@ import {PaletteTree} from './palette';
 
 const ComponentPreviews = () => {
     return (
-            <Previews palette={<PaletteTree/>}>
-            </Previews>
+        <Previews palette={<PaletteTree/>}>
+        </Previews>
     );
 };
 
