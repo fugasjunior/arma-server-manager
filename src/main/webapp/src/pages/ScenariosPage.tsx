@@ -6,7 +6,7 @@ import {Arma3ScenarioDto} from "../dtos/Arma3ScenarioDto.ts";
 
 const ScenariosPage = () => {
     const [scenarios, setScenarios] = useState<Array<Arma3ScenarioDto>>([]);
-    const [selected, setSelected] = useState([]);
+    const [selected, setSelected] = useState<Array<string>>([]);
     const [uploadInProgress, setUploadInProgress] = useState(false);
     const [percentUploaded, setPercentUploaded] = useState(0);
 
@@ -31,6 +31,10 @@ const ScenariosPage = () => {
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
+        if (!e.target.files) {
+            return;
+        }
+
         const file = e.target.files[0];
         try {
             const formData = new FormData();
@@ -40,7 +44,7 @@ const ScenariosPage = () => {
             await uploadScenario(formData, {onUploadProgress: handleProgress});
             await refreshScenarios();
             toast.success("Scenario successfully uploaded");
-        } catch (ex) {
+        } catch (ex: any) {
             console.error(ex);
             toast.error(ex.response.data);
         }

@@ -1,6 +1,6 @@
 import {useFormik} from "formik";
 import {
-    Autocomplete,
+    Autocomplete, AutocompleteValue,
     Box,
     Button,
     FormControlLabel,
@@ -55,7 +55,7 @@ type EditReforgerServerSettingsFormProps = {
 
 export default function EditReforgerServerSettingsForm(props: EditReforgerServerSettingsFormProps) {
 
-    const [scenarios, setScenarios] = useState([]);
+    const [scenarios, setScenarios] = useState<Array<ReforgerScenarioDto>>([]);
 
     useEffect(() => {
         async function fetchScenarios() {
@@ -85,6 +85,21 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
         enableReinitialize: true
     });
 
+    function findSelectedScenario(): ReforgerScenarioDto {
+        const scenario = scenarios.find(scenario => scenario.value === formik.values.scenarioId);
+        if (!scenario) {
+            throw new Error("Selected scenario not found in available scenarios.");
+        }
+        return scenario;
+    }
+
+    function setScenario(value: AutocompleteValue<ReforgerScenarioDto, false, false, false> | null): void {
+        if (!value) {
+            return;
+        }
+        formik.setFieldValue("scenarioId", value.value);
+    }
+
     return (
         <div>
             <form onSubmit={formik.handleSubmit}>
@@ -103,8 +118,8 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
                             options={scenarios}
                             autoHighlight
                             getOptionLabel={(option) => option.value}
-                            value={{value: formik.values.scenarioId}}
-                            onChange={(_, value) => formik.setFieldValue("scenarioId", value.value)}
+                            value={findSelectedScenario()}
+                            onChange={(_, value) => setScenario(value)}
                             renderOption={(props, option) => (
                                 <Box component="li"  {...props}>
                                     {getScenarioDisplayName(option)}

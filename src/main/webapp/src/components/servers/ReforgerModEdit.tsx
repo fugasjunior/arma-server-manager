@@ -41,6 +41,10 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
     const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
 
     async function handleManageModsButtonClick() {
+        if (props.server.id === undefined) {
+            return;
+        }
+
         setIsLoading(true);
         setIsOpen(false);
         try {
@@ -48,7 +52,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
             setServer(serverDto);
             setMods(serverDto.activeMods);
             setIsOpen(true);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not load server data");
         }
@@ -76,11 +80,15 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
     }
 
     async function handleConfirm() {
+        if (props.server.id === undefined) {
+            return;
+        }
+
         setIsOpen(false);
         try {
             await updateServer(props.server.id, {...server, activeMods: mods});
             toast.success("Mods successfully set");
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.data.response || "Failed to update the server");
         }

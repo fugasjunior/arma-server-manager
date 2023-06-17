@@ -2,9 +2,9 @@ import {createContext, useState} from "react";
 import http from "../services/httpService";
 
 interface AuthContextType {
-    token: string,
+    token: string | null,
     isLoggedIn: boolean,
-    login: (token: string, expiresIn?: number) => void,
+    login: (token: string, expiresIn: number) => void,
     logout: () => void,
 }
 
@@ -17,12 +17,11 @@ export const AuthContext = createContext<AuthContextType>({
 );
 export const AuthContextProvider = (props: any) => {
     const tokenData = retrieveStoredToken();
-    let initialToken: string;
+    let initialToken: string | null = null;
     if (tokenData) {
         initialToken = tokenData.storedToken;
     }
-    const [token, setToken] = useState(initialToken);
-    http.setJwt(token);
+    const [token, setToken] = useState<string | null>(initialToken);
 
     const userIsLoggedIn = !!token;
 

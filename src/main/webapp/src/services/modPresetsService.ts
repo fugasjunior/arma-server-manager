@@ -46,7 +46,7 @@ export function downloadExportedPreset(id: string) {
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
-            link.parentNode.removeChild(link);
+            document.body.removeChild(link);
         })
 }
 

@@ -5,5 +5,5 @@ export interface ModDto {
     fileSize: number,
     lastUpdated: Date,
     installationStatus: string,
-    errorStatus: string
+    errorStatus: string | null
 }

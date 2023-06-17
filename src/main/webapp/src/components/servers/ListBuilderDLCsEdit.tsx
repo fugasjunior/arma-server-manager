@@ -22,6 +22,10 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
     const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
 
     async function handleManageDLCsButtonClick() {
+        if (props.server.id === undefined) {
+            return;
+        }
+
         setIsLoading(true);
         setIsOpen(false);
         try {
@@ -32,7 +36,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
             setAvailableDLCs(dlcsDto.creatorDlcs.filter((mod: CreatorDlcDto) => !serverDto.activeDLCs.find((searchedDlc: CreatorDlcDto) => searchedDlc.id === mod.id))
                 .sort((a: CreatorDlcDto, b: CreatorDlcDto) => a.name.localeCompare(b.name)));
             setIsOpen(true);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not load server data");
         }
@@ -60,11 +64,15 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
     }
 
     async function handleConfirm() {
+        if (props.server.id === undefined) {
+            return;
+        }
+
         setIsOpen(false);
         try {
             await updateServer(props.server.id, {...server, activeDLCs: selectedDLCs});
             toast.success("DLCs successfully set");
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.data.response || "Failed to update the server");
         }

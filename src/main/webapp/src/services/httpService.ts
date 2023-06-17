@@ -1,7 +1,7 @@
 import axios from "axios";
 import {toast} from "material-react-toastify";
 
-axios.interceptors.response.use(null, error => {
+axios.interceptors.response.use(undefined, error => {
     const expectedError =
         error.response &&
         error.response.status >= 400 &&

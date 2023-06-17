@@ -33,10 +33,10 @@ import {ServerType} from "../../dtos/ServerDto.ts";
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
     const [presets, setPresets] = useState<Array<ModPresetDto>>([]);
-    const [editedPreset, setEditedPreset] = useState<ModPresetDto>();
+    const [editedPreset, setEditedPreset] = useState<ModPresetDto | null>();
     const [presetModalOpen, setPresetModalOpen] = useState(false);
     const [selectedMods, setSelectedMods] = useState<Array<ModPresetModDto>>([]);
-    const [availableMods, setAvailableMods] = useState<Array<ModPresetModDto>>();
+    const [availableMods, setAvailableMods] = useState<Array<ModPresetModDto>>([]);
     const [isUploadInProgress, setIsUploadInProgress] = useState(false);
 
     useEffect(() => {
@@ -51,12 +51,16 @@ export default function PresetsManagement() {
 
     async function handleDelete(id: string) {
         const deletedPreset = presets.find(preset => preset.id === id);
+        if (!deletedPreset) {
+            return;
+        }
+
         setPresets(prevState => [...prevState].filter(preset => preset !== deletedPreset));
 
         try {
             await deleteModPreset(id);
             toast.success(`Preset '${deletedPreset.name}' successfully deleted`);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not delete preset");
             setPresets(prevState => [...prevState, deletedPreset]);
@@ -94,6 +98,10 @@ export default function PresetsManagement() {
     }
 
     async function handlePresetModalClosed() {
+        if (!editedPreset || editedPreset.id === undefined) {
+            return;
+        }
+
         const request = {
             name: editedPreset.name,
             mods: selectedMods.map(mod => mod.id)
@@ -110,7 +118,7 @@ export default function PresetsManagement() {
                     return [...newState.filter(preset => preset !== oldPreset), savedPreset];
                 });
                 toast.success(`Preset '${savedPreset.name}' successfully updated`);
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e);
                 toast.error(e.response.data || "Could not update preset");
             }
@@ -123,6 +131,7 @@ export default function PresetsManagement() {
     }
 
     function handleModSelect(option: ModPresetModDto) {
+
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
@@ -142,13 +151,17 @@ export default function PresetsManagement() {
     }
 
     async function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files) {
+            return;
+        }
+
         try {
             setIsUploadInProgress(true);
             const {data: importedPreset} = await uploadImportedPreset(e.target.files[0]);
             setPresets(prevState => [...prevState, importedPreset]);
             setIsUploadInProgress(false);
             toast.success(`Preset '${importedPreset.name}' successfully imported`);
-        } catch (e) {
+        } catch (e: any) {
             setIsUploadInProgress(false);
             console.error(e);
             toast.error(e.response.data || "Error during mod import");
@@ -158,7 +171,7 @@ export default function PresetsManagement() {
     function handleDownload(presetId: string) {
         try {
             downloadExportedPreset(presetId);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Error during mod export");
         }
@@ -225,13 +238,13 @@ export default function PresetsManagement() {
                                         </TableCell>
                                         <TableCell>
                                             <IconButton aria-label="export"
-                                                        onClick={() => handleDownload(preset.id)}>
+                                                        onClick={() => handleDownload(preset.id as string)}>
                                                 <DownloadIcon color="primary"/>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
                                             <IconButton aria-label="delete"
-                                                        onClick={() => handleDelete(preset.id)}>
+                                                        onClick={() => handleDelete(preset.id as string)}>
                                                 <DeleteIcon color="error"/>
                                             </IconButton>
                                         </TableCell>

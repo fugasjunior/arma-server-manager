@@ -45,6 +45,10 @@ export default function ModsManagement() {
             const newMods = [...prevState];
             for (const selectedModId of selectedModsIds) {
                 const selectedMod = newMods.find((mod: ModDto) => mod.id === selectedModId);
+                if (!selectedMod) {
+                    continue;
+                }
+
                 selectedMod.installationStatus = "INSTALLATION_IN_PROGRESS";
                 selectedMod.errorStatus = null;
             }
@@ -103,8 +107,8 @@ export default function ModsManagement() {
         return mods.filter(mod => mod.serverType === filter);
     }
 
-    const getSelectedMods = () => {
-        return selectedModsIds.map(id => mods.find(mod => mod.id === id));
+    const getSelectedMods = (): Array<ModDto> => {
+        return mods.filter(mod => selectedModsIds.indexOf(mod.id) !== -1);
     }
     const handlePresedDialogOpen = () => {
         setNewPresetDialogOpen(true);
@@ -116,11 +120,15 @@ export default function ModsManagement() {
 
     const handleCreateNewPreset = async (presetName: string) => {
         setNewPresetDialogOpen(false);
-        const type = mods.find(mod => mod.id === selectedModsIds[0]).serverType;
+        const mod = mods.find(mod => mod.id === selectedModsIds[0]);
+        if (!mod) {
+            return;
+        }
+
         const request = {
             name: presetName,
             mods: selectedModsIds,
-            type
+            type: mod.serverType
         };
         await createModPreset(request);
         toast.success(`Preset '${presetName}' successfully created`);

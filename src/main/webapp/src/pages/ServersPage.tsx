@@ -40,37 +40,34 @@ const ServersPage = () => {
     }
 
     const handleStartServer = async (id: number) => {
-        const newServers = [...servers];
-        const server = newServers.find(s => s.id === id);
-        server.instanceInfo = {
-            ...server.instanceInfo,
-            alive: true
-        }
-        setServers(newServers);
+        updateServerList(id, true);
         await startServer(id);
     };
 
     const handleStopServer = async (id: number) => {
-        const newServers = [...servers];
-        const server = newServers.find(s => s.id === id);
-        server.instanceInfo = {
-            ...server.instanceInfo,
-            alive: false
-        }
-        setServers(newServers);
+        updateServerList(id, false);
         await stopServer(id);
     };
 
     const handleRestartServer = async (id: number) => {
-        const newServers = [...servers];
-        const server = newServers.find(s => s.id === id);
-        server.instanceInfo = {
-            ...server.instanceInfo,
-            alive: true
-        }
-        setServers(newServers);
+        updateServerList(id, false);
         await restartServer(id);
     };
+
+    const updateServerList = (targetServerId: number, isNewServerAlive: boolean): void => {
+        const newServers = [...servers];
+        const server = newServers.find(s => s.id === targetServerId);
+        if (!server) {
+            return;
+        }
+
+        server.instanceInfo = {
+            description: "", map: "", maxPlayers: 0, playersOnline: 0, startedAt: "", version: "",
+            ...server.instanceInfo,
+            alive: isNewServerAlive
+        }
+        setServers(newServers);
+    }
 
     const handleDeleteServerClicked = (server: ServerDto) => {
         setServerToDelete(server);
@@ -78,6 +75,10 @@ const ServersPage = () => {
     }
 
     const handleDeleteServer = async () => {
+        if (!serverToDelete || !serverToDelete.id) {
+            return;
+        }
+
         setServers(prevState => [...prevState].filter(server => server.id !== serverToDelete.id));
         await deleteServer(serverToDelete.id);
         toast.success(`Server '${serverToDelete.name}' successfully deleted`);
@@ -102,7 +103,7 @@ const ServersPage = () => {
     return (
         <>
             <NewServerButton/>
-            {isLogOpen && <ServerLogs onClose={handleCloseLogs} serverId={logServerId}/>}
+            {isLogOpen && logServerId !== undefined && <ServerLogs onClose={handleCloseLogs} serverId={logServerId}/>}
             <TableContainer component={Paper}>
                 <Table>
                     <TableBody>

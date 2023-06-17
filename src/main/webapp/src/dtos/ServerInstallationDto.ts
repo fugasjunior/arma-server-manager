@@ -8,6 +8,6 @@ export interface ServerInstallationDto {
     type: ServerType,
     version: string,
     installationStatus: string,
-    errorStatus: string,
+    errorStatus: string | null,
     lastUpdatedAt: string
 }

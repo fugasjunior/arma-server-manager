@@ -5,6 +5,13 @@ export interface ModPresetDto {
     type: string
 }
 
+export interface ModPresetDto {
+    id?: string,
+    name: string,
+    mods: Array<ModPresetModDto>,
+    type: string
+}
+
 export interface ModPresetRequestDto {
     name: string,
     mods: Array<number>,

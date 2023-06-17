@@ -6,10 +6,11 @@ import Paper from "@mui/material/Paper";
 import config from "../config";
 import TableSkeletons from "../UI/TableSkeletons";
 import CircularProgress from "@mui/material/CircularProgress";
+import {AdditionalServerDto} from "../dtos/AdditionalServerDto.ts";
 
 const AdditionalServersPage = () => {
     const [isLoading, setIsLoading] = useState(true);
-    const [additionalServers, setAdditionalServers] = useState([]);
+    const [additionalServers, setAdditionalServers] = useState<Array<AdditionalServerDto>>([]);
 
     useEffect(() => {
         fetchAdditionalServers();
@@ -30,7 +31,9 @@ const AdditionalServersPage = () => {
         setAdditionalServers(prevState => {
             const newServers = [...prevState];
             const server = newServers.find(server => server.id === id);
-            server.alive = true;
+            if (server) {
+                server.alive = true;
+            }
             return newServers;
         })
     };
@@ -40,55 +43,57 @@ const AdditionalServersPage = () => {
         setAdditionalServers(prevState => {
             const newServers = [...prevState];
             const server = newServers.find(server => server.id === id);
-            server.alive = false;
-            server.startedAt = null;
+            if (server) {
+                server.alive = false;
+                server.startedAt = null;
+            }
             return newServers;
         })
     };
 
     return (
-            <>
-                {!isLoading && additionalServers.length === 0 &&
-                        <div>
-                            <Typography variant="h5" align="center">No additional servers set up</Typography>
-                            <Typography variant="body1" align="center">You can set them up manually through
-                                database</Typography>
-                        </div>
+        <>
+            {!isLoading && additionalServers.length === 0 &&
+                <div>
+                    <Typography variant="h5" align="center">No additional servers set up</Typography>
+                    <Typography variant="body1" align="center">You can set them up manually through
+                        database</Typography>
+                </div>
+            }
+            {!isLoading && additionalServers.length > 0 && <Paper>
+                <TableSkeletons count={8} spacing={6} display={isLoading}/>
+                {!isLoading && <Stack p={3} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
+                    {additionalServers.map(server => (
+                        <Stack key={server.id} direction="row" justifyContent="space-between" width="100%">
+                            <Stack direction="row" spacing={3}>
+                                <Avatar src={server.imageUrl} alt={`${server.name} icon`}/>
+                                <p>{server.name}</p>
+                            </Stack>
+                            {server.startedAt &&
+                                <div>
+                                    Started at: {new Date(server.startedAt).toLocaleString(undefined,
+                                    config.dateFormat)}
+                                </div>
+                            }
+                            {server.startedAt && server.alive &&
+                                <Button variant="contained" color="error"
+                                        onClick={() => handleStop(server.id)}>
+                                    Stop
+                                </Button>}
+                            {!server.startedAt &&
+                                <Button variant="contained" color="primary"
+                                        disabled={!server.startedAt && server.alive}
+                                        onClick={() => handleStart(server.id)}>
+                                    {!server.startedAt && server.alive ?
+                                        <CircularProgress size={24}/> : "Start"}
+                                </Button>}
+                        </Stack>
+                    ))}
+                </Stack>
                 }
-                {!isLoading && additionalServers.length > 0 && <Paper>
-                    <TableSkeletons count={8} spacing={6} display={isLoading}/>
-                    {!isLoading && <Stack p={3} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
-                        {additionalServers.map(server => (
-                                <Stack key={server.id} direction="row" justifyContent="space-between" width="100%">
-                                    <Stack direction="row" spacing={3}>
-                                        <Avatar src={server.imageUrl} alt={`${server.name} icon`}/>
-                                        <p>{server.name}</p>
-                                    </Stack>
-                                    {server.startedAt &&
-                                            <div>
-                                                Started at: {new Date(server.startedAt).toLocaleString(undefined,
-                                                    config.dateFormat)}
-                                            </div>
-                                    }
-                                    {server.startedAt && server.alive &&
-                                            <Button variant="contained" color="error"
-                                                    onClick={() => handleStop(server.id)}>
-                                                Stop
-                                            </Button>}
-                                    {!server.startedAt &&
-                                            <Button variant="contained" color="primary"
-                                                    disabled={!server.startedAt && server.alive}
-                                                    onClick={() => handleStart(server.id)}>
-                                                {!server.startedAt && server.alive ?
-                                                        <CircularProgress size={24}/> : "Start"}
-                                            </Button>}
-                                </Stack>
-                        ))}
-                    </Stack>
-                    }
-                </Paper>
-                }
-            </>
+            </Paper>
+            }
+        </>
     )
 }
 

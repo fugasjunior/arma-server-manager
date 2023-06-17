@@ -1,5 +1,5 @@
-import {ChangeEvent, useState} from "react";
-import {Backdrop, Box, Button, CircularProgress, Modal} from "@mui/material";
+import {useState} from "react";
+import {Backdrop, Box, Button, CircularProgress, Modal, SelectChangeEvent} from "@mui/material";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {getModPresets} from "../../services/modPresetsService";
 import {getServer, updateServer} from "../../services/serversService";
@@ -7,7 +7,6 @@ import {getMods} from "../../services/modsService";
 import {toast} from "material-react-toastify";
 import MemoryIcon from "@mui/icons-material/Memory";
 import {ServerDto} from "../../dtos/ServerDto";
-import {ModDto} from "../../dtos/ModDto.ts";
 import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
 import {ServerWorkshopModDto} from "../../dtos/ServerWorkshopModDto.ts";
 
@@ -27,6 +26,10 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
 
     async function handleManageModsButtonClick() {
+        if (props.server.id === undefined) {
+            return;
+        }
+
         setIsLoading(true);
         setIsOpen(false);
         try {
@@ -36,18 +39,19 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
             setPresets(presetsDto.presets);
             setServer(serverDto);
             setSelectedMods(serverDto.activeMods);
-            setAvailableMods(modsDto.workshopMods.filter((mod: ModDto) => !serverDto.activeMods.find((searchedMod: ModDto) => searchedMod.id === mod.id))
-                .sort((a: ModDto, b: ModDto) => a.name.localeCompare(b.name)));
+            setAvailableMods(modsDto.workshopMods.filter((mod: ServerWorkshopModDto) => !serverDto.activeMods
+                .find((searchedMod: ServerWorkshopModDto) => searchedMod.id === mod.id))
+                .sort((a: ServerWorkshopModDto, b: ServerWorkshopModDto) => a.name.localeCompare(b.name)));
             setSelectedPreset("");
             setIsOpen(true);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not load server data");
         }
         setIsLoading(false);
     }
 
-    function handleModSelect(option: ModDto) {
+    function handleModSelect(option: ServerWorkshopModDto) {
         setSelectedPreset("");
 
         setAvailableMods((prevState) => {
@@ -59,7 +63,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
         });
     }
 
-    function handleModDeselect(option: ModDto) {
+    function handleModDeselect(option: ServerWorkshopModDto) {
         setSelectedPreset("");
 
         setSelectedMods((prevState) => {
@@ -71,7 +75,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
         });
     }
 
-    function handlePresetChange(e: ChangeEvent<HTMLInputElement>) {
+    function handlePresetChange(e: SelectChangeEvent) {
         const presetId = e.target.value;
         const preset = presets.find(preset => preset.id === presetId);
         if (!preset) {
@@ -82,6 +86,9 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
         const newSelectedMods = [];
         for (const mod of preset.mods) {
             const selectedMod = newAvailableMods.find(m => m.id === mod.id);
+            if (!selectedMod) {
+                continue;
+            }
             const index = newAvailableMods.indexOf(selectedMod);
             console.log(mod, selectedMod);
             newSelectedMods.push(selectedMod);
@@ -94,11 +101,15 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     }
 
     async function handleConfirm() {
+        if (props.server.id === undefined) {
+            return;
+        }
+
         setIsOpen(false);
         try {
             await updateServer(props.server.id, {...server, activeMods: selectedMods});
             toast.success("Mods successfully set");
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             toast.error(e.data.response || "Failed to update the server");
         }

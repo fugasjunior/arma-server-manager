@@ -34,6 +34,10 @@ const ServerSettingsPage = () => {
     }
 
     const handleSubmit = async (values: ServerDto) => {
+        if (!server) {
+            return;
+        }
+
         const request = {
             ...server,
             ...values,
@@ -57,7 +61,7 @@ const ServerSettingsPage = () => {
     return (
         <>
             {isLoading && <h2>Loading server data...</h2>}
-            {!isLoading &&
+            {!isLoading && !!server &&
                 <>
                     <Typography variant="h4" mb={2}>Server Settings
                         ({SERVER_NAMES.get(ServerType[server.type as keyof typeof ServerType])})</Typography>

@@ -24,7 +24,7 @@ type ServerLogsProps = {
 
 const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
     const [logs, setLogs] = useState("");
-    const logTextArea = useRef<HTMLTextAreaElement>();
+    const logTextArea = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         fetchLogs();
@@ -33,7 +33,9 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
     async function fetchLogs() {
         const {data: downloadedLogs} = await getServerLogs(serverId);
         setLogs(downloadedLogs);
-        logTextArea.current.scrollTop = logTextArea.current.scrollHeight;
+        if (logTextArea.current) {
+            logTextArea.current.scrollTop = logTextArea.current.scrollHeight;
+        }
     }
 
     async function handleDownloadLogFile() {

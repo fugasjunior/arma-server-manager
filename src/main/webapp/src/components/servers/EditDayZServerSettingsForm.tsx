@@ -214,10 +214,10 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
                         />
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <Button title={props.isServerRunning
-                            && "Stop the server to be able to update the settings."}
-                                fullWidth={!mediaQuery}
-                                color="primary" variant="contained" type="submit" size="large">
+                        <Button
+                            title={props.isServerRunning ? "Stop the server to be able to update the settings." : ""}
+                            fullWidth={!mediaQuery}
+                            color="primary" variant="contained" type="submit" size="large">
                             Submit
                         </Button>
                         <Button color="error" variant="outlined"

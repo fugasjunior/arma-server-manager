@@ -44,7 +44,6 @@
         ]
     },
     "devDependencies": {
-        "@types/fuse": "^2.6.0",
         "@types/lodash": "^4.14.195",
         "@types/react": "^18.2.0",
         "@types/react-dom": "^18.2.0",

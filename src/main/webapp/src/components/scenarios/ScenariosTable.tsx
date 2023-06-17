@@ -17,6 +17,9 @@ import config from "../../config";
 
 function getComparator(order: 'asc' | 'desc', orderBy: string) {
     const sortByCell = headCells.find(cell => cell.id === orderBy);
+    if (!sortByCell) {
+        return;
+    }
 
     if (sortByCell.type === "number" || sortByCell.type === "date") {
         return order === "desc"

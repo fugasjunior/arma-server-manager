@@ -20,7 +20,7 @@ export function downloadScenario(name: string) {
             link.setAttribute('download', name);
             document.body.appendChild(link);
             link.click();
-            link.parentNode.removeChild(link);
+            document.body.removeChild(link);
         })
 }
 

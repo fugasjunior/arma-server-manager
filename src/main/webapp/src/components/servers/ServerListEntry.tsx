@@ -35,6 +35,10 @@ type ServerListEntryProps = {
 
 const ServerListEntry = (props: ServerListEntryProps) => {
     const {server, onStartServer, onStopServer, onRestartServer, onDeleteServer, serverWithSamePortRunning} = props;
+    if (server.id === undefined) {
+        console.log("Server should have ID assigned.");
+        return;
+    }
 
     const serverRunning = server.instanceInfo && server.instanceInfo.alive;
 
@@ -62,16 +66,16 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                             <Button id={`server-${server.id}-stop-btn`}
                                     className="server-stop-btn"
                                     variant="contained" color="error"
-                                    onClick={() => onStopServer(server.id)}>
+                                    onClick={() => onStopServer(server.id as number)}>
                                 Stop
                             </Button>
-                            <Button onClick={() => onRestartServer(server.id)}>Restart
+                            <Button onClick={() => onRestartServer(server.id as number)}>Restart
                             </Button>
                         </>
                         : <Button id={`server-${server.id}-start-btn`}
                                   variant="contained" startIcon={<PlayCircleFilledIcon/>}
                                   disabled={serverWithSamePortRunning}
-                                  onClick={() => onStartServer(server.id)}>
+                                  onClick={() => onStartServer(server.id as number)}>
                             Start
                         </Button>
                     }
@@ -93,12 +97,13 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                 {server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
             </TableCell>
             <TableCell>
-                <Button startIcon={<TextSnippetIcon/>} onClick={() => props.onOpenLogs(server.id)} color="info">
+                <Button startIcon={<TextSnippetIcon/>} onClick={() => props.onOpenLogs(server.id as number)}
+                        color="info">
                     Logs
                 </Button>
             </TableCell>
             <TableCell>
-                {serverRunning && server.instanceInfo.maxPlayers &&
+                {serverRunning && server.instanceInfo &&
                     <List>
                         <ListItem>
                             <ListItemAvatar>
@@ -126,7 +131,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                     <Button id={`server-${server.id}-delete-btn`}
                             className="server-delete-btn"
                             variant="outlined" startIcon={<DeleteIcon/>} color="error"
-                            onClick={() => onDeleteServer(server.id)}>Delete
+                            onClick={() => onDeleteServer(server.id as number)}>Delete
                     </Button>}
             </TableCell>
         </TableRow>

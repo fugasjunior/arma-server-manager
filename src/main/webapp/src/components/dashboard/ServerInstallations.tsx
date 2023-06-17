@@ -3,7 +3,6 @@ import {Grid} from "@mui/material";
 import {useInterval} from "../../hooks/use-interval";
 import {getServerInstallations, installServer} from "../../services/serverInstallationsService";
 import ServerInstallationItem from "./ServerInstallationItem";
-import SERVER_NAMES from "../../util/serverNames";
 import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
 
@@ -19,8 +18,7 @@ const ServerInstallations = () => {
     const fetchServerInstallations = async () => {
         const {data: serverInstallationsDto} = await getServerInstallations();
         const installations = serverInstallationsDto.serverInstallations
-            .sort((a: ServerInstallationDto, b: ServerInstallationDto) => SERVER_NAMES.get(ServerType[a.type])
-                .localeCompare(SERVER_NAMES.get(ServerType[b.type as keyof typeof ServerType])));
+            .sort((a: ServerInstallationDto, b: ServerInstallationDto) => a.type.localeCompare(b.type));
         setServerInstallations(installations);
     };
 
@@ -30,6 +28,10 @@ const ServerInstallations = () => {
         setServerInstallations(prevState => {
             const newState = [...prevState];
             const installation = newState.find(i => i.type === serverType);
+            if (!installation) {
+                return prevState;
+            }
+
             installation.installationStatus = "INSTALLATION_IN_PROGRESS";
             installation.errorStatus = null;
             return newState;

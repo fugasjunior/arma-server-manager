@@ -1,22 +1,19 @@
-import {Button, FormControl, InputLabel, Select, Stack, Typography} from "@mui/material";
+import {Button, FormControl, InputLabel, Select, SelectChangeEvent, Stack, Typography} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
-import {ChangeEvent} from "react";
 
 type ListBuilderHeaderProps = {
     itemsLabel: string,
-    withControls: boolean,
-    confirmDisabled: boolean,
-    selectedPreset: string,
+    withControls?: boolean,
+    confirmDisabled?: boolean,
+    selectedPreset?: string,
     presets?: Array<ModPresetDto>,
-    onPresetChange: (event: ChangeEvent<HTMLInputElement>) => void
-    onConfirm: () => void,
-    onCancel: () => void,
+    onPresetChange?: (event: SelectChangeEvent) => void
+    onConfirm?: () => void,
+    onCancel?: () => void,
 }
 
 export default function ListBuilderHeader(props: ListBuilderHeaderProps) {
-
-    const presetAvailable = !!props.presets && props.presets.length > 0;
 
     return (
         <Stack direction="row" justifyContent="space-between">
@@ -38,7 +35,7 @@ export default function ListBuilderHeader(props: ListBuilderHeaderProps) {
                         <Button color="error" variant="outlined" onClick={props.onCancel}>Cancel</Button>
                     </>
                 }
-                {presetAvailable && <FormControl sx={{m: 1, minWidth: 150}}>
+                {props.presets && <FormControl sx={{m: 1, minWidth: 150}}>
                     <InputLabel id="preset-select-label">Select preset</InputLabel>
                     <Select
                         labelId="preset-select-label"

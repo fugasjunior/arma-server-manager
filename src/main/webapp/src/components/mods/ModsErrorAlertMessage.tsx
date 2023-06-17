@@ -8,10 +8,13 @@ type ModsErrorAlertMessageProps = {
 }
 
 const ModsErrorAlertMessage = ({mods}: ModsErrorAlertMessageProps) => {
-    const onlyUnique = (value: string, index: number, self: Array<string>) => self.indexOf(value) === index;
+    const onlyUnique = (value: string | null, index: number, self: Array<string | null>) => {
+        return value !== null && self.indexOf(value) === index;
+    }
 
     const errors = mods.filter(mod => mod.installationStatus === "ERROR")
-        .map(mod => mod.errorStatus).filter(onlyUnique);
+        .map(mod => mod.errorStatus)
+        .filter(onlyUnique);
 
     return (
         <Alert severity="error" sx={{mb: 2}}>
