@@ -15,11 +15,7 @@ export interface ServerDto {
     password: string,
     adminPassword: string,
     maxPlayers: number
-    instanceInfo?: ServerInstanceInfo
-}
-
-export interface ServerInstanceInfo {
-    alive: boolean
+    instanceInfo?: ServerInstanceInfoDto
 }
 
 export interface Arma3ServerDto extends ServerDto {
