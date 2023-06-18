@@ -2,6 +2,7 @@ import {FormikState} from "formik";
 import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
 import {FormikHandlers} from "formik/dist/types";
 import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@mui/material";
+import {getValueByKeyPath} from "../../../util/formUtils.ts";
 
 type ThreeStateFlagFieldProps = {
     id: string,
@@ -13,6 +14,8 @@ type ThreeStateFlagFieldProps = {
 };
 
 export const ThreeStateFlagField = ({id, label, onLabel, middleLabel, offLabel, formik}: ThreeStateFlagFieldProps) => {
+    const value = (getValueByKeyPath(formik.values, id) || 0) as 0 | 1 | 2;
+
     return <FormGroup>
         <FormControl>
             <FormLabel>{label}</FormLabel>
@@ -21,7 +24,7 @@ export const ThreeStateFlagField = ({id, label, onLabel, middleLabel, offLabel, 
                 id={id}
                 name={id}
                 onChange={formik.handleChange}
-                value={formik.values['difficultySettings' + id as keyof Arma3ServerDto]}
+                value={value}
             >
                 <FormControlLabel value="2" control={<Radio/>} label={onLabel}/>
                 <FormControlLabel value="1" control={<Radio/>} label={middleLabel}/>

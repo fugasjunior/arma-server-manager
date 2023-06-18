@@ -12,11 +12,50 @@ import {
     Slider,
     Typography
 } from "@mui/material";
-import SchoolIcon from "@mui/icons-material/School";
-import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
+import {ReactNode} from "react";
+import {LocationSearching} from "@mui/icons-material";
+import {getValueByKeyPath} from "../../../util/formUtils.ts";
 
 type Arma3AiSkillSettingsProps = {
     formik: FormikState<Arma3ServerDto> & FormikHandlers
+}
+
+type SliderFieldProps = {
+    id: string,
+    label: string,
+    min: number,
+    max: number,
+    step: number
+    icon?: ReactNode
+    formik: FormikState<Arma3ServerDto> & FormikHandlers
+}
+
+function SliderField({id, label, min, max, step, icon, formik}: SliderFieldProps) {
+    const value = (getValueByKeyPath(formik.values, id) || 0) as number;
+
+    return <>
+        <Typography gutterBottom>
+            {label}
+        </Typography>
+        <Grid container spacing={2} alignItems="center">
+            {icon && <Grid item>
+                {icon}
+            </Grid>}
+            <Grid item xs>
+                <Slider
+                    aria-label={label}
+                    id={id}
+                    name={id}
+                    value={value}
+                    valueLabelDisplay="auto"
+                    onChange={formik.handleChange}
+                    step={step}
+                    min={min}
+                    max={max}
+                />
+            </Grid>
+        </Grid>
+    </>;
 }
 
 export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
@@ -38,47 +77,9 @@ export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
                 </RadioGroup>
             </FormControl>
         </FormGroup>
-        <Typography gutterBottom>
-            AI skill
-        </Typography>
-        <Grid container spacing={2} alignItems="center">
-            <Grid item>
-                <SchoolIcon/>
-            </Grid>
-            <Grid item xs>
-                <Slider
-                    aria-label="AI skill"
-                    id="difficultySettings.skillAI"
-                    name="difficultySettings.skillAI"
-                    value={formik.values.difficultySettings.skillAI}
-                    valueLabelDisplay="auto"
-                    onChange={formik.handleChange}
-                    step={0.05}
-                    min={0}
-                    max={1}
-                />
-            </Grid>
-        </Grid>
-        <Typography gutterBottom>
-            AI precision
-        </Typography>
-        <Grid container spacing={2} alignItems="center">
-            <Grid item>
-                <LocationSearchingIcon/>
-            </Grid>
-            <Grid item xs>
-                <Slider
-                    aria-label="AI precision"
-                    id="difficultySettings.precisionAI"
-                    name="difficultySettings.precisionAI"
-                    value={formik.values.difficultySettings.precisionAI}
-                    valueLabelDisplay="auto"
-                    onChange={formik.handleChange}
-                    step={0.05}
-                    min={0}
-                    max={1}
-                />
-            </Grid>
-        </Grid>
+        <SliderField id='difficultySettings.skillAI' label='AI skill' min={0} max={1} step={0.05}
+                     icon={<LocationSearching/>} formik={formik}/>
+        <SliderField id='difficultySettings.precisionAI' label='AI precision' min={0} max={1} step={0.05}
+                     icon={<LocationSearching/>} formik={formik}/>
     </>;
 }

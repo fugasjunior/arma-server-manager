@@ -17,78 +17,78 @@ import {ThreeStateFlagField} from "./ThreeStateFlagField.tsx";
 import {Arma3AiSkillSettings} from "./Arma3AiSkillSettings.tsx";
 
 const booleanFields = [
-    {id: 'reducedDamage', label: 'Reduced damage'},
-    {id: 'tacticalPing', label: 'Tactical ping'},
-    {id: 'staminaBar', label: 'Stamina bar'},
-    {id: 'weaponCrosshair', label: 'Weapon crosshair'},
-    {id: 'visionAid', label: 'Vision aid'},
-    {id: 'scoreTable', label: 'Score table'},
-    {id: 'deathMessages', label: 'Killed by'},
-    {id: 'vonID', label: 'VON ID'},
-    {id: 'mapContent', label: 'Extended map content'},
-    {id: 'autoReport', label: 'Auto report'},
-    {id: 'cameraShake', label: 'Camera shake'}
+    {id: 'difficultySettings.reducedDamage', label: 'Reduced damage'},
+    {id: 'difficultySettings.tacticalPing', label: 'Tactical ping'},
+    {id: 'difficultySettings.staminaBar', label: 'Stamina bar'},
+    {id: 'difficultySettings.weaponCrosshair', label: 'Weapon crosshair'},
+    {id: 'difficultySettings.visionAid', label: 'Vision aid'},
+    {id: 'difficultySettings.scoreTable', label: 'Score table'},
+    {id: 'difficultySettings.deathMessages', label: 'Killed by'},
+    {id: 'difficultySettings.vonID', label: 'VON ID'},
+    {id: 'difficultySettings.mapContent', label: 'Extended map content'},
+    {id: 'difficultySettings.autoReport', label: 'Auto report'},
+    {id: 'difficultySettings.cameraShake', label: 'Camera shake'}
 ];
 
 const threeStateFlagFields = [
     {
-        id: 'groupIndicators',
+        id: 'difficultySettings.groupIndicators',
         label: 'Group indicators',
         onLabel: 'Always',
         middleLabel: 'Limited distance',
         offLabel: 'Never'
     },
     {
-        id: 'friendlyTags',
+        id: 'difficultySettings.friendlyTags',
         label: 'Friendly tags',
         onLabel: 'Always',
         middleLabel: 'Limited distance',
         offLabel: 'Never'
     },
     {
-        id: 'enemyTags',
+        id: 'difficultySettings.enemyTags',
         label: 'Enemy tags',
         onLabel: 'Always',
         middleLabel: 'Limited distance',
         offLabel: 'Never'
     },
     {
-        id: 'detectedMines',
+        id: 'difficultySettings.detectedMines',
         label: 'Detected mines',
         onLabel: 'Always',
         middleLabel: 'Limited distance',
         offLabel: 'Never'
     },
     {
-        id: 'commands',
+        id: 'difficultySettings.commands',
         label: 'Commands',
         onLabel: 'Always',
         middleLabel: 'Fade out',
         offLabel: 'Never'
     },
     {
-        id: 'waypoints',
+        id: 'difficultySettings.waypoints',
         label: 'Waypoints',
         onLabel: 'Always',
         middleLabel: 'Fade out',
         offLabel: 'Never'
     },
     {
-        id: 'weaponInfo',
+        id: 'difficultySettings.weaponInfo',
         label: 'Weapon info',
         onLabel: 'Always',
         middleLabel: 'Fade out',
         offLabel: 'Never'
     },
     {
-        id: 'stanceIndicator',
+        id: 'difficultySettings.stanceIndicator',
         label: 'Stance indicator',
         onLabel: 'Always',
         middleLabel: 'Fade out',
         offLabel: 'Never'
     },
     {
-        id: 'thirdPersonView',
+        id: 'difficultySettings.thirdPersonView',
         label: 'Third person view',
         onLabel: 'Enabled',
         middleLabel: 'Vehicles only',
@@ -103,7 +103,7 @@ type Arma3DifficultySettingsFormProps = {
 function renderSwitchField(id: string, label: string, formik: FormikState<Arma3ServerDto> & FormikHandlers) {
     return <FormControlLabel
         control={
-            <Switch checked={formik.values['difficultySettings' + id as keyof Arma3ServerDto] as boolean}
+            <Switch checked={formik.values[id as keyof Arma3ServerDto] as boolean}
                     onChange={formik.handleChange}
                     name={id}
                     id={id}/>
@@ -133,13 +133,13 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps)
                 </Grid>
                 <Grid item xs={12} md={4}>
                     {threeStateFlagFields.map((field, index) =>
-                        index < 4 && <ThreeStateFlagField {...field} formik={formik}/>
+                        index < 4 && <ThreeStateFlagField key={field.id} {...field} formik={formik}/>
                     )}
                     <Arma3AiSkillSettings formik={formik}/>
                 </Grid>
                 <Grid item xs={12} md={4}>
                     {threeStateFlagFields.map((field, index) =>
-                        index >= 4 && <ThreeStateFlagField {...field} formik={formik}/>
+                        index >= 4 && <ThreeStateFlagField key={field.id} {...field} formik={formik}/>
                     )}
                 </Grid>
             </Grid>
