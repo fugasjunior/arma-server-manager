@@ -1,7 +1,8 @@
 import {useFormik} from "formik";
-import {Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
+import {Button, FormGroup, Grid, useMediaQuery} from "@mui/material";
 import {DayZServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
+import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
 type EditDayZServerSettingsFormProps = {
     server: DayZServerDto,
@@ -27,129 +28,19 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
         <div>
             <form onSubmit={formik.handleSubmit}>
                 <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="name"
-                            name="name"
-                            label="Server name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="description"
-                            name="description"
-                            label="Description"
-                            value={formik.values.description}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="port"
-                            name="port"
-                            label="Port"
-                            type="number"
-                            value={formik.values.port}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="queryPort"
-                            name="queryPort"
-                            label="Query Port"
-                            type="number"
-                            value={formik.values.queryPort}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="maxPlayers"
-                            name="maxPlayers"
-                            label="Max players"
-                            type="number"
-                            value={formik.values.maxPlayers}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="password"
-                            name="password"
-                            label="Server password"
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="adminPassword"
-                            name="adminPassword"
-                            label="Admin password"
-                            value={formik.values.adminPassword}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="respawnTime"
-                            name="respawnTime"
-                            label="Respawn time"
-                            type="number"
-                            inputProps={{
-                                min: "0"
-                            }}
-                            value={formik.values.respawnTime}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="timeAcceleration"
-                            name="timeAcceleration"
-                            label="Time acceleration"
-                            type="number"
-                            inputProps={{
-                                step: "0.1",
-                                min: "0.1",
-                                max: "64"
-                            }}
-                            value={formik.values.timeAcceleration}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="nightTimeAcceleration"
-                            name="nightTimeAcceleration"
-                            label="Night time acceleration"
-                            type="number"
-                            inputProps={{
-                                step: "0.1",
-                                min: "0.1",
-                                max: "64"
-                            }}
-                            value={formik.values.nightTimeAcceleration}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
+                    <CustomTextField id='name' label='Server name' required formik={formik}/>
+                    <CustomTextField id='description' label='Description' formik={formik}/>
+                    <CustomTextField id='port' label='Port' required type='number' formik={formik}/>
+                    <CustomTextField id='queryPort' label='Query port' required type='number' formik={formik}/>
+                    <CustomTextField id='maxPlayers' label='Max players' required type='number' formik={formik}/>
+                    <CustomTextField id='password' label='Server password' formik={formik}/>
+                    <CustomTextField id='adminPassword' label='Admin password' formik={formik}/>
+                    <CustomTextField id='respawnTime' label='Respawn time (seconds)' type='number'
+                                     formik={formik} inputProps={{min: "0"}}/>
+                    <CustomTextField id='timeAcceleration' label='Time acceleration' type='number'
+                                     formik={formik} inputProps={{step: "0.1", min: "0.1", max: "64"}}/>
+                    <CustomTextField id='nightTimeAcceleration' label='Night time acceleration' type='number'
+                                     formik={formik} inputProps={{step: "0.1", min: "0.1", max: "64"}}/>
                     <Grid item xs={6}>
                         <FormGroup>
                             <SwitchField id='vonEnabled' label='VON enabled' formik={formik}/>
@@ -164,17 +55,8 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
                             <SwitchField id='crosshairEnabled' label='Crosshair enabled' formik={formik}/>
                         </FormGroup>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            id="additionalOptions"
-                            name="additionalOptions"
-                            label="Additional options"
-                            multiline
-                            value={formik.values.additionalOptions}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
+                    <CustomTextField id='additionalOptions' label='Additional options' multiline
+                                     formik={formik} containerMd={12}/>
                     <Grid item xs={12} md={6}>
                         <Button
                             title={props.isServerRunning ? "Stop the server to be able to update the settings." : ""}
