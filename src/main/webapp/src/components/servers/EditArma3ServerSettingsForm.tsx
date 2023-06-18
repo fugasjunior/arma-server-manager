@@ -1,9 +1,10 @@
 import {useFormik} from "formik";
-import {Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
+import {FormGroup, Grid} from "@mui/material";
 import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
 import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
+import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
 
 type EditArma3ServerSettingsFormProps = {
     server: Arma3ServerDto,
@@ -24,7 +25,6 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
         enableReinitialize: true
     });
 
-    const mediaQuery = useMediaQuery('(min-width:600px)');
 
     return (
         <div>
@@ -57,20 +57,7 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                         <Arma3DifficultySettingsForm formik={formik}/>
                     </Grid>
 
-                    <Grid item xs={12} md={6}>
-                        <Button id="submit-btn"
-                                title={props.isServerRunning ? "Stop the server to be able to update the settings."
-                                    : ""}
-                                fullWidth={!mediaQuery}
-                                color="primary" variant="contained" type="submit" size="large">
-                            Submit
-                        </Button>
-                        <Button id="cancel-btn" color="error" variant="outlined"
-                                fullWidth={!mediaQuery} sx={mediaQuery ? {ml: 1} : {mt: 1}}
-                                onClick={props.onCancel}>
-                            Cancel
-                        </Button>
-                    </Grid>
+                    <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
                 </Grid>
             </form>
         </div>

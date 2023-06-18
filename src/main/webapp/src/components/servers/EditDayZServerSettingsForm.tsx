@@ -1,8 +1,9 @@
 import {useFormik} from "formik";
-import {Button, FormGroup, Grid, useMediaQuery} from "@mui/material";
+import {FormGroup, Grid} from "@mui/material";
 import {DayZServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
+import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
 
 type EditDayZServerSettingsFormProps = {
     server: DayZServerDto,
@@ -23,7 +24,6 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
         validateOnChange: false,
     });
 
-    const mediaQuery = useMediaQuery('(min-width:600px)');
     return (
         <div>
             <form onSubmit={formik.handleSubmit}>
@@ -57,19 +57,8 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
                     </Grid>
                     <CustomTextField id='additionalOptions' label='Additional options' multiline
                                      formik={formik} containerMd={12}/>
-                    <Grid item xs={12} md={6}>
-                        <Button
-                            title={props.isServerRunning ? "Stop the server to be able to update the settings." : ""}
-                            fullWidth={!mediaQuery}
-                            color="primary" variant="contained" type="submit" size="large">
-                            Submit
-                        </Button>
-                        <Button color="error" variant="outlined"
-                                fullWidth={!mediaQuery} sx={mediaQuery ? {ml: 1} : {mt: 1}}
-                                onClick={props.onCancel}>
-                            Cancel
-                        </Button>
-                    </Grid>
+
+                    <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
                 </Grid>
             </form>
         </div>
