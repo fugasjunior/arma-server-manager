@@ -17,11 +17,38 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import SchoolIcon from '@mui/icons-material/School';
-import {FormikProps} from "formik";
+import {FormikProps, FormikState} from "formik";
 import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
+import {FormikHandlers} from "formik/dist/types";
+
+const difficultySettingsBooleanFields = [
+    {id: 'difficultySettings.reducedDamage', label: 'Reduced damage'},
+    {id: 'difficultySettings.tacticalPing', label: 'Tactical ping'},
+    {id: 'difficultySettings.staminaBar', label: 'Stamina bar'},
+    {id: 'difficultySettings.weaponCrosshair', label: 'Weapon crosshair'},
+    {id: 'difficultySettings.visionAid', label: 'Vision aid'},
+    {id: 'difficultySettings.scoreTable', label: 'Score table'},
+    {id: 'difficultySettings.deathMessages', label: 'Killed by'},
+    {id: 'difficultySettings.vonID', label: 'VON ID'},
+    {id: 'difficultySettings.mapContent', label: 'Extended map content'},
+    {id: 'difficultySettings.autoReport', label: 'Auto report'},
+    {id: 'difficultySettings.cameraShake', label: 'Camera shake'}
+];
 
 type Arma3DifficultySettingsFormProps = {
     formik: FormikProps<Arma3ServerDto>
+}
+
+function renderSwitchField(id: string, label: string, formik: FormikState<Arma3ServerDto> & FormikHandlers) {
+    return <FormControlLabel
+        control={
+            <Switch checked={formik.values[id as keyof Arma3ServerDto] as boolean}
+                    onChange={formik.handleChange}
+                    name={id}
+                    id={id}/>
+        }
+        label={label}
+    />;
 }
 
 const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps) => {
@@ -37,98 +64,9 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps)
             <Grid container>
                 <Grid item xs={12} md={4}>
                     <FormGroup>
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.reducedDamage}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.reducedDamage"
-                                        id="difficultySettings.reducedDamage"/>
-                            }
-                            label="Reduced damage"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.staminaBar}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.staminaBar" id="difficultySettings.staminaBar"/>
-                            }
-                            label="Stamina bar"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.weaponCrosshair}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.weaponCrosshair"
-                                        id="difficultySettings.weaponCrosshair"/>
-                            }
-                            label="Crosshair"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.visionAid}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.visionAid" id="difficultySettings.visionAid"/>
-                            }
-                            label="Vision aid"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.cameraShake}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.cameraShake" id="difficultySettings.cameraShake"/>
-                            }
-                            label="Camera shake"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.scoreTable}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.scoreTable" id="difficultySettings.scoreTable"/>
-                            }
-                            label="Score table"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.deathMessages}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.deathMessages"
-                                        id="difficultySettings.deathMessages"/>
-                            }
-                            label="Killed By"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.vonID}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.vonID" id="difficultySettings.vonID"/>
-                            }
-                            label="VON ID"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.tacticalPing}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.tacticalPing"
-                                        id="difficultySettings.tacticalPing"/>
-                            }
-                            label="Tactical ping"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.mapContent}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.mapContent" id="difficultySettings.mapContent"/>
-                            }
-                            label="Extended map content"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Switch checked={formik.values.difficultySettings.autoReport}
-                                        onChange={formik.handleChange}
-                                        name="difficultySettings.autoReport" id="difficultySettings.autoReport"/>
-                            }
-                            label="Automatic reporting"
-                        />
+                        {difficultySettingsBooleanFields.map(booleanField =>
+                            renderSwitchField(booleanField.id, booleanField.label, formik)
+                        )}
                     </FormGroup>
                 </Grid>
                 <Grid item xs={12} md={4}>
