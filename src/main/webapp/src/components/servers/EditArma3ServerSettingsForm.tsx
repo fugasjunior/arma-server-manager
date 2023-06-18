@@ -3,6 +3,7 @@ import {Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
 import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
 import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
+import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
 type EditArma3ServerSettingsFormProps = {
     server: Arma3ServerDto,
@@ -29,71 +30,12 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
         <div>
             <form onSubmit={formik.handleSubmit}>
                 <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="name"
-                            name="name"
-                            label="Server name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="description"
-                            name="description"
-                            label="Description"
-                            value={formik.values.description}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="port"
-                            name="port"
-                            label="Port"
-                            type="number"
-                            value={formik.values.port}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            id="maxPlayers"
-                            name="maxPlayers"
-                            label="Max players"
-                            type="number"
-                            value={formik.values.maxPlayers}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="password"
-                            name="password"
-                            label="Server password"
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            id="adminPassword"
-                            name="adminPassword"
-                            label="Admin password"
-                            value={formik.values.adminPassword}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
+                    <CustomTextField id='name' label='Server name' required formik={formik}/>
+                    <CustomTextField id='description' label='Description' formik={formik}/>
+                    <CustomTextField id='port' label='Port' required type='number' formik={formik}/>
+                    <CustomTextField id='maxPlayers' label='Max players' required type='number' formik={formik}/>
+                    <CustomTextField id='password' label='Server password' formik={formik}/>
+                    <CustomTextField id='adminPassword' label='Admin password' formik={formik}/>
                     <Grid item xs={6}>
                         <FormGroup>
                             <SwitchField id='clientFilePatching' label='Client file patching' formik={formik}/>
@@ -108,17 +50,8 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                             <SwitchField id='persistent' label='Persistent' formik={formik}/>
                         </FormGroup>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            id="additionalOptions"
-                            name="additionalOptions"
-                            label="Additional options"
-                            multiline
-                            value={formik.values.additionalOptions}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
+                    <CustomTextField id='additionalOptions' label='Additional options' multiline
+                                     formik={formik} containerMd={12}/>
 
                     <Grid item xs={12}>
                         <Arma3DifficultySettingsForm formik={formik}/>
