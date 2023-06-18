@@ -12,6 +12,7 @@
         "axios": "^0.27.2",
         "font-awesome": "^4.7.0",
         "formik": "^2.2.9",
+        "fuse.js": "^6.6.2",
         "jwt-decode": "^3.1.2",
         "lodash": "^4.17.21",
         "material-react-toastify": "1.0.3",
