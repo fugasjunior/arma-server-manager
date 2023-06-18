@@ -1,7 +1,6 @@
 import {useFormik} from "formik";
 import {
-    Autocomplete, AutocompleteValue,
-    Box,
+    AutocompleteValue,
     Button,
     FormControlLabel,
     FormGroup,
@@ -10,10 +9,9 @@ import {
     TextField,
     useMediaQuery
 } from "@mui/material";
-import {useEffect, useState} from "react";
-import {getReforgerScenarios} from "../../services/scenarioService";
 import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
 import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
+import {ReforgerScenariosAutocomplete} from "./ReforgerScenariosAutocomplete.tsx";
 
 function renderTextField(name: string, label: string, formik: any, required?: boolean, type?: string, helperText?: string) {
     return (
@@ -55,26 +53,8 @@ type EditReforgerServerSettingsFormProps = {
 
 export default function EditReforgerServerSettingsForm(props: EditReforgerServerSettingsFormProps) {
 
-    const [scenarios, setScenarios] = useState<Array<ReforgerScenarioDto>>([]);
-
-    useEffect(() => {
-        async function fetchScenarios() {
-            const {data: scenariosDto} = await getReforgerScenarios();
-            setScenarios(scenariosDto.scenarios);
-        }
-
-        fetchScenarios();
-    }, []);
-
     function handleSubmit(values: ReforgerServerDto) {
         props.onSubmit(values);
-    }
-
-    function getScenarioDisplayName(scenario: ReforgerScenarioDto) {
-        if (scenario.name) {
-            return `${scenario.name} (${scenario.value})`;
-        }
-        return scenario.value;
     }
 
     const mediaQuery = useMediaQuery('(min-width:600px)');
@@ -85,20 +65,12 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
         enableReinitialize: true
     });
 
-    function findSelectedScenario(): ReforgerScenarioDto {
-        const scenario = scenarios.find(scenario => scenario.value === formik.values.scenarioId);
-        if (!scenario) {
-            throw new Error("Selected scenario not found in available scenarios.");
-        }
-        return scenario;
-    }
-
-    function setScenario(value: AutocompleteValue<ReforgerScenarioDto, false, false, false> | null): void {
+    const setScenario = (_: any, value: AutocompleteValue<ReforgerScenarioDto, false, false, false> | null): void => {
         if (!value) {
             return;
         }
         formik.setFieldValue("scenarioId", value.value);
-    }
+    };
 
     return (
         <div>
@@ -112,36 +84,7 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
                         "Leave empty to generate a new ID automatically")}
 
                     <Grid item xs={12} md={6}>
-                        <Autocomplete
-                            id="scenario-select"
-                            fullWidth
-                            options={scenarios}
-                            autoHighlight
-                            getOptionLabel={(option) => option.value}
-                            value={findSelectedScenario()}
-                            onChange={(_, value) => setScenario(value)}
-                            renderOption={(props, option) => (
-                                <Box component="li"  {...props}>
-                                    {getScenarioDisplayName(option)}
-                                </Box>
-                            )}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    required
-                                    id="scenarioId"
-                                    name="scenarioId"
-                                    label="Scenario ID"
-                                    value={formik.values.scenarioId}
-                                    error={formik.touched.scenarioId && Boolean(
-                                        formik.errors.scenarioId)}
-                                    inputProps={{
-                                        ...params.inputProps,
-                                        autoComplete: 'new-password'
-                                    }}
-                                />
-                            )}
-                        />
+                        <ReforgerScenariosAutocomplete onChange={setScenario} formik={formik}/>
                     </Grid>
 
                     {renderTextField("maxPlayers", "Max players", formik, true, "number")}
