@@ -1,7 +1,7 @@
 import {FormikState} from "formik";
 import {FormikHandlers} from "formik/dist/types";
 import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@mui/material";
-import {getValueByKeyPath} from "../../../util/formUtils.ts";
+import {getValueByKeyPath} from "../../util/formUtils.ts";
 
 type ThreeStateFlagFieldProps<T> = {
     id: string,

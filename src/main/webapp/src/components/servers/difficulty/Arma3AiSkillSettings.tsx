@@ -3,7 +3,7 @@ import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
 import {FormikHandlers} from "formik/dist/types";
 import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@mui/material";
 import {LocationSearching} from "@mui/icons-material";
-import {SliderField} from "./SliderField.tsx";
+import {SliderField} from "../../../UI/Form/SliderField.tsx";
 
 type Arma3AiSkillSettingsProps = {
     formik: FormikState<Arma3ServerDto> & FormikHandlers

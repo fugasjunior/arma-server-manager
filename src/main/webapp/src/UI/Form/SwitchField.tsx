@@ -1,6 +1,6 @@
 import {FormikState} from "formik";
 import {FormikHandlers} from "formik/dist/types";
-import {getValueByKeyPath} from "../../../util/formUtils.ts";
+import {getValueByKeyPath} from "../../util/formUtils.ts";
 import {FormControlLabel, Switch} from "@mui/material";
 
 type SwitchFieldProps<T> = {

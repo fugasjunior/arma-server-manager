@@ -1,7 +1,7 @@
 import {ReactNode} from "react";
 import {FormikState} from "formik";
 import {FormikHandlers} from "formik/dist/types";
-import {getValueByKeyPath} from "../../../util/formUtils.ts";
+import {getValueByKeyPath} from "../../util/formUtils.ts";
 import {Grid, Slider, Typography} from "@mui/material";
 
 type SliderFieldProps<T> = {
