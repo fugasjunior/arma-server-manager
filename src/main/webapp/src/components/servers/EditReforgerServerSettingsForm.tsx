@@ -1,28 +1,10 @@
 import {useFormik} from "formik";
-import {AutocompleteValue, Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
+import {AutocompleteValue, Button, FormGroup, Grid, useMediaQuery} from "@mui/material";
 import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
 import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
 import {ReforgerScenariosAutocomplete} from "./ReforgerScenariosAutocomplete.tsx";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
-
-function renderTextField(name: string, label: string, formik: any, required?: boolean, type?: string, helperText?: string) {
-    return (
-        <Grid item xs={12} md={6}>
-            <TextField
-                fullWidth
-                required={required}
-                id={name}
-                name={name}
-                label={label}
-                type={type ?? "text"}
-                value={formik.values[name]}
-                onChange={formik.handleChange}
-                helperText={helperText}
-                inputProps={{autoComplete: 'new-password'}}
-            />
-        </Grid>
-    )
-}
+import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
 type EditReforgerServerSettingsFormProps = {
     server: ReforgerServerDto,
@@ -56,20 +38,18 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
         <div>
             <form onSubmit={formik.handleSubmit}>
                 <Grid container spacing={3}>
-                    {renderTextField("name", "Server name", formik, true)}
-                    {renderTextField("description", "Description", formik)}
-                    {renderTextField("port", "Port", formik, true, "number")}
-                    {renderTextField("queryPort", "Query port", formik, true, "number")}
-                    {renderTextField("dedicatedServerId", "Dedicated server ID", formik, false, "text",
-                        "Leave empty to generate a new ID automatically")}
-
+                    <CustomTextField id='name' label='Server name' required formik={formik}/>
+                    <CustomTextField id='description' label='Description' formik={formik}/>
+                    <CustomTextField id='port' label='Port' type='number' formik={formik}/>
+                    <CustomTextField id='queryPort' label='Query port' type='number' formik={formik}/>
+                    <CustomTextField id='dedicatedServerId' label='Dedicated server ID' type='number' formik={formik}
+                                     helperText='Leave empty to generate a new ID automatically'/>
                     <Grid item xs={12} md={6}>
                         <ReforgerScenariosAutocomplete onChange={setScenario} formik={formik}/>
                     </Grid>
-
-                    {renderTextField("maxPlayers", "Max players", formik, true, "number")}
-                    {renderTextField("password", "Password", formik)}
-                    {renderTextField("adminPassword", "Admin password", formik, true)}
+                    <CustomTextField id='maxPlayers' label='Max players' required type='number' formik={formik}/>
+                    <CustomTextField id='password' label='Password' formik={formik}/>
+                    <CustomTextField id='adminPassword' label='Admin password' required formik={formik}/>
                     <Grid item xs={12}>
                         <FormGroup>
                             <SwitchField id='battlEye' label='BattlEye enabled' formik={formik}/>
