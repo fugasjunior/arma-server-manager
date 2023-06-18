@@ -1,6 +1,7 @@
 import {useFormik} from "formik";
-import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
+import {Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
 import {DayZServerDto} from "../../dtos/ServerDto.ts";
+import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 
 type EditDayZServerSettingsFormProps = {
     server: DayZServerDto,
@@ -151,55 +152,16 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
                     </Grid>
                     <Grid item xs={6}>
                         <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.vonEnabled} onChange={formik.handleChange}
-                                            name="vonEnabled" id="vonEnabled"/>
-                                }
-                                label="VON enabled"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.persistent} onChange={formik.handleChange}
-                                            name="persistent" id="persistent"/>
-                                }
-                                label="Persistent server time"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.clientFilePatching}
-                                            onChange={formik.handleChange}
-                                            name="clientFilePatching" id="clientFilePatching"/>
-                                }
-                                label="Client file patching"
-                            />
+                            <SwitchField id='vonEnabled' label='VON enabled' formik={formik}/>
+                            <SwitchField id='persistent' label='Persistent server time' formik={formik}/>
+                            <SwitchField id='clientFilePatching' label='Client file patching' formik={formik}/>
                         </FormGroup>
                     </Grid>
                     <Grid item xs={6}>
                         <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.forceSameBuild}
-                                            onChange={formik.handleChange}
-                                            name="forceSameBuild" id="forceSameBuild"/>
-                                }
-                                label="Force same build"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.thirdPersonViewEnabled}
-                                            onChange={formik.handleChange}
-                                            name="thirdPersonViewEnabled" id="thirdPersonViewEnabled"/>
-                                }
-                                label="Third person view enabled"
-                            />
-                            <FormControlLabel control={
-                                <Switch checked={formik.values.crosshairEnabled}
-                                        onChange={formik.handleChange}
-                                        name="crosshairEnabled" id="crosshairEnabled"/>
-                            }
-                                              label="Crosshair enabled"
-                            />
+                            <SwitchField id='forceSameBuild' label='Force same build' formik={formik}/>
+                            <SwitchField id='thirdPersonViewEnabled' label='Third person view enabled' formik={formik}/>
+                            <SwitchField id='crosshairEnabled' label='Crosshair enabled' formik={formik}/>
                         </FormGroup>
                     </Grid>
                     <Grid item xs={12}>

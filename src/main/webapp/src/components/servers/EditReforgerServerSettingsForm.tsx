@@ -1,17 +1,9 @@
 import {useFormik} from "formik";
-import {
-    AutocompleteValue,
-    Button,
-    FormControlLabel,
-    FormGroup,
-    Grid,
-    Switch,
-    TextField,
-    useMediaQuery
-} from "@mui/material";
+import {AutocompleteValue, Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
 import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
 import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
 import {ReforgerScenariosAutocomplete} from "./ReforgerScenariosAutocomplete.tsx";
+import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 
 function renderTextField(name: string, label: string, formik: any, required?: boolean, type?: string, helperText?: string) {
     return (
@@ -29,18 +21,6 @@ function renderTextField(name: string, label: string, formik: any, required?: bo
                 inputProps={{autoComplete: 'new-password'}}
             />
         </Grid>
-    )
-}
-
-function renderSwitch(name: string, label: string, formik: any) {
-    return (
-        <FormControlLabel
-            control={
-                <Switch checked={formik.values[name]} onChange={formik.handleChange}
-                        name={name} id={name}/>
-            }
-            label={label}
-        />
     )
 }
 
@@ -92,8 +72,8 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
                     {renderTextField("adminPassword", "Admin password", formik, true)}
                     <Grid item xs={12}>
                         <FormGroup>
-                            {renderSwitch("battlEye", "BattlEye enabled", formik)}
-                            {renderSwitch("thirdPersonViewEnabled", "Third person view enabled", formik)}
+                            <SwitchField id='battlEye' label='BattlEye enabled' formik={formik}/>
+                            <SwitchField id='thirdPersonViewEnabled' label='Third person view enabled' formik={formik}/>
                         </FormGroup>
                     </Grid>
                     <Grid item xs={12}>

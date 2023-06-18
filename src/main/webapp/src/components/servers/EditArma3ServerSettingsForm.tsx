@@ -1,7 +1,8 @@
 import {useFormik} from "formik";
-import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
+import {Button, FormGroup, Grid, TextField, useMediaQuery} from "@mui/material";
 import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
 import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
+import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 
 type EditArma3ServerSettingsFormProps = {
     server: Arma3ServerDto,
@@ -95,55 +96,16 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                     </Grid>
                     <Grid item xs={6}>
                         <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.clientFilePatching}
-                                            onChange={formik.handleChange}
-                                            name="clientFilePatching" id="clientFilePatching"/>
-                                }
-                                label="Client file patching"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.serverFilePatching}
-                                            onChange={formik.handleChange}
-                                            name="serverFilePatching" id="serverFilePatching"/>
-                                }
-                                label="Server file patching"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.verifySignatures}
-                                            onChange={formik.handleChange}
-                                            name="verifySignatures" id="verifySignatures"/>
-                                }
-                                label="Verify signatures"
-                            />
+                            <SwitchField id='clientFilePatching' label='Client file patching' formik={formik}/>
+                            <SwitchField id='serverFilePatching' label='Server file patching' formik={formik}/>
+                            <SwitchField id='verifySignatures' label='Verify signatures' formik={formik}/>
                         </FormGroup>
                     </Grid>
                     <Grid item xs={6}>
                         <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.vonEnabled} onChange={formik.handleChange}
-                                            name="vonEnabled" id="vonEnabled"/>
-                                }
-                                label="VON enabled"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.battlEye} onChange={formik.handleChange}
-                                            name="battlEye" id="battlEye"/>
-                                }
-                                label="BattlEye enabled"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch checked={formik.values.persistent} onChange={formik.handleChange}
-                                            name="persistent" id="persistent"/>
-                                }
-                                label="Persistent"
-                            />
+                            <SwitchField id='vonEnabled' label='VON enabled' formik={formik}/>
+                            <SwitchField id='battlEye' label='BattlEye enabled' formik={formik}/>
+                            <SwitchField id='persistent' label='Persistent' formik={formik}/>
                         </FormGroup>
                     </Grid>
                     <Grid item xs={12}>
