@@ -22,6 +22,9 @@ export const AuthContextProvider = (props: any) => {
         initialToken = tokenData.storedToken;
     }
     const [token, setToken] = useState<string | null>(initialToken);
+    if (token) {
+        http.setJwt(token);
+    }
 
     const userIsLoggedIn = !!token;
 
