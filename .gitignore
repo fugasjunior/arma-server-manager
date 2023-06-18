@@ -42,3 +42,6 @@ out/
 
 # cypress example files
 **/cypress/e2e/examples/
+
+# Transpiled Jest tests
+/src/main/webapp/__tests__/**.test.js
