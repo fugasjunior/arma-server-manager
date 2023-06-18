@@ -37,7 +37,7 @@ class ServerInstallationController {
     @GetMapping
     @Cacheable("serverInstallationsResponse")
     public ResponseEntity<ServerInstallationsDto> getAllInstalations() {
-        log.info("Getting server installations");
+        log.debug("Getting server installations");
         List<ServerInstallation> installations = installationService.getAvailableServerInstallations();
         return ResponseEntity.ok(new ServerInstallationsDto(mapper.map(installations)));
     }
