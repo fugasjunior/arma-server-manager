@@ -1,6 +1,6 @@
 import {useFormik} from "formik";
 import {Button, FormControlLabel, FormGroup, Grid, Switch, TextField, useMediaQuery} from "@mui/material";
-import Arma3DifficultySettingsForm from "./Arma3DifficultySettingsForm";
+import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
 import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 
 type EditArma3ServerSettingsFormProps = {

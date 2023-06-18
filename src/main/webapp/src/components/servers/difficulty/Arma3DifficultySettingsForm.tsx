@@ -2,24 +2,19 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    FormControl,
     FormControlLabel,
     FormGroup,
-    FormLabel,
     Grid,
-    Radio,
-    RadioGroup,
-    Slider,
     Switch,
     Typography
 } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
-import SchoolIcon from '@mui/icons-material/School';
 import {FormikProps, FormikState} from "formik";
-import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
+import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
 import {FormikHandlers} from "formik/dist/types";
+import {ThreeStateFlagField} from "./ThreeStateFlagField.tsx";
+import {Arma3AiSkillSettings} from "./Arma3AiSkillSettings.tsx";
 
 const booleanFields = [
     {id: 'reducedDamage', label: 'Reduced damage'},
@@ -35,15 +30,7 @@ const booleanFields = [
     {id: 'cameraShake', label: 'Camera shake'}
 ];
 
-type ThreeStateFlagField = {
-    id: string,
-    label: string,
-    onLabel: string,
-    middleLabel: string,
-    offLabel: string
-}
-
-const threeStateFlagFields: Array<ThreeStateFlagField> = [
+const threeStateFlagFields = [
     {
         id: 'groupIndicators',
         label: 'Group indicators',
@@ -125,89 +112,6 @@ function renderSwitchField(id: string, label: string, formik: FormikState<Arma3S
     />;
 }
 
-function renderThreeStateFlagField(field: ThreeStateFlagField, formik: FormikState<Arma3ServerDto> & FormikHandlers) {
-    return <FormGroup>
-        <FormControl>
-            <FormLabel>{field.label}</FormLabel>
-            <RadioGroup
-                row
-                id={field.id}
-                name={field.id}
-                onChange={formik.handleChange}
-                value={formik.values['difficultySettings' + field.id as keyof Arma3ServerDto]}
-            >
-                <FormControlLabel value="2" control={<Radio/>} label={field.onLabel}/>
-                <FormControlLabel value="1" control={<Radio/>} label={field.middleLabel}/>
-                <FormControlLabel value="0" control={<Radio/>} label={field.offLabel}/>
-            </RadioGroup>
-        </FormControl>
-    </FormGroup>
-}
-
-
-function renderAiSkillSettings(formik: FormikState<Arma3ServerDto> & FormikHandlers) {
-    return <>
-        <FormGroup>
-            <FormControl>
-                <FormLabel>AI level preset</FormLabel>
-                <RadioGroup
-                    row
-                    id="difficultySettings.aiLevelPreset"
-                    name="difficultySettings.aiLevelPreset"
-                    onChange={formik.handleChange}
-                    value={formik.values.difficultySettings.aiLevelPreset}
-                >
-                    <FormControlLabel value="0" control={<Radio/>} label="Low"/>
-                    <FormControlLabel value="1" control={<Radio/>} label="Normal"/>
-                    <FormControlLabel value="2" control={<Radio/>} label="High"/>
-                    <FormControlLabel value="3" control={<Radio/>} label="Custom"/>
-                </RadioGroup>
-            </FormControl>
-        </FormGroup>
-        <Typography gutterBottom>
-            AI skill
-        </Typography>
-        <Grid container spacing={2} alignItems="center">
-            <Grid item>
-                <SchoolIcon/>
-            </Grid>
-            <Grid item xs>
-                <Slider
-                    aria-label="AI skill"
-                    id="difficultySettings.skillAI"
-                    name="difficultySettings.skillAI"
-                    value={formik.values.difficultySettings.skillAI}
-                    valueLabelDisplay="auto"
-                    onChange={formik.handleChange}
-                    step={0.05}
-                    min={0}
-                    max={1}
-                />
-            </Grid>
-        </Grid>
-        <Typography gutterBottom>
-            AI precision
-        </Typography>
-        <Grid container spacing={2} alignItems="center">
-            <Grid item>
-                <LocationSearchingIcon/>
-            </Grid>
-            <Grid item xs>
-                <Slider
-                    aria-label="AI precision"
-                    id="difficultySettings.precisionAI"
-                    name="difficultySettings.precisionAI"
-                    value={formik.values.difficultySettings.precisionAI}
-                    valueLabelDisplay="auto"
-                    onChange={formik.handleChange}
-                    step={0.05}
-                    min={0}
-                    max={1}
-                />
-            </Grid>
-        </Grid>
-    </>;
-}
 
 const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps) => {
     return <Accordion>
@@ -229,13 +133,13 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps)
                 </Grid>
                 <Grid item xs={12} md={4}>
                     {threeStateFlagFields.map((field, index) =>
-                        index < 4 && renderThreeStateFlagField(field, formik)
+                        index < 4 && <ThreeStateFlagField {...field} formik={formik}/>
                     )}
-                    {renderAiSkillSettings(formik)}
+                    <Arma3AiSkillSettings formik={formik}/>
                 </Grid>
                 <Grid item xs={12} md={4}>
                     {threeStateFlagFields.map((field, index) =>
-                        index >= 4 && renderThreeStateFlagField(field, formik)
+                        index >= 4 && <ThreeStateFlagField {...field} formik={formik}/>
                     )}
                 </Grid>
             </Grid>
