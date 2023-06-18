@@ -1,21 +1,20 @@
 import {ReactNode} from "react";
 import {FormikState} from "formik";
-import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
 import {FormikHandlers} from "formik/dist/types";
 import {getValueByKeyPath} from "../../../util/formUtils.ts";
 import {Grid, Slider, Typography} from "@mui/material";
 
-type SliderFieldProps = {
+type SliderFieldProps<T> = {
     id: string,
     label: string,
     min: number,
     max: number,
     step: number
     icon?: ReactNode
-    formik: FormikState<Arma3ServerDto> & FormikHandlers
+    formik: FormikState<T> & FormikHandlers
 }
 
-export function SliderField({id, label, min, max, step, icon, formik}: SliderFieldProps) {
+export const SliderField = <T, >({id, label, min, max, step, icon, formik}: SliderFieldProps<T>) => {
     const value = (getValueByKeyPath(formik.values, id) || 0) as number;
 
     return <>
@@ -41,4 +40,4 @@ export function SliderField({id, label, min, max, step, icon, formik}: SliderFie
             </Grid>
         </Grid>
     </>;
-}
+};

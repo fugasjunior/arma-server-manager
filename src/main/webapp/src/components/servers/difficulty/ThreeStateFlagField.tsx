@@ -1,19 +1,20 @@
 import {FormikState} from "formik";
-import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
 import {FormikHandlers} from "formik/dist/types";
 import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@mui/material";
 import {getValueByKeyPath} from "../../../util/formUtils.ts";
 
-type ThreeStateFlagFieldProps = {
+type ThreeStateFlagFieldProps<T> = {
     id: string,
     label: string,
     onLabel: string,
     middleLabel: string,
     offLabel: string
-    formik: FormikState<Arma3ServerDto> & FormikHandlers
+    formik: FormikState<T> & FormikHandlers
 };
 
-export const ThreeStateFlagField = ({id, label, onLabel, middleLabel, offLabel, formik}: ThreeStateFlagFieldProps) => {
+export const ThreeStateFlagField = <T, >(
+    {id, label, onLabel, middleLabel, offLabel, formik}: ThreeStateFlagFieldProps<T>
+) => {
     const value = (getValueByKeyPath(formik.values, id) || 0) as 0 | 1 | 2;
 
     return <FormGroup>
