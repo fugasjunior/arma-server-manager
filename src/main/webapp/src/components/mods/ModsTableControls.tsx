@@ -4,24 +4,24 @@ import {ChangeEvent} from "react";
 import {ModDto} from "../../dtos/ModDto.ts";
 
 type ModsTableControlsProps = {
-    value: string,
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void,
+    modId: string,
+    onModIdChange: (e: ChangeEvent<HTMLInputElement>) => void,
     onInstallClicked: () => void,
     modDtos: Array<ModDto>,
     rowsPerPage: number,
-    page: number,
+    pageNumber: number,
     onPageChange: (_: any, newPage: number) => void,
     onRowsPerPageChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 export function ModsTableControls(
-    {value, onChange, onInstallClicked, modDtos, rowsPerPage, page, onPageChange, onRowsPerPageChange}: ModsTableControlsProps
+    {modId, onModIdChange, onInstallClicked, modDtos, rowsPerPage, pageNumber, onPageChange, onRowsPerPageChange}: ModsTableControlsProps
 ) {
     return <Stack direction="row" justifyContent="space-between" alignItems="start" m={2}>
         <Stack direction="row" spacing={1}>
             <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID" size="small"
-                       variant="filled" value={value} onChange={onChange}/>
-            <Button variant="outlined" size="small" disabled={value.length === 0}
+                       variant="filled" value={modId} onChange={onModIdChange}/>
+            <Button variant="outlined" size="small" disabled={modId.length === 0}
                     onClick={onInstallClicked}>Install</Button>
         </Stack>
         {modDtos.length > 0 && <TablePagination
@@ -29,7 +29,7 @@ export function ModsTableControls(
             component="div"
             count={modDtos.length}
             rowsPerPage={rowsPerPage}
-            page={page}
+            page={pageNumber}
             onPageChange={onPageChange}
             onRowsPerPageChange={onRowsPerPageChange}
         />}

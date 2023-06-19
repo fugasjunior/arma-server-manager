@@ -16,7 +16,7 @@ type ModsTableToolbarProps = {
     arma3ModsCount: number
     dayZModsCount: number
     mixedModsSelected: boolean
-    search: string
+    searchTerm: string
     onUpdateClicked: () => void,
     onCreatePresetClicked: () => void,
     onUninstallClicked: () => void,
@@ -59,7 +59,7 @@ function ModsTableToolbar(props: ModsTableToolbarProps) {
             )}
 
             <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
-                <TextField label="Search" type="search" variant="standard" value={props.search}
+                <TextField label="Search" type="search" variant="standard" value={props.searchTerm}
                            sx={{minWidth: "120px"}} id="search-field" onChange={props.onSearchChange}
                 />
 

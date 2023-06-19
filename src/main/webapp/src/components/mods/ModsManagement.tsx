@@ -40,7 +40,7 @@ export default function ModsManagement() {
         })
     };
 
-    const handleUpdate = async () => {
+    const handleModUpdate = async () => {
         setMods(prevState => {
             const newMods = [...prevState];
             for (const selectedModId of selectedModsIds) {
@@ -66,7 +66,7 @@ export default function ModsManagement() {
         toast.success("Mod(s) successfully uninstalled");
     };
 
-    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleSelectAllRowsClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             const newSelected = filteredMods.map((n) => n.id);
             setSelectedModsIds(newSelected);
@@ -75,7 +75,7 @@ export default function ModsManagement() {
         setSelectedModsIds([]);
     };
 
-    const handleClick = (_: any, id: number) => {
+    const handleRowClick = (_: any, id: number) => {
         const selectedIndex = selectedModsIds.indexOf(id);
         let newSelected: Array<number> = [];
 
@@ -146,9 +146,9 @@ export default function ModsManagement() {
         <ModsTable rows={filteredMods} selected={selectedModsIds} filter={filter} loading={initialLoading}
                    arma3ModsCount={arma3ModsCount}
                    dayZModsCount={dayZModsCount} mixedModsSelected={mixedModsSelected}
-                   onClick={handleClick} onSelectAllClick={handleSelectAllClick}
-                   onUpdateClicked={handleUpdate}
-                   onUninstallClicked={handleUninstall} onInstallClicked={handleInstall}
+                   onRowClick={handleRowClick} onSelectAllRowsClick={handleSelectAllRowsClick}
+                   onModUpdateClicked={handleModUpdate}
+                   onModUninstallClicked={handleUninstall} onModInstallClicked={handleInstall}
                    onFilterChange={handleFilterChange} onCreatePresetClicked={handlePresedDialogOpen}
         />
         <CreatePresetDialog open={newPresetDialogOpen} onClose={handlePresedDialogClose}
