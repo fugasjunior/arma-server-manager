@@ -14,23 +14,7 @@ import {humanFileSize} from "../../util/util";
 import {Button} from "@mui/material";
 import Fuse from "fuse.js";
 import config from "../../config";
-
-function getComparator(order: 'asc' | 'desc', orderBy: string) {
-    const sortByCell = headCells.find(cell => cell.id === orderBy);
-    if (!sortByCell) {
-        return;
-    }
-
-    if (sortByCell.type === "number" || sortByCell.type === "date") {
-        return order === "desc"
-            ? (a: any, b: any) => a[orderBy] - b[orderBy]
-            : (a: any, b: any) => b[orderBy] - a[orderBy];
-    }
-
-    return order === "desc"
-        ? (a: any, b: any) => b[orderBy].localeCompare(a[orderBy])
-        : (a: any, b: any) => a[orderBy].localeCompare(b[orderBy]);
-}
+import {getComparator} from "../../util/tableUtils.ts";
 
 const headCells: Array<{ id: string, label: string, type?: string }> = [
     {
@@ -101,7 +85,7 @@ const ScenariosTable = (props: ScenariosTableProps) => {
             const searched = fuse.search(search);
             return searched.map(o => o.item);
         }
-        return props.rows.sort(getComparator(order, orderBy));
+        return props.rows.sort(getComparator(order, orderBy, headCells));
     }
 
     return (

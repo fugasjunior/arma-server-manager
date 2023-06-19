@@ -9,6 +9,7 @@ import TableGhosts from "../../UI/TableSkeletons.tsx";
 import Fuse from "fuse.js";
 import {ModsTableRow} from "./ModsTableRow.tsx";
 import {ChangeEvent, MouseEvent} from "react";
+import {getComparator} from "../../util/tableUtils.ts";
 
 const headCells = [
     {id: 'id', label: 'ID', type: 'number'},
@@ -18,23 +19,6 @@ const headCells = [
     {id: 'lastUpdated', label: 'Last updated', type: 'date'},
     {id: 'installationStatus', label: 'Status'}
 ];
-
-function getComparator(order: 'asc' | 'desc', orderBy: string) {
-    const sortByCell = headCells.find(cell => cell.id === orderBy);
-    if (!sortByCell) {
-        return;
-    }
-
-    if (sortByCell.type === "number" || sortByCell.type === "date") {
-        return order === "desc"
-            ? (a: any, b: any) => a[orderBy] - b[orderBy]
-            : (a: any, b: any) => b[orderBy] - a[orderBy];
-    }
-
-    return order === "desc"
-        ? (a: any, b: any) => b[orderBy].localeCompare(a[orderBy])
-        : (a: any, b: any) => a[orderBy].localeCompare(b[orderBy]);
-}
 
 export function ModsTableBody(props: {
     numbers: Array<number>,
@@ -57,7 +41,7 @@ export function ModsTableBody(props: {
             const searched = fuse.search(props.searchTerm);
             return searched.map(o => o.item);
         }
-        return props.rows.sort(getComparator(props.order, props.orderBy));
+        return props.rows.sort(getComparator(props.order, props.orderBy, headCells));
     }
 
     const isSelected = (id: number) => props.selected.indexOf(id) !== -1;
