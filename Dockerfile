@@ -38,6 +38,7 @@ USER root
 RUN dpkg --add-architecture i386 \
     && apt-get update \
     && apt-get install -y \
+          ca-certificates-java \
           lib32gcc-s1 \
           lib32stdc++6  \
           libcap2 \
