@@ -4,16 +4,15 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
 import EnhancedTableHead from "../../UI/Table/EnhancedTableHead";
-import {Button, Stack, TextField} from "@mui/material";
 import TableGhosts from "../../UI/TableSkeletons";
 import Fuse from "fuse.js";
 import {ModDto} from "../../dtos/ModDto.ts";
 import {ModsTableRow} from "./ModsTableRow.tsx";
+import {ModsTableControls} from "./ModsTableControls.tsx";
 
 function getComparator(order: 'asc' | 'desc', orderBy: string) {
     const sortByCell = headCells.find(cell => cell.id === orderBy);
@@ -188,23 +187,10 @@ const ModsTable = (props: ModsTableProps) => {
                     </Table>
                     <TableGhosts display={props.loading} count={15}/>
                 </TableContainer>
-                <Stack direction="row" justifyContent="space-between" alignItems="start" m={2}>
-                    <Stack direction="row" spacing={1}>
-                        <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID" size="small"
-                                   variant="filled" value={enteredModId} onChange={handleEnteredModIdChange}/>
-                        <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
-                                onClick={() => props.onInstallClicked(Number(enteredModId))}>Install</Button>
-                    </Stack>
-                    {rows.length > 0 && <TablePagination
-                        rowsPerPageOptions={[10, 15, 25, 50]}
-                        component="div"
-                        count={rows.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />}
-                </Stack>
+                <ModsTableControls value={enteredModId} onChange={handleEnteredModIdChange}
+                                   onInstallClicked={() => props.onInstallClicked(Number(enteredModId))} modDtos={rows}
+                                   rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage}
+                                   onRowsPerPageChange={handleChangeRowsPerPage}/>
             </Paper>
         </Box>
     );
