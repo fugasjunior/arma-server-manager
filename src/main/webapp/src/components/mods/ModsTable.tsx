@@ -7,22 +7,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
 import ModsTableToolbar from "./ModsTableToolbar";
 import EnhancedTableHead from "../../UI/Table/EnhancedTableHead";
-import {humanFileSize} from "../../util/util";
-import {Button, CircularProgress, Stack, TextField} from "@mui/material";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import CheckIcon from "@mui/icons-material/Check";
-import Tooltip from "@mui/material/Tooltip";
-import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
-import SERVER_NAMES from "../../util/serverNames";
+import {Button, Stack, TextField} from "@mui/material";
 import TableGhosts from "../../UI/TableSkeletons";
-import config from "../../config";
 import Fuse from "fuse.js";
 import {ModDto} from "../../dtos/ModDto.ts";
-import {ErrorStatus} from "../../dtos/Status.ts";
-import {ServerType} from "../../dtos/ServerDto.ts";
+import {ModsTableRow} from "./ModsTableRow.tsx";
 
 function getComparator(order: 'asc' | 'desc', orderBy: string) {
     const sortByCell = headCells.find(cell => cell.id === orderBy);
@@ -70,23 +61,6 @@ const headCells: { id: string, label: string, type?: string }[] = [
         label: 'Status',
     }
 ];
-
-const getInstalledIcon = (mod: ModDto) => {
-    const status = mod.installationStatus;
-    const error = mod.errorStatus;
-
-    if (status === "INSTALLATION_IN_PROGRESS") {
-        return <CircularProgress size={20}/>;
-    }
-    if (status === "ERROR") {
-        return <Tooltip
-            title={workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}><ReportProblemIcon/></Tooltip>
-    }
-
-    if (status === "FINISHED") {
-        return <CheckIcon/>;
-    }
-};
 
 type ModsTableProps = {
     rows: Array<ModDto>,
@@ -197,41 +171,8 @@ const ModsTable = (props: ModsTableProps) => {
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
-                                        <TableRow
-                                            hover
-                                            onClick={(event) => props.onClick(event, row.id)}
-                                            role="checkbox"
-                                            aria-checked={isItemSelected}
-                                            tabIndex={-1}
-                                            key={row.id}
-                                            selected={isItemSelected}
-                                        >
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                padding="none"
-                                            >
-                                                {row.id}
-                                            </TableCell>
-                                            <TableCell>{row.name}</TableCell>
-                                            <TableCell>{SERVER_NAMES.get(ServerType[row.serverType as keyof typeof ServerType])}</TableCell>
-                                            <TableCell>{humanFileSize(row.fileSize)}</TableCell>
-                                            <TableCell>
-                                                {row.lastUpdated && row.lastUpdated.toLocaleDateString(undefined,
-                                                    config.dateFormat)}
-                                            </TableCell>
-                                            <TableCell>{getInstalledIcon(row)}</TableCell>
-                                        </TableRow>
+                                        <ModsTableRow key={row.id} onClick={(event) => props.onClick(event, row.id)}
+                                                      ariaChecked={isItemSelected} labelId={labelId} row={row}/>
                                     );
                                 })}
                             {emptyRows > 0 && (
