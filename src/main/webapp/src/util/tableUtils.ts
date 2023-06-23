@@ -1,16 +1,35 @@
-export function getComparator(order: 'asc' | 'desc', orderBy: string, headCells: Array<{id: string, type?: string}>) {
+import {EnhancedTableHeadCell, EnhancedTableRow} from "../UI/EnhancedTable/EnhancedTable.tsx";
+import {isNumber} from "lodash";
+
+export function getComparator(order: 'asc' | 'desc', orderBy: string, headCells: Array<EnhancedTableHeadCell>) {
     const sortByCell = headCells.find(cell => cell.id === orderBy);
     if (!sortByCell) {
         return;
     }
 
-    if (sortByCell.type === "number" || sortByCell.type === "date") {
-        return order === "desc"
-            ? (a: any, b: any) => a[orderBy] - b[orderBy]
-            : (a: any, b: any) => b[orderBy] - a[orderBy];
+    const findCellValueToSortBy = (row: EnhancedTableRow) => {
+        const cellToSortBy = row.cells.find(cell => cell.id === orderBy);
+        if (!cellToSortBy) {
+            throw new Error("Could not find cell to order by in table row.");
+        }
+        return cellToSortBy.value;
     }
 
-    return order === "desc"
-        ? (a: any, b: any) => b[orderBy].localeCompare(a[orderBy])
-        : (a: any, b: any) => a[orderBy].localeCompare(b[orderBy]);
+    const orderSignum = order === "asc" ? 1 : -1;
+
+    return (a: EnhancedTableRow, b: EnhancedTableRow) => {
+        const first = findCellValueToSortBy(a);
+        const second = findCellValueToSortBy(b);
+
+        if (first instanceof Date && second instanceof Date) {
+            return orderSignum * (+first - +second);
+        }
+        if (isNumber(first) && isNumber(second)) {
+            return orderSignum * (first - second);
+        }
+        if (typeof first === "string" && typeof second === "string") {
+            return orderSignum * (first.localeCompare(second));
+        }
+        return 0;
+    }
 }

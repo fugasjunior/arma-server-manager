@@ -1,10 +1,28 @@
-import {ChangeEvent, MouseEvent, useState} from 'react';
+import {ChangeEvent, ReactNode, useState} from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
 import {ModDto} from "../../dtos/ModDto.ts";
 import {ModsTableControls} from "./ModsTableControls.tsx";
-import {ModsTableBody} from "./ModsTableBody.tsx";
+import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
+import {CircularProgress} from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
+import {ErrorStatus} from "../../dtos/Status.ts";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import CheckIcon from "@mui/icons-material/Check";
+import {ServerType} from "../../dtos/ServerDto.ts";
+import SERVER_NAMES from "../../util/serverNames.ts";
+import {humanFileSize} from "../../util/util.ts";
+
+const headCells: Array<EnhancedTableHeadCell> = [
+    {id: 'id', label: 'ID', type: 'numeric'},
+    {id: 'name', label: 'Name', searchable: true},
+    {id: 'serverType', label: 'For'},
+    {id: 'fileSize', label: 'File size', type: 'numeric'},
+    {id: 'lastUpdated', label: 'Last updated', type: 'date'},
+    {id: 'installationStatus', label: 'Status'}
+];
 
 type ModsTableProps = {
     rows: Array<ModDto>,
@@ -19,26 +37,17 @@ type ModsTableProps = {
     onCreatePresetClicked: () => void,
     onModUninstallClicked: () => void,
     onFilterChange: (_: any, newValue: string) => void,
-    onRowClick: (e: MouseEvent<HTMLTableRowElement>, rowId: number) => void,
-    onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
+    onRowClick: (rowId: number | string) => void,
+    onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
 }
 
 const ModsTable = (props: ModsTableProps) => {
     const {rows, selected} = props;
 
-    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-    const [orderBy, setOrderBy] = useState('name');
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [enteredModId, setEnteredModId] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-
-    const handleSortColumnClicked = (_: Event, property: string) => {
-        setSearchTerm("");
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
-    };
 
     const handleEnteredModIdChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -61,6 +70,42 @@ const ModsTable = (props: ModsTableProps) => {
         setSearchTerm(event.target.value);
     }
 
+    const getInstalledIcon = (mod: ModDto): ReactNode => {
+        const status = mod.installationStatus;
+        const error = mod.errorStatus;
+
+        if (status === "INSTALLATION_IN_PROGRESS") {
+            return <CircularProgress size={20}/>;
+        }
+        if (status === "ERROR") {
+            return <Tooltip
+                title={workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}><ReportProblemIcon/></Tooltip>
+        }
+
+        if (status === "FINISHED") {
+            return <CheckIcon/>;
+        }
+    };
+
+    const mapModDtosToRows = (): Array<EnhancedTableRow> => {
+        return props.rows.map(modDto => {
+            return {
+                id: modDto.id,
+                cells: [
+                    {id: "id", value: modDto.id},
+                    {id: "name", value: modDto.name},
+                    {
+                        id: "serverType",
+                        value: SERVER_NAMES.get(ServerType[modDto.serverType as keyof typeof ServerType])!
+                    },
+                    {id: "fileSize", value: modDto.fileSize, displayValue: humanFileSize(modDto.fileSize)},
+                    {id: "lastUpdated", value: modDto.lastUpdated},
+                    {id: "installationStatus", value: modDto.installationStatus, displayValue: getInstalledIcon(modDto)}
+                ]
+            };
+        })
+    }
+
     return (
         <Box sx={{width: '100%'}}>
             <Paper sx={{width: '100%', mb: 2}}>
@@ -78,12 +123,12 @@ const ModsTable = (props: ModsTableProps) => {
                     onFilterChange={props.onFilterChange}
                     onSearchChange={handleSearchChange}
                 />
-                <ModsTableBody numbers={selected} order={order} orderBy={orderBy}
-                               onSelectAllRowsClick={props.onSelectAllRowsClick} onSortColumnClicked={handleSortColumnClicked}
-                               rows={rows} searchTerm={searchTerm} loading={props.loading} pageNumber={pageNumber}
-                               rowsPerPage={rowsPerPage} selected={selected} onRowClick={props.onRowClick}/>
+                <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={selected} headCells={headCells}
+                               searchTerm={searchTerm}
+                               onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}/>
                 <ModsTableControls modId={enteredModId} onModIdChange={handleEnteredModIdChange}
-                                   onInstallClicked={() => props.onModInstallClicked(Number(enteredModId))} modDtos={rows}
+                                   onInstallClicked={() => props.onModInstallClicked(Number(enteredModId))}
+                                   modDtos={rows}
                                    rowsPerPage={rowsPerPage} pageNumber={pageNumber} onPageChange={handleChangePage}
                                    onRowsPerPageChange={handleChangeRowsPerPage}/>
             </Paper>

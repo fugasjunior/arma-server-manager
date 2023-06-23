@@ -75,12 +75,12 @@ export default function ModsManagement() {
         setSelectedModsIds([]);
     };
 
-    const handleRowClick = (_: any, id: number) => {
-        const selectedIndex = selectedModsIds.indexOf(id);
+    const handleRowClick = (id: string | number) => {
+        const selectedIndex = selectedModsIds.indexOf(Number(id));
         let newSelected: Array<number> = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selectedModsIds, id);
+            newSelected = newSelected.concat(selectedModsIds, Number(id));
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selectedModsIds.slice(1));
         } else if (selectedIndex === selectedModsIds.length - 1) {
