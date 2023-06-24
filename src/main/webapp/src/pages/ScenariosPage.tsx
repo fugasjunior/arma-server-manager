@@ -18,7 +18,10 @@ const ScenariosPage = () => {
         const {data: scenariosDto} = await getScenarios();
         const scenarios = scenariosDto.scenarios.map((scenario: Arma3ScenarioDto) => {
             const createdOn = scenario.createdOn ? new Date(scenario.createdOn) : "";
-            return {...scenario, createdOn};
+            return {
+                ...scenario,
+                createdOn
+            };
         });
         setScenarios(scenarios);
     };
@@ -89,12 +92,16 @@ const ScenariosPage = () => {
         setSelected([]);
     };
 
-    const handleClick = (_: any, name: string) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleClick = (id: string | number) => {
+        if (typeof id !== "string") {
+            return;
+        }
+
+        const selectedIndex = selected.indexOf(id);
         let newSelected: Array<string> = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, id);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -110,8 +117,8 @@ const ScenariosPage = () => {
     };
 
     return (
-        <ScenariosTable rows={scenarios} selected={selected} onSelectAllClick={handleSelectAllClick}
-                        onClick={handleClick} onDeleteClicked={handleDelete} onFileChange={handleFileChange}
+        <ScenariosTable rows={scenarios} selected={selected} onSelectAllRowsClick={handleSelectAllClick}
+                        onRowClick={handleClick} onDeleteClicked={handleDelete} onFileChange={handleFileChange}
                         percentUploaded={percentUploaded} uploadInProgress={uploadInProgress}
                         onDownloadClicked={handleDownload}
         />
