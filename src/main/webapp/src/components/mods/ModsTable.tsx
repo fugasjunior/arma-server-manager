@@ -3,9 +3,8 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
 import {ModDto} from "../../dtos/ModDto.ts";
-import {ModsTableControls} from "./ModsTableControls.tsx";
 import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
-import {CircularProgress} from "@mui/material";
+import {Button, CircularProgress, Stack, TextField} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
@@ -42,10 +41,6 @@ type ModsTableProps = {
 }
 
 const ModsTable = (props: ModsTableProps) => {
-    const {rows, selected} = props;
-
-    const [pageNumber, setPageNumber] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(15);
     const [enteredModId, setEnteredModId] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -56,16 +51,6 @@ const ModsTable = (props: ModsTableProps) => {
         }
         setEnteredModId(e.target.value);
     }
-
-    const handleChangePage = (_: any, newPage: number) => {
-        setPageNumber(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPageNumber(0);
-    };
-
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     }
@@ -110,7 +95,7 @@ const ModsTable = (props: ModsTableProps) => {
         <Box sx={{width: '100%'}}>
             <Paper sx={{width: '100%', mb: 2}}>
                 <ModsTableToolbar
-                    numSelected={selected.length}
+                    numSelected={props.selected.length}
                     title="Workshop mods"
                     filter={props.filter}
                     arma3ModsCount={props.arma3ModsCount}
@@ -123,14 +108,20 @@ const ModsTable = (props: ModsTableProps) => {
                     onFilterChange={props.onFilterChange}
                     onSearchChange={handleSearchChange}
                 />
-                <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={selected} headCells={headCells}
+                <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={props.selected} headCells={headCells}
                                searchTerm={searchTerm}
-                               onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}/>
-                <ModsTableControls modId={enteredModId} onModIdChange={handleEnteredModIdChange}
-                                   onInstallClicked={() => props.onModInstallClicked(Number(enteredModId))}
-                                   modDtos={rows}
-                                   rowsPerPage={rowsPerPage} pageNumber={pageNumber} onPageChange={handleChangePage}
-                                   onRowsPerPageChange={handleChangeRowsPerPage}/>
+                               onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}
+                               customControls={
+                                   <Stack direction="row" spacing={1}>
+                                       <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
+                                                  size="small"
+                                                  variant="filled" value={enteredModId}
+                                                  onChange={handleEnteredModIdChange}/>
+                                       <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
+                                               onClick={() => props.onModInstallClicked(Number(enteredModId))}>Install</Button>
+                                   </Stack>
+                               }
+                />
             </Paper>
         </Box>
     );
