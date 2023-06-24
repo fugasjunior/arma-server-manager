@@ -104,6 +104,9 @@ class SteamCmdExecutor {
         String errorLine = result.lines()
                 .map(String::toLowerCase)
                 .map(this::removeParametersFromOutputLine)
+                // Issue #69 missing steamservice.so and libSDL3.so.0 caused the job to be marked as failed
+                // TODO find better solution to determine the job result
+                .filter(line -> !line.contains("cannot open shared object file"))
                 .filter(this::containsErrorKeyword)
                 .findFirst()
                 .orElse(null);
