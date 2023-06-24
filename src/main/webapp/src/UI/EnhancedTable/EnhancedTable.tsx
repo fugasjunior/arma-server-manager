@@ -1,16 +1,12 @@
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
 import TableGhosts from "../TableSkeletons.tsx";
 import Fuse from "fuse.js";
 import {getComparator} from "../../util/tableUtils.ts";
 import {ChangeEvent, ReactNode, useState} from "react";
-import Checkbox from "@mui/material/Checkbox";
-import config from "../../config.ts";
 import EnhancedTableHead from "./EnhancedTableHead.tsx";
 import {EnhancedTableControls} from "./EnhancedTableControls.tsx";
+import {EnhancedTableBody} from "./EnhancedTableBody.tsx";
 
 export type EnhancedTableRow = {
     id: string | number,
@@ -86,6 +82,10 @@ export const EnhancedTable = (
         return rows.sort(getComparator(order, orderByColumnId, headCells));
     };
 
+    const getPaginatedRows = () => {
+        return getFilteredRows().slice(pageNumber * rowsPerPage, pageNumber * rowsPerPage + rowsPerPage);
+    }
+
     const isSelected = (rowId: number | string) => selectedRowIds.indexOf(rowId) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
@@ -124,38 +124,8 @@ export const EnhancedTable = (
                     headCells={headCells}
                     search={searchTerm}
                 />
-                {!loading && <TableBody>
-                    {getFilteredRows()
-                        .slice(pageNumber * rowsPerPage, pageNumber * rowsPerPage + rowsPerPage)
-                        .map((row) => {
-                            const selected = isSelected(row.id);
-                            return (
-                                <TableRow key={row.id} hover onClick={() => onRowSelect(row.id)} role="checkbox"
-                                          aria-checked={selected} tabIndex={-1} selected={selected}>
-                                    <TableCell padding="checkbox">
-                                        <Checkbox checked={selected} color="primary"
-                                                  inputProps={{
-                                                      "aria-labelledby": String(row.id),
-                                                  }}
-                                        />
-                                    </TableCell>
-                                    {row.cells.map((cell, index) => {
-                                        const valueToShow = cell.displayValue ?? cell.value;
-                                        if (valueToShow instanceof Date) {
-                                            return <TableCell
-                                                key={index}>{valueToShow.toLocaleDateString(undefined, config.dateFormat)}</TableCell>;
-                                        }
-                                        return <TableCell key={index}>{valueToShow}</TableCell>;
-                                    })}
-                                </TableRow>
-                            );
-                        })}
-                    {emptyRowsCount > 0 && (
-                        <TableRow style={{height: 33 * emptyRowsCount}}>
-                            <TableCell colSpan={6}/>
-                        </TableRow>
-                    )}
-                </TableBody>}
+                {!loading && <EnhancedTableBody rows={getPaginatedRows()} selectedRowIds={selectedRowIds}
+                                                emptyRowsCount={emptyRowsCount} onRowSelect={onRowSelect}/>}
             </Table>
             <TableGhosts display={!!loading} count={15}/>
         </TableContainer>
