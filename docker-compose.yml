@@ -20,32 +20,25 @@ services:
     ports:
       - "8090:8080"
 
-#  armaservermanager:
-##    image: "fugasjunior/armaservermanager:${VERSION}"
-#    build: .
-#    restart: always
-#    #    Not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
-##    network_mode: host
-#    ports:
-#      - "8080:8080"
-#      - "2302:2302/tcp"
-#      - "2302:2302/udp"
-#      - "2303:2303/tcp"
-#      - "2303:2303/udp"
-#    depends_on:
-#      - db
-#    volumes:
-#      - C:/Users/fugasjunior/armaservermanager:/home/steam/armaservermanager/
-##      - armaservermanager-storage:/home/steam/armaservermanager/
-#    environment:
-#      AUTH_USERNAME: "${AUTH_USERNAME}"
-#      AUTH_PASSWORD: "${AUTH_PASSWORD}"
-#      SPRING_DATASOURCE_URL: "${MYSQL_DB_URL}"
-#      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER}"
-#      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD}"
-#      STEAM_API_KEY: "${STEAM_API_KEY}"
-#      JWT_SECRET: "${JWT_SECRET}"
-#      DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
+  armaservermanager:
+    image: "fugasjunior/armaservermanager:${VERSION}"
+    restart: always
+    #    Not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
+    network_mode: host
+    depends_on:
+      - db
+    volumes:
+      #      - /home/armaservermanager/storage:/home/steam/armaservermanager/
+      - armaservermanager-storage:/home/steam/armaservermanager/
+    environment:
+      AUTH_USERNAME: "${AUTH_USERNAME}"
+      AUTH_PASSWORD: "${AUTH_PASSWORD}"
+      SPRING_DATASOURCE_URL: "${MYSQL_DB_URL}"
+      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD}"
+      STEAM_API_KEY: "${STEAM_API_KEY}"
+      JWT_SECRET: "${JWT_SECRET}"
+      DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
 
 volumes:
   armaservermanager-db:
