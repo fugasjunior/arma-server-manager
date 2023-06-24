@@ -9,7 +9,7 @@ import {getComparator} from "../../util/tableUtils.ts";
 import {ChangeEvent, ReactNode, useState} from "react";
 import Checkbox from "@mui/material/Checkbox";
 import config from "../../config.ts";
-import EnhancedTableHead2 from "./EnhancedTableHead2.tsx";
+import EnhancedTableHead from "./EnhancedTableHead.tsx";
 import {EnhancedTableControls} from "./EnhancedTableControls.tsx";
 
 export type EnhancedTableRow = {
@@ -114,7 +114,7 @@ export const EnhancedTable = (
                 aria-labelledby="tableTitle"
                 size="small"
             >
-                <EnhancedTableHead2
+                <EnhancedTableHead
                     numSelected={selectedRowIds.length}
                     order={order}
                     orderBy={orderByColumnId}

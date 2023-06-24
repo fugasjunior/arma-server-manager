@@ -8,7 +8,7 @@ import {visuallyHidden} from "@mui/utils";
 import {ChangeEvent} from "react";
 import {EnhancedTableHeadCell} from "./EnhancedTable.tsx";
 
-type EnhancedTableHead2Props = {
+type EnhancedTableHeadProps = {
     numSelected: number,
     onRequestSort: (property: string) => void,
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
@@ -19,9 +19,18 @@ type EnhancedTableHead2Props = {
     headCells: Array<EnhancedTableHeadCell>
 };
 
-function EnhancedTableHead2(props: EnhancedTableHead2Props) {
-    const {onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells, search} =
-        props;
+const EnhancedTableHead = (
+    {
+        onSelectAllClick,
+        order,
+        orderBy,
+        numSelected,
+        rowCount,
+        onRequestSort,
+        headCells,
+        search
+    }: EnhancedTableHeadProps
+) => {
     const createSortHandler = (property: string) => (_: any) => {
         onRequestSort(property);
     };
@@ -64,6 +73,6 @@ function EnhancedTableHead2(props: EnhancedTableHead2Props) {
             </TableRow>
         </TableHead>
     );
-}
+};
 
-export default EnhancedTableHead2;
+export default EnhancedTableHead;
