@@ -1,7 +1,7 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import {deleteScenario, downloadScenario, getScenarios, uploadScenario} from "../services/scenarioService";
 import {toast} from "material-react-toastify";
-import ScenariosTable from "../components/scenarios/ScenariosTable";
+import {ScenariosTable} from "../components/scenarios/ScenariosTable";
 import {Arma3ScenarioDto} from "../dtos/Arma3ScenarioDto.ts";
 
 const ScenariosPage = () => {

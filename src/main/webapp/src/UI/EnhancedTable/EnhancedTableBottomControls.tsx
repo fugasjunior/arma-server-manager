@@ -11,7 +11,7 @@ type EnhancedTableControlsProps = {
     customControls?: ReactNode
 }
 
-export const EnhancedTableControls = (
+export const EnhancedTableBottomControls = (
     {
         totalRowsCount,
         rowsPerPage,

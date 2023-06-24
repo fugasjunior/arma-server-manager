@@ -15,12 +15,34 @@ import SERVER_NAMES from "../../util/serverNames.ts";
 import {humanFileSize} from "../../util/util.ts";
 
 const headCells: Array<EnhancedTableHeadCell> = [
-    {id: 'id', label: 'ID', type: 'numeric'},
-    {id: 'name', label: 'Name', searchable: true},
-    {id: 'serverType', label: 'For'},
-    {id: 'fileSize', label: 'File size', type: 'numeric'},
-    {id: 'lastUpdated', label: 'Last updated', type: 'date'},
-    {id: 'installationStatus', label: 'Status'}
+    {
+        id: 'id',
+        label: 'ID',
+        type: 'numeric'
+    },
+    {
+        id: 'name',
+        label: 'Name',
+        searchable: true
+    },
+    {
+        id: 'serverType',
+        label: 'For'
+    },
+    {
+        id: 'fileSize',
+        label: 'File size',
+        type: 'numeric'
+    },
+    {
+        id: 'lastUpdated',
+        label: 'Last updated',
+        type: 'date'
+    },
+    {
+        id: 'installationStatus',
+        label: 'Status'
+    }
 ];
 
 type ModsTableProps = {
@@ -77,15 +99,32 @@ const ModsTable = (props: ModsTableProps) => {
             return {
                 id: modDto.id,
                 cells: [
-                    {id: "id", value: modDto.id},
-                    {id: "name", value: modDto.name},
+                    {
+                        id: "id",
+                        value: modDto.id
+                    },
+                    {
+                        id: "name",
+                        value: modDto.name
+                    },
                     {
                         id: "serverType",
                         value: SERVER_NAMES.get(ServerType[modDto.serverType as keyof typeof ServerType])!
                     },
-                    {id: "fileSize", value: modDto.fileSize, displayValue: humanFileSize(modDto.fileSize)},
-                    {id: "lastUpdated", value: modDto.lastUpdated},
-                    {id: "installationStatus", value: modDto.installationStatus, displayValue: getInstalledIcon(modDto)}
+                    {
+                        id: "fileSize",
+                        value: modDto.fileSize,
+                        displayValue: humanFileSize(modDto.fileSize)
+                    },
+                    {
+                        id: "lastUpdated",
+                        value: modDto.lastUpdated
+                    },
+                    {
+                        id: "installationStatus",
+                        value: modDto.installationStatus,
+                        displayValue: getInstalledIcon(modDto)
+                    }
                 ]
             };
         })
@@ -93,25 +132,27 @@ const ModsTable = (props: ModsTableProps) => {
 
     return (
         <Box sx={{width: '100%'}}>
-            <Paper sx={{width: '100%', mb: 2}}>
-                <ModsTableToolbar
-                    numSelected={props.selected.length}
-                    title="Workshop mods"
-                    filter={props.filter}
-                    arma3ModsCount={props.arma3ModsCount}
-                    dayZModsCount={props.dayZModsCount}
-                    mixedModsSelected={props.mixedModsSelected}
-                    searchTerm={searchTerm}
-                    onUpdateClicked={props.onModUpdateClicked}
-                    onCreatePresetClicked={props.onCreatePresetClicked}
-                    onUninstallClicked={props.onModUninstallClicked}
-                    onFilterChange={props.onFilterChange}
-                    onSearchChange={handleSearchChange}
-                />
+            <Paper sx={{
+                width: '100%',
+                mb: 2
+            }}>
                 <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={props.selected} headCells={headCells}
-                               searchTerm={searchTerm}
+                               searchTerm={searchTerm} title="Workshop mods"
                                onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}
-                               customControls={
+
+                               customTopControls={<ModsTableToolbar
+                                   selectedModsCount={props.selected.length}
+                                   filter={props.filter}
+                                   arma3ModsCount={props.arma3ModsCount}
+                                   dayZModsCount={props.dayZModsCount}
+                                   mixedModsSelected={props.mixedModsSelected}
+                                   onUpdateClicked={props.onModUpdateClicked}
+                                   onCreatePresetClicked={props.onCreatePresetClicked}
+                                   onUninstallClicked={props.onModUninstallClicked}
+                                   onFilterChange={props.onFilterChange}
+                               />}
+
+                               customBottomControls={
                                    <Stack direction="row" spacing={1}>
                                        <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
                                                   size="small"

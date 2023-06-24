@@ -1,10 +1,10 @@
 import {ChangeEvent, ChangeEventHandler, MouseEventHandler, useState} from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import ScenariosTableToolbar from "./ScenariosTableToolbar";
 import {humanFileSize} from "../../util/util";
 import {EnhancedTable, EnhancedTableHeadCell} from "../../UI/EnhancedTable/EnhancedTable.tsx";
 import {Button} from "@mui/material";
+import {ScenariosTableToolbar} from "./ScenariosTableToolbar.tsx";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
@@ -40,7 +40,7 @@ type ScenariosTableProps = {
     percentUploaded: number
 }
 
-const ScenariosTable = (props: ScenariosTableProps) => {
+export const ScenariosTable = (props: ScenariosTableProps) => {
     const {
         rows,
         selected
@@ -83,23 +83,19 @@ const ScenariosTable = (props: ScenariosTableProps) => {
                 width: '100%',
                 mb: 2
             }}>
-                <ScenariosTableToolbar
-                    numSelected={selected.length}
-                    onDeleteClicked={props.onDeleteClicked}
-                    onFileChange={props.onFileChange}
-                    uploadInProgress={props.uploadInProgress}
-                    percentUploaded={props.percentUploaded}
-                    search={search}
-                    title="Scenarios"
-                    onSearchChange={handleSearchChange}
-                />
                 <EnhancedTable rows={getRows()} selectedRowIds={selected} headCells={headCells}
-                               onRowSelect={props.onRowClick}
+                               onRowSelect={props.onRowClick} title="Scenarios"
                                onSelectAllRowsClick={props.onSelectAllRowsClick} searchTerm={search}
-                               defaultSortColumnId="name"/>
+                               defaultSortColumnId="name"
+                               customTopControls={<ScenariosTableToolbar
+                                   onFileChange={props.onFileChange}
+                                   onDeleteClicked={props.onDeleteClicked}
+                                   percentUploaded={props.percentUploaded}
+                                   selectedScenariosCount={selected.length}
+                                   uploadInProgress={props.uploadInProgress}/>
+                               }
+                />
             </Paper>
         </Box>
     );
 }
-
-export default ScenariosTable;

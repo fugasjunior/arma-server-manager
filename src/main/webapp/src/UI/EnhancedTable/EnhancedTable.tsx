@@ -5,8 +5,9 @@ import Fuse from "fuse.js";
 import {getComparator} from "../../util/tableUtils.ts";
 import {ChangeEvent, ReactNode, useState} from "react";
 import EnhancedTableHead from "./EnhancedTableHead.tsx";
-import {EnhancedTableControls} from "./EnhancedTableControls.tsx";
+import {EnhancedTableBottomControls} from "./EnhancedTableBottomControls.tsx";
 import {EnhancedTableBody} from "./EnhancedTableBody.tsx";
+import {EnhancedTableTopControls} from "./EnhancedTableTopControls.tsx";
 
 export type EnhancedTableRow = {
     id: string | number,
@@ -31,28 +32,31 @@ export type EnhancedTableHeadCell = {
 type EnhancedTableProps = {
     rows: Array<EnhancedTableRow>,
     selectedRowIds: Array<string | number>,
+    title: string,
     headCells: Array<EnhancedTableHeadCell>,
     onRowSelect: (rowId: string | number) => void,
     onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
-    searchTerm?: string,
     loading?: boolean
     defaultSortColumnId?: string,
-    customControls?: ReactNode
+    customTopControls?: ReactNode
+    customBottomControls?: ReactNode
 };
 
 export const EnhancedTable = (
     {
         rows,
         selectedRowIds,
+        title,
         headCells,
         onRowSelect,
         onSelectAllRowsClick,
-        searchTerm,
         loading,
         defaultSortColumnId,
-        customControls
+        customTopControls,
+        customBottomControls
     }: EnhancedTableProps
 ) => {
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [pageNumber, setPageNumber] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
     const [orderByColumnId, setOrderByColumnId] = useState<string>(defaultSortColumnId ?? headCells[0].id);
@@ -104,7 +108,13 @@ export const EnhancedTable = (
         setPageNumber(0);
     };
 
+    const handleSearchTermChange = (newSearchTerm: string) => {
+        setSearchTerm(newSearchTerm);
+    };
+
     return <>
+        <EnhancedTableTopControls selectedRowsCount={selectedRowIds.length} searchTerm={searchTerm}
+                                  onSearchChange={handleSearchTermChange} customControls={customTopControls}/>
         <TableContainer>
             <Table
                 sx={{minWidth: 750}}
@@ -121,14 +131,14 @@ export const EnhancedTable = (
                     headCells={headCells}
                     search={searchTerm}
                 />
-                {!loading && <EnhancedTableBody rows={getPaginatedRows()} selectedRowIds={selectedRowIds}
+                {!loading && <EnhancedTableBody title={title} rows={getPaginatedRows()} selectedRowIds={selectedRowIds}
                                                 emptyRowsCount={emptyRowsCount} onRowSelect={onRowSelect}/>}
             </Table>
             <TableGhosts display={!!loading} count={15}/>
         </TableContainer>
-        <EnhancedTableControls totalRowsCount={getFilteredRows().length} rowsPerPage={rowsPerPage}
-                               pageNumber={pageNumber} onPageChange={handlePageChange}
-                               onRowsPerPageChange={handleRowsPerPageChange} customControls={customControls}
+        <EnhancedTableBottomControls totalRowsCount={getFilteredRows().length} rowsPerPage={rowsPerPage}
+                                     pageNumber={pageNumber} onPageChange={handlePageChange}
+                                     onRowsPerPageChange={handleRowsPerPageChange} customControls={customBottomControls}
         />
     </>;
 };
