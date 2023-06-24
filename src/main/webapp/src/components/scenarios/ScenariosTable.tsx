@@ -4,21 +4,22 @@ import Paper from '@mui/material/Paper';
 import ScenariosTableToolbar from "./ScenariosTableToolbar";
 import {humanFileSize} from "../../util/util";
 import {EnhancedTable, EnhancedTableHeadCell} from "../../UI/EnhancedTable/EnhancedTable.tsx";
+import {Button} from "@mui/material";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
-        id: 'name',
-        label: 'ID',
+        id: "name",
+        label: "ID",
         searchable: true
     },
     {
-        id: 'fileSize',
-        label: 'File size',
+        id: "fileSize",
+        label: "File size",
         type: "numeric"
     },
     {
-        id: 'createdOn',
-        label: 'Created on',
+        id: "createdOn",
+        label: "Created on",
         type: "date"
     },
 ];
@@ -57,16 +58,19 @@ const ScenariosTable = (props: ScenariosTableProps) => {
                 cells: [
                     {
                         id: "name",
-                        value: scenarioDto.name
-                    },
-                    {
-                        id: "createdOn",
-                        value: scenarioDto.createdOn
+                        value: scenarioDto.name,
+                        displayValue: <Button onClick={(e) => props.onDownloadClicked(scenarioDto.name, e)}>
+                            {scenarioDto.name}
+                        </Button>
                     },
                     {
                         id: "fileSize",
                         value: scenarioDto.fileSize,
                         displayValue: humanFileSize(scenarioDto.fileSize)
+                    },
+                    {
+                        id: "createdOn",
+                        value: scenarioDto.createdOn
                     },
                 ]
             };

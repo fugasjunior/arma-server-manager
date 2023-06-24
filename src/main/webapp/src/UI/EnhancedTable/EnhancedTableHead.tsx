@@ -12,7 +12,7 @@ type EnhancedTableHeadProps = {
     numSelected: number,
     onRequestSort: (property: string) => void,
     onSelectAllClick: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
-    order: 'asc' | 'desc',
+    order: "asc" | "desc",
     orderBy: string,
     rowCount: number,
     search?: string,
@@ -45,26 +45,26 @@ const EnhancedTableHead = (
                         checked={rowCount > 0 && numSelected === rowCount}
                         onChange={onSelectAllClick}
                         inputProps={{
-                            'aria-label': 'select all',
+                            "aria-label": "select all",
                         }}
                     />
                 </TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.type === "numeric" ? 'right' : 'left'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
+                        align="left"
+                        padding={headCell.disablePadding ? "none" : "normal"}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
                         <TableSortLabel
                             active={orderBy === headCell.id && !search}
-                            direction={orderBy === headCell.id ? order : 'asc'}
+                            direction={orderBy === headCell.id ? order : "asc"}
                             onClick={createSortHandler(headCell.id)}
                         >
                             {headCell.label}
                             {orderBy === headCell.id ? (
                                 <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    {order === "desc" ? "sorted descending" : "sorted ascending"}
                                 </Box>
                             ) : null}
                         </TableSortLabel>

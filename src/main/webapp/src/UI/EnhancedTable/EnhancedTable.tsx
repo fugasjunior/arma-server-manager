@@ -86,19 +86,16 @@ export const EnhancedTable = (
         return getFilteredRows().slice(pageNumber * rowsPerPage, pageNumber * rowsPerPage + rowsPerPage);
     }
 
-    const isSelected = (rowId: number | string) => selectedRowIds.indexOf(rowId) !== -1;
-
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRowsCount = pageNumber > 0 ? Math.max(0, (1 + pageNumber) * rowsPerPage - rows.length) : 0;
 
     const handleSortColumnClicked = (columnId: string) => {
         const isAlreadySelectedAndAscending = orderByColumnId === columnId && order === "asc";
-        setOrder(isAlreadySelectedAndAscending ? 'desc' : 'asc');
+        setOrder(isAlreadySelectedAndAscending ? "desc" : "asc");
         setOrderByColumnId(columnId);
     };
 
     const handlePageChange = (newPage: number) => {
-        console.log("new page", newPage);
         setPageNumber(newPage);
     };
 
