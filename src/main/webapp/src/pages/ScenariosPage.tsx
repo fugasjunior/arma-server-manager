@@ -117,7 +117,7 @@ const ScenariosPage = () => {
     };
 
     return (
-        <ScenariosTable rows={scenarios} selected={selected} onSelectAllRowsClick={handleSelectAllClick}
+        <ScenariosTable rows={scenarios} selectedScenarioIds={selected} onSelectAllRowsClick={handleSelectAllClick}
                         onRowClick={handleClick} onDeleteClicked={handleDelete} onFileChange={handleFileChange}
                         percentUploaded={percentUploaded} uploadInProgress={uploadInProgress}
                         onDownloadClicked={handleDownload}

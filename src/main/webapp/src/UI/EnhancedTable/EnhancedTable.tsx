@@ -113,7 +113,7 @@ export const EnhancedTable = (
     };
 
     return <>
-        <EnhancedTableTopControls selectedRowsCount={selectedRowIds.length} searchTerm={searchTerm}
+        <EnhancedTableTopControls selectedRowsCount={selectedRowIds.length} searchTerm={searchTerm} title={title}
                                   onSearchChange={handleSearchTermChange} customControls={customTopControls}/>
         <TableContainer>
             <Table
@@ -131,7 +131,7 @@ export const EnhancedTable = (
                     headCells={headCells}
                     search={searchTerm}
                 />
-                {!loading && <EnhancedTableBody title={title} rows={getPaginatedRows()} selectedRowIds={selectedRowIds}
+                {!loading && <EnhancedTableBody rows={getPaginatedRows()} selectedRowIds={selectedRowIds}
                                                 emptyRowsCount={emptyRowsCount} onRowSelect={onRowSelect}/>}
             </Table>
             <TableGhosts display={!!loading} count={15}/>

@@ -1,10 +1,11 @@
-import {ChangeEvent, ChangeEventHandler, MouseEventHandler, useState} from 'react';
+import {ChangeEvent, ChangeEventHandler, MouseEventHandler} from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import {humanFileSize} from "../../util/util";
 import {EnhancedTable, EnhancedTableHeadCell} from "../../UI/EnhancedTable/EnhancedTable.tsx";
 import {Button} from "@mui/material";
 import {ScenariosTableToolbar} from "./ScenariosTableToolbar.tsx";
+import {Arma3ScenarioDto} from "../../dtos/Arma3ScenarioDto.ts";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
@@ -25,12 +26,8 @@ const headCells: Array<EnhancedTableHeadCell> = [
 ];
 
 type ScenariosTableProps = {
-    rows: Array<{
-        name: string,
-        fileSize: number,
-        createdOn: Date
-    }>,
-    selected: Array<string>,
+    rows: Array<Arma3ScenarioDto>,
+    selectedScenarioIds: Array<string>,
     onDeleteClicked: MouseEventHandler,
     onRowClick: (rowId: number | string) => void,
     onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
@@ -40,16 +37,19 @@ type ScenariosTableProps = {
     percentUploaded: number
 }
 
-export const ScenariosTable = (props: ScenariosTableProps) => {
-    const {
+export const ScenariosTable = (
+    {
         rows,
-        selected
-    } = props;
-
-    const [search, setSearch] = useState("");
-    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setSearch(event.target.value);
-    }
+        selectedScenarioIds,
+        onDeleteClicked,
+        onRowClick,
+        onSelectAllRowsClick,
+        onFileChange,
+        onDownloadClicked,
+        uploadInProgress,
+        percentUploaded
+    }: ScenariosTableProps
+) => {
 
     const getRows = () => {
         return rows.map(scenarioDto => {
@@ -59,7 +59,7 @@ export const ScenariosTable = (props: ScenariosTableProps) => {
                     {
                         id: "name",
                         value: scenarioDto.name,
-                        displayValue: <Button onClick={(e) => props.onDownloadClicked(scenarioDto.name, e)}>
+                        displayValue: <Button onClick={(e) => onDownloadClicked(scenarioDto.name, e)}>
                             {scenarioDto.name}
                         </Button>
                     },
@@ -83,16 +83,16 @@ export const ScenariosTable = (props: ScenariosTableProps) => {
                 width: '100%',
                 mb: 2
             }}>
-                <EnhancedTable rows={getRows()} selectedRowIds={selected} headCells={headCells}
-                               onRowSelect={props.onRowClick} title="Scenarios"
-                               onSelectAllRowsClick={props.onSelectAllRowsClick} searchTerm={search}
+                <EnhancedTable rows={getRows()} selectedRowIds={selectedScenarioIds} headCells={headCells}
+                               onRowSelect={onRowClick} title="Scenarios"
+                               onSelectAllRowsClick={onSelectAllRowsClick}
                                defaultSortColumnId="name"
                                customTopControls={<ScenariosTableToolbar
-                                   onFileChange={props.onFileChange}
-                                   onDeleteClicked={props.onDeleteClicked}
-                                   percentUploaded={props.percentUploaded}
-                                   selectedScenariosCount={selected.length}
-                                   uploadInProgress={props.uploadInProgress}/>
+                                   onFileChange={onFileChange}
+                                   onDeleteClicked={onDeleteClicked}
+                                   percentUploaded={percentUploaded}
+                                   selectedScenariosCount={selectedScenarioIds.length}
+                                   uploadInProgress={uploadInProgress}/>
                                }
                 />
             </Paper>

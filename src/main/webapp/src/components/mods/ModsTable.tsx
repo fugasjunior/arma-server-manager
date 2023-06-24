@@ -64,7 +64,6 @@ type ModsTableProps = {
 
 const ModsTable = (props: ModsTableProps) => {
     const [enteredModId, setEnteredModId] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
 
     const handleEnteredModIdChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -73,10 +72,6 @@ const ModsTable = (props: ModsTableProps) => {
         }
         setEnteredModId(e.target.value);
     }
-    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    }
-
     const getInstalledIcon = (mod: ModDto): ReactNode => {
         const status = mod.installationStatus;
         const error = mod.errorStatus;
@@ -137,7 +132,7 @@ const ModsTable = (props: ModsTableProps) => {
                 mb: 2
             }}>
                 <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={props.selected} headCells={headCells}
-                               searchTerm={searchTerm} title="Workshop mods"
+                               title="Workshop mods"
                                onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}
 
                                customTopControls={<ModsTableToolbar
