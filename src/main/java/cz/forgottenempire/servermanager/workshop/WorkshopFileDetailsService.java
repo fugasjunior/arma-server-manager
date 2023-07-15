@@ -84,7 +84,7 @@ public class WorkshopFileDetailsService {
     }
 
     private JsonNode getModInfo(Long modId) {
-        log.info("Getting info for mod {} from Steam Workshop", modId);
+        log.debug("Getting info for mod {} from Steam Workshop", modId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

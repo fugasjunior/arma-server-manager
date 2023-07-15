@@ -33,7 +33,7 @@ class WorkshopModsController {
     @GetMapping
     @Cacheable("workshopModsResponse")
     public ResponseEntity<ModsDto> getAllMods(@RequestParam(required = false) ServerType filter) {
-        log.info("Getting all mods");
+        log.debug("Getting all mods");
         List<CreatorDlcDto> creatorDlcDtos = Collections.emptyList();
         if (filter == null || filter == ServerType.ARMA3) {
             creatorDlcDtos = modMapper.creatorDlcsToCreatorDlcDtos(Arma3CDLC.getAll());

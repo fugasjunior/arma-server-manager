@@ -84,7 +84,7 @@ class ConfigFileService {
         }
 
         try {
-            log.info("Deleting old configuration '{}'", configFile.getName());
+            log.debug("Deleting old configuration '{}'", configFile.getName());
             FileUtils.forceDelete(configFile);
         } catch (IOException e) {
             log.error("Could not delete old server config '{}'", configFile, e);

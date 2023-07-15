@@ -117,7 +117,7 @@ class WorkshopInstallerService {
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
             for (ServerType serverType : getRelevantServerTypes(mod)) {
-                log.info("Copying BiKey {} to server {}", key.getName(), serverType);
+                log.debug("Copying BiKey {} to server {}", key.getName(), serverType);
                 FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), serverType).toFile());
             }
         }
@@ -130,7 +130,7 @@ class WorkshopInstallerService {
         for (ServerType serverType : getRelevantServerTypes(mod)) {
             Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), serverType);
             if (!Files.isSymbolicLink(linkPath)) {
-                log.info("Creating symlink - link {}, target {}", linkPath, targetPath);
+                log.debug("Creating symlink - link {}, target {}", linkPath, targetPath);
                 Files.createSymbolicLink(linkPath, targetPath);
             }
         }
@@ -154,7 +154,7 @@ class WorkshopInstallerService {
 
     private void deleteSymlink(WorkshopMod mod) throws IOException {
         Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), mod.getServerType());
-        log.info("Deleting symlink {}", linkPath);
+        log.debug("Deleting symlink {}", linkPath);
         if (Files.isSymbolicLink(linkPath)) {
             Files.delete(linkPath);
         }
