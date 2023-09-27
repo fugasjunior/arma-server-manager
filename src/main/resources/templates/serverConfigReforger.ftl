@@ -1,21 +1,18 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer" -->
 {
-"dedicatedServerId": "${dedicatedServerId!}",
-"region": "EU",
-"gameHostBindAddress": "",
-"gameHostBindPort": ${port?string.computer},
-"gameHostRegisterBindAddress": "",
-"gameHostRegisterPort": ${port?string.computer},
-"adminPassword": "${adminPassword!}",
+"bindAddress": "",
+"bindPort": ${port?string.computer},
+"publicAddress": "",
+"publicPort": ${port?string.computer},
 "game": {
 "name": "${name!}",
 "password": "${password!}",
+"passwordAdmin": "${adminPassword!}",
 "scenarioId": "${scenarioId!}",
-"playerCountLimit": ${maxPlayers?string.computer},
-"autoJoinable": false,
+"maxPlayers": ${maxPlayers?string.computer},
 "visible": true,
 <#--TODO make supported client types configurable-->
-"supportedGameClientTypes": [
+"supportedPlatforms": [
 "PLATFORM_PC"
 ],
 "gameProperties": {
@@ -26,13 +23,7 @@
 "fastValidation": true,
 "battlEye": ${battlEye?then('true', 'false')},
 "VONDisableUI": true,
-"VONDisableDirectSpeechUI": true,
-"missionHeader": {
-"m_iPlayerCount": 40,
-"m_eEditableGameFlags": 6,
-"m_eDefaultGameFlags": 6,
-"other": "values"
-}
+"VONDisableDirectSpeechUI": true
 },
 "mods": [
 <#list activeMods as mod>
@@ -43,6 +34,8 @@
 </#list>
 ]
 },
-"a2sQueryEnabled": true,
-"steamQueryPort": ${queryPort?string.computer}
+"a2s": {
+"address": "0.0.0.0",
+"port": ${queryPort?string.computer}
+}
 }
