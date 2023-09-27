@@ -26,7 +26,6 @@ public class ReforgerServerDto implements ServerDto {
 
     private String password;
     private String adminPassword;
-    private String dedicatedServerId;
 
     @NotEmpty
     private String scenarioId;
