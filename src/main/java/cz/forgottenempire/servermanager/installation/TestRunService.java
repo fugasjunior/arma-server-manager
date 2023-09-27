@@ -6,6 +6,10 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.util.SystemUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,9 +19,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -156,43 +157,19 @@ class TestRunService {
     private String getReforgerTestConfig(int port, int queryPort) {
         return """
                 {
-                     "dedicatedServerId": "",
-                     "region": "EU",
-                     "gameHostBindAddress": "",
-                     "gameHostBindPort": %d,
-                     "gameHostRegisterBindAddress": "",
-                     "gameHostRegisterPort": %d,
-                     "game": {
-                         "name": "TEST SERVER",
-                         "password": "",
-                         "scenarioId": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
-                         "playerCountLimit": 1,
-                         "autoJoinable": false,
-                         "visible": true,
-                         "supportedGameClientTypes": [
-                             "PLATFORM_PC",
-                             "PLATFORM_XBL"
-                         ],
-                         "gameProperties": {
-                             "serverMaxViewDistance": 2500,
-                             "serverMinGrassDistance": 50,
-                             "networkViewDistance": 1000,
-                             "disableThirdPerson": true,
-                             "fastValidation": true,
-                             "battlEye": false,
-                             "VONDisableUI": true,
-                             "VONDisableDirectSpeechUI": true,
-                             "missionHeader": {
-                                 "m_iPlayerCount": 40,
-                                 "m_eEditableGameFlags": 6,
-                                 "m_eDefaultGameFlags": 6,
-                                 "other": "values"
-                             }
-                         },
-                         "mods": []
-                     },
-                     "a2sQueryEnabled": true,
-                     "steamQueryPort": %d
+                	"bindAddress": "",
+                	"bindPort": %d,
+                	"publicAddress": "",
+                	"publicPort": %d,
+                	"a2s": {
+                		"address": "127.0.0.1",
+                		"port": %d
+                	},
+                	"game": {
+                		"name": "TEST SERVER",
+                		"scenarioId": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
+                		"visible": false
+                	}
                 }
                  """.formatted(port, port, queryPort);
     }
