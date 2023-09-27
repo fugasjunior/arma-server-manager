@@ -50,7 +50,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO fix depre
 
         http.cors().and()
                 .authorizeRequests()
-                .antMatchers("/api/login", "/static/**", "/{spring:[^(api)]}/**", "/*", "/h2-console/**").permitAll()
+                .antMatchers("/api/login", "/assets/**", "/static/**", "/{spring:[^(api)]}/**", "/*", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter)
