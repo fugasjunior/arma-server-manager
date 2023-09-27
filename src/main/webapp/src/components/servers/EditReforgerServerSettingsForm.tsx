@@ -41,8 +41,6 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
                     <CustomTextField id='description' label='Description' formik={formik}/>
                     <CustomTextField id='port' label='Port' type='number' formik={formik}/>
                     <CustomTextField id='queryPort' label='Query port' type='number' formik={formik}/>
-                    <CustomTextField id='dedicatedServerId' label='Dedicated server ID' type='number' formik={formik}
-                                     helperText='Leave empty to generate a new ID automatically'/>
                     <Grid item xs={12} md={6}>
                         <ReforgerScenariosAutocomplete onChange={setScenario} formik={formik}/>
                     </Grid>

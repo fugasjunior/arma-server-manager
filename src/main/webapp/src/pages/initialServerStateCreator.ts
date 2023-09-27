@@ -85,7 +85,6 @@ export function reforgerServerInitialState(): ReforgerServerDto {
         type: ServerType.REFORGER,
         name: "",
         description: "",
-        dedicatedServerId: "",
         scenarioId: "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
         port: 2001,
         queryPort: 17777,

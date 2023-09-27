@@ -78,7 +78,6 @@ export interface DayZServerDto extends ServerDto {
 }
 
 export interface ReforgerServerDto extends ServerDto {
-    dedicatedServerId: string,
     scenarioId: string,
     battlEye: boolean,
     thirdPersonViewEnabled: boolean,

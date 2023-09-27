@@ -14,8 +14,6 @@ import lombok.Setter;
 @Entity
 public class ReforgerServer extends Server {
 
-    private String dedicatedServerId;
-
     @NotEmpty
     private String scenarioId;
 

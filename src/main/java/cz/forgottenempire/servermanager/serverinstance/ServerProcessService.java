@@ -7,10 +7,13 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
-import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
 import cz.forgottenempire.servermanager.util.LogUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -90,8 +88,6 @@ class ServerProcessService {
                 .alive(false)
                 .build();
         instanceInfoRepository.storeServerInstanceInfo(id, instanceInfo);
-
-        readGeneratedReforgerServerId(id);
     }
 
     public void restartServer(Long id) {
@@ -113,19 +109,6 @@ class ServerProcessService {
                 .filter(Objects::nonNull)
                 .filter(Process::isAlive)
                 .forEach(Process::destroy)));
-    }
-
-    private void readGeneratedReforgerServerId(Long serverId) {
-        Server server = serverRepository.findById(serverId).orElseThrow();
-
-        if (server instanceof ReforgerServer reforgerServer) {
-            configFileService.readOptionFromConfig("dedicatedServerId", reforgerServer)
-                    .ifPresent(dedicatedServerId -> {
-                        reforgerServer.setDedicatedServerId(dedicatedServerId);
-                        serverRepository.save(reforgerServer);
-                        log.info("Successfully loaded Reforger dedicated ID for server ID {}", serverId);
-                    });
-        }
     }
 
     private void validatePortsNotTaken(Server server) {
