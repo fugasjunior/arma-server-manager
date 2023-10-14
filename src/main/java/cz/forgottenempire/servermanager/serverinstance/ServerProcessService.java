@@ -5,8 +5,6 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
-import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
 import cz.forgottenempire.servermanager.util.LogUtils;
@@ -18,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,8 +30,6 @@ class ServerProcessService {
     private final PathsFactory pathsFactory;
     @Value("${directory.logs}")
     private String logDir; // TODO get rid of this, fix for multiple server instances
-    @Value("${additionalMods:#{null}}")
-    private String[] additionalMods;
 
     @Autowired
     public ServerProcessService(
@@ -137,7 +131,7 @@ class ServerProcessService {
     private Process startServerProcess(Server server) {
         Process serverProcess = null;
         File executable = pathsFactory.getServerExecutableWithFallback(server.getType());
-        List<String> parameters = getParameters(server);
+        List<String> parameters = server.getLaunchParameters();
 
         File logFile = new File(logDir + File.separatorChar + server.getType().name() + "_" + server.getId()
                 + ".log"); // TODO extract to PathsFactory
@@ -151,66 +145,6 @@ class ServerProcessService {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
         }
         return serverProcess;
-    }
-
-    private List<String> getParameters(Server server) {
-        List<String> parameters = new ArrayList<>();
-        ServerType type = server.getType();
-
-        String configFilePath = configFileService.getConfigFileForServer(server).getAbsolutePath();
-
-        if (type == ServerType.ARMA3) {
-            parameters.add("-port=" + server.getPort());
-            parameters.add("-config=" + configFilePath);
-            parameters.add("-profiles=\"" + pathsFactory.getProfilesDirectoryPath().toAbsolutePath() + "\"");
-            parameters.add("-name=" + ServerType.ARMA3 + "_" + server.getId());
-            parameters.add("-nosplash");
-            parameters.add("-skipIntro");
-            parameters.add("-world=empty");
-            addArma3ModsAndDlcsToParameters(parameters, (Arma3Server) server);
-        } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
-            parameters.add("-port=" + server.getPort());
-            parameters.add("-config=" + configFilePath);
-            parameters.add("-limitFPS=60");
-            parameters.add("-dologs");
-            parameters.add("-adminlog");
-            parameters.add("-freezeCheck");
-            addDayZModsToParameters(parameters, (DayZServer) server);
-        } else if (type == ServerType.REFORGER) {
-            parameters.add("-config");
-            parameters.add(configFilePath);
-            parameters.add("-maxFPS");
-            parameters.add("60");
-            parameters.add("-backendlog");
-            parameters.add("-logAppend");
-        }
-
-        return parameters;
-    }
-
-    private void addArma3ModsAndDlcsToParameters(List<String> parameters, Arma3Server server) {
-        // add enabled mods
-        server.getActiveMods().stream() // TODO check installation status
-                .map(mod -> "-mod=" + mod.getNormalizedName())
-                .forEach(parameters::add);
-
-        // add additional mods from properties
-        if (additionalMods != null) {
-            Arrays.stream(additionalMods)
-                    .map(mod -> "-mod=" + mod)
-                    .forEach(parameters::add);
-        }
-
-        // add enabled Creator DLCs
-        server.getActiveDLCs().stream()
-                .map(dlc -> "-mod=" + dlc.getId())
-                .forEach(parameters::add);
-    }
-
-    private void addDayZModsToParameters(List<String> parameters, DayZServer server) {
-        server.getActiveMods().stream() // TODO check installation status
-                .map(mod -> "-mod=" + mod.getNormalizedName())
-                .forEach(parameters::add);
     }
 
     private void writeConfigFiles(Server server) {
