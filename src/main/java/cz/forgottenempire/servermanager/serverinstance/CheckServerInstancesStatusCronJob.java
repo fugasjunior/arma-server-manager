@@ -4,17 +4,15 @@ import com.ibasco.agql.core.exceptions.ReadTimeoutException;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
-
-import java.net.InetSocketAddress;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -23,46 +21,52 @@ class CheckServerInstancesStatusCronJob {
     private static final String LOCALHOST = "localhost";
 
     private final ServerInstanceInfoRepository instanceInfoRepository;
+    private final ServerProcessRepository processRepository;
 
     private final ServerInstanceService serverService;
 
 
     @Autowired
     public CheckServerInstancesStatusCronJob(ServerInstanceInfoRepository instanceInfoRepository,
-                                             ServerInstanceService serverService) {
+                                             ServerProcessRepository processRepository, ServerInstanceService serverService) {
         this.instanceInfoRepository = instanceInfoRepository;
+        this.processRepository = processRepository;
         this.serverService = serverService;
     }
 
     @Scheduled(fixedDelay = 10000)
     public void checkServers() {
-        instanceInfoRepository.getAll().stream()
-                .filter(ServerInstanceInfo::isAlive)
-                .forEach(server -> {
-                    if (checkCrashed(server)) {
-                        handleCrashedServer(server);
+        processRepository.getAll().stream()
+                .filter(process -> process.getInstanceInfo().isAlive())
+                .forEach(process -> {
+                    if (checkCrashed(process)) {
+                        handleCrashedServer(process);
                         return;
                     }
-                    updateServerInstanceInfo(server);
+                    updateServerInstanceInfo(process.getInstanceInfo());
                 });
     }
 
-    private boolean checkCrashed(ServerInstanceInfo instanceInfo) {
-        Process process = instanceInfo.getProcess();
-        return process == null || !process.isAlive();
+    private boolean checkCrashed(ServerProcess serverProcess) {
+        boolean hasBeenStarted = serverProcess.getInstanceInfo().isAlive();
+        return hasBeenStarted && !serverProcess.isAlive();
     }
 
-    private void handleCrashedServer(ServerInstanceInfo instanceInfo) {
-        Server server = getServer(instanceInfo.getId());
-
-        instanceInfoRepository.storeServerInstanceInfo(instanceInfo.getId(), ServerInstanceInfo.builder()
-                .id(instanceInfo.getId()).alive(false).build());
-
-        log.warn("Server '{}' (ID {}, type '{}') likely crashed or was exited outside the admin UI. "
-                        + "Server was started on {} with process ID {}.",
-                server.getName(), server.getId(), server.getType(),
-                instanceInfo.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
-                instanceInfo.getProcess().pid());
+    private void handleCrashedServer(ServerProcess serverProcess) {
+        ServerInstanceInfo instanceInfo = serverProcess.getInstanceInfo();
+        instanceInfo.setStartedAt(null);
+        instanceInfo.setProcess(null);
+        instanceInfo.setPlayersOnline(0);
+        instanceInfo.setMaxPlayers(0);
+        instanceInfo.setVersion(null);
+        instanceInfo.setMap(null);
+        instanceInfo.setDescription(null);
+        // TODO fix log
+//        log.warn("Server '{}' (ID {}, type '{}') likely crashed or was exited outside the admin UI. "
+//                        + "Server was started on {} with process ID {}.",
+//                server.getName(), sserver.getId(), server.getType(),
+//                instanceInfo.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
+//                instanceInfo.getProcess().pid());
     }
 
     private void updateServerInstanceInfo(ServerInstanceInfo instanceInfo) {
@@ -75,7 +79,6 @@ class CheckServerInstancesStatusCronJob {
                     .id(instanceInfo.getId())
                     .process(instanceInfo.getProcess())
                     .startedAt(instanceInfo.getStartedAt())
-                    .alive(true)
                     .playersOnline(queryServerInfo.getNumOfPlayers())
                     .maxPlayers(server.getMaxPlayers())
                     .map(queryServerInfo.getMapName())
