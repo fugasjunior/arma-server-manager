@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
 
@@ -9,12 +10,30 @@ import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.util.Optional;
 
+@Slf4j
 public class ServerLog {
 
     private final File logFile;
 
     public ServerLog(File logFile) {
         this.logFile = logFile;
+    }
+
+    public File getFile() {
+        return logFile;
+    }
+
+    public void prepare() {
+        if (logFile.exists()) {
+            return;
+        }
+
+        try {
+            logFile.getParentFile().mkdirs();
+            logFile.createNewFile();
+        } catch (IOException e) {
+            log.error("Could not create log file {}", logFile.getAbsolutePath());
+        }
     }
 
     public String getLastLines(int count) {
