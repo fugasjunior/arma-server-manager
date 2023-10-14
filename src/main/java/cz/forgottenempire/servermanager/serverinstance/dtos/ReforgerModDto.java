@@ -1,6 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance.dtos;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data

@@ -2,8 +2,8 @@ package cz.forgottenempire.servermanager.modpreset.dtos;
 
 import cz.forgottenempire.servermanager.common.ServerType;
 import java.util.List;
-import javax.persistence.Id;
-import javax.validation.constraints.NotEmpty;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data

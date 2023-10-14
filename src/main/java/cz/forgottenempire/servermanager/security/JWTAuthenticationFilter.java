@@ -1,21 +1,20 @@
 package cz.forgottenempire.servermanager.security;
 
-import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import static cz.forgottenempire.servermanager.security.SecurityConstants.EXPIRATION_TIME;
-import static cz.forgottenempire.servermanager.security.SecurityConstants.HEADER_STRING;
-import static cz.forgottenempire.servermanager.security.SecurityConstants.TOKEN_PREFIX;
-
 import com.auth0.jwt.JWT;
 import com.google.gson.JsonObject;
-import java.io.IOException;
-import java.util.Date;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
+import java.util.Date;
+
+import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
+import static cz.forgottenempire.servermanager.security.SecurityConstants.*;
 
 class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 

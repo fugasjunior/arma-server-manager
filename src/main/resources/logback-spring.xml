@@ -6,7 +6,7 @@
             class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) %yellow(%C{1.}): %msg%n%throwable
+                %black(%d{ISO8601}) %highlight(%-5level) %yellow(%C): %msg%n%throwable
             </Pattern>
         </layout>
     </appender>
@@ -16,7 +16,7 @@
                 name="RollingFile">
             <encoder
                     class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                <Pattern>%d %p %C{1.} %m%n</Pattern>
+                <Pattern>%d %p %C %m%n</Pattern>
             </encoder>
             <file>${LOGS}/spring-boot-logger.log</file>
 

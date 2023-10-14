@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.workshop;
 
 import cz.forgottenempire.servermanager.common.ServerType;
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
