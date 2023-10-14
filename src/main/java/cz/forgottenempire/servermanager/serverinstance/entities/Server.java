@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -14,13 +15,21 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@Configurable
 public abstract class Server {
+
+    @Autowired
+    protected transient PathsFactory pathsFactory;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +52,6 @@ public abstract class Server {
 
     private String password;
     private String adminPassword;
+
+    public abstract List<String> getLaunchParameters();
 }
