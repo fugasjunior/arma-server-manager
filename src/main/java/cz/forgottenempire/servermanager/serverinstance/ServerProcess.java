@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,13 +17,22 @@ public class ServerProcess {
     private final PathsFactory pathsFactory;
     private final Server server;
     private Process process;
+    private ServerInstanceInfo instanceInfo;
 
     public ServerProcess(Server server, PathsFactory pathsFactory) {
         this.pathsFactory = pathsFactory;
         this.server = server;
     }
 
+    public ServerInstanceInfo getInstanceInfo() {
+        return instanceInfo;
+    }
+
     public Process start() {
+        if (isAlive()) {
+            return process;
+        }
+
         File executable = pathsFactory.getServerExecutableWithFallback(server.getType());
         List<String> parameters = server.getLaunchParameters();
 
@@ -35,11 +45,27 @@ public class ServerProcess {
         } catch (IOException e) {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
         }
+
+        instanceInfo = ServerInstanceInfo.builder()
+                .id(server.getId())
+                .alive(true)
+                .startedAt(LocalDateTime.now())
+                .maxPlayers(server.getMaxPlayers())
+                .process(process)
+                .build();
         return process;
     }
 
     public void stop() {
+        if (!isAlive()) {
+            return;
+        }
+
         process.destroy();
+        instanceInfo = ServerInstanceInfo.builder()
+                .id(server.getId())
+                .alive(false)
+                .build();
     }
 
     public boolean isAlive() {
