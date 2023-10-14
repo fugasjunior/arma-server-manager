@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.modpreset.dtos;
 
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data

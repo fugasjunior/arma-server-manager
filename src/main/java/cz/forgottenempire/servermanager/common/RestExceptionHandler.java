@@ -1,13 +1,12 @@
 package cz.forgottenempire.servermanager.common;
 
 import cz.forgottenempire.servermanager.common.exceptions.CustomUserErrorException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.FieldError;
@@ -19,6 +18,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 @ControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -28,7 +31,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers,
-            @NonNull HttpStatus status,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request
     ) {
         List<String> errors = new ArrayList<>();
@@ -44,7 +47,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .message(ex.getLocalizedMessage())
                 .errors(errors)
                 .build();
-        return handleExceptionInternal(ex, error, headers, error.getStatus(), request);
+        return Objects.requireNonNull(handleExceptionInternal(ex, error, headers, error.getStatus(), request));
     }
 
     @Override
@@ -52,7 +55,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex,
             @NonNull HttpHeaders headers,
-            @NonNull HttpStatus status,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request
     ) {
         String error = ex.getParameterName() + " parameter is missing";
@@ -87,7 +90,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .message(ex.getLocalizedMessage())
                 .build();
-        log.error("Exception occured, HTTP 500 was returned", ex);
+        log.error("Exception occurred, HTTP 500 was returned", ex);
         return new ResponseEntity<>(error, new HttpHeaders(), error.getStatus());
     }
 }

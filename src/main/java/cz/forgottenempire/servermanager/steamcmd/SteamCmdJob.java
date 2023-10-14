@@ -4,7 +4,7 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 
 @Data

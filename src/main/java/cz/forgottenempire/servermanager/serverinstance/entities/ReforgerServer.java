@@ -1,9 +1,9 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import java.util.List;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.validation.constraints.NotEmpty;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

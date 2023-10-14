@@ -2,7 +2,7 @@ package cz.forgottenempire.servermanager.steamcmd;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 class SteamCmdParameters {
 

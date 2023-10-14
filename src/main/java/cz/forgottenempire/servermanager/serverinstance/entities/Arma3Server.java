@@ -3,7 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import java.util.List;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
