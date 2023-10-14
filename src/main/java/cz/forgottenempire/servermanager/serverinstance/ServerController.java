@@ -109,7 +109,7 @@ class ServerController {
     public ResponseEntity<Resource> downloadLogFile(@PathVariable long id) throws IOException {
         Server server = getServerEntity(id);
 
-        Resource resource = server.getLogFile().asResource()
+        Resource resource = server.getLog().asResource()
                 .orElseThrow(() -> new NotFoundException("Log file for server '" + server.getName() + "' doesn't exist"));
 
         HttpHeaders headers = new HttpHeaders();
@@ -128,7 +128,7 @@ class ServerController {
         }
 
         Server server = getServerEntity(id);
-        ServerLog logFile = server.getLogFile();
+        ServerLog logFile = server.getLog();
         String logLines = logFile.getLastLines(count);
         return ResponseEntity.ok(logLines);
     }
