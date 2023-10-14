@@ -31,7 +31,6 @@ class ServerInstanceInfoRepository {
     private ServerInstanceInfo createEmptyInstanceInfo(Long id) {
         return ServerInstanceInfo.builder()
                 .id(id)
-                .alive(false)
                 .startedAt(null)
                 .playersOnline(0)
                 .process(null)
