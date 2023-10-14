@@ -28,6 +28,10 @@ public class ServerProcess {
         return instanceInfo;
     }
 
+    public long getServerId() {
+        return server.getId();
+    }
+
     public Process start() {
         if (isAlive()) {
             return process;
