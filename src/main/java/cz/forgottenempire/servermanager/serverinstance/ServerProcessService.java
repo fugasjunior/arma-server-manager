@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 class ServerProcessService {
 
     private final ServerRepository serverRepository;
-    private final ServerInstanceInfoRepository instanceInfoRepository;
     private final ServerProcessRepository processRepository;
     private final ConfigFileService configFileService;
     private final PathsFactory pathsFactory;
@@ -22,12 +21,11 @@ class ServerProcessService {
     @Autowired
     public ServerProcessService(
             ServerRepository serverRepository,
-            ServerInstanceInfoRepository instanceInfoRepository,
-            ServerProcessRepository processRepository, ConfigFileService configFileService,
+            ServerProcessRepository processRepository,
+            ConfigFileService configFileService,
             PathsFactory pathsFactory
     ) {
         this.serverRepository = serverRepository;
-        this.instanceInfoRepository = instanceInfoRepository;
         this.processRepository = processRepository;
         this.configFileService = configFileService;
         this.pathsFactory = pathsFactory;
@@ -49,7 +47,6 @@ class ServerProcessService {
         writeConfigFiles(server);
 
         serverProcess.start();
-        instanceInfoRepository.storeServerInstanceInfo(id, serverProcess.getInstanceInfo());
     }
 
     public void shutDownServer(Long id) {
@@ -57,7 +54,6 @@ class ServerProcessService {
                 .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
         ServerProcess serverProcess = getServerProcess(server);
         serverProcess.stop();
-        instanceInfoRepository.storeServerInstanceInfo(id, serverProcess.getInstanceInfo());
     }
 
     public void restartServer(Long id) {
@@ -93,8 +89,8 @@ class ServerProcessService {
         serverRepository.findAllByPortOrQueryPort(server.getPort(), server.getQueryPort()).stream()
                 .filter(s -> !s.equals(server))
                 .forEach(s -> {
-                    ServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(s.getId());
-                    if (instanceInfo.isAlive()) {
+                    ServerProcess process = getServerProcess(server);
+                    if (process.isAlive()) {
                         int conflictingPort = s.getPort() == server.getPort() ?
                                 server.getPort()
                                 : server.getQueryPort();
