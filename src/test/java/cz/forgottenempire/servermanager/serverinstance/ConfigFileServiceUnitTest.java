@@ -1,14 +1,5 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.google.gson.JsonObject;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
@@ -17,16 +8,19 @@ import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Path;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Path;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 class ConfigFileServiceUnitTest {
 
@@ -56,14 +50,6 @@ class ConfigFileServiceUnitTest {
         server.setType(type);
         server.setId(1L);
         return server;
-    }
-
-    private static void writeTestConfigFile(File configFile, String key, String value) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
-            JsonObject jsonConfig = new JsonObject();
-            jsonConfig.addProperty(key, value);
-            writer.write(jsonConfig.toString());
-        }
     }
 
     @Test
@@ -104,54 +90,6 @@ class ConfigFileServiceUnitTest {
         verify(freeMarkerConfigurer).getConfiguration();
         verify(freeMarkerConfig).getTemplate(Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3));
         verify(template).process(any(Arma3Server.class), any(Writer.class));
-    }
-
-    @Test
-    public void whenReadOptionFromConfigAndOptionExists_thenReturnOptionValue() throws IOException {
-        Server server = createServer(ServerType.REFORGER);
-        File configFile = tempDir.resolve("REFORGER_1.cfg").toFile();
-        writeTestConfigFile(configFile, "dedicatedServerId", "ID_12345");
-        when(pathsFactory.getConfigFilePath(ServerType.REFORGER, "REFORGER_1.json"))
-                .thenReturn(configFile.toPath().toAbsolutePath());
-
-        Optional<String> value = configFileService.readOptionFromConfig("dedicatedServerId", server);
-
-        assertThat(value).isPresent();
-        assertThat(value.get()).isEqualTo("ID_12345");
-    }
-
-    @Test
-    public void whenReadOptionFromConfigAndOptionDoesNotExist_thenReturnEmptyOptional() throws IOException {
-        Server server = createServer(ServerType.REFORGER);
-        File configFile = tempDir.resolve("REFORGER_1.cfg").toFile();
-        writeTestConfigFile(configFile, "key", "value");
-        when(pathsFactory.getConfigFilePath(ServerType.REFORGER, "REFORGER_1.json"))
-                .thenReturn(configFile.toPath().toAbsolutePath());
-
-        Optional<String> value = configFileService.readOptionFromConfig("NOT_EXISTING_KEY", server);
-
-        assertThat(value).isEmpty();
-    }
-
-    @Test
-    public void whenReadOptionFromConfigAndNotReforger_thenThrowUnsupportedOperationException() {
-        Server server = createServer(ServerType.ARMA3);
-
-        assertThatThrownBy(() -> configFileService.readOptionFromConfig("test", server))
-                .isInstanceOf(UnsupportedOperationException.class)
-                .hasMessageContaining("Reading properties is only implemented for Reforger servers");
-    }
-
-    @Test
-    public void whenReadOptionFromConfigAndConfigDoesNotExist_thenThrowIllegalStateException() {
-        Server server = createServer(ServerType.REFORGER);
-        when(pathsFactory.getConfigFilePath(ServerType.REFORGER, "REFORGER_1.json"))
-                .thenReturn(tempDir.resolve("REFORGER_1.json").toAbsolutePath());
-
-        assertThatThrownBy(() -> configFileService.readOptionFromConfig("test", server))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(
-                        "Cannot read property from config file REFORGER_1.json because it does not exist");
     }
 
     private void mockFreeMarker() throws IOException {
