@@ -77,7 +77,9 @@ class ServerProcessService {
     }
 
     public ServerInstanceInfo getServerInstanceInfo(Long id) {
-        return instanceInfoRepository.getServerInstanceInfo(id);
+        return processRepository.get(id)
+                .map(ServerProcess::getInstanceInfo)
+                .orElse(null);
     }
 
     public boolean isServerInstanceRunning(Server server) {
