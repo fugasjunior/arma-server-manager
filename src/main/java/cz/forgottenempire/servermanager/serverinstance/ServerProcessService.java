@@ -25,23 +25,21 @@ class ServerProcessService {
 
     private final ServerRepository serverRepository;
     private final ServerInstanceInfoRepository instanceInfoRepository;
+    private final ServerProcessRepository processRepository;
     private final ConfigFileService configFileService;
-    private final ProcessFactory processFactory;
     private final PathsFactory pathsFactory;
-    @Value("${directory.logs}")
-    private String logDir; // TODO get rid of this, fix for multiple server instances
 
     @Autowired
     public ServerProcessService(
             ServerRepository serverRepository,
             ServerInstanceInfoRepository instanceInfoRepository,
-            ConfigFileService configFileService,
-            ProcessFactory processFactory, PathsFactory pathsFactory
+            ServerProcessRepository processRepository, ConfigFileService configFileService,
+            PathsFactory pathsFactory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
+        this.processRepository = processRepository;
         this.configFileService = configFileService;
-        this.processFactory = processFactory;
         this.pathsFactory = pathsFactory;
 
         addShutdownHook(instanceInfoRepository);
@@ -49,8 +47,18 @@ class ServerProcessService {
 
     public void startServer(Long id) {
         Server server = serverRepository.findById(id)
-                .orElseThrow(
-                        () -> new NotFoundException("Server ID " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
+
+        ServerProcess serverProcess = processRepository.get(id)
+                .orElseGet(() -> {
+                    ServerProcess process = server.getProcess();
+                    processRepository.store(id, process);
+                    return process;
+                });
+
+        if (serverProcess.isAlive()) {
+            return;
+        }
 
         validatePortsNotTaken(server);
 
@@ -61,7 +69,7 @@ class ServerProcessService {
 
         writeConfigFiles(server);
 
-        Process process = startServerProcess(server);
+        Process process = serverProcess.start();
         instanceInfo = ServerInstanceInfo.builder()
                 .id(id)
                 .alive(true)
@@ -126,25 +134,6 @@ class ServerProcessService {
 
     private boolean isServerInstanceRunning(ServerInstanceInfo instanceInfo) {
         return instanceInfo.isAlive() && instanceInfo.getProcess().isAlive();
-    }
-
-    private Process startServerProcess(Server server) {
-        Process serverProcess = null;
-        File executable = pathsFactory.getServerExecutableWithFallback(server.getType());
-        List<String> parameters = server.getLaunchParameters();
-
-        File logFile = new File(logDir + File.separatorChar + server.getType().name() + "_" + server.getId()
-                + ".log"); // TODO extract to PathsFactory
-        LogUtils.prepareLogFile(logFile);
-
-        try {
-            log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
-            serverProcess = processFactory.startProcessWithRedirectedOutput(executable, parameters, logFile);
-            log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), serverProcess.pid());
-        } catch (IOException e) {
-            log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
-        }
-        return serverProcess;
     }
 
     private void writeConfigFiles(Server server) {

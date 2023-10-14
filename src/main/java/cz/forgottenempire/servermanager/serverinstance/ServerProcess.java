@@ -42,7 +42,11 @@ public class ServerProcess {
         process.destroy();
     }
 
-    public Process startProcessWithRedirectedOutput(File executable, List<String> parameters, File outputFile)
+    public boolean isAlive() {
+        return process != null && process.isAlive();
+    }
+
+    private Process startProcessWithRedirectedOutput(File executable, List<String> parameters, File outputFile)
             throws IOException {
         File directory = executable.getParentFile();
         List<String> commands = new ArrayList<>();
