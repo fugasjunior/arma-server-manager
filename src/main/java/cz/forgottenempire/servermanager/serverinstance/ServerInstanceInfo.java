@@ -11,9 +11,7 @@ import lombok.*;
 @Builder
 class ServerInstanceInfo {
 
-    private final long id;
     private LocalDateTime startedAt;
-    private Process process;
     private int playersOnline;
     private int maxPlayers;
     private String version;

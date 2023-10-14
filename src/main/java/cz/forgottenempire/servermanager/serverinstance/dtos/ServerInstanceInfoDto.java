@@ -1,15 +1,12 @@
 package cz.forgottenempire.servermanager.serverinstance.dtos;
 
-import lombok.Data;
-
-@Data
-public class ServerInstanceInfoDto {
-
-    private final boolean alive;
-    private final String startedAt;
-    private final int playersOnline;
-    private final int maxPlayers;
-    private final String version;
-    private final String map;
-    private final String description;
+public record ServerInstanceInfoDto(
+        boolean alive,
+        String startedAt,
+        int playersOnline,
+        int maxPlayers,
+        String version,
+        String map,
+        String description
+) {
 }

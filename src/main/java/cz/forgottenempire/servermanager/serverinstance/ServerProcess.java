@@ -51,10 +51,8 @@ public class ServerProcess {
         }
 
         instanceInfo = ServerInstanceInfo.builder()
-                .id(server.getId())
                 .startedAt(LocalDateTime.now())
                 .maxPlayers(server.getMaxPlayers())
-                .process(process)
                 .build();
         return process;
     }
@@ -64,9 +62,7 @@ public class ServerProcess {
             process.destroy();
         }
 
-        instanceInfo = ServerInstanceInfo.builder()
-                .id(server.getId())
-                .build();
+        instanceInfo = ServerInstanceInfo.builder().build();
     }
 
     public boolean isAlive() {

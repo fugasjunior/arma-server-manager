@@ -50,7 +50,6 @@ class CheckServerInstancesStatusCronJob {
     private void handleCrashedServer(ServerProcess serverProcess) {
         ServerInstanceInfo instanceInfo = serverProcess.getInstanceInfo();
         instanceInfo.setStartedAt(null);
-        instanceInfo.setProcess(null);
         instanceInfo.setPlayersOnline(0);
         instanceInfo.setMaxPlayers(0);
         instanceInfo.setVersion(null);
