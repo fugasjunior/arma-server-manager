@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 @Slf4j
 class ServerProcessService {
@@ -34,7 +32,7 @@ class ServerProcessService {
         this.configFileService = configFileService;
         this.pathsFactory = pathsFactory;
 
-        addShutdownHook(instanceInfoRepository);
+        addShutdownHook(processRepository);
     }
 
     public void startServer(Long id) {
@@ -86,12 +84,9 @@ class ServerProcessService {
         return isServerInstanceRunning(getServerInstanceInfo(server.getId()));
     }
 
-    private static void addShutdownHook(ServerInstanceInfoRepository instanceInfoRepository) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> instanceInfoRepository.getAll().stream()
-                .map(ServerInstanceInfo::getProcess)
-                .filter(Objects::nonNull)
-                .filter(Process::isAlive)
-                .forEach(Process::destroy)));
+    private static void addShutdownHook(ServerProcessRepository processRepository) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> processRepository.getAll()
+                .forEach(ServerProcess::stop)));
     }
 
     private void validatePortsNotTaken(Server server) {
