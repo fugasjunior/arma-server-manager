@@ -1,22 +1,14 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import com.google.common.base.Joiner;
 import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
-import cz.forgottenempire.servermanager.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -49,52 +41,39 @@ class ServerProcessService {
         Server server = serverRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
 
-        ServerProcess serverProcess = processRepository.get(id)
-                .orElseGet(() -> {
-                    ServerProcess process = server.getProcess();
-                    processRepository.store(id, process);
-                    return process;
-                });
-
+        ServerProcess serverProcess = getServerProcess(server);
         if (serverProcess.isAlive()) {
             return;
         }
 
         validatePortsNotTaken(server);
 
-        ServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(id);
-        if (isServerInstanceRunning(instanceInfo)) {
-            log.info("Server '{}' (ID {}) is already running", server.getName(), id);
-        }
-
         writeConfigFiles(server);
 
-        Process process = serverProcess.start();
-        instanceInfo = ServerInstanceInfo.builder()
-                .id(id)
-                .alive(true)
-                .startedAt(LocalDateTime.now())
-                .maxPlayers(server.getMaxPlayers())
-                .process(process)
-                .build();
-        instanceInfoRepository.storeServerInstanceInfo(id, instanceInfo);
+        serverProcess.start();
+        instanceInfoRepository.storeServerInstanceInfo(id, serverProcess.getInstanceInfo());
     }
 
     public void shutDownServer(Long id) {
-        ServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(id);
-        Process process = instanceInfo.getProcess();
-        process.destroy();
-
-        instanceInfo = ServerInstanceInfo.builder()
-                .id(id)
-                .alive(false)
-                .build();
-        instanceInfoRepository.storeServerInstanceInfo(id, instanceInfo);
+        Server server = serverRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
+        ServerProcess serverProcess = getServerProcess(server);
+        serverProcess.stop();
+        instanceInfoRepository.storeServerInstanceInfo(id, serverProcess.getInstanceInfo());
     }
 
     public void restartServer(Long id) {
         shutDownServer(id);
         startServer(id);
+    }
+
+    private ServerProcess getServerProcess(Server server) {
+        return processRepository.get(server.getId())
+                .orElseGet(() -> {
+                    ServerProcess process = server.getProcess();
+                    processRepository.store(server.getId(), process);
+                    return process;
+                });
     }
 
     public ServerInstanceInfo getServerInstanceInfo(Long id) {
