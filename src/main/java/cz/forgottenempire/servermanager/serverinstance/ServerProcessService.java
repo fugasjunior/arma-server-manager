@@ -77,7 +77,7 @@ class ServerProcessService {
     }
 
     public boolean isServerInstanceRunning(Server server) {
-        return isServerInstanceRunning(getServerInstanceInfo(server.getId()));
+        return getServerProcess(server).isAlive();
     }
 
     private static void addShutdownHook(ServerProcessRepository processRepository) {
@@ -102,10 +102,6 @@ class ServerProcessService {
                         throw new PortAlreadyTakenException(errorMessage);
                     }
                 });
-    }
-
-    private boolean isServerInstanceRunning(ServerInstanceInfo instanceInfo) {
-        return instanceInfo.isAlive() && instanceInfo.getProcess().isAlive();
     }
 
     private void writeConfigFiles(Server server) {
