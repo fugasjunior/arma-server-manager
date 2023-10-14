@@ -20,16 +20,11 @@ class CheckServerInstancesStatusCronJob {
 
     private static final String LOCALHOST = "localhost";
 
-    private final ServerInstanceInfoRepository instanceInfoRepository;
     private final ServerProcessRepository processRepository;
-
     private final ServerInstanceService serverService;
 
-
     @Autowired
-    public CheckServerInstancesStatusCronJob(ServerInstanceInfoRepository instanceInfoRepository,
-                                             ServerProcessRepository processRepository, ServerInstanceService serverService) {
-        this.instanceInfoRepository = instanceInfoRepository;
+    public CheckServerInstancesStatusCronJob(ServerProcessRepository processRepository, ServerInstanceService serverService) {
         this.processRepository = processRepository;
         this.serverService = serverService;
     }
@@ -43,7 +38,7 @@ class CheckServerInstancesStatusCronJob {
                         handleCrashedServer(process);
                         return;
                     }
-                    updateServerInstanceInfo(process.getInstanceInfo());
+                    updateServerInstanceInfo(process);
                 });
     }
 
@@ -69,22 +64,13 @@ class CheckServerInstancesStatusCronJob {
 //                instanceInfo.getProcess().pid());
     }
 
-    private void updateServerInstanceInfo(ServerInstanceInfo instanceInfo) {
-        Server server = getServer(instanceInfo.getId());
+    private void updateServerInstanceInfo(ServerProcess process) {
+        Server server = getServer(process.getServerId());
+        ServerInstanceInfo instanceInfo = process.getInstanceInfo();
         try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
             InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, server.getQueryPort());
             SourceServer queryServerInfo = sourceQueryClient.getServerInfo(serverAddress).get(30, TimeUnit.SECONDS);
-
-            instanceInfoRepository.storeServerInstanceInfo(instanceInfo.getId(), ServerInstanceInfo.builder()
-                    .id(instanceInfo.getId())
-                    .process(instanceInfo.getProcess())
-                    .startedAt(instanceInfo.getStartedAt())
-                    .playersOnline(queryServerInfo.getNumOfPlayers())
-                    .maxPlayers(server.getMaxPlayers())
-                    .map(queryServerInfo.getMapName())
-                    .version(queryServerInfo.getGameVersion())
-                    .description(queryServerInfo.getGameDescription())
-                    .build());
+            updateInstanceInfoFromQueryResult(instanceInfo, queryServerInfo);
         } catch (ReadTimeoutException e) {
             // ignore any timeouts that happen during the first minute of starting the server
             LocalDateTime startedAt = instanceInfo.getStartedAt();
@@ -92,12 +78,20 @@ class CheckServerInstancesStatusCronJob {
                 log.warn("Timeout happened during querying the status of server {} (ID {}) on port {}. " +
                                 "It may not have finished initialization yet. If this message keeps occurring, " +
                                 "there's likely a problem with the server.",
-                        server.getName(), instanceInfo.getId(), server.getQueryPort());
+                        server.getName(), server.getId(), server.getQueryPort());
             }
         } catch (Exception e) {
             log.error("Couldn't query server {} (ID {}) on port {}",
-                    server.getName(), instanceInfo.getId(), server.getQueryPort(), e);
+                    server.getName(), server.getId(), server.getQueryPort(), e);
         }
+    }
+
+    private static void updateInstanceInfoFromQueryResult(ServerInstanceInfo instanceInfo, SourceServer queryServerInfo) {
+        instanceInfo.setMap(queryServerInfo.getMapName());
+        instanceInfo.setPlayersOnline(queryServerInfo.getNumOfPlayers());
+        instanceInfo.setMaxPlayers(queryServerInfo.getMaxPlayers());
+        instanceInfo.setVersion(queryServerInfo.getGameVersion());
+        instanceInfo.setDescription(queryServerInfo.getGameDescription());
     }
 
     private Server getServer(Long serverId) {
