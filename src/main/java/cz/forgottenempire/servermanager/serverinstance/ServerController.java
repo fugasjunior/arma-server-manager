@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.serverinstance.dtos.ServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServersDto;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,18 +27,15 @@ class ServerController {
     public static final int DEFAULT_LOG_LINES_COUNT = 100;
     private final ServerInstanceService serverInstanceService;
     private final ServerProcessService serverProcessService;
-    private final ServerLogsService logsService;
     private final ServerMapper serverMapper = Mappers.getMapper(ServerMapper.class);
 
     @Autowired
     public ServerController(
             ServerInstanceService serverInstanceService,
-            ServerProcessService serverProcessService,
-            ServerLogsService logsService
+            ServerProcessService serverProcessService
     ) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
-        this.logsService = logsService;
     }
 
     @GetMapping
@@ -112,7 +109,7 @@ class ServerController {
     public ResponseEntity<Resource> downloadLogFile(@PathVariable long id) throws IOException {
         Server server = getServerEntity(id);
 
-        Resource resource = logsService.getLogFileAsResource(server)
+        Resource resource = server.getLogFile().asResource()
                 .orElseThrow(() -> new NotFoundException("Log file for server '" + server.getName() + "' doesn't exist"));
 
         HttpHeaders headers = new HttpHeaders();
@@ -131,7 +128,8 @@ class ServerController {
         }
 
         Server server = getServerEntity(id);
-        String logLines = logsService.getLastLinesFromServerLog(server, count);
+        ServerLog logFile = server.getLogFile();
+        String logLines = logFile.getLastLines(count);
         return ResponseEntity.ok(logLines);
     }
 

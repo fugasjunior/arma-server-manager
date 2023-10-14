@@ -1,10 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,37 +9,33 @@ import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.util.Optional;
 
-@Service
-public class ServerLogsService {
+public class ServerLog {
 
-    private final PathsFactory pathsFactory;
+    private final File logFile;
 
-    public ServerLogsService(PathsFactory pathsFactory) {
-        this.pathsFactory = pathsFactory;
+    public ServerLog(File logFile) {
+        this.logFile = logFile;
     }
 
-    public String getLastLinesFromServerLog(Server server, int count) {
-        File serverLogFile = pathsFactory.getServerLogFile(server.getType(), server.getId());
-        if (!serverLogFile.exists()) {
+    public String getLastLines(int count) {
+        if (!logFile.exists()) {
             return "";
         }
 
         try {
-            return getLastNLines(serverLogFile, count);
+            return getLastNLines(logFile, count);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Optional<Resource> getLogFileAsResource(Server server) {
-        File serverLogFile = pathsFactory.getServerLogFile(server.getType(), server.getId());
-
-        if (!serverLogFile.exists()) {
+    public Optional<Resource> asResource() {
+        if (!logFile.exists()) {
             return Optional.empty();
         }
 
         try {
-            return Optional.of(new FileUrlResource(serverLogFile.getAbsolutePath()));
+            return Optional.of(new FileUrlResource(logFile.getAbsolutePath()));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

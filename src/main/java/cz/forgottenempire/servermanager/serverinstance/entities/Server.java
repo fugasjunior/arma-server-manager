@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ServerLog;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -54,4 +55,8 @@ public abstract class Server {
     private String adminPassword;
 
     public abstract List<String> getLaunchParameters();
+
+    public ServerLog getLogFile() {
+        return new ServerLog(pathsFactory.getServerLogFile(type, id));
+    }
 }
