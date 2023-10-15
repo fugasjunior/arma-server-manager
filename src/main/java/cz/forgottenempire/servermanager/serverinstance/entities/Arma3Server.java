@@ -53,6 +53,11 @@ public class Arma3Server extends Server {
     private Arma3DifficultySettings difficultySettings;
 
     @Override
+    public void setQueryPort(int queryPort) {
+        super.setQueryPort(getPort() + 1);
+    }
+
+    @Override
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
