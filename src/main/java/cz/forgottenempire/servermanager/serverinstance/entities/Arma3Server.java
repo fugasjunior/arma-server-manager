@@ -52,6 +52,10 @@ public class Arma3Server extends Server {
     @OneToOne(mappedBy = "server", cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     private Arma3DifficultySettings difficultySettings;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "network_settings_id")
+    private Arma3NetworkSettings networkSettings;
+
     @Override
     public void setQueryPort(int queryPort) {
         super.setQueryPort(getPort() + 1);
