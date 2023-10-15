@@ -32,7 +32,7 @@ class CheckServerInstancesStatusCronJob {
     @Scheduled(fixedDelay = 10000)
     public void checkServers() {
         processRepository.getAll().stream()
-                .filter(process -> process.getInstanceInfo().isAlive())
+                .filter(process -> process.getInstanceInfo() != null && process.getInstanceInfo().isAlive())
                 .forEach(process -> {
                     if (checkCrashed(process)) {
                         handleCrashedServer(process);
