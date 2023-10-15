@@ -1,6 +1,9 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
+import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
+import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import jakarta.persistence.*;
@@ -11,8 +14,10 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -51,8 +56,8 @@ public class Arma3Server extends Server {
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=" + getConfigFileForServer().getAbsolutePath());
-        parameters.add("-profiles=\"" + pathsFactory.getProfilesDirectoryPath().toAbsolutePath() + "\"");
+        parameters.add("-config=" + getConfigFile().getAbsolutePath());
+        parameters.add("-profiles=\"" + getProfilesDirectoryPath() + "\"");
         parameters.add("-name=" + ServerType.ARMA3 + "_" + getId());
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
@@ -61,9 +66,28 @@ public class Arma3Server extends Server {
         return parameters;
     }
 
-    private File getConfigFileForServer() {
+    @Override
+    public Collection<ServerConfig> getConfigs() {
+        return List.of(
+                new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this),
+                new ServerConfig(getProfileFile(), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings)
+        );
+    }
+
+    private File getConfigFile() {
         String fileName = "ARMA3_" + getId() + ".cfg";
         return pathsFactory.getConfigFilePath(ServerType.ARMA3, fileName).toFile();
+    }
+
+    private File getProfileFile() {
+        String serverProfile = "ARMA3_" + getId();
+        String profileSubdirectory = SystemUtils.getOsType() == SystemUtils.OSType.WINDOWS ? "Users" : "home";
+        return Path.of(getProfilesDirectoryPath(), profileSubdirectory,
+                serverProfile, serverProfile + ".Arma3Profile").toFile();
+    }
+
+    private String getProfilesDirectoryPath() {
+        return pathsFactory.getProfilesDirectoryPath().toString();
     }
 
     private void addModsAndDlcsToParameters(List<String> parameters) {
