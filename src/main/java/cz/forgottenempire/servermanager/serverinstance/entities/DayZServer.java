@@ -56,12 +56,13 @@ public class DayZServer extends Server {
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=" + getConfigFile().getAbsolutePath());
+        parameters.add("-config=\"" + getConfigFile().getAbsolutePath() + "\"");
         parameters.add("-limitFPS=60");
         parameters.add("-dologs");
         parameters.add("-adminlog");
         parameters.add("-freezeCheck");
         addModsToParameters(parameters);
+        addCustomLaunchParameters(parameters);
         return parameters;
     }
 
@@ -79,5 +80,15 @@ public class DayZServer extends Server {
         getActiveMods().stream()
                 .map(mod -> "-mod=" + mod.getNormalizedName())
                 .forEach(parameters::add);
+    }
+
+    private void addCustomLaunchParameters(List<String> parameters) {
+        getCustomLaunchParameters().forEach(parameter -> {
+            String s = "-" + parameter.getName();
+            if (parameter.getValue() != null) {
+                s += "=" + parameter.getValue();
+            }
+            parameters.add(s);
+        });
     }
 }

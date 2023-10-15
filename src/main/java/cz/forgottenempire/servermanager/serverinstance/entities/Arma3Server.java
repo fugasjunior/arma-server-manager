@@ -66,10 +66,10 @@ public class Arma3Server extends Server {
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=" + getConfigFile().getAbsolutePath());
+        parameters.add("-config=\"" + getConfigFile().getAbsolutePath() + "\"");
 
         if (networkSettings != null) {
-            parameters.add("-cfg=" + getNetworkConfigFile().getAbsolutePath());
+            parameters.add("-cfg=\"" + getNetworkConfigFile().getAbsolutePath() + "\"");
         }
 
         parameters.add("-profiles=\"" + getProfilesDirectoryPath() + "\"");
@@ -78,6 +78,7 @@ public class Arma3Server extends Server {
         parameters.add("-skipIntro");
         parameters.add("-world=empty");
         addModsAndDlcsToParameters(parameters);
+        addCustomLaunchParameters(parameters);
         return parameters;
     }
 
@@ -125,5 +126,15 @@ public class Arma3Server extends Server {
         getActiveDLCs().stream()
                 .map(dlc -> "-mod=" + dlc.getId())
                 .forEach(parameters::add);
+    }
+
+    private void addCustomLaunchParameters(List<String> parameters) {
+        getCustomLaunchParameters().forEach(parameter -> {
+            String s = "-" + parameter.getName();
+            if (parameter.getValue() != null) {
+                s += "=" + parameter.getValue();
+            }
+            parameters.add(s);
+        });
     }
 }

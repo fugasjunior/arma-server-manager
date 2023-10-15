@@ -48,7 +48,7 @@ public abstract class Server {
     private int maxPlayers;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
-    private List<LaunchParameter> launchParameters;
+    private List<LaunchParameter> customLaunchParameters;
 
     private String password;
     private String adminPassword;
