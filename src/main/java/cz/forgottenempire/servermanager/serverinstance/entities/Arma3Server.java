@@ -72,7 +72,7 @@ public class Arma3Server extends Server {
     }
 
     @Override
-    public Collection<ServerConfig> getConfigs() {
+    public Collection<ServerConfig> getConfigFiles() {
         return List.of(
                 new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this),
                 new ServerConfig(getProfileFile(), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings)

@@ -40,7 +40,7 @@ public class ServerProcess {
         File executable = pathsFactory.getServerExecutableWithFallback(server.getType());
         List<String> parameters = server.getLaunchParameters();
 
-        server.getConfigs().forEach(ServerConfig::generateIfNecessary);
+        server.getConfigFiles().forEach(ServerConfig::generateIfNecessary);
         server.getLog().prepare();
 
         try {
