@@ -38,7 +38,6 @@ class ServerInstanceService {
     }
 
     public Server createServer(Server server) {
-        setQueryPortForArma3Server(server);
         setDifficultySettingsForArma3Server(server);
         setInstanceIdForDayZServer(server);
         server.getConfigs().forEach(ServerConfig::generate);
@@ -57,13 +56,6 @@ class ServerInstanceService {
             throw new ModifyingRunningServerException("Cannot delete running server '" + server.getName() + "'");
         }
         serverRepository.delete(server);
-    }
-
-    private void setQueryPortForArma3Server(Server server) {
-        // Arma 3 server doesn't support customizing Steam query port, it's always game port + 1
-        if (server.getType() == ServerType.ARMA3) {
-            server.setQueryPort(server.getPort() + 1);
-        }
     }
 
     private void setDifficultySettingsForArma3Server(Server server) {
