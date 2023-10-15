@@ -49,7 +49,8 @@ public class Arma3Server extends Server {
     @Enumerated(EnumType.STRING)
     private List<Arma3CDLC> activeDLCs;
 
-    @OneToOne(mappedBy = "server", cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "difficulty_settings_id")
     private Arma3DifficultySettings difficultySettings;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

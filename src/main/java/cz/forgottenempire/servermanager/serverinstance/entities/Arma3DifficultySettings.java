@@ -18,9 +18,6 @@ public class Arma3DifficultySettings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Arma3Server server;
-
     // (0 = never, 1 = limited distance, 2 = always)
     @Min(0)
     @Max(2)

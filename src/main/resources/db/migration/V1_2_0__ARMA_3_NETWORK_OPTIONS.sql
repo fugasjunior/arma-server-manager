@@ -14,7 +14,18 @@ CREATE TABLE arma3_network_settings
 );
 
 ALTER TABLE arma3server
-    ADD network_settings_id BIGINT,
+    ADD network_settings_id    BIGINT,
+    ADD difficulty_settings_id BIGINT,
     ADD CONSTRAINT fk_arma3_network_settings FOREIGN KEY (network_settings_id)
         REFERENCES arma3_network_settings (id)
+        ON DELETE SET NULL,
+    ADD CONSTRAINT fk_arma3_difficulty_settings FOREIGN KEY (difficulty_settings_id)
+        REFERENCES arma3difficulty_settings (id)
         ON DELETE SET NULL;
+
+UPDATE arma3server s
+SET s.difficulty_settings_id = (SELECT id FROM arma3difficulty_settings d WHERE d.server_id = s.id);
+
+ALTER TABLE arma3difficulty_settings
+    DROP CONSTRAINT FK_ARMA3DIFFICULTYSETTINGS_ON_SERVER,
+    DROP COLUMN server_id;

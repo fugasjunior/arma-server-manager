@@ -38,7 +38,6 @@ class ServerInstanceService {
     }
 
     public Server createServer(Server server) {
-        setDifficultySettingsForArma3Server(server);
         setInstanceIdForDayZServer(server);
         server.getConfigFiles().forEach(ServerConfig::generate);
         return serverRepository.save(server);
@@ -56,14 +55,6 @@ class ServerInstanceService {
             throw new ModifyingRunningServerException("Cannot delete running server '" + server.getName() + "'");
         }
         serverRepository.delete(server);
-    }
-
-    private void setDifficultySettingsForArma3Server(Server server) {
-        if (server.getType() == ServerType.ARMA3) {
-            Arma3Server arma3Server = (Arma3Server) server;
-            arma3Server.getDifficultySettings().setServer(arma3Server);
-            serverRepository.save(arma3Server);
-        }
     }
 
     private void setInstanceIdForDayZServer(Server server) {
