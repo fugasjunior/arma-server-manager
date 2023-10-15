@@ -1,20 +1,8 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.serverinstance.dtos.Arma3DifficultySettingsDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.Arma3ServerDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.DayZServerDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.ReforgerModDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.ReforgerServerDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.ServerDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.ServerInstanceInfoDto;
-import cz.forgottenempire.servermanager.serverinstance.dtos.ServerWorkshopModDto;
-import cz.forgottenempire.servermanager.serverinstance.entities.Arma3DifficultySettings;
-import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
-import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
-import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerMod;
-import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer;
-import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import cz.forgottenempire.servermanager.serverinstance.dtos.*;
+import cz.forgottenempire.servermanager.serverinstance.entities.*;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
 import cz.forgottenempire.servermanager.workshop.CreatorDlcDto;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
@@ -53,6 +41,10 @@ interface ServerMapper {
     Arma3DifficultySettingsDto mapDifficultySettingsToDto(Arma3DifficultySettings settings);
 
     Arma3DifficultySettings mapDifficultySettingsDtoToEntity(Arma3DifficultySettingsDto difficultySettingsDto);
+
+    Arma3NetworkSettingsDto mapNetworkSettingsToDto(Arma3NetworkSettings settings);
+
+    Arma3NetworkSettings mapNetworkSettingsDtoToEntity(Arma3NetworkSettingsDto difficultySettingsDto);
 
     default CreatorDlcDto mapCreatorDlcToDto(Arma3CDLC cdlc) {
         return new CreatorDlcDto(cdlc.getId(), cdlc.getName());
@@ -108,5 +100,4 @@ interface ServerMapper {
             throw new IllegalStateException("Unsupported server type");
         }
     }
-
 }
