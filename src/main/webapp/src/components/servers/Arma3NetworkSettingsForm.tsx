@@ -73,7 +73,7 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3NetworkSettingsFormProps) =>
         </AccordionSummary>
         <AccordionDetails>
             <Typography variant='body2' mb={2}>
-                For further info, refer to
+                For further info, refer to&nbsp;
                 <a href='https://community.bistudio.com/wiki/Arma_3:_Basic_Server_Config_File' target="_blank">
                     Community Wiki: Basic Server Config File
                 </a>
