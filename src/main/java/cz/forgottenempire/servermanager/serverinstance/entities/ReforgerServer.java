@@ -34,11 +34,12 @@ public class ReforgerServer extends Server {
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-config");
-        parameters.add(getConfigFile().getAbsolutePath());
+        parameters.add("\"" + getConfigFile().getAbsolutePath() + "\"");
         parameters.add("-maxFPS");
         parameters.add("60");
         parameters.add("-backendlog");
         parameters.add("-logAppend");
+        addCustomLaunchParameters(parameters);
         return parameters;
     }
 
@@ -50,5 +51,14 @@ public class ReforgerServer extends Server {
     private File getConfigFile() {
         String fileName = "REFORGER_" + getId() + ".json";
         return pathsFactory.getConfigFilePath(ServerType.REFORGER, fileName).toFile();
+    }
+
+    private void addCustomLaunchParameters(List<String> parameters) {
+        getCustomLaunchParameters().forEach(parameter -> {
+            parameters.add("-" + parameter.getName());
+            if (parameter.getValue() != null) {
+                parameters.add(parameter.getValue());
+            }
+        });
     }
 }
