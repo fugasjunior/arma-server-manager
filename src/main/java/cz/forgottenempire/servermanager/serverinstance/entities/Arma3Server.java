@@ -66,6 +66,11 @@ public class Arma3Server extends Server {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
         parameters.add("-config=" + getConfigFile().getAbsolutePath());
+
+        if (networkSettings != null) {
+            parameters.add("-cfg=" + getNetworkConfigFile().getAbsolutePath());
+        }
+
         parameters.add("-profiles=\"" + getProfilesDirectoryPath() + "\"");
         parameters.add("-name=" + ServerType.ARMA3 + "_" + getId());
         parameters.add("-nosplash");
@@ -77,14 +82,22 @@ public class Arma3Server extends Server {
 
     @Override
     public Collection<ServerConfig> getConfigFiles() {
-        return List.of(
-                new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this),
-                new ServerConfig(getProfileFile(), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings)
-        );
+        List<ServerConfig> configs = new ArrayList<>();
+        configs.add(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this));
+        configs.add(new ServerConfig(getProfileFile(), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings));
+        if (networkSettings != null) {
+            configs.add(new ServerConfig(getNetworkConfigFile(), Constants.ARMA3_NETWORK_SETTINGS, networkSettings));
+        }
+        return configs;
     }
 
     private File getConfigFile() {
         String fileName = "ARMA3_" + getId() + ".cfg";
+        return pathsFactory.getConfigFilePath(ServerType.ARMA3, fileName).toFile();
+    }
+
+    private File getNetworkConfigFile() {
+        String fileName = "ARMA3_" + getId() + "_network.cfg";
         return pathsFactory.getConfigFilePath(ServerType.ARMA3, fileName).toFile();
     }
 
