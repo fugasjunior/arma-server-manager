@@ -5,6 +5,7 @@ import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
+import Arma3NetworkSettingsForm from "./Arma3NetworkSettingsForm.tsx";
 
 type EditArma3ServerSettingsFormProps = {
     server: Arma3ServerDto,
@@ -55,6 +56,9 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
 
                     <Grid item xs={12}>
                         <Arma3DifficultySettingsForm formik={formik}/>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Arma3NetworkSettingsForm formik={formik}/>
                     </Grid>
 
                     <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
