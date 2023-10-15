@@ -5,13 +5,7 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerLog;
 import cz.forgottenempire.servermanager.serverinstance.ServerProcess;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -53,10 +47,14 @@ public abstract class Server {
     @Min(1)
     private int maxPlayers;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
+    private List<LaunchParameter> launchParameters;
+
     private String password;
     private String adminPassword;
 
     public abstract List<String> getLaunchParameters();
+
     public abstract Collection<ServerConfig> getConfigFiles();
 
     public ServerLog getLog() {
