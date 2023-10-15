@@ -1,32 +1,32 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.Arma3NetworkSettings" -->
 
 <#if maxMessagesSend??>
-    MaxMsgSend = ${maxMessagesSend}
+    MaxMsgSend = ${maxMessagesSend};
 </#if>
 <#if maxSizeGuaranteed??>
-    MaxSizeGuaranteed = ${maxSizeGuaranteed}
+    MaxSizeGuaranteed = ${maxSizeGuaranteed};
 </#if>
 <#if maxSizeNonguaranteed??>
-    MaxSizeNonguaranteed = ${maxSizeNonguaranteed}
+    MaxSizeNonguaranteed = ${maxSizeNonguaranteed};
 </#if>
 <#if minBandwidth??>
-    MinBandwidth = ${minBandwidth}
+    MinBandwidth = ${minBandwidth};
 </#if>
 <#if maxBandwidth??>
-    MaxBandwidth = ${maxBandwidth}
+    MaxBandwidth = ${maxBandwidth};
 </#if>
 <#if minErrorToSend??>
-    MinErrorToSend = ${minErrorToSend}
+    MinErrorToSend = ${minErrorToSend};
 </#if>
 <#if minErrorToSendNear??>
-    MinErrorToSendNear = ${minErrorToSendNear}
+    MinErrorToSendNear = ${minErrorToSendNear};
 </#if>
 <#if maxPacketSize??>
     class sockets
     {
-    maxPacketSize = ${maxPacketSize}
+    maxPacketSize = ${maxPacketSize};
     };
 </#if>
 <#if maxCustomFileSize??>
-    MaxCustomFileSize = ${maxCustomFileSize}
+    MaxCustomFileSize = ${maxCustomFileSize};
 </#if>
