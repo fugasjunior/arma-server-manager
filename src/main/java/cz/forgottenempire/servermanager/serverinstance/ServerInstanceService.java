@@ -18,16 +18,14 @@ import java.util.Optional;
 class ServerInstanceService {
 
     private final ServerRepository serverRepository;
-    private final ConfigFileService configFileService;
     private final ServerProcessService processService;
 
     @Autowired
     public ServerInstanceService(
             ServerRepository serverRepository,
-            ConfigFileService configFileService,
-            ServerProcessService processService) {
+            ServerProcessService processService
+    ) {
         this.serverRepository = serverRepository;
-        this.configFileService = configFileService;
         this.processService = processService;
     }
 
@@ -43,7 +41,7 @@ class ServerInstanceService {
         setQueryPortForArma3Server(server);
         setDifficultySettingsForArma3Server(server);
         setInstanceIdForDayZServer(server);
-        configFileService.writeConfig(server);
+        server.getConfigs().forEach(ServerConfig::generate);
         return serverRepository.save(server);
     }
 
