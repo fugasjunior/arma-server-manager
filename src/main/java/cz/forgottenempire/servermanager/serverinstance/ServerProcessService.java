@@ -1,7 +1,5 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
@@ -15,27 +13,19 @@ class ServerProcessService {
 
     private final ServerRepository serverRepository;
     private final ServerProcessRepository processRepository;
-    private final ConfigFileService configFileService;
-    private final PathsFactory pathsFactory;
 
     @Autowired
     public ServerProcessService(
             ServerRepository serverRepository,
-            ServerProcessRepository processRepository,
-            ConfigFileService configFileService,
-            PathsFactory pathsFactory
+            ServerProcessRepository processRepository
     ) {
         this.serverRepository = serverRepository;
         this.processRepository = processRepository;
-        this.configFileService = configFileService;
-        this.pathsFactory = pathsFactory;
-
         addShutdownHook(processRepository);
     }
 
     public void startServer(Long id) {
-        Server server = serverRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
+        Server server = getServer(id);
 
         ServerProcess serverProcess = getServerProcess(server);
         if (serverProcess.isAlive()) {
@@ -44,14 +34,11 @@ class ServerProcessService {
 
         validatePortsNotTaken(server);
 
-        writeConfigFiles(server);
-
         serverProcess.start();
     }
 
     public void shutDownServer(Long id) {
-        Server server = serverRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
+        Server server = getServer(id);
         ServerProcess serverProcess = getServerProcess(server);
         serverProcess.stop();
     }
@@ -59,15 +46,6 @@ class ServerProcessService {
     public void restartServer(Long id) {
         shutDownServer(id);
         startServer(id);
-    }
-
-    private ServerProcess getServerProcess(Server server) {
-        return processRepository.get(server.getId())
-                .orElseGet(() -> {
-                    ServerProcess process = server.getProcess();
-                    processRepository.store(server.getId(), process);
-                    return process;
-                });
     }
 
     public ServerInstanceInfo getServerInstanceInfo(Long id) {
@@ -80,9 +58,18 @@ class ServerProcessService {
         return getServerProcess(server).isAlive();
     }
 
-    private static void addShutdownHook(ServerProcessRepository processRepository) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> processRepository.getAll()
-                .forEach(ServerProcess::stop)));
+    private Server getServer(Long id) {
+        return serverRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Server ID " + id + " not found"));
+    }
+
+    private ServerProcess getServerProcess(Server server) {
+        return processRepository.get(server.getId())
+                .orElseGet(() -> {
+                    ServerProcess process = server.getProcess();
+                    processRepository.store(server.getId(), process);
+                    return process;
+                });
     }
 
     private void validatePortsNotTaken(Server server) {
@@ -104,13 +91,8 @@ class ServerProcessService {
                 });
     }
 
-    private void writeConfigFiles(Server server) {
-        boolean configRegenerationNeeded = !configFileService.getConfigFileForServer(server).exists();
-        if (server.getType() == ServerType.ARMA3) {
-            configRegenerationNeeded = configRegenerationNeeded || !pathsFactory.getServerProfileFile(server.getId()).exists();
-        }
-        if (configRegenerationNeeded) {
-            configFileService.writeConfig(server);
-        }
+    private static void addShutdownHook(ServerProcessRepository processRepository) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> processRepository.getAll()
+                .forEach(ServerProcess::stop)));
     }
 }

@@ -1,6 +1,8 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
+import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +16,7 @@ import lombok.Setter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -60,6 +63,11 @@ public class DayZServer extends Server {
         parameters.add("-freezeCheck");
         addModsToParameters(parameters);
         return parameters;
+    }
+
+    @Override
+    public Collection<ServerConfig> getConfigs() {
+        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this));
     }
 
     private File getConfigFile() {

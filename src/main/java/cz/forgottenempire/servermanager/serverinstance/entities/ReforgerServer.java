@@ -1,6 +1,8 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
+import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,6 +12,7 @@ import lombok.Setter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -37,6 +40,11 @@ public class ReforgerServer extends Server {
         parameters.add("-backendlog");
         parameters.add("-logAppend");
         return parameters;
+    }
+
+    @Override
+    public Collection<ServerConfig> getConfigs() {
+        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.REFORGER), this));
     }
 
     private File getConfigFile() {

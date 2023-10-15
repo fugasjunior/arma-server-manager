@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerLog;
 import cz.forgottenempire.servermanager.serverinstance.ServerProcess;
 import jakarta.persistence.Entity;
@@ -20,6 +21,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -56,6 +58,7 @@ public abstract class Server {
     private String adminPassword;
 
     public abstract List<String> getLaunchParameters();
+    public abstract Collection<ServerConfig> getConfigs();
 
     public ServerLog getLog() {
         return new ServerLog(pathsFactory.getServerLogFile(type, id));
