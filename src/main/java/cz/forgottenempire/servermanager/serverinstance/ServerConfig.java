@@ -71,7 +71,7 @@ public class ServerConfig {
     }
 
     @Autowired
-    public void setFreeMarkerConfigurer(FreeMarkerConfigurer freeMarkerConfigurer) {
+    void setFreeMarkerConfigurer(FreeMarkerConfigurer freeMarkerConfigurer) {
         this.freeMarkerConfigurer = freeMarkerConfigurer;
     }
 }

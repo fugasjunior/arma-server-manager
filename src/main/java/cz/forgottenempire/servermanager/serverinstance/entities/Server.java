@@ -32,7 +32,6 @@ import java.util.List;
 @Configurable
 public abstract class Server {
 
-    @Autowired
     protected transient PathsFactory pathsFactory;
 
     @Id
@@ -58,7 +57,7 @@ public abstract class Server {
     private String adminPassword;
 
     public abstract List<String> getLaunchParameters();
-    public abstract Collection<ServerConfig> getConfigs();
+    public abstract Collection<ServerConfig> getConfigFiles();
 
     public ServerLog getLog() {
         return new ServerLog(pathsFactory.getServerLogFile(type, id));
@@ -66,5 +65,10 @@ public abstract class Server {
 
     public ServerProcess getProcess() {
         return new ServerProcess(this, pathsFactory);
+    }
+
+    @Autowired
+    void setPathsFactory(PathsFactory pathsFactory) {
+        this.pathsFactory = pathsFactory;
     }
 }

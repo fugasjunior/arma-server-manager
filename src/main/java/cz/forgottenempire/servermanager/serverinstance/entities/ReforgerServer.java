@@ -43,7 +43,7 @@ public class ReforgerServer extends Server {
     }
 
     @Override
-    public Collection<ServerConfig> getConfigs() {
+    public Collection<ServerConfig> getConfigFiles() {
         return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.REFORGER), this));
     }
 

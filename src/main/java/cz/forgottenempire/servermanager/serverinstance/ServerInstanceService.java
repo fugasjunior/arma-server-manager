@@ -40,7 +40,7 @@ class ServerInstanceService {
     public Server createServer(Server server) {
         setDifficultySettingsForArma3Server(server);
         setInstanceIdForDayZServer(server);
-        server.getConfigs().forEach(ServerConfig::generate);
+        server.getConfigFiles().forEach(ServerConfig::generate);
         return serverRepository.save(server);
     }
 
