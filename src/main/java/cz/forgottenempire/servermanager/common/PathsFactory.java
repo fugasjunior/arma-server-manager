@@ -73,13 +73,6 @@ public class PathsFactory {
         return Path.of(getServerPath(type).toString(), configName).toAbsolutePath();
     }
 
-    public File getServerProfileFile(long serverId) {
-        String serverProfile = ServerType.ARMA3 + "_" + serverId;
-        String profileSubdirectory = SystemUtils.getOsType() == OSType.WINDOWS ? "Users" : "home";
-        return Path.of(getProfilesDirectoryPath().toString(), profileSubdirectory,
-                serverProfile, serverProfile + ".Arma3Profile").toFile();
-    }
-
     public Path getProfilesDirectoryPath() {
         return Path.of(getServerPath(ServerType.ARMA3).toString(), "custom_profiles");
     }
