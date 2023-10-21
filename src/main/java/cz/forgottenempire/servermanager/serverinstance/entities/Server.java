@@ -63,7 +63,7 @@ public abstract class Server {
     }
 
     public ServerProcess getProcess() {
-        return new ServerProcess(this, pathsFactory);
+        return new ServerProcess(id);
     }
 
     @Autowired

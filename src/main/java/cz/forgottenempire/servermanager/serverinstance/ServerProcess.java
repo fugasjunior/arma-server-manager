@@ -4,6 +4,8 @@ import com.google.common.base.Joiner;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,16 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Configurable
 public class ServerProcess {
 
-    private final PathsFactory pathsFactory;
-    private final Server server;
+    private final long serverId;
+    private PathsFactory pathsFactory;
+    private ServerRepository serverRepository;
     private Process process;
     private ServerInstanceInfo instanceInfo;
 
-    public ServerProcess(Server server, PathsFactory pathsFactory) {
-        this.pathsFactory = pathsFactory;
-        this.server = server;
+    public ServerProcess(long serverId) {
+        this.serverId = serverId;
     }
 
     public ServerInstanceInfo getInstanceInfo() {
@@ -29,13 +32,15 @@ public class ServerProcess {
     }
 
     public long getServerId() {
-        return server.getId();
+        return serverId;
     }
 
     public Process start() {
         if (isAlive()) {
             return process;
         }
+
+        Server server = serverRepository.findById(serverId).orElseThrow();
 
         File executable = pathsFactory.getServerExecutableWithFallback(server.getType());
         List<String> parameters = server.getLaunchParameters();
@@ -82,5 +87,15 @@ public class ServerProcess {
                 .redirectErrorStream(true)
                 .redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
                 .start();
+    }
+
+    @Autowired
+    void setPathsFactory(PathsFactory pathsFactory) {
+        this.pathsFactory = pathsFactory;
+    }
+
+    @Autowired
+    void setServerRepository(ServerRepository serverRepository) {
+        this.serverRepository = serverRepository;
     }
 }
