@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Configurable;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -18,6 +17,7 @@ import java.util.List;
 public class ServerProcess {
 
     private final long serverId;
+    private ServerProcessCreator serverProcessCreator;
     private PathsFactory pathsFactory;
     private ServerRepository serverRepository;
     private Process process;
@@ -50,7 +50,7 @@ public class ServerProcess {
 
         try {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
-            process = startProcessWithRedirectedOutput(executable, parameters, server.getLog().getFile());
+            process = serverProcessCreator.startProcessWithRedirectedOutput(executable, parameters, server.getLog().getFile());
             log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
@@ -75,20 +75,6 @@ public class ServerProcess {
         return process != null && process.isAlive();
     }
 
-    private Process startProcessWithRedirectedOutput(File executable, List<String> parameters, File outputFile)
-            throws IOException {
-        File directory = executable.getParentFile();
-        List<String> commands = new ArrayList<>();
-        commands.add(executable.getAbsolutePath());
-        commands.addAll(parameters);
-
-        return new ProcessBuilder(commands)
-                .directory(directory)
-                .redirectErrorStream(true)
-                .redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile))
-                .start();
-    }
-
     @Autowired
     void setPathsFactory(PathsFactory pathsFactory) {
         this.pathsFactory = pathsFactory;
@@ -97,5 +83,10 @@ public class ServerProcess {
     @Autowired
     void setServerRepository(ServerRepository serverRepository) {
         this.serverRepository = serverRepository;
+    }
+
+    @Autowired
+    public void setServerProcessCreator(ServerProcessCreator serverProcessCreator) {
+        this.serverProcessCreator = serverProcessCreator;
     }
 }
