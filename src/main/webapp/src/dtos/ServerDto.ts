@@ -20,7 +20,7 @@ export interface ServerDto {
     adminPassword: string,
     maxPlayers: number
     instanceInfo?: ServerInstanceInfoDto
-    customLaunchParameters: Array<{name: string, value?: string | null}>
+    customLaunchParameters: Array<{name: string, value: string | null}>
 }
 
 export interface Arma3ServerDto extends ServerDto {

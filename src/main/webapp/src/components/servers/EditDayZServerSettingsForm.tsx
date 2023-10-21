@@ -4,6 +4,8 @@ import {DayZServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
+import {CustomLaunchParametersInput} from "./CustomLaunchParametersInput.tsx";
+import {useState} from "react";
 
 type EditDayZServerSettingsFormProps = {
     server: DayZServerDto,
@@ -13,7 +15,10 @@ type EditDayZServerSettingsFormProps = {
 }
 const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
 
+    const [launchParameters, setLaunchParameters] = useState([...props.server.customLaunchParameters]);
+
     const handleSubmit = (values: DayZServerDto) => {
+        values.customLaunchParameters = [...launchParameters];
         props.onSubmit(values);
     }
 
@@ -57,7 +62,13 @@ const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
                     </Grid>
                     <CustomTextField id='additionalOptions' label='Additional options' multiline
                                      formik={formik} containerMd={12}/>
-
+                    <Grid item xs={12}>
+                        <CustomLaunchParametersInput
+                            valueDelimiter='='
+                            parameters={launchParameters}
+                            onParametersChange={setLaunchParameters}
+                        />
+                    </Grid>
                     <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
                 </Grid>
             </form>

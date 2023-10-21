@@ -6,6 +6,8 @@ import {ReforgerScenariosAutocomplete} from "./ReforgerScenariosAutocomplete.tsx
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
+import {CustomLaunchParametersInput} from "./CustomLaunchParametersInput.tsx";
+import {useState} from "react";
 
 type EditReforgerServerSettingsFormProps = {
     server: ReforgerServerDto,
@@ -16,7 +18,10 @@ type EditReforgerServerSettingsFormProps = {
 
 export default function EditReforgerServerSettingsForm(props: EditReforgerServerSettingsFormProps) {
 
+    const [launchParameters, setLaunchParameters] = useState([...props.server.customLaunchParameters]);
+
     function handleSubmit(values: ReforgerServerDto) {
+        values.customLaunchParameters = [...launchParameters];
         props.onSubmit(values);
     }
 
@@ -53,7 +58,13 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
                             <SwitchField id='thirdPersonViewEnabled' label='Third person view enabled' formik={formik}/>
                         </FormGroup>
                     </Grid>
-
+                    <Grid item xs={12}>
+                        <CustomLaunchParametersInput
+                            valueDelimiter=' '
+                            parameters={launchParameters}
+                            onParametersChange={setLaunchParameters}
+                        />
+                    </Grid>
                     <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
                 </Grid>
             </form>
