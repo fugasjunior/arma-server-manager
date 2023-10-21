@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import cz.forgottenempire.servermanager.common.ServerType;
 
+import java.util.List;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         property = "type",
@@ -26,4 +28,8 @@ public interface ServerDto {
     ServerInstanceInfoDto getInstanceInfo();
 
     void setInstanceInfo(ServerInstanceInfoDto instanceInfo);
+
+    List<LaunchParameterDto> getCustomLaunchParameters();
+
+    void setCustomLaunchParameters(List<LaunchParameterDto> customLaunchParameters);
 }

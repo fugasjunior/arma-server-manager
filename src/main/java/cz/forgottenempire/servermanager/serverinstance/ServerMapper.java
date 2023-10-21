@@ -58,6 +58,10 @@ interface ServerMapper {
 
     ReforgerMod mapReforgerModDtoToEntity(ReforgerModDto reforgerModDto);
 
+    LaunchParameterDto mapCustomLaunchParameterToDto(LaunchParameter launchParameter);
+
+    LaunchParameter mapCustomLaunchParameterDtoToEntity(LaunchParameterDto launchParameterDto);
+
     default ServerDto mapServerToDto(Server server) {
         ServerType type = server.getType();
         if (type == ServerType.ARMA3) {
