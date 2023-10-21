@@ -59,4 +59,6 @@ public class DayZServerDto implements ServerDto {
     private String additionalOptions;
     private List<ServerWorkshopModDto> activeMods;
     private ServerInstanceInfoDto instanceInfo;
+
+    private List<LaunchParameterDto> customLaunchParameters;
 }

@@ -38,6 +38,7 @@ class ServerInstanceService {
     }
 
     public Server createServer(Server server) {
+        server.getCustomLaunchParameters().forEach(param -> param.setServer(server));
         setInstanceIdForDayZServer(server);
         server.getConfigFiles().forEach(ServerConfig::generate);
         return serverRepository.save(server);

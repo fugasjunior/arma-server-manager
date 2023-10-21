@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public abstract class Server {
     private int maxPlayers;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
-    private List<LaunchParameter> customLaunchParameters;
+    private List<LaunchParameter> customLaunchParameters = new ArrayList<>();
 
     private String password;
     private String adminPassword;
