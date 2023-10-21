@@ -1,11 +1,13 @@
 import {useFormik} from "formik";
-import {FormGroup, Grid} from "@mui/material";
+import {FormGroup, Grid, Typography} from "@mui/material";
 import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
 import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
 import Arma3NetworkSettingsForm from "./Arma3NetworkSettingsForm.tsx";
+import {MuiChipsInput} from "mui-chips-input";
+import {useState} from "react";
 
 type EditArma3ServerSettingsFormProps = {
     server: Arma3ServerDto,
@@ -16,7 +18,21 @@ type EditArma3ServerSettingsFormProps = {
 
 const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) => {
 
+    const convertLaunchParameters = () => {
+        return props.server.customLaunchParameters
+            .map(param => `-${param.name}${param.value ? ('=' + param.value) : ''}`);
+    }
+
+    const [launchParameters, setLaunchParameters] = useState(convertLaunchParameters());
+
     const handleSubmit = (values: Arma3ServerDto) => {
+        values.customLaunchParameters = launchParameters.map(param => {
+            let split = param.slice(1).split("=");
+            return {
+                name: split[0],
+                value: split.length > 0 ? split[1] : null
+            };
+        })
         props.onSubmit(values);
     }
 
@@ -26,6 +42,22 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
         enableReinitialize: true
     });
 
+    const handleParameterInput = (newParameters: Array<string>) => {
+        const formattedParameters = newParameters
+            .filter(param => param)
+            .map(param => {
+                const split = param.trim().split(/\s+|=/);
+                const name = split[0].startsWith("-") ? split[0] : "-" + split[0];
+
+                if (split.length === 1) {
+                    return name;
+                }
+
+                return `${name}=${split.slice(1).join(' ')}`;
+            });
+
+        setLaunchParameters(formattedParameters);
+    };
 
     return (
         <div>
@@ -54,6 +86,10 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                     <CustomTextField id='additionalOptions' label='Additional options' multiline
                                      formik={formik} containerMd={12}/>
 
+                    <Grid item xs={12}>
+                        <Typography>Additional launch parameters</Typography>
+                        <MuiChipsInput value={launchParameters} onChange={handleParameterInput}/>
+                    </Grid>
                     <Grid item xs={12}>
                         <Arma3DifficultySettingsForm formik={formik}/>
                     </Grid>
