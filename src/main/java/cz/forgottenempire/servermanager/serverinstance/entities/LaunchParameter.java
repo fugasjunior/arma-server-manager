@@ -18,7 +18,7 @@ public class LaunchParameter {
     private Long id;
 
     @Nonnull
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "server_id", nullable = false)
     private Server server;
 
