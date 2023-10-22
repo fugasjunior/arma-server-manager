@@ -86,4 +86,14 @@ class ServerProcessTest {
 
         verify(serverLog).prepare();
     }
+
+    @Test
+    void start_whenServerFailsToStart_thenNullIsReturned() throws IOException {
+        when(processCreator.startProcessWithRedirectedOutput(any(), any(), any())).thenThrow(IOException.class);
+
+        Process actualProcess = serverProcess.start();
+
+        assertThat(serverProcess.getInstanceInfo()).isNull();
+        assertThat(actualProcess).isNull();
+    }
 }

@@ -54,6 +54,7 @@ public class ServerProcess {
             log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
+            return null;
         }
 
         instanceInfo = ServerInstanceInfo.builder()
