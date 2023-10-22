@@ -21,10 +21,8 @@ class ServerProcessTest {
 
     private ServerProcess serverProcess;
     private Server server;
-    private ServerRepository serverRepository;
     private File logFile;
     private ServerLog serverLog;
-    private PathsFactory pathsFactory;
     private File executable;
     private ServerProcessCreator processCreator;
     private Process process;
@@ -37,9 +35,9 @@ class ServerProcessTest {
         logFile = mock(File.class);
         when(serverLog.getFile()).thenReturn(logFile);
         when(server.getLog()).thenReturn(serverLog);
-        serverRepository = mock(ServerRepository.class);
+        ServerRepository serverRepository = mock(ServerRepository.class);
         when(serverRepository.findById(SERVER_ID)).thenReturn(Optional.of(server));
-        pathsFactory = mock(PathsFactory.class);
+        PathsFactory pathsFactory = mock(PathsFactory.class);
         executable = mock(File.class);
         when(pathsFactory.getServerExecutableWithFallback(ServerType.ARMA3)).thenReturn(executable);
         processCreator = mock(ServerProcessCreator.class);
@@ -107,5 +105,31 @@ class ServerProcessTest {
 
         assertThat(actualProcess).isEqualTo(process);
         verifyNoMoreInteractions(processCreator);
+    }
+
+    @Test
+    void stop_whenServerIsRunning_thenProcessIsDestroyed() {
+        serverProcess.start();
+        when(process.isAlive()).thenReturn(true);
+
+        serverProcess.stop();
+
+        verify(process).destroy();
+    }
+
+    @Test
+    void stop_whenProcessDoesNotExist_thenNoActionIsTaken() {
+        serverProcess.stop();
+
+        verifyNoInteractions(process);
+    }
+
+    @Test
+    void stop_whenProcessIsNotAlive_thenNoActionIsTaken() {
+        serverProcess.start();
+        verify(process).pid();
+        when(process.isAlive()).thenReturn(false);
+
+        verifyNoMoreInteractions(process);
     }
 }
