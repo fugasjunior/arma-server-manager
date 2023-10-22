@@ -96,4 +96,16 @@ class ServerProcessTest {
         assertThat(serverProcess.getInstanceInfo()).isNull();
         assertThat(actualProcess).isNull();
     }
+
+    @Test
+    void start_whenServerIsAlreadyRunning_thenExistingProcessIsReturned() throws IOException {
+        serverProcess.start();
+        verify(processCreator).startProcessWithRedirectedOutput(any(), any(), any());
+        when(process.isAlive()).thenReturn(true);
+
+        Process actualProcess = serverProcess.start();
+
+        assertThat(actualProcess).isEqualTo(process);
+        verifyNoMoreInteractions(processCreator);
+    }
 }
