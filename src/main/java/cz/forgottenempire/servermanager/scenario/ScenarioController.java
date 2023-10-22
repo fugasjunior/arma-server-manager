@@ -78,19 +78,23 @@ class ScenarioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> uploadScenario(@RequestParam MultipartFile file) {
-        log.info("Receiving file upload ({})", file.getOriginalFilename());
+    public ResponseEntity<?> uploadScenarios(@RequestParam("file") List<MultipartFile> files) {
+        files.forEach(file -> {
+            log.info("Receiving file upload ({})", file.getOriginalFilename());
 
-        if (file.getOriginalFilename() == null) {
-            return new ResponseEntity<>("Error: Could not determine file name", HttpStatus.BAD_REQUEST);
-        }
+            if (file.getOriginalFilename() == null) {
+                log.warn("Could not determine file name, skipping");
+                return;
+            }
 
-        if (!file.getOriginalFilename().endsWith(".pbo")) {
-            log.warn("File {} is not a PBO file", file.getOriginalFilename());
-            return new ResponseEntity<>("Error: PBO file required", HttpStatus.BAD_REQUEST);
-        }
+            if (!file.getOriginalFilename().endsWith(".pbo")) {
+                log.warn("File {} is not a PBO file, skipping", file.getOriginalFilename());
+                return;
+            }
 
-        scenarioService.uploadScenarioToServer(file);
+            scenarioService.uploadScenarioToServer(file);
+        });
+
         return ResponseEntity.ok().build();
     }
 

@@ -1,5 +1,5 @@
 import {ChangeEvent, useEffect, useState} from "react";
-import {deleteScenario, downloadScenario, getScenarios, uploadScenario} from "../services/scenarioService";
+import {deleteScenario, downloadScenario, getScenarios, uploadScenarios} from "../services/scenarioService";
 import {toast} from "material-react-toastify";
 import {ScenariosTable} from "../components/scenarios/ScenariosTable";
 import {Arma3ScenarioDto} from "../dtos/Arma3ScenarioDto.ts";
@@ -28,7 +28,6 @@ const ScenariosPage = () => {
 
     const handleProgress = (e: ProgressEvent) => {
         const percentCompleted = Math.round((e.loaded * 100) / e.total);
-        console.log(percentCompleted);
         setPercentUploaded(percentCompleted);
     }
 
@@ -38,15 +37,16 @@ const ScenariosPage = () => {
             return;
         }
 
-        const file = e.target.files[0];
         try {
             const formData = new FormData();
-            formData.append("file", file);
+            [...e.target.files].forEach(file => {
+                formData.append(`file`, file, file.name);
+            })
             setUploadInProgress(true);
 
-            await uploadScenario(formData, {onUploadProgress: handleProgress});
+            await uploadScenarios(formData, {onUploadProgress: handleProgress});
             await refreshScenarios();
-            toast.success("Scenario successfully uploaded");
+            toast.success("Scenarios successfully uploaded");
         } catch (ex: any) {
             console.error(ex);
             toast.error(ex.response.data);
