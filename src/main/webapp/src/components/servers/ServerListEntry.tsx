@@ -36,7 +36,7 @@ type ServerListEntryProps = {
 const ServerListEntry = (props: ServerListEntryProps) => {
     const {server, onStartServer, onStopServer, onRestartServer, onDeleteServer, serverWithSamePortRunning} = props;
     if (server.id === undefined) {
-        console.log("Server should have ID assigned.");
+        console.error("Server should have ID assigned.");
         return;
     }
 

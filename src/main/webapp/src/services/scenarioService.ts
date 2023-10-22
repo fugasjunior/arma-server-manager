@@ -24,7 +24,7 @@ export function downloadScenario(name: string) {
         })
 }
 
-export function uploadScenario(formData: FormData, config: any) {
+export function uploadScenarios(formData: FormData, config: any) {
     return http.post(apiEndpoint, formData, config);
 }
 
