@@ -87,7 +87,7 @@ public class ServerProcess {
     }
 
     @Autowired
-    public void setServerProcessCreator(ServerProcessCreator serverProcessCreator) {
+    void setServerProcessCreator(ServerProcessCreator serverProcessCreator) {
         this.serverProcessCreator = serverProcessCreator;
     }
 }
