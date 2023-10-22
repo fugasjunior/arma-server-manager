@@ -62,7 +62,7 @@ class ServerProcessTest {
 
         Process actualProcess = serverProcess.start();
 
-        assertThat(actualProcess).isEqualTo(actualProcess);
+        assertThat(actualProcess).isEqualTo(process);
         verify(processCreator).startProcessWithRedirectedOutput(executable, parameters, logFile);
     }
 
@@ -131,5 +131,26 @@ class ServerProcessTest {
         when(process.isAlive()).thenReturn(false);
 
         verifyNoMoreInteractions(process);
+    }
+
+    @Test
+    void isAlive_whenProcessIsRunning_thenReturnsTrue() {
+        serverProcess.start();
+        when(process.isAlive()).thenReturn(true);
+
+        assertThat(process.isAlive()).isTrue();
+    }
+
+    @Test
+    void isAlive_whenProcessDoesNotExist_thenReturnsFalse() {
+        assertThat(process.isAlive()).isFalse();
+    }
+
+    @Test
+    void isAlive_whenProcessIsNotAlive_thenReturnsFalse() {
+        serverProcess.start();
+        when(process.isAlive()).thenReturn(false);
+
+        assertThat(process.isAlive()).isFalse();
     }
 }
