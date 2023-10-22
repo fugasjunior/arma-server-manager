@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.*;
 class ServerProcessTest {
 
     private static final long SERVER_ID = 1L;
+    public static final int MAX_PLAYERS = 32;
 
     private ServerProcess serverProcess;
     private Server server;
@@ -152,5 +154,30 @@ class ServerProcessTest {
         when(process.isAlive()).thenReturn(false);
 
         assertThat(process.isAlive()).isFalse();
+    }
+
+    @Test
+    void getInstanceInfo_whenServerIsStarted_thenInstanceInfoIsCreated() {
+        LocalDateTime beforeCreation = LocalDateTime.now();
+        when(server.getMaxPlayers()).thenReturn(MAX_PLAYERS);
+        serverProcess.start();
+
+        ServerInstanceInfo instanceInfo = serverProcess.getInstanceInfo();
+
+        assertThat(instanceInfo).isNotNull();
+        assertThat(instanceInfo.getStartedAt()).isBetween(beforeCreation, LocalDateTime.now());
+        assertThat(instanceInfo.getMaxPlayers()).isEqualTo(MAX_PLAYERS);
+    }
+
+    @Test
+    void getInstanceInfo_whenServerIsStopped_thenInstanceInfoIsReset() {
+        serverProcess.start();
+        serverProcess.stop();
+
+        ServerInstanceInfo instanceInfo = serverProcess.getInstanceInfo();
+
+        assertThat(instanceInfo).isNotNull();
+        assertThat(instanceInfo.getStartedAt()).isNull();
+        assertThat(instanceInfo.getMaxPlayers()).isZero();
     }
 }
