@@ -79,4 +79,11 @@ class ServerProcessTest {
         verify(config1).generateIfNecessary();
         verify(config2).generateIfNecessary();
     }
+
+    @Test
+    void start_whenServerIsStarted_thenServerLogIsPrepared() {
+        serverProcess.start();
+
+        verify(serverLog).prepare();
+    }
 }
