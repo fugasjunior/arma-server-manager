@@ -25,6 +25,7 @@ const SERVER_ICON_URLS = new Map<ServerType, string>([
 
 type ServerListEntryProps = {
     server: ServerDto,
+    status: ServerInstanceInfoDto | null,
     serverWithSamePortRunning: boolean
     onStartServer: (id: number) => void,
     onStopServer: (id: number) => void,
@@ -34,13 +35,13 @@ type ServerListEntryProps = {
 }
 
 const ServerListEntry = (props: ServerListEntryProps) => {
-    const {server, onStartServer, onStopServer, onRestartServer, onDeleteServer, serverWithSamePortRunning} = props;
+    const {server, status, onStartServer, onStopServer, onRestartServer, onDeleteServer, serverWithSamePortRunning} = props;
     if (server.id === undefined) {
         console.error("Server should have ID assigned.");
         return;
     }
 
-    const serverRunning = server.instanceInfo && server.instanceInfo.alive;
+    const serverRunning = status && status.alive;
 
     return (
         <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
@@ -103,7 +104,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                 </Button>
             </TableCell>
             <TableCell>
-                {serverRunning && server.instanceInfo &&
+                {serverRunning && status &&
                     <List>
                         <ListItem>
                             <ListItemAvatar>
@@ -112,9 +113,9 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText primary="Players"
-                                          secondary={`${server.instanceInfo.playersOnline} / ${server.instanceInfo.maxPlayers}`}/>
+                                          secondary={`${status.playersOnline} / ${status.maxPlayers}`}/>
                         </ListItem>
-                        {server.instanceInfo.map &&
+                        {status.map &&
                             <ListItem>
                                 <ListItemAvatar>
                                     <Avatar>
@@ -122,7 +123,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText primary="Map"
-                                              secondary={`${server.instanceInfo.map}`}/>
+                                              secondary={`${status.map}`}/>
                             </ListItem>
                         }
                     </List>
