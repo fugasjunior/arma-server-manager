@@ -1,4 +1,10 @@
-import {deleteServer, getServers, restartServer, startServer, stopServer} from "../services/serversService"
+import {
+    deleteServer,
+    getServers, getServerStatus,
+    restartServer,
+    startServer,
+    stopServer
+} from "../services/serversService"
 import {useEffect, useState} from "react";
 import {useInterval} from "../hooks/use-interval";
 import ServerListEntry from "../components/servers/ServerListEntry";
@@ -24,12 +30,31 @@ const ServersPage = () => {
     }, [])
 
     useInterval(async () => {
-        fetchServers();
-    }, 2000);
+        await updateActiveServersStatus();
+    }, 10000);
 
     const fetchServers = async () => {
         const {data: servers} = await getServers();
         setServers(servers.servers);
+    }
+
+    const updateActiveServersStatus = async () => {
+        servers.filter(s => s.instanceInfo?.alive)
+            .forEach(updateServerStatus);
+    }
+
+    const updateServerStatus = async (server: ServerDto) => {
+        if (server.id == null) {
+            return;
+        }
+        const newServers = [...servers];
+        const foundServer = newServers.find(s => s.id === server.id);
+        if (!foundServer) {
+            return;
+        }
+        const {data: instanceInfo} = await getServerStatus(server.id);
+        foundServer.instanceInfo = instanceInfo;
+        setServers(newServers);
     }
 
     const isServerWithSamePortRunning = (server: ServerDto) => {

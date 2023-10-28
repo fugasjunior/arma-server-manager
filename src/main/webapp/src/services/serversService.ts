@@ -35,3 +35,7 @@ export function restartServer(id: number) {
 export function deleteServer(id: number) {
     return http.delete(apiEndpoint + "/" + id);
 }
+
+export function getServerStatus(id: number) {
+    return http.get(apiEndpoint + "/" + id + "/status");
+}
