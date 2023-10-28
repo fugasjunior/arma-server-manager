@@ -1,6 +1,7 @@
 import {
     deleteServer,
-    getServers, getServerStatus,
+    getServers,
+    getServerStatus,
     restartServer,
     startServer,
     stopServer
@@ -18,8 +19,13 @@ import ConfirmationDialog from "../UI/ConfirmationDialog";
 import ServerLogs from "../components/servers/ServerLogs";
 import {ServerDto} from "../dtos/ServerDto";
 
+type ServerInstance = {
+    server: ServerDto,
+    status: ServerInstanceInfoDto | null
+}
+
 const ServersPage = () => {
-    const [servers, setServers] = useState<ServerDto[]>([]);
+    const [serverInstances, setServerInstances] = useState<ServerInstance[]>([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [serverToDelete, setServerToDelete] = useState<ServerDto | null>();
     const [logServerId, setLogServerId] = useState<number>();
@@ -35,11 +41,21 @@ const ServersPage = () => {
 
     const fetchServers = async () => {
         const {data: servers} = await getServers();
-        setServers(servers.servers);
+        const instances = servers.servers.map((server: ServerDto) => {return {server, status: null}});
+        for (const instance of instances) {
+            const {data: status} = await getServerStatus(instance.server.id);
+            instance.status = status;
+        }
+        setServerInstances(instances);
+    }
+
+    function shouldUpdateServerStatus(instance: ServerInstance) {
+        return instance.status === null || instance.status.alive;
     }
 
     const updateActiveServersStatus = async () => {
-        servers.filter(s => s.instanceInfo?.alive)
+        serverInstances.filter(shouldUpdateServerStatus)
+            .map(s => s.server)
             .forEach(updateServerStatus);
     }
 
@@ -47,20 +63,21 @@ const ServersPage = () => {
         if (server.id == null) {
             return;
         }
-        const newServers = [...servers];
-        const foundServer = newServers.find(s => s.id === server.id);
-        if (!foundServer) {
+        const {data: instanceInfo} = await getServerStatus(server.id);
+        const newInstances = [...serverInstances];
+        const foundInstance = newInstances.find(instance => instance.server.id === server.id);
+        if (!foundInstance) {
             return;
         }
-        const {data: instanceInfo} = await getServerStatus(server.id);
-        foundServer.instanceInfo = instanceInfo;
-        setServers(newServers);
+        foundInstance.status = instanceInfo;
+        setServerInstances(newInstances);
     }
 
     const isServerWithSamePortRunning = (server: ServerDto) => {
-        const activeServerWithSamePort = servers.filter(s => s !== server)
-            .filter(s => s.instanceInfo && s.instanceInfo.alive)
-            .filter(s => s.port === server.port || s.queryPort === server.queryPort);
+        const activeServerWithSamePort = serverInstances.map(instance => instance.server)
+            .filter(anotherServer => anotherServer !== server)
+            .filter(anotherServer => anotherServer.instanceInfo && anotherServer.instanceInfo.alive)
+            .filter(anotherServer => anotherServer.port === server.port || anotherServer.queryPort === server.queryPort);
         return !!activeServerWithSamePort[0];
     }
 
@@ -80,18 +97,19 @@ const ServersPage = () => {
     };
 
     const updateServerList = (targetServerId: number, isNewServerAlive: boolean): void => {
-        const newServers = [...servers];
-        const server = newServers.find(s => s.id === targetServerId);
-        if (!server) {
+        const newInstances = [...serverInstances];
+        const instance = newInstances.find(instance => instance.server.id === targetServerId);
+        if (!instance) {
             return;
         }
 
-        server.instanceInfo = {
+        instance.status = {
             description: "", map: "", maxPlayers: 0, playersOnline: 0, startedAt: "", version: "",
-            ...server.instanceInfo,
+            ...instance.status,
             alive: isNewServerAlive
-        }
-        setServers(newServers);
+        };
+
+        setServerInstances(newInstances);
     }
 
     const handleDeleteServerClicked = (server: ServerDto) => {
@@ -104,7 +122,7 @@ const ServersPage = () => {
             return;
         }
 
-        setServers(prevState => [...prevState].filter(server => server.id !== serverToDelete.id));
+        setServerInstances(prevState => [...prevState].filter(server => server.server.id !== serverToDelete.id));
         await deleteServer(serverToDelete.id);
         toast.success(`Server '${serverToDelete.name}' successfully deleted`);
         setServerToDelete(null);
@@ -132,15 +150,16 @@ const ServersPage = () => {
             <TableContainer component={Paper}>
                 <Table>
                     <TableBody>
-                        {servers.map(server =>
-                            <ServerListEntry key={server.id}
-                                             server={server}
+                        {serverInstances.map(instance =>
+                            <ServerListEntry key={instance.server.id}
+                                             server={instance.server}
+                                             status={instance.status}
                                              onStartServer={handleStartServer}
                                              onStopServer={handleStopServer}
                                              onRestartServer={handleRestartServer}
                                              onOpenLogs={handleOpenLogs}
-                                             onDeleteServer={() => handleDeleteServerClicked(server)}
-                                             serverWithSamePortRunning={isServerWithSamePortRunning(server)}
+                                             onDeleteServer={() => handleDeleteServerClicked(instance.server)}
+                                             serverWithSamePortRunning={isServerWithSamePortRunning(instance.server)}
                             />
                         )}
                     </TableBody>
