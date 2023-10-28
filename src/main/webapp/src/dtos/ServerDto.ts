@@ -19,7 +19,6 @@ export interface ServerDto {
     password: string,
     adminPassword: string,
     maxPlayers: number
-    instanceInfo?: ServerInstanceInfoDto
     customLaunchParameters: Array<{name: string, value: string | null}>
 }
 

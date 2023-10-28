@@ -33,8 +33,6 @@ public class ReforgerServerDto implements ServerDto {
     private boolean battlEye;
     private boolean thirdPersonViewEnabled;
 
-    private ServerInstanceInfoDto instanceInfo;
-
     private List<ReforgerModDto> activeMods;
 
     private List<LaunchParameterDto> customLaunchParameters;
