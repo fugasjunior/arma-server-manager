@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/server")
@@ -103,6 +104,13 @@ class ServerController {
         log.info("Received request to restart server ID {}", id);
         serverProcessService.restartServer(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ServerInstanceInfoDto> getInstanceInfo(@PathVariable long id) {
+        ServerInstanceInfo instanceInfo = Optional.ofNullable(serverProcessService.getServerInstanceInfo(id))
+                .orElse(ServerInstanceInfo.builder().build());
+        return ResponseEntity.ok(serverMapper.mapServerInstanceInfoToDto(instanceInfo));
     }
 
     @GetMapping("/{id}/log/download")
