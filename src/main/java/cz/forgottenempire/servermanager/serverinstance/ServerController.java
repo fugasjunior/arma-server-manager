@@ -44,12 +44,6 @@ class ServerController {
         List<ServerDto> serverDtos = serverInstanceService.getAllServers()
                 .stream()
                 .map(serverMapper::mapServerToDto).toList();
-        serverDtos.forEach(s -> {
-            ServerInstanceInfo instanceInfo = serverProcessService.getServerInstanceInfo(s.getId());
-            ServerInstanceInfoDto instanceInfoDto = serverMapper.mapServerInstanceInfoToDto(
-                    instanceInfo);
-            s.setInstanceInfo(instanceInfoDto);
-        });
         return ResponseEntity.ok(new ServersDto(serverDtos));
     }
 
@@ -57,8 +51,6 @@ class ServerController {
     public ResponseEntity<ServerDto> getServer(@PathVariable Long id) {
         Server server = getServerEntity(id);
         ServerDto serverDto = serverMapper.mapServerToDto(server);
-        ServerInstanceInfo instanceInfo = serverProcessService.getServerInstanceInfo(id);
-        serverDto.setInstanceInfo(serverMapper.mapServerInstanceInfoToDto(instanceInfo));
         return ResponseEntity.ok(serverDto);
     }
 

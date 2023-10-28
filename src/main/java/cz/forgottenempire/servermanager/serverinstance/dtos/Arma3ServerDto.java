@@ -42,7 +42,5 @@ public class Arma3ServerDto implements ServerDto {
     private Arma3DifficultySettingsDto difficultySettings;
     private Arma3NetworkSettingsDto networkSettings;
 
-    private ServerInstanceInfoDto instanceInfo;
-
     private List<LaunchParameterDto> customLaunchParameters;
 }

@@ -25,10 +25,6 @@ public interface ServerDto {
 
     ServerType getType();
 
-    ServerInstanceInfoDto getInstanceInfo();
-
-    void setInstanceInfo(ServerInstanceInfoDto instanceInfo);
-
     List<LaunchParameterDto> getCustomLaunchParameters();
 
     void setCustomLaunchParameters(List<LaunchParameterDto> customLaunchParameters);
