@@ -1,4 +1,4 @@
 export interface ReforgerModDto {
-    id: number,
+    id: string,
     name: string
 }

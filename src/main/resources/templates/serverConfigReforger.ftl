@@ -28,7 +28,7 @@
 "mods": [
 <#list activeMods as mod>
   {
-  "modID": "${mod.id}",
+  "modId": "${mod.id}",
   "name": "${mod.name}"
   }<#sep>,</#sep>
 </#list>
