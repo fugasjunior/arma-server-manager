@@ -27,7 +27,8 @@ const modalStyle = {
 };
 
 type ReforgerModEditProps = {
-    server: ReforgerServerDto
+    server: ReforgerServerDto,
+    serverStatus: ServerInstanceInfoDto | null
 }
 
 const ReforgerModEdit = (props: ReforgerModEditProps) => {
@@ -38,7 +39,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
     const [newModId, setNewModId] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
+    const serverRunning = props.serverStatus != null && props.serverStatus.alive;
 
     async function handleManageModsButtonClick() {
         if (props.server.id === undefined) {
@@ -68,14 +69,14 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
     }
 
     function handleAddNewMod() {
-        if (!mods.find(mod => mod.id === Number(newModId))) {
-            setMods(prevState => [...prevState, {id: Number(newModId), name: newModName}]);
+        if (!mods.find(mod => mod.id === newModId)) {
+            setMods(prevState => [...prevState, {id: newModId, name: newModName}]);
         }
         setNewModId("");
         setNewModName("");
     }
 
-    function handleDeleteMod(id: number) {
+    function handleDeleteMod(id: string) {
         setMods(prevState => prevState.filter(mod => mod.id !== id));
     }
 

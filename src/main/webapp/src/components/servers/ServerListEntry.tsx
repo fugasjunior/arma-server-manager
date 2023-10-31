@@ -92,7 +92,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                 </Button>
             </TableCell>
             <TableCell>
-                <ModEditButton server={server}/>
+                <ModEditButton server={server} serverStatus={status}/>
             </TableCell>
             <TableCell>
                 {server.type === "ARMA3" && <ListBuilderDLCsEdit server={server}/>}
