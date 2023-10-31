@@ -1,12 +1,12 @@
 import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
 import {Autocomplete, AutocompleteValue, Box, TextField} from "@mui/material";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getReforgerScenarios} from "../../services/scenarioService.ts";
 import {FormikState} from "formik";
 import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
 
 type ReforgerScenariosAutocompleteProps = {
-    onChange: (_: any, value: AutocompleteValue<ReforgerScenarioDto, false, false, false> | null) => void,
+    onChange: (_: any, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
     formik: FormikState<ReforgerServerDto>
 };
 
@@ -21,16 +21,6 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
 
         fetchScenarios();
     }, []);
-
-    const findSelectedScenario = (): ReforgerScenarioDto => {
-        let selectedScenarioId = formik.values.scenarioId;
-        const scenario = scenarios.find(scenario => scenario.value === selectedScenarioId);
-        if (!scenario) {
-            return {name: "", value: selectedScenarioId, isOfficial: true};
-        }
-        return scenario;
-    };
-
     const getScenarioDisplayName = (scenario: ReforgerScenarioDto) => {
         if (scenario.name) {
             return `${scenario.name} (${scenario.value})`;
@@ -38,13 +28,25 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
         return scenario.value;
     };
 
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        onChange(null, e.target.value);
+    };
+
     return <Autocomplete
         id="scenario-select"
         fullWidth
+        freeSolo
+        selectOnFocus
+        onBlur={handleBlur}
+        handleHomeEndKeys
         options={scenarios}
         autoHighlight
-        getOptionLabel={(option) => option.value}
-        value={findSelectedScenario()}
+        getOptionLabel={(option) => {
+            if (typeof option === "string")
+                return option;
+            return option.value;
+        }}
+        value={formik.values.scenarioId}
         onChange={onChange}
         renderOption={(props, option) => (
             <Box component="li"  {...props}>

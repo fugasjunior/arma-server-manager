@@ -31,11 +31,12 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
         enableReinitialize: true
     });
 
-    const setScenario = (_: any, value: AutocompleteValue<ReforgerScenarioDto, false, false, false> | null): void => {
+    const setScenario = (_: any, value: AutocompleteValue<ReforgerScenarioDto | string, false, false, true> | null): void => {
+        console.log(_, value);
         if (!value) {
             return;
         }
-        formik.setFieldValue("scenarioId", value.value);
+        formik.setFieldValue("scenarioId", typeof value === "string" ? value : value.value);
     };
 
     return (
