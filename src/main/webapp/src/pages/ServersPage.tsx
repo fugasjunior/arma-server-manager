@@ -41,7 +41,9 @@ const ServersPage = () => {
 
     const fetchServers = async () => {
         const {data: servers} = await getServers();
-        const instances = servers.servers.map((server: ServerDto) => {return {server, status: null}});
+        const instances = servers.servers.map((server: ServerDto) => {
+            return {server, status: null}
+        });
         for (const instance of instances) {
             const {data: status} = await getServerStatus(instance.server.id);
             instance.status = status;
@@ -74,10 +76,10 @@ const ServersPage = () => {
     }
 
     const isServerWithSamePortRunning = (server: ServerDto) => {
-        const activeServerWithSamePort = serverInstances.map(instance => instance.server)
-            .filter(anotherServer => anotherServer !== server)
-            .filter(anotherServer => anotherServer.instanceInfo && anotherServer.instanceInfo.alive)
-            .filter(anotherServer => anotherServer.port === server.port || anotherServer.queryPort === server.queryPort);
+        const activeServerWithSamePort = serverInstances
+            .filter(anotherInstance => anotherInstance.server !== server)
+            .filter(anotherInstance => anotherInstance.status && anotherInstance.status.alive)
+            .filter(anotherInstance => anotherInstance.server.port === server.port || anotherInstance.server.queryPort === server.queryPort);
         return !!activeServerWithSamePort[0];
     }
 

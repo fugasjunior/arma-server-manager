@@ -9,7 +9,8 @@ import {ServerDto} from "../../dtos/ServerDto";
 import {CreatorDlcDto} from "../../dtos/CreatorDlcDto.ts";
 
 type ListBuilderDLCsEditProps = {
-    server: ServerDto
+    server: ServerDto,
+    status: ServerInstanceInfoDto | null
 }
 
 const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
@@ -19,7 +20,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
     const [selectedDLCs, setSelectedDLCs] = useState<Array<CreatorDlcDto>>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
+    const serverRunning = props.status != null && props.status.alive;
 
     async function handleManageDLCsButtonClick() {
         if (props.server.id === undefined) {

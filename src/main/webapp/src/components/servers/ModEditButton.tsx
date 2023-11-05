@@ -11,7 +11,7 @@ const ModEditButton = ({server, serverStatus}: ModEditButtonProps) => {
     if (server.type === "REFORGER") {
         return <ReforgerModEdit server={server as ReforgerServerDto} serverStatus={serverStatus}/>;
     } else {
-        return <ListBuilderModEdit server={server}/>;
+        return <ListBuilderModEdit status={serverStatus} server={server}/>;
     }
 }
 

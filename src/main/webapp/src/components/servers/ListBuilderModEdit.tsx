@@ -12,6 +12,7 @@ import {ServerWorkshopModDto} from "../../dtos/ServerWorkshopModDto.ts";
 
 type ListBuilderModEditProps = {
     server: ServerDto
+    status: ServerInstanceInfoDto | null
 }
 
 const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
@@ -23,7 +24,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     const [selectedPreset, setSelectedPreset] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const serverRunning = props.server.instanceInfo && props.server.instanceInfo.alive;
+    const serverRunning = props.status != null && props.status.alive;
 
     async function handleManageModsButtonClick() {
         if (props.server.id === undefined) {
