@@ -8,6 +8,8 @@ import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,8 +69,9 @@ public class WorkshopModsService {
     }
 
     private void removeModFromServers(WorkshopMod mod) {
-        serverRepository.findAllByActiveMod(mod.getId())
-                .forEach(server -> {
+        serverRepository.findAllServerIdsByActiveMod(mod.getId())
+                .forEach(serverId -> {
+                    Server server = serverRepository.findById(serverId).orElseThrow();
                     if (server instanceof Arma3Server arma3Server) {
                         arma3Server.getActiveMods().remove(mod);
                     } else if (server instanceof DayZServer dayZServer) {
