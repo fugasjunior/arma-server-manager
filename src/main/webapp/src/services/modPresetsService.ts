@@ -53,5 +53,5 @@ export function downloadExportedPreset(id: string) {
 export function uploadImportedPreset(file: File) {
     const formData = new FormData();
     formData.append('preset', file);
-    return http.post(config.apiUrl + "/mod/launcher_preset/", formData);
+    return http.post(config.apiUrl + "/mod/launcher_preset", formData);
 }
