@@ -20,8 +20,7 @@ public class AutomaticRestartTask {
     }
 
     public AutomaticRestartTask schedule() {
-        Instant restartInstant = getNearestFutureInstantOf(restartTime);
-        job = taskScheduler.scheduleAtFixedRate(serverProcess::restart, restartInstant, Duration.ofDays(1));
+        job = taskScheduler.scheduleAtFixedRate(serverProcess::restart, getNearestFutureInstantOf(restartTime), Duration.ofDays(1));
         return this;
     }
 
