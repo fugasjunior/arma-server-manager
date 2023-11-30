@@ -9,9 +9,11 @@ import java.util.concurrent.ScheduledFuture;
 
 @Configurable
 public class AutomaticRestartTask {
+
+    private Clock clock;
+    private TaskScheduler taskScheduler;
     private final ServerProcess serverProcess;
     private final LocalTime restartTime;
-    private TaskScheduler taskScheduler;
     private ScheduledFuture<?> job;
 
     public AutomaticRestartTask(ServerProcess serverProcess, LocalTime restartTime) {
@@ -28,13 +30,18 @@ public class AutomaticRestartTask {
         job.cancel(false);
     }
 
-    private static Instant getNearestFutureInstantOf(LocalTime localTime) {
-        LocalDateTime currentDateTime = LocalDateTime.now();
+    private Instant getNearestFutureInstantOf(LocalTime localTime) {
+        LocalDateTime currentDateTime = LocalDateTime.now(clock);
         LocalDateTime upcomingDateTime = LocalDateTime.of(currentDateTime.toLocalDate(), localTime);
         if (currentDateTime.isAfter(upcomingDateTime)) {
             upcomingDateTime = upcomingDateTime.plusDays(1);
         }
         return upcomingDateTime.atZone(ZoneId.systemDefault()).toInstant();
+    }
+
+    @Autowired
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 
     @Autowired
