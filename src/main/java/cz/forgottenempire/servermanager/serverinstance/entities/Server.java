@@ -49,7 +49,7 @@ public abstract class Server {
     @Min(1)
     private int maxPlayers;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
     private List<LaunchParameter> customLaunchParameters = new ArrayList<>();
 
     private String password;

@@ -6,6 +6,7 @@ import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -49,7 +50,7 @@ public class DayZServer extends Server {
     @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<WorkshopMod> activeMods;
 
     @Override
