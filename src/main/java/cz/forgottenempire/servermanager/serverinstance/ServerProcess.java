@@ -6,10 +6,13 @@ import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -22,6 +25,7 @@ public class ServerProcess {
     private ServerRepository serverRepository;
     private Process process;
     private ServerInstanceInfo instanceInfo;
+    private AutomaticRestartTask automaticRestartTask;
 
     public ServerProcess(long serverId) {
         this.serverId = serverId;
@@ -61,6 +65,11 @@ public class ServerProcess {
                 .startedAt(LocalDateTime.now())
                 .maxPlayers(server.getMaxPlayers())
                 .build();
+
+        if (server.isRestartAutomatically()) {
+            scheduleRestartJobAt(server.getAutomaticRestartTime());
+        }
+
         return process;
     }
 
@@ -69,11 +78,27 @@ public class ServerProcess {
             process.destroy();
         }
 
+        cancelRestartJob();
         instanceInfo = ServerInstanceInfo.builder().build();
+    }
+
+    public void restart() {
+        stop();
+        start();
     }
 
     public boolean isAlive() {
         return process != null && process.isAlive();
+    }
+
+    public void scheduleRestartJobAt(LocalTime time) {
+        automaticRestartTask = new AutomaticRestartTask(this, time).schedule();
+    }
+
+    private void cancelRestartJob() {
+        if (automaticRestartTask != null) {
+            automaticRestartTask.cancel();
+        }
     }
 
     @Autowired
