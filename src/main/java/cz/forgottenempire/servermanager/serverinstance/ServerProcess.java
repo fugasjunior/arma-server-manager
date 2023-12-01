@@ -92,10 +92,13 @@ public class ServerProcess {
     }
 
     public void scheduleRestartJobAt(LocalTime time) {
+        if (automaticRestartTask != null) {
+            automaticRestartTask.cancel();
+        }
         automaticRestartTask = new AutomaticRestartTask(this, time).schedule();
     }
 
-    private void cancelRestartJob() {
+    public void cancelRestartJob() {
         if (automaticRestartTask != null) {
             automaticRestartTask.cancel();
         }
