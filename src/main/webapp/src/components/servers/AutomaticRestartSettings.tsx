@@ -43,6 +43,7 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
                     value={dayjs(time)}
                     label="Time"
                     format="HH:mm"
+                    size="small"
                     onChange={(newTime) => setTime(newTime)}
                 />
             }
