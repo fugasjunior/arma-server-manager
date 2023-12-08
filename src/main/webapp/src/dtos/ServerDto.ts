@@ -1,6 +1,7 @@
 import {ReforgerModDto} from "./ReforgerModDto.ts";
 import {ServerWorkshopModDto} from "./ServerWorkshopModDto.ts";
 import {CreatorDlcDto} from "./CreatorDlcDto.ts";
+import {AutomaticRestartDto} from "./AutomaticRestartDto.ts";
 
 export enum ServerType {
     ARMA3 = 'ARMA3',
@@ -20,6 +21,7 @@ export interface ServerDto {
     adminPassword: string,
     maxPlayers: number
     customLaunchParameters: Array<{name: string, value: string | null}>
+    automaticRestart: AutomaticRestartDto
 }
 
 export interface Arma3ServerDto extends ServerDto {
