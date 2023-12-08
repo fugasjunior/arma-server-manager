@@ -63,18 +63,20 @@ interface ServerMapper {
     LaunchParameter mapCustomLaunchParameterDtoToEntity(LaunchParameterDto launchParameterDto);
 
     default ServerDto mapServerToDto(Server server) {
+        ServerDto serverDto;
         ServerType type = server.getType();
         if (type == ServerType.ARMA3) {
-            return mapArma3ServerToDto((Arma3Server) server);
-        }
-        if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
-            return mapDayZServerToDto((DayZServer) server);
-        }
-        if (type == ServerType.REFORGER) {
-            return mapReforgerServerToDto((ReforgerServer) server);
+            serverDto = mapArma3ServerToDto((Arma3Server) server);
+        } else if (type == ServerType.DAYZ || type == ServerType.DAYZ_EXP) {
+            serverDto = mapDayZServerToDto((DayZServer) server);
+        } else if (type == ServerType.REFORGER) {
+            serverDto = mapReforgerServerToDto((ReforgerServer) server);
+        } else {
+            throw new IllegalStateException("Unsupported server type");
         }
 
-        throw new IllegalStateException("Unsupported server type");
+        serverDto.setAutomaticRestart(new AutomaticRestartDto(server.isRestartAutomatically(), server.getAutomaticRestartTime()));
+        return serverDto;
     }
 
     default Server mapServerDtoToEntity(ServerDto serverDto) {
