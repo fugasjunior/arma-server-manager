@@ -1,6 +1,7 @@
 import http from "./httpService";
 import config from "../config";
 import {ServerDto} from "../dtos/ServerDto.ts";
+import {AutomaticRestartDto} from "../dtos/AutomaticRestartDto.ts";
 
 const apiEndpoint = config.apiUrl + "/server";
 
@@ -38,4 +39,8 @@ export function deleteServer(id: number) {
 
 export function getServerStatus(id: number) {
     return http.get(apiEndpoint + "/" + id + "/status");
+}
+
+export function setAutomaticRestart(id: number, dto: AutomaticRestartDto) {
+    return http.patch(apiEndpoint + "/" + id + "/autorestart", dto);
 }
