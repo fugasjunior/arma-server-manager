@@ -2,7 +2,7 @@ import {AutomaticRestartDto} from "../../dtos/AutomaticRestartDto.ts";
 import {useEffect, useState} from "react";
 import {TimeField} from "@mui/x-date-pickers";
 import {setAutomaticRestart} from "../../services/serversService.ts";
-import {FormControlLabel, Switch} from "@mui/material";
+import {FormControlLabel, Stack, Switch} from "@mui/material";
 import {parseInt} from "lodash";
 import dayjs from "dayjs";
 
@@ -31,7 +31,7 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
     }, [enabled, time])
 
     return (
-        <>
+        <Stack direction="row">
             <FormControlLabel control={
                 <Switch
                     checked={enabled}
@@ -47,7 +47,7 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
                     onChange={(newTime) => setTime(newTime)}
                 />
             }
-        </>
+        </Stack>
     )
 }
 

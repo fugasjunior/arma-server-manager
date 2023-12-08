@@ -10,20 +10,17 @@ export function ServerListEntryDetails(props: {
     serverStatus: ServerInstanceInfoDto | null,
     onClick: () => void
 }) {
-    return <Stack spacing={2}>
-        <Stack direction="row" spacing={2}>
-            <ModEditButton server={props.server} serverStatus={props.serverStatus}/>
-            {props.server.type === "ARMA3" &&
-                <ListBuilderDLCsEdit status={props.serverStatus} server={props.server}/>}
-            <Button
-                variant="contained"
-                startIcon={<TextSnippetIcon/>} onClick={props.onClick}
-                color="info">
-                Logs
-            </Button>
-        </Stack>
-        <Stack direction="row">
-            <AutomaticRestartSettings serverId={props.server.id!} dto={props.server.automaticRestart}/>
-        </Stack>
+    return <Stack direction="row" spacing={2}>
+        <ModEditButton server={props.server} serverStatus={props.serverStatus}/>
+        {props.server.type === "ARMA3" &&
+            <ListBuilderDLCsEdit status={props.serverStatus} server={props.server}/>}
+        <Button
+            variant="contained"
+            startIcon={<TextSnippetIcon/>} onClick={props.onClick}
+            color="info">
+            Logs
+        </Button>
+
+        <AutomaticRestartSettings serverId={props.server.id!} dto={props.server.automaticRestart}/>
     </Stack>;
 }
