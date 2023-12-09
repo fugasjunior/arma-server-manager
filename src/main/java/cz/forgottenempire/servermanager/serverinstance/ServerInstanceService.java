@@ -1,15 +1,15 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.validation.constraints.NotNull;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +56,12 @@ class ServerInstanceService {
             throw new ModifyingRunningServerException("Cannot delete running server '" + server.getName() + "'");
         }
         serverRepository.delete(server);
+    }
+
+    public void setAutomaticRestart(Server server, boolean enabled, LocalTime time) {
+        server.setRestartAutomatically(enabled);
+        server.setAutomaticRestartTime(time);
+        serverRepository.save(server);
     }
 
     private void setInstanceIdForDayZServer(Server server) {

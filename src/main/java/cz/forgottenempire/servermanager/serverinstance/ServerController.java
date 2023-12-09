@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.serverinstance.dtos.AutomaticRestartDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServersDto;
@@ -131,6 +132,20 @@ class ServerController {
         ServerLog logFile = server.getLog();
         String logLines = logFile.getLastLines(count);
         return ResponseEntity.ok(logLines);
+    }
+
+    @PatchMapping("/{id}/autorestart")
+    public ResponseEntity<?> setAutomaticRestart(@PathVariable long id, @RequestBody AutomaticRestartDto automaticRestartDto) {
+        Server server = getServerEntity(id);
+        serverInstanceService.setAutomaticRestart(server, automaticRestartDto.isEnabled(), automaticRestartDto.getTime());
+
+        if (automaticRestartDto.isEnabled()) {
+            serverProcessService.enableAutoRestart(id, automaticRestartDto.getTime());
+        } else {
+            serverProcessService.disableAutoRestart(id);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private Server getServerEntity(long id) {

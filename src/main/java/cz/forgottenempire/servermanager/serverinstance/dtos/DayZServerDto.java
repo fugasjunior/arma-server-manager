@@ -60,4 +60,6 @@ public class DayZServerDto implements ServerDto {
     private List<ServerWorkshopModDto> activeMods;
 
     private List<LaunchParameterDto> customLaunchParameters;
+
+    private AutomaticRestartDto automaticRestart;
 }

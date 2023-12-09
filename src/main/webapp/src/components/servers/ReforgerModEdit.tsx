@@ -104,7 +104,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>}>
+            <Button onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="contained">
                 Mods
             </Button>
             <Modal open={isOpen} onClose={handleClose}>

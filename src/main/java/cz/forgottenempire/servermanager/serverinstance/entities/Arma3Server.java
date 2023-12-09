@@ -42,18 +42,18 @@ public class Arma3Server extends Server {
     @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<WorkshopMod> activeMods;
 
-    @ElementCollection(targetClass = Arma3CDLC.class)
+    @ElementCollection(targetClass = Arma3CDLC.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private List<Arma3CDLC> activeDLCs;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "difficulty_settings_id")
     private Arma3DifficultySettings difficultySettings;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "network_settings_id")
     private Arma3NetworkSettings networkSettings;
 

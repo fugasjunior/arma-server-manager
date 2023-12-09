@@ -44,7 +44,11 @@ export function arma3ServerInitialState(): Arma3ServerDto {
             skillAI: 0.5,
             precisionAI: 0.5
         },
-        customLaunchParameters: []
+        customLaunchParameters: [],
+        automaticRestart: {
+            enabled: false,
+            time: null
+        }
     };
 }
 
@@ -78,7 +82,11 @@ export function dayzServerInitialState(): DayZServerDto {
                 template = "dayzOffline.chernarusplus";
             };
         };`,
-        customLaunchParameters: []
+        customLaunchParameters: [],
+        automaticRestart: {
+            enabled: false,
+            time: null
+        }
     };
 }
 
@@ -96,6 +104,10 @@ export function reforgerServerInitialState(): ReforgerServerDto {
         battlEye: true,
         thirdPersonViewEnabled: true,
         activeMods: [],
-        customLaunchParameters: []
+        customLaunchParameters: [],
+        automaticRestart: {
+            enabled: false,
+            time: null
+        }
     };
 }
