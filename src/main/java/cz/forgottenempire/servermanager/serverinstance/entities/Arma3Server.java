@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -77,7 +78,7 @@ public class Arma3Server extends Server {
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
         parameters.add("-world=empty");
-        addModsAndDlcsToParameters(parameters);
+        parameters.addAll(getModsAsParameters());
         addCustomLaunchParameters(parameters);
         return parameters;
     }
@@ -91,6 +92,16 @@ public class Arma3Server extends Server {
             configs.add(new ServerConfig(getNetworkConfigFile(), Constants.ARMA3_NETWORK_SETTINGS, networkSettings));
         }
         return configs;
+    }
+
+    public List<String> getModsAsParameters() {
+        return Stream.concat(
+                Stream.concat(
+                        getActiveMods().stream().map(mod -> "-mod=" + mod.getNormalizedName()),
+                        getActiveDLCs().stream().map(dlc -> "-mod=" + dlc.getId())
+                ),
+                Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod)
+        ).toList();
     }
 
     private File getConfigFile() {
@@ -112,20 +123,6 @@ public class Arma3Server extends Server {
 
     private String getProfilesDirectoryPath() {
         return pathsFactory.getProfilesDirectoryPath().toString();
-    }
-
-    private void addModsAndDlcsToParameters(List<String> parameters) {
-        getActiveMods().stream()
-                .map(mod -> "-mod=" + mod.getNormalizedName())
-                .forEach(parameters::add);
-        if (additionalMods != null) {
-            Arrays.stream(additionalMods)
-                    .map(mod -> "-mod=" + mod)
-                    .forEach(parameters::add);
-        }
-        getActiveDLCs().stream()
-                .map(dlc -> "-mod=" + dlc.getId())
-                .forEach(parameters::add);
     }
 
     private void addCustomLaunchParameters(List<String> parameters) {
