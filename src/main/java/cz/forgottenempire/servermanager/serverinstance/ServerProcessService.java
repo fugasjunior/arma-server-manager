@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+
 @Service
 @Slf4j
 class ServerProcessService {
@@ -56,6 +58,22 @@ class ServerProcessService {
 
     public boolean isServerInstanceRunning(Server server) {
         return getServerProcess(server).isAlive();
+    }
+
+    public void enableAutoRestart(long id, LocalTime time) {
+        processRepository.get(id).ifPresent(process -> {
+            if (process.isAlive()) {
+                process.scheduleRestartJobAt(time);
+            }
+        });
+    }
+
+    public void disableAutoRestart(long id) {
+        processRepository.get(id).ifPresent(process -> {
+            if (process.isAlive()) {
+                process.cancelRestartJob();
+            }
+        });
     }
 
     private Server getServer(Long id) {

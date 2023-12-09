@@ -28,4 +28,8 @@ public interface ServerDto {
     List<LaunchParameterDto> getCustomLaunchParameters();
 
     void setCustomLaunchParameters(List<LaunchParameterDto> customLaunchParameters);
+
+    AutomaticRestartDto getAutomaticRestart();
+
+    void setAutomaticRestart(AutomaticRestartDto automaticRestartDto);
 }

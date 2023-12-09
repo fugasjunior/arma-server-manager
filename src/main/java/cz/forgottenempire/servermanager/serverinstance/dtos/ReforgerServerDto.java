@@ -36,4 +36,6 @@ public class ReforgerServerDto implements ServerDto {
     private List<ReforgerModDto> activeMods;
 
     private List<LaunchParameterDto> customLaunchParameters;
+
+    private AutomaticRestartDto automaticRestart;
 }

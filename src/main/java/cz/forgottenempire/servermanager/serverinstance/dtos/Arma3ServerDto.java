@@ -43,4 +43,6 @@ public class Arma3ServerDto implements ServerDto {
     private Arma3NetworkSettingsDto networkSettings;
 
     private List<LaunchParameterDto> customLaunchParameters;
+
+    private AutomaticRestartDto automaticRestart;
 }

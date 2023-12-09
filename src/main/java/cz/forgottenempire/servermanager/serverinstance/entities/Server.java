@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,11 +49,16 @@ public abstract class Server {
     @Min(1)
     private int maxPlayers;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "server")
     private List<LaunchParameter> customLaunchParameters = new ArrayList<>();
 
     private String password;
     private String adminPassword;
+
+    @Column(name = "automatic_restart")
+    private boolean restartAutomatically;
+    @Column(name = "automatic_restart_time")
+    private LocalTime automaticRestartTime;
 
     public abstract List<String> getLaunchParameters();
 
