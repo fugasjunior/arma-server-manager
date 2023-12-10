@@ -1,4 +1,4 @@
-import {ServerDto} from "../../dtos/ServerDto.ts";
+import {ServerDto} from "../../../dtos/ServerDto.ts";
 import {Button, Stack} from "@mui/material";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 

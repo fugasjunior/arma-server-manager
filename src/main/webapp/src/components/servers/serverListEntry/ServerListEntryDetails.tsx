@@ -1,7 +1,7 @@
-import {ServerDto} from "../../dtos/ServerDto.ts";
+import {ServerDto} from "../../../dtos/ServerDto.ts";
 import {Button, Stack} from "@mui/material";
-import ModEditButton from "./ModEditButton.tsx";
-import ListBuilderDLCsEdit from "./ListBuilderDLCsEdit.tsx";
+import ModEditButton from "../ModEditButton.tsx";
+import ListBuilderDLCsEdit from "../ListBuilderDLCsEdit.tsx";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import AutomaticRestartSettings from "./AutomaticRestartSettings.tsx";
 

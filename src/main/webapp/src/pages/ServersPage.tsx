@@ -8,7 +8,7 @@ import {
 } from "../services/serversService"
 import {useEffect, useState} from "react";
 import {useInterval} from "../hooks/use-interval";
-import ServerListEntry from "../components/servers/ServerListEntry";
+import ServerListEntry from "../components/servers/serverListEntry/ServerListEntry.tsx";
 import NewServerButton from "../components/servers/NewServerButton";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
@@ -16,7 +16,7 @@ import Paper from "@mui/material/Paper";
 import TableBody from "@mui/material/TableBody";
 import {toast} from "material-react-toastify";
 import ConfirmationDialog from "../UI/ConfirmationDialog";
-import ServerLogs from "../components/servers/ServerLogs";
+import ServerLogs from "../components/servers/serverListEntry/ServerLogs.tsx";
 import {ServerDto} from "../dtos/ServerDto";
 
 type ServerInstance = {
