@@ -1,7 +1,7 @@
-import {AutomaticRestartDto} from "../../dtos/AutomaticRestartDto.ts";
+import {AutomaticRestartDto} from "../../../dtos/AutomaticRestartDto.ts";
 import {useEffect, useState} from "react";
 import {TimeField} from "@mui/x-date-pickers";
-import {setAutomaticRestart} from "../../services/serversService.ts";
+import {setAutomaticRestart} from "../../../services/serversService.ts";
 import {FormControlLabel, Stack, Switch} from "@mui/material";
 import {parseInt} from "lodash";
 import dayjs from "dayjs";

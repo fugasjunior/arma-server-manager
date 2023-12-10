@@ -1,4 +1,4 @@
-import {ServerDto} from "../../dtos/ServerDto.ts";
+import {ServerDto} from "../../../dtos/ServerDto.ts";
 import {Stack, Typography} from "@mui/material";
 import {ServerIcon} from "./ServerIcon.tsx";
 

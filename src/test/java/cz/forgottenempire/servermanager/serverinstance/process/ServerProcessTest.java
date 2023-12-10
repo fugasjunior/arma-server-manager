@@ -1,7 +1,11 @@
-package cz.forgottenempire.servermanager.serverinstance;
+package cz.forgottenempire.servermanager.serverinstance.process;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
+import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
+import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

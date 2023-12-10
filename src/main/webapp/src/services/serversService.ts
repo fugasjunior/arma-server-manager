@@ -44,3 +44,11 @@ export function getServerStatus(id: number) {
 export function setAutomaticRestart(id: number, dto: AutomaticRestartDto) {
     return http.patch(apiEndpoint + "/" + id + "/autorestart", dto);
 }
+
+export function addHeadlessClient(id: number) {
+    return http.post(apiEndpoint + "/" + id + "/hc/start");
+}
+
+export function removeHeadlessClient(id: number) {
+    return http.delete(apiEndpoint + "/" + id + "/hc/stop");
+}
