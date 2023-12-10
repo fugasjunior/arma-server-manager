@@ -24,8 +24,8 @@ public class ServerProcess {
     private PathsFactory pathsFactory;
     private ServerRepository serverRepository;
     private Process process;
-    private ServerInstanceInfo instanceInfo;
     private AutomaticRestartTask automaticRestartTask;
+    protected ServerInstanceInfo instanceInfo;
 
     public ServerProcess(long serverId) {
         this.serverId = serverId;
