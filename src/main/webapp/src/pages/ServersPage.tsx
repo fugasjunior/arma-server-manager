@@ -106,7 +106,7 @@ const ServersPage = () => {
         }
 
         instance.status = {
-            description: "", map: "", maxPlayers: 0, playersOnline: 0, startedAt: "", version: "",
+            description: "", map: "", maxPlayers: 0, playersOnline: 0, startedAt: "", version: "", headlessClientsCount: 0,
             ...instance.status,
             alive: isNewServerAlive
         };
