@@ -4,6 +4,7 @@ import com.ibasco.agql.core.exceptions.ReadTimeoutException;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -34,35 +35,22 @@ class CheckServerInstancesStatusCronJob {
     @Scheduled(fixedDelay = 10000)
     public void checkServers() {
         processRepository.getAll().stream()
-                .filter(process -> process.getInstanceInfo() != null && process.getInstanceInfo().isAlive())
-                .forEach(process -> {
-                    if (checkCrashed(process)) {
-                        handleCrashedServer(process);
-                        return;
-                    }
-                    updateServerInstanceInfo(process);
-                });
+                .filter(CheckServerInstancesStatusCronJob::isServerStarted)
+                .forEach(this::checkServerProcess);
     }
 
-    private boolean checkCrashed(ServerProcess serverProcess) {
-        boolean hasBeenStarted = serverProcess.getInstanceInfo().isAlive();
-        return hasBeenStarted && !serverProcess.isAlive();
+    private void checkServerProcess(ServerProcess process) {
+        if (!process.isAlive()) {
+            handleCrashedServer(process);
+            return;
+        }
+        updateHeadlessClients(process);
+        updateServerInstanceInfo(process);
     }
 
     private void handleCrashedServer(ServerProcess serverProcess) {
-        ServerInstanceInfo instanceInfo = serverProcess.getInstanceInfo();
-        instanceInfo.setStartedAt(null);
-        instanceInfo.setPlayersOnline(0);
-        instanceInfo.setMaxPlayers(0);
-        instanceInfo.setVersion(null);
-        instanceInfo.setMap(null);
-        instanceInfo.setDescription(null);
-        // TODO fix log
-//        log.warn("Server '{}' (ID {}, type '{}') likely crashed or was exited outside the admin UI. "
-//                        + "Server was started on {} with process ID {}.",
-//                server.getName(), sserver.getId(), server.getType(),
-//                instanceInfo.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
-//                instanceInfo.getProcess().pid());
+        serverProcess.stop();
+        log.warn("Server ID {} crashed or was exited outside the manager.", serverProcess.getServerId());
     }
 
     private void updateServerInstanceInfo(ServerProcess process) {
@@ -98,5 +86,15 @@ class CheckServerInstancesStatusCronJob {
     private Server getServer(Long serverId) {
         return serverService.getServer(serverId)
                 .orElseThrow(() -> new IllegalStateException("Invalid ID " + serverId + " in server instances map"));
+    }
+
+    private static boolean isServerStarted(ServerProcess process) {
+        return process.getInstanceInfo() != null && process.getInstanceInfo().isAlive();
+    }
+
+    private static void updateHeadlessClients(ServerProcess process) {
+        if (process instanceof Arma3ServerProcess arma3ServerProcess) {
+            arma3ServerProcess.checkHeadlessClients();
+        }
     }
 }

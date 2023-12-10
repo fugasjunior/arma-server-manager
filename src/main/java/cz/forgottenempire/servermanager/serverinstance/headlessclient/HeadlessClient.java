@@ -44,7 +44,7 @@ public class HeadlessClient {
     }
 
     public void stop() {
-        if (process == null || !process.isAlive()) {
+        if (!isAlive()) {
             return;
         }
         process.destroy();

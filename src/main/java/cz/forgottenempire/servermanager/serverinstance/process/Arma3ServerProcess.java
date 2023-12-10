@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 @Configurable
 public class Arma3ServerProcess extends ServerProcess {
@@ -26,7 +27,7 @@ public class Arma3ServerProcess extends ServerProcess {
     @Override
     public void stop() {
         super.stop();
-        for (int i = 0; i < headlessClients.size(); i++) {
+        while (!headlessClients.isEmpty()) {
             removeHeadlessClient();
         }
     }
@@ -54,6 +55,12 @@ public class Arma3ServerProcess extends ServerProcess {
             return;
         }
         headlessClients.pop().stop();
+        instanceInfo.setHeadlessClientsCount(headlessClients.size());
+    }
+
+    public void checkHeadlessClients() {
+        List<HeadlessClient> crashedHeadlessClients = headlessClients.stream().filter(hc -> !hc.isAlive()).toList();
+        crashedHeadlessClients.forEach(headlessClients::remove);
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 
