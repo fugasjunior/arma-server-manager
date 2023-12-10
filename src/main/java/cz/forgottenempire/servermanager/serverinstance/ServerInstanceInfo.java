@@ -1,9 +1,11 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import java.time.LocalDateTime;
-import javax.annotation.concurrent.Immutable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Setter;
 
-import lombok.*;
+import java.time.LocalDateTime;
 
 @Data
 @Setter
@@ -17,6 +19,7 @@ class ServerInstanceInfo {
     private String version;
     private String map;
     private String description;
+    private int headlessClientsCount;
 
     public boolean isAlive() {
         return startedAt != null;

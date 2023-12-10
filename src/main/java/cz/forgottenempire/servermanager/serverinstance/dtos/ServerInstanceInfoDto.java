@@ -7,6 +7,7 @@ public record ServerInstanceInfoDto(
         int maxPlayers,
         String version,
         String map,
-        String description
+        String description,
+        int headlessClientsCount
 ) {
 }
