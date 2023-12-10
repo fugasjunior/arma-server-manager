@@ -29,15 +29,17 @@ class ServerController {
     public static final int DEFAULT_LOG_LINES_COUNT = 100;
     private final ServerInstanceService serverInstanceService;
     private final ServerProcessService serverProcessService;
+    private final HeadlessClientService headlessClientService;
     private final ServerMapper serverMapper = Mappers.getMapper(ServerMapper.class);
 
     @Autowired
     public ServerController(
             ServerInstanceService serverInstanceService,
-            ServerProcessService serverProcessService
-    ) {
+            ServerProcessService serverProcessService,
+            HeadlessClientService headlessClientService) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
+        this.headlessClientService = headlessClientService;
     }
 
     @GetMapping
@@ -145,6 +147,18 @@ class ServerController {
             serverProcessService.disableAutoRestart(id);
         }
 
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/hc/start")
+    public ResponseEntity<?> addHeadlessClient(@PathVariable Long id) {
+        headlessClientService.addHeadlessClient(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/hc/stop")
+    public ResponseEntity<?> removeHeadlessClient(@PathVariable Long id) {
+        headlessClientService.removeHeadlessClient(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
