@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
@@ -61,6 +62,11 @@ public class Arma3Server extends Server {
     @Override
     public void setQueryPort(int queryPort) {
         super.setQueryPort(getPort() + 1);
+    }
+
+    @Override
+    public Arma3ServerProcess getProcess() {
+        return new Arma3ServerProcess(getId());
     }
 
     @Override
