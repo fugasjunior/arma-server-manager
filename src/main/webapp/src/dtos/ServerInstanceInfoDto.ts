@@ -5,5 +5,6 @@ interface ServerInstanceInfoDto {
     maxPlayers: number,
     version: string,
     map: string,
-    description: string
+    description: string,
+    headlessClientsCount: number
 }

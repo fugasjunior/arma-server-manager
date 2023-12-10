@@ -4,7 +4,7 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerLog;
-import cz.forgottenempire.servermanager.serverinstance.ServerProcess;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;

@@ -108,6 +108,10 @@ public class PathsFactory {
         return Path.of(logsBasePath.toString(), type.name() + "_" + id + ".log").toFile();
     }
 
+    public File getHeadlessClientLogFile(long serverId, int headlessClientId) {
+        return Path.of(logsBasePath.toString(), "ARMA3_" + serverId + "_HC " + headlessClientId + ".log").toFile();
+    }
+
     private Path getServerExecutable(ServerType type) {
         return Path.of(getServerPath(type).toString(), Constants.SERVER_EXECUTABLES.get(type));
     }

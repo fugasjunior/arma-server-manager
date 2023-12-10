@@ -1,6 +1,8 @@
-package cz.forgottenempire.servermanager.serverinstance;
+package cz.forgottenempire.servermanager.serverinstance.process;
 
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
+import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import java.time.LocalTime;
 
 @Service
 @Slf4j
+public
 class ServerProcessService {
 
     private final ServerRepository serverRepository;

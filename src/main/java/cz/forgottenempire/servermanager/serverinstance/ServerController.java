@@ -6,6 +6,7 @@ import cz.forgottenempire.servermanager.serverinstance.dtos.ServerDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.serverinstance.dtos.ServersDto;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -34,8 +35,7 @@ class ServerController {
     @Autowired
     public ServerController(
             ServerInstanceService serverInstanceService,
-            ServerProcessService serverProcessService
-    ) {
+            ServerProcessService serverProcessService) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
     }

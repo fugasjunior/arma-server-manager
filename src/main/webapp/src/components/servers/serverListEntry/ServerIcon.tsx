@@ -1,7 +1,7 @@
-import {ServerType} from "../../dtos/ServerDto.ts";
-import arma3Icon from "../../img/arma3_icon.png";
-import dayZIcon from "../../img/dayz_icon.png";
-import reforgerIcon from "../../img/reforger_icon.png";
+import {ServerType} from "../../../dtos/ServerDto.ts";
+import arma3Icon from "../../../img/arma3_icon.png";
+import dayZIcon from "../../../img/dayz_icon.png";
+import reforgerIcon from "../../../img/reforger_icon.png";
 import {Avatar} from "@mui/material";
 
 const SERVER_ICON_URLS = new Map<ServerType, string>([

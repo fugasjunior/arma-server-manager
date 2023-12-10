@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Box, Modal, Typography} from "@mui/material";
-import {downloadLogFile, getServerLogs} from "../../services/serverLogService";
+import {downloadLogFile, getServerLogs} from "../../../services/serverLogService.ts";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
