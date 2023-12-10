@@ -13,13 +13,13 @@ export function HeadlessClientControls(props: { serverStatus: ServerInstanceInfo
     const handleAddHeadlessClient = async () => {
         setHeadlessClientsCount(prevState => ++prevState);
         await addHeadlessClient(props.serverId);
-        toast.success("Headless client started.");
+        toast.success("Headless client started");
     }
 
     const handleRemoveHeadlessClient = async () => {
         setHeadlessClientsCount(prevState => --prevState);
         await removeHeadlessClient(props.serverId);
-        toast.success("Headless client stopped.");
+        toast.success("Headless client stopped");
     }
 
     return <Stack spacing={1}>
