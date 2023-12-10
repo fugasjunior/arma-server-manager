@@ -30,8 +30,7 @@ class ServerControllerTest {
     public ServerControllerTest() {
         serverInstanceService = mock(ServerInstanceService.class, withSettings().stubOnly());
         serverProcessService = mock(ServerProcessService.class, withSettings().stubOnly());
-        HeadlessClientService headlessClientService = mock(HeadlessClientService.class, withSettings().stubOnly());
-        controller = new ServerController(serverInstanceService, serverProcessService, headlessClientService);
+        controller = new ServerController(serverInstanceService, serverProcessService);
     }
 
     @Test
