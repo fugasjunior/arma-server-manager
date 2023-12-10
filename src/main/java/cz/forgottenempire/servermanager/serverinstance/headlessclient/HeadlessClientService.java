@@ -1,8 +1,8 @@
 package cz.forgottenempire.servermanager.serverinstance.headlessclient;
 
-import cz.forgottenempire.servermanager.serverinstance.Arma3ServerProcess;
-import cz.forgottenempire.servermanager.serverinstance.ServerProcess;
-import cz.forgottenempire.servermanager.serverinstance.ServerProcessRepository;
+import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

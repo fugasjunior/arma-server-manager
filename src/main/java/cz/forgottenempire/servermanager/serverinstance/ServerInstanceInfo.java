@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @Builder
+public
 class ServerInstanceInfo {
 
     private LocalDateTime startedAt;

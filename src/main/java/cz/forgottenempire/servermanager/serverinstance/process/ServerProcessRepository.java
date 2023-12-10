@@ -1,4 +1,4 @@
-package cz.forgottenempire.servermanager.serverinstance;
+package cz.forgottenempire.servermanager.serverinstance.process;
 
 import org.springframework.stereotype.Repository;
 

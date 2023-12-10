@@ -1,13 +1,15 @@
-package cz.forgottenempire.servermanager.serverinstance;
+package cz.forgottenempire.servermanager.serverinstance.process;
 
 import com.google.common.base.Joiner;
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.serverinstance.AutomaticRestartTask;
+import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
+import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
+import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;

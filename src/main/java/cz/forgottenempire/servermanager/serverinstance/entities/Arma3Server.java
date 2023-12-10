@@ -2,7 +2,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.serverinstance.Arma3ServerProcess;
+import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;

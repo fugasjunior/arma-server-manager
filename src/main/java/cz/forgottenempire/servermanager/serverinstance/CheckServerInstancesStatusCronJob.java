@@ -4,6 +4,8 @@ import com.ibasco.agql.core.exceptions.ReadTimeoutException;
 import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
