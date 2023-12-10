@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+public
 class ServerProcessRepository {
 
     private final Map<Long, ServerProcess> serverIdToProcessMap = new ConcurrentHashMap<>();

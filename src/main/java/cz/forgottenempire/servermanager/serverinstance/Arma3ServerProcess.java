@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import cz.forgottenempire.servermanager.serverinstance.headlessclient.HeadlessClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
