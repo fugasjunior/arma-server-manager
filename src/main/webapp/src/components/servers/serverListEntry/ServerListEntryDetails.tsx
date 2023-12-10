@@ -9,16 +9,22 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {useState} from "react";
 import {blue, grey} from '@mui/material/colors';
+import {addHeadlessClient, removeHeadlessClient} from "../../../services/serversService.ts";
+import {toast} from "material-react-toastify";
 
 function HeadlessClientControls(props: { serverStatus: ServerInstanceInfoDto, serverId: number }) {
     const [headlessClientsCount, setHeadlessClientsCount] = useState(props.serverStatus.headlessClientsCount);
 
-    const handleAddHeadlessClient = () => {
+    const handleAddHeadlessClient = async () => {
         setHeadlessClientsCount(prevState => ++prevState);
+        await addHeadlessClient(props.serverId);
+        toast.success("Headless client started.");
     }
 
-    const handleRemoveHeadlessClient = () => {
+    const handleRemoveHeadlessClient = async () => {
         setHeadlessClientsCount(prevState => --prevState);
+        await removeHeadlessClient(props.serverId);
+        toast.success("Headless client stopped.");
     }
 
     return <Stack spacing={1}>
