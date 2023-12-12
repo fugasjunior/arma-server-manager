@@ -46,13 +46,10 @@ For more comprehensive list of features, see [Features](#features).
 - [Support](#support)
 - [Credits](#credits)
 
-
+## Features
 ![Main dashboard screenshot](https://imgur.com/LcvCtlk.jpg)
 
 [More screenshots](https://imgur.com/a/74pWsoO)
-
-
-## Features
 
 ### Host multiple game servers
 
