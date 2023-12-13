@@ -23,13 +23,18 @@ services:
   armaservermanager:
     image: "fugasjunior/armaservermanager:${VERSION}"
     restart: always
-    #    Not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
+    # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host
+    # uncomment when running on Windows and add additional ports according to your needs
+    # ports:
+    #   - "8080:8080"
+    #   - "2302:2303/udp"
+    #   - "2303:2303/udp"
     depends_on:
       - db
     volumes:
-      #      - /home/armaservermanager/storage:/home/steam/armaservermanager/
-      - armaservermanager-storage:/home/steam/armaservermanager/
+      # Change the path where the servers will be stored on your server (first part before semicolon)
+      - /home/armaservermanager/storage:/home/steam/armaservermanager/
     environment:
       AUTH_USERNAME: "${AUTH_USERNAME}"
       AUTH_PASSWORD: "${AUTH_PASSWORD}"
@@ -42,4 +47,3 @@ services:
 
 volumes:
   armaservermanager-db:
-  armaservermanager-storage:
