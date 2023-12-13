@@ -118,6 +118,8 @@ services:
       MYSQL_DATABASE: "${MYSQL_DB_NAME}"
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    ports:
+      - "3306:3306"
     volumes:
       - armaservermanager-db:/var/lib/mysql
 
@@ -167,7 +169,7 @@ AUTH_PASSWORD=password
 
 # Database settings. Make sure to change the password and root password
 MYSQL_DB_NAME=armaservermanager_db
-MYSQL_DB_URL=jdbc:mysql://db:3306/armaservermanager_db
+MYSQL_DB_URL=jdbc:mysql://localhost:3306/armaservermanager_db
 MYSQL_USER=armaservermanager
 MYSQL_PASSWORD=example
 MYSQL_ROOT_PASSWORD=change_me
