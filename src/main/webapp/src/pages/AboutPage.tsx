@@ -4,6 +4,7 @@ import {DiscordIcon} from "../icons/DiscordIcon.tsx";
 import {GitHubIcon} from "../icons/GitHubIcon.tsx";
 import {BuyMeACoffeeIcon} from "../icons/BuyMeACoffeeIcon.tsx";
 import {PayPalIcon} from "../icons/PayPalIcon.tsx";
+import config from "../config.ts";
 
 const AboutPage = () => {
 
@@ -17,7 +18,7 @@ const AboutPage = () => {
                     style={{height: 100}}
                 />
                 <Typography variant="h4" mt={1}>Arma Server Manager</Typography>
-                <Typography variant="subtitle2">v1.1.2</Typography>
+                <Typography variant="subtitle2">{config.version}</Typography>
                 <Typography variant="subtitle1">by fugasjunior</Typography>
                 <Stack direction="row" mt={2} spacing={2}>
                     <Button target="_blank" href="https://github.com/fugasjunior/arma-server-manager"
@@ -26,7 +27,7 @@ const AboutPage = () => {
                     >
                         GitHub
                     </Button>
-                    <Button target="_blank" href="https://discord.gg"
+                    <Button target="_blank" href="https://discord.gg/Yn93vCADPg"
                             variant="contained"
                             startIcon={<DiscordIcon/>}
                     >
