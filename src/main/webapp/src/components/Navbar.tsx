@@ -1,8 +1,8 @@
 import {useContext} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
-import {AppBar, Avatar, Button, CssBaseline, Stack, Toolbar, Typography} from "@mui/material";
+import {AppBar, Button, CssBaseline, Stack, Toolbar} from "@mui/material";
 import {AuthContext} from "../store/auth-context";
-import logo from "../img/logo_48x48.png"
+import logo from "../img/asm_logo.png"
 
 const Navbar = () => {
     const authCtx = useContext(AuthContext);
@@ -19,14 +19,12 @@ const Navbar = () => {
                 {isLoggedIn && <AppBar position="static" sx={{mb: 4}}>
                     <CssBaseline/>
                     <Toolbar>
-                        <Avatar
-                                alt="Forgotten Empire Logo"
-                                src={logo}
-                                sx={{width: 52, height: 52, mr: 2}}
+                        <img
+                            alt="Arma Server Manager Logo"
+                            title="Arma Server Manager"
+                            src={logo}
+                            style={{height: 52}}
                         />
-                        <Typography component="h1" variant="h5">
-                            Arma Server Manager
-                        </Typography>
                         <Stack marginLeft={4}
                                direction="row"
                                justifyContent="flex-start"
