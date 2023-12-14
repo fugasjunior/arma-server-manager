@@ -14,6 +14,7 @@ import ScenariosPage from "./pages/ScenariosPage";
 import AppConfigPage from "./pages/AppConfigPage";
 import AdditionalServersPage from "./pages/AdditionalServersPage";
 import DashboardPage from "./pages/DashboardPage";
+import AboutPage from "./pages/AboutPage.tsx";
 
 const App = () => {
     return (
@@ -48,6 +49,9 @@ const App = () => {
                         }/>
                         <Route path="additionalServers" element={
                             <ProtectedRoute><AdditionalServersPage/></ProtectedRoute>
+                        }/>
+                        <Route path="about" element={
+                            <ProtectedRoute><AboutPage/></ProtectedRoute>
                         }/>
                     </Routes>
                 </Container>
