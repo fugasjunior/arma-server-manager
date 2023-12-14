@@ -11,7 +11,7 @@ export function ServerListEntryDetails(props: {
     serverStatus: ServerInstanceInfoDto | null,
     onClick: () => void
 }) {
-    return <Stack direction="row" spacing={2}>
+    return <Stack direction="row" spacing={2} justifyItems="center" alignItems="center">
         <ModEditButton server={props.server} serverStatus={props.serverStatus}/>
         {props.server.type === "ARMA3" &&
             <ListBuilderDLCsEdit status={props.serverStatus} server={props.server}/>}
