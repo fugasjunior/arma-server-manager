@@ -15,49 +15,56 @@ const Navbar = () => {
     }
 
     return (
-            <>
-                {isLoggedIn && <AppBar position="static" sx={{mb: 4}}>
-                    <CssBaseline/>
-                    <Toolbar>
-                        <img
-                            alt="Arma Server Manager Logo"
-                            title="Arma Server Manager"
-                            src={logo}
-                            style={{height: 52}}
-                        />
-                        <Stack marginLeft={4}
-                               direction="row"
-                               justifyContent="flex-start"
-                               alignItems="center"
-                               spacing={1}>
-                            <Button color="success" component={NavLink} to="/" sx={{color: '#fff'}}>
-                                Dashboard
-                            </Button>
-                            <Button component={NavLink} to="/servers" sx={{color: '#fff'}}>
-                                Servers
-                            </Button>
-                            <Button component={NavLink} to="/mods" sx={{color: '#fff'}}>
-                                Mods
-                            </Button>
-                            <Button component={NavLink} to="/scenarios" sx={{color: '#fff'}}>
-                                Scenarios
-                            </Button>
-                            <Button component={NavLink} to="/config" sx={{color: '#fff'}}>
-                                App config
-                            </Button>
-                            <Button component={NavLink} to="/additionalServers" sx={{color: '#fff'}}>
-                                Additional servers
-                            </Button>
-                            <Button onClick={handleLogout}
-                                    sx={{color: '#fff'}}
-                            >
-                                Log out
-                            </Button>
-                        </Stack>
-                    </Toolbar>
-                </AppBar>
-                }
-            </>
+        <>
+            {isLoggedIn && <AppBar position="static" sx={{mb: 4}}>
+                <CssBaseline/>
+                <Toolbar>
+                    <img
+                        alt="Arma Server Manager Logo"
+                        title="Arma Server Manager"
+                        src={logo}
+                        style={{height: 52}}
+                    />
+                    <Stack marginLeft={4}
+                           direction="row"
+                           justifyContent="flex-start"
+                           alignItems="center"
+                           spacing={1}
+                           sx={{flexGrow: 1}}
+                    >
+                        <Button color="success" component={NavLink} to="/" sx={{color: '#fff'}}>
+                            Dashboard
+                        </Button>
+                        <Button component={NavLink} to="/servers" sx={{color: '#fff'}}>
+                            Servers
+                        </Button>
+                        <Button component={NavLink} to="/mods" sx={{color: '#fff'}}>
+                            Mods
+                        </Button>
+                        <Button component={NavLink} to="/scenarios" sx={{color: '#fff'}}>
+                            Scenarios
+                        </Button>
+                        <Button component={NavLink} to="/config" sx={{color: '#fff'}}>
+                            App config
+                        </Button>
+                        <Button component={NavLink} to="/additionalServers" sx={{color: '#fff'}}>
+                            Additional servers
+                        </Button>
+                    </Stack>
+                    <Stack direction="row" sx={{flexGrow: 0}}>
+                        <Button component={NavLink} to="/about" sx={{color: '#fff'}}>
+                            About
+                        </Button>
+                        <Button onClick={handleLogout}
+                                sx={{color: '#fff'}}
+                        >
+                            Log out
+                        </Button>
+                    </Stack>
+                </Toolbar>
+            </AppBar>
+            }
+        </>
     );
 };
 
