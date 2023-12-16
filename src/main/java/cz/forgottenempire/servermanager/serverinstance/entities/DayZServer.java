@@ -57,7 +57,7 @@ public class DayZServer extends Server {
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=\"" + getConfigFile().getAbsolutePath() + "\"");
+        parameters.add("-config=" + getConfigFile().getAbsolutePath());
         parameters.add("-limitFPS=60");
         parameters.add("-dologs");
         parameters.add("-adminlog");
