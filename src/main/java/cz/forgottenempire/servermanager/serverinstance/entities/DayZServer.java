@@ -74,7 +74,7 @@ public class DayZServer extends Server {
 
     private File getConfigFile() {
         String fileName = "DAYZ_" + getId() + ".cfg";
-        return pathsFactory.getConfigFilePath(ServerType.DAYZ, fileName).toFile();
+        return pathsFactory.getConfigFilePath(getType(), fileName).toFile();
     }
 
     private void addModsToParameters(List<String> parameters) {
