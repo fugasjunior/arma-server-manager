@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -60,7 +61,7 @@ class CheckServerInstancesStatusCronJob {
             InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, server.getQueryPort());
             SourceServer queryServerInfo = sourceQueryClient.getServerInfo(serverAddress).get(30, TimeUnit.SECONDS);
             updateInstanceInfoFromQueryResult(instanceInfo, queryServerInfo);
-        } catch (ReadTimeoutException e) {
+        } catch (ExecutionException e) {
             // ignore any timeouts that happen during the first minute of starting the server
             LocalDateTime startedAt = instanceInfo.getStartedAt();
             if (startedAt.isBefore(LocalDateTime.now().minus(1, ChronoUnit.MINUTES))) {
