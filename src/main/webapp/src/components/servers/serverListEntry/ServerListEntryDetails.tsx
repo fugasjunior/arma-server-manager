@@ -24,7 +24,7 @@ export function ServerListEntryDetails(props: {
 
         <AutomaticRestartSettings serverId={props.server.id!} dto={props.server.automaticRestart}/>
 
-        {props.serverStatus?.alive &&
+        {props.serverStatus?.alive && props.server.type === "ARMA3" &&
             <HeadlessClientControls serverId={props.server.id!} serverStatus={props.serverStatus}/>}
     </Stack>;
 }
