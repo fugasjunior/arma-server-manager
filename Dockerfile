@@ -1,5 +1,5 @@
 # --- Build ---
-FROM openjdk:17-jdk-slim-buster AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 
 ENV NODE_VERSION=16.13.0
 ENV NVM_DIR=/root/.nvm

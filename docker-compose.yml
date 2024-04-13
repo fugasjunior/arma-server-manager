@@ -44,6 +44,7 @@ services:
       STEAM_API_KEY: "${STEAM_API_KEY}"
       JWT_SECRET: "${JWT_SECRET}"
       DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
+      TZ: "${TIMEZONE}"
 
 volumes:
   armaservermanager-db:
