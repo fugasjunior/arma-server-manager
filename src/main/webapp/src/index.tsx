@@ -7,9 +7,8 @@ import {BrowserRouter} from "react-router-dom";
 import {AuthContextProvider} from "./store/auth-context";
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
-import {OSContextProvider} from "./store/os-context"
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import {LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
@@ -17,17 +16,15 @@ if (rootElement) {
     root.render(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <AuthContextProvider>
-                <OSContextProvider>
-                    <BrowserRouter>
-                        <React.StrictMode>
-                            <DevSupport ComponentPreviews={ComponentPreviews}
-                                        useInitialHook={useInitial}
-                            >
-                                <App/>
-                            </DevSupport>
-                        </React.StrictMode>
-                    </BrowserRouter>
-                </OSContextProvider>
+                <BrowserRouter>
+                    <React.StrictMode>
+                        <DevSupport ComponentPreviews={ComponentPreviews}
+                                    useInitialHook={useInitial}
+                        >
+                            <App/>
+                        </DevSupport>
+                    </React.StrictMode>
+                </BrowserRouter>
             </AuthContextProvider>
         </LocalizationProvider>
     );

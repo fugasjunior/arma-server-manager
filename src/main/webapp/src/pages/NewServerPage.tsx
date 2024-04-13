@@ -1,4 +1,3 @@
-import {useContext, useEffect} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {createServer} from "../services/serversService";
 import {toast} from "material-react-toastify";
@@ -7,7 +6,6 @@ import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
-import {OsContext} from "../store/os-context";
 import {arma3ServerInitialState, dayzServerInitialState, reforgerServerInitialState} from "./initialServerStateCreator";
 import {ServerType} from "../dtos/ServerDto";
 
@@ -15,14 +13,6 @@ import {ServerType} from "../dtos/ServerDto";
 const NewServerPage = () => {
     const {type} = useParams<{ type: string }>();
     const navigate = useNavigate();
-    const osCtx = useContext(OsContext);
-
-    useEffect(() => {
-        if (type === "DAYZ" && osCtx.os === "LINUX") {
-            navigate("/servers");
-            toast.error("DayZ server is available only on Windows machines");
-        }
-    }, []);
 
     type FixMeLater = any;
 
