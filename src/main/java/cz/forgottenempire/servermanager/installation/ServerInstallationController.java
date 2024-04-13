@@ -44,23 +44,14 @@ class ServerInstallationController {
 
     @GetMapping("/{type}")
     public ResponseEntity<ServerInstallationDto> getInstallation(@PathVariable ServerType type) {
-        checkServerSupportedOnOS(type);
         ServerInstallation installation = installationService.getServerInstallation(type);
         return ResponseEntity.ok(mapper.map(installation));
     }
 
     @PostMapping("/{type}")
     public ResponseEntity<ServerInstallationDto> installOrUpdateServer(@PathVariable ServerType type) {
-        checkServerSupportedOnOS(type);
         installerService.installServer(type);
         ServerInstallation installation = installationService.getServerInstallation(type);
         return ResponseEntity.ok(mapper.map(installation));
-    }
-
-    private void checkServerSupportedOnOS(ServerType type) {
-        if (type == ServerType.DAYZ && SystemUtils.getOsType() == OSType.LINUX) {
-            throw new ServerUnsupportedOnOsException(
-                    "DayZ server is not supported on Linux yet. Use DayZ Experimental server instead");
-        }
     }
 }

@@ -33,13 +33,7 @@ public class ServerInstallationService {
         return getServerInstallation(type).getInstallationStatus() == InstallationStatus.FINISHED;
     }
 
-    private static boolean filterUnavailableInstallationsBasedOnOS(ServerType type) {
-        return SystemUtils.getOsType() != OSType.LINUX || type != ServerType.DAYZ;
-    }
-
     private List<ServerType> getAvailableServerTypes() {
-        return ServerType.getAll().stream()
-                .filter(ServerInstallationService::filterUnavailableInstallationsBasedOnOS)
-                .toList();
+        return ServerType.getAll();
     }
 }
