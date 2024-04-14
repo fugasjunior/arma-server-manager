@@ -120,7 +120,7 @@ class SteamCmdExecutor {
 
         dumpErrorOutputToLog(result);
 
-        String[] loginRelatedErrors = new String[]{"login", "expired", "account logon denied", "two-factor code mismatch"};
+        String[] loginRelatedErrors = new String[]{"login", "expired", "account logon denied", "two-factor code mismatch", "invalid password"};
         if (Arrays.stream(loginRelatedErrors).anyMatch(errorLine::contains)) {
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
         }
