@@ -64,6 +64,7 @@ public class ServerConfig {
         Template configTemplate;
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
             configTemplate = freeMarkerConfigurer.getConfiguration().getTemplate(templateName);
+            configTemplate.setNumberFormat("computer");
             configTemplate.process(templateModel, writer);
         } catch (IOException | TemplateException e) {
             log.error("Could not write config file", e);

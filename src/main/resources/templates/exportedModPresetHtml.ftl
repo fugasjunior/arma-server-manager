@@ -83,8 +83,8 @@
                     <span class="from-steam">Steam</span>
                 </td>
                 <td>
-                    <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id?string.computer}" data-type="Link">
-                        http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id?string.computer}
+                    <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}" data-type="Link">
+                        http://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}
                     </a>
                 </td>
             </tr>
