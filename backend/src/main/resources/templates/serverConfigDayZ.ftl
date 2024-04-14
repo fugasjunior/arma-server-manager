@@ -5,6 +5,8 @@ hostname = "${name}";
 password = "${password!}";
 passwordAdmin = "${adminPassword!}";
 steamQueryPort = ${queryPort};
+guaranteedUpdates = 1;
+storageAutoFix = 1;
 
 // JOINING RULES
 maxPlayers = ${maxPlayers};
