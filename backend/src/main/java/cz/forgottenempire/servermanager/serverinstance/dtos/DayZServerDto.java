@@ -42,9 +42,6 @@ public class DayZServerDto implements ServerDto {
     private boolean thirdPersonViewEnabled;
     private boolean crosshairEnabled;
 
-    @Min(1)
-    private int instanceId;
-
     @Min(0)
     private int respawnTime;
 

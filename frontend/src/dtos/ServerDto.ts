@@ -71,7 +71,6 @@ export interface DayZServerDto extends ServerDto {
     forceSameBuild: boolean,
     thirdPersonViewEnabled: boolean,
     crosshairEnabled: boolean,
-    instanceId: number,
     respawnTime: number,
     timeAcceleration: number,
     nightTimeAcceleration: number,

@@ -26,9 +26,6 @@ import java.util.List;
 @Entity
 public class DayZServer extends Server {
 
-    @Min(1)
-    private long instanceId;
-
     @Min(0)
     private int respawnTime;
 

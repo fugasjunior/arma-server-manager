@@ -69,7 +69,6 @@ export function dayzServerInitialState(): DayZServerDto {
         forceSameBuild: false,
         thirdPersonViewEnabled: true,
         crosshairEnabled: true,
-        instanceId: 1,
         respawnTime: 5,
         timeAcceleration: 1.0,
         nightTimeAcceleration: 1.0,
