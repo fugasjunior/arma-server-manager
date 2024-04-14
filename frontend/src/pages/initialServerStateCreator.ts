@@ -18,7 +18,8 @@ export function arma3ServerInitialState(): Arma3ServerDto {
         verifySignatures: true,
         activeMods: [],
         activeDLCs: [],
-        additionalOptions: "headlessClients[]  = {\"127.0.0.1\"}; \nlocalClient[] = { \"127.0.0.1\"};",
+        additionalOptions: `headlessClients[] = {"127.0.0.1"}; 
+localClient[] = { "127.0.0.1"};`,
         difficultySettings: {
             groupIndicators: 0,
             friendlyTags: 0,
@@ -73,14 +74,13 @@ export function dayzServerInitialState(): DayZServerDto {
         timeAcceleration: 1.0,
         nightTimeAcceleration: 1.0,
         activeMods: [],
-        additionalOptions: `
-        class Missions 
-        {
-            class DayZ
-            {
-                template = "dayzOffline.chernarusplus";
-            };
-        };`,
+        additionalOptions: `class Missions
+{
+    class DayZ
+    {
+        template = "dayzOffline.chernarusplus";
+    };
+};`,
         customLaunchParameters: [],
         automaticRestart: {
             enabled: false,
