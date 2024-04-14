@@ -59,7 +59,7 @@ class DifficultyPresets
 
     class CustomAILevel
     {
-        skillAI = ${skillAI?string.computer};
-        precisionAI = ${precisionAI?string.computer};
+        skillAI = ${skillAI};
+        precisionAI = ${precisionAI};
     };
 };

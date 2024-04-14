@@ -28,6 +28,7 @@ public class ArmaLauncherPresetExportService {
 
         try {
             Template template = freeMarkerConfigurer.getConfiguration().getTemplate(TEMPLATE_FILE_NAME);
+            template.setNumberFormat("computer");
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Writer writer = new OutputStreamWriter(outputStream);
             template.process(model, writer);

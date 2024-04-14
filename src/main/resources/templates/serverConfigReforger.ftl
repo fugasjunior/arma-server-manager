@@ -1,15 +1,15 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer" -->
 {
 "bindAddress": "",
-"bindPort": ${port?string.computer},
+"bindPort": ${port},
 "publicAddress": "",
-"publicPort": ${port?string.computer},
+"publicPort": ${port},
 "game": {
 "name": "${name!}",
 "password": "${password!}",
 "passwordAdmin": "${adminPassword!}",
 "scenarioId": "${scenarioId!}",
-"maxPlayers": ${maxPlayers?string.computer},
+"maxPlayers": ${maxPlayers},
 "visible": true,
 <#--TODO make supported client types configurable-->
 "supportedPlatforms": [
@@ -36,6 +36,6 @@
 },
 "a2s": {
 "address": "0.0.0.0",
-"port": ${queryPort?string.computer}
+"port": ${queryPort}
 }
 }
