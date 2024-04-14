@@ -58,7 +58,7 @@ export function dayzServerInitialState(): DayZServerDto {
         name: "",
         description: "",
         port: 2302,
-        queryPort: 2303,
+        queryPort: 27016,
         maxPlayers: 32,
         password: "",
         adminPassword: "",
