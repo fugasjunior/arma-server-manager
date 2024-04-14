@@ -25,7 +25,8 @@ COPY ./build.gradle /app
 COPY ./gradle /app/gradle
 COPY ./gradlew /app
 COPY ./settings.gradle /app
-COPY ./src /app/src
+COPY ./frontend /app/frontend
+COPY ./backend /app/backend
 
 # Build
 RUN chmod 555 ./gradlew \
@@ -54,7 +55,7 @@ RUN dpkg --add-architecture i386 \
 
 WORKDIR /home/steam
 COPY ./config/application-docker.properties /home/steam/config/application.properties
-COPY --from=build /app/build/libs/arma3-server-gui-$APP_VERSION.jar /home/steam/app.jar
+COPY --from=build /app/backend/build/libs/backend-$APP_VERSION.jar /home/steam/app.jar
 
 RUN chown -R root:root /home/steam \
     && chmod -R 755 /home/steam

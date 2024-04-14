@@ -1,0 +1,37 @@
+plugins {
+    id 'com.github.node-gradle.node' version '7.0.1'
+    id 'base'
+}
+
+node {
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.buildDir}/npm")
+}
+
+tasks.register('appNpmInstall', NpmTask) {
+    description = "Installs all dependencies from package.json"
+    workingDir = file("${project.projectDir}/src/main/webapp")
+    args = ["install"]
+}
+
+tasks.register('appNpmBuild', NpmTask) {
+    inputs.files(fileTree('node_modules'))
+    inputs.files(fileTree('src'))
+    inputs.file('package.json')
+    inputs.file('tsconfig.json')
+    inputs.file('tsconfig.node.json')
+    inputs.file('vite.config.ts')
+    inputs.file('index.html')
+
+    outputs.dir('build')
+
+    description = "Builds production version of the webapp"
+    workingDir = file("${project.projectDir}/src/main/webapp")
+    args = ["run", "build"]
+}
+
+appNpmBuild.dependsOn(appNpmInstall)
+assemble.dependsOn(appNpmBuild)
