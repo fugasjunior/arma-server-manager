@@ -31,7 +31,7 @@ tasks.register('copyWebApp', Copy) {
     into "$rootDir/backend/build/resources/main/static/."
 }
 
-compileJava.dependsOn ':frontend:build'
+compileJava.dependsOn copyWebApp
 bootJar.dependsOn copyWebApp
 resolveMainClassName.dependsOn copyWebApp
 jar.dependsOn copyWebApp
