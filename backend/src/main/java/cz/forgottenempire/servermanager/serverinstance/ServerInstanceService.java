@@ -41,9 +41,9 @@ class ServerInstanceService {
 
     public Server createServer(Server server) {
         server.getCustomLaunchParameters().forEach(param -> param.setServer(server));
-        setInstanceIdForDayZServer(server);
-        server.getConfigFiles().forEach(ServerConfig::generate);
-        return serverRepository.save(server);
+        Server persistedServer = serverRepository.save(server);
+        persistedServer.getConfigFiles().forEach(ServerConfig::generate);
+        return persistedServer;
     }
 
     public Server updateServer(Server server) {
@@ -64,16 +64,5 @@ class ServerInstanceService {
         server.setRestartAutomatically(enabled);
         server.setAutomaticRestartTime(time);
         serverRepository.save(server);
-    }
-
-    private void setInstanceIdForDayZServer(Server server) {
-        Long id = server.getId();
-        if (id == null) {
-            id = serverRepository.save(server).getId();
-        }
-
-        if (server.getType() == ServerType.DAYZ || server.getType() == ServerType.DAYZ_EXP) {
-            ((DayZServer) server).setInstanceId(id);
-        }
     }
 }
