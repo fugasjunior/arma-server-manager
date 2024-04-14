@@ -71,4 +71,4 @@ ENV DIRECTORY_LOGS=/home/steam/armaservermanager/logs
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["java"]
-CMD ["-jar", "./app.jar", "-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
+CMD ["-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "./app.jar"]
