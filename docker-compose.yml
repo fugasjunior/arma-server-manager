@@ -33,8 +33,7 @@ services:
     depends_on:
       - db
     volumes:
-      # Change the path where the servers will be stored on your server (first part before semicolon)
-      - /home/armaservermanager/storage:/home/steam/armaservermanager/
+      - "${STORAGE_PATH}:/home/steam/armaservermanager/"
     environment:
       AUTH_USERNAME: "${AUTH_USERNAME}"
       AUTH_PASSWORD: "${AUTH_PASSWORD}"
