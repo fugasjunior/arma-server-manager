@@ -5,10 +5,12 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.servermanager.installation.ServerInstallationService;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,14 +55,18 @@ public class WorkshopModsFacade {
     }
 
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
-
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
-                .peek(this::setModServerType)
-                .peek(this::validateServerInitialized)
+                .peek((mod) -> {
+                    WorkshopFileDetailsService.ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId())
+                            .orElseThrow(() -> new NotFoundException("Mod ID " + mod.getId() + " not found."));
+
+                    mod.setName(modMetadata.name());
+                    setModServerType(mod, modMetadata.consumerAppId());
+                    validateServerInitialized(mod);
+                })
                 .toList();
 
-        workshopMods.forEach(this::setModNameFromWorkshop);
         modsService.saveAllMods(workshopMods);
 
         installerService.installOrUpdateMods(workshopMods);
@@ -81,12 +87,7 @@ public class WorkshopModsFacade {
         modsService.deleteMod(workshopMod);
     }
 
-    private void setModNameFromWorkshop(WorkshopMod mod) {
-        mod.setName(fileDetailsService.getModName(mod.getId()));
-    }
-
-    private void setModServerType(WorkshopMod mod) {
-        Long appId = fileDetailsService.getModAppId(mod.getId());
+    private void setModServerType(WorkshopMod mod, long appId) {
         if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
             mod.setServerType(ServerType.ARMA3);
         } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
