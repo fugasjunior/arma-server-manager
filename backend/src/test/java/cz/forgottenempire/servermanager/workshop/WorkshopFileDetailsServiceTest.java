@@ -46,4 +46,21 @@ class WorkshopFileDetailsServiceTest {
 
         assertThat(modName).isEqualTo("Mod Name");
     }
+
+    @Test
+    void whenGettingModNameOfNonExistingMod_thenNullReturned() {
+        when(response .getBody()).thenReturn(
+                """
+                        {
+                          "response": {
+                              "publishedfiledetails": []
+                          }
+                        }
+                        """);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
+
+        String modName = fileDetailsService.getModName(1234L);
+
+        assertThat(modName).isNull();
+    }
 }
