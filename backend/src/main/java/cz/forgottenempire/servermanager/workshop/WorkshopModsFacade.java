@@ -87,10 +87,10 @@ public class WorkshopModsFacade {
         modsService.deleteMod(workshopMod);
     }
 
-    private void setModServerType(WorkshopMod mod, long appId) {
-        if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
+    private void setModServerType(WorkshopMod mod, String consumerAppId) {
+        if (Constants.GAME_IDS.get(ServerType.ARMA3).toString().equals(consumerAppId)) {
             mod.setServerType(ServerType.ARMA3);
-        } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
+        } else if (Constants.GAME_IDS.get(ServerType.DAYZ).toString().equals(consumerAppId)) {
             mod.setServerType(ServerType.DAYZ);
         } else {
             log.warn("Tried to install mod ID {} which is not consumed by any of the supported servers", mod.getId());

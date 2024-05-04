@@ -39,10 +39,7 @@ public class WorkshopFileDetailsService {
         }
 
         String modName = getValueFromJson("title", modInfoJsonFromSteamApi);
-        String consumerAppIdString = getValueFromJson("consumer_app_id", modInfoJsonFromSteamApi);
-        Long consumerAppId = consumerAppIdString != null ?
-                Long.parseLong(consumerAppIdString)
-                : null;
+        String consumerAppId = getValueFromJson("consumer_app_id", modInfoJsonFromSteamApi);
 
         if (modName == null || consumerAppId == null) {
             return Optional.empty();
@@ -82,6 +79,6 @@ public class WorkshopFileDetailsService {
         return modInfo;
     }
 
-    record ModMetadata(@Nonnull String name, long consumerAppId) {
+    record ModMetadata(@Nonnull String name, @Nonnull String consumerAppId) {
     }
 }

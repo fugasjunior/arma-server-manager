@@ -60,7 +60,7 @@ class WorkshopFileDetailsServiceTest {
 
         assertThat(metadata).isPresent();
         assertThat(metadata.get().name()).isEqualTo("Mod Name");
-        assertThat(metadata.get().consumerAppId()).isEqualTo(107410L);
+        assertThat(metadata.get().consumerAppId()).isEqualTo("107410");
     }
 
     @Test
