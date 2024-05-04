@@ -14,6 +14,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WorkshopFileDetailsServiceTest {
 
+    private static final String STEAM_API_KEY = "ABCD1234";
     private static final long NON_EXISTING_MOD_ID = 1L;
     private static final long MOD_ID = 2L;
 
@@ -26,7 +27,7 @@ class WorkshopFileDetailsServiceTest {
 
     @BeforeEach
     void setUp() {
-        fileDetailsService = new WorkshopFileDetailsService(restTemplate);
+        fileDetailsService = new WorkshopFileDetailsService(STEAM_API_KEY, restTemplate);
     }
 
     @Test

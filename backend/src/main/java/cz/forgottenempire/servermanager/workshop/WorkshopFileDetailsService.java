@@ -41,7 +41,8 @@ public class WorkshopFileDetailsService {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public WorkshopFileDetailsService(RestTemplate restTemplate) {
+    public WorkshopFileDetailsService(@Value("${steam.api.key}") String steamApiKey, RestTemplate restTemplate) {
+        this.steamApiKey = steamApiKey;
         this.restTemplate = restTemplate;
     }
 
