@@ -33,8 +33,13 @@ public class WorkshopFileDetailsService {
     }
 
     public Optional<ModMetadata> fetchModMetadata(long modId) {
-        String modName = getValueFromInfo(modId, "title");
-        String consumerAppIdString = getValueFromInfo(modId, "consumer_app_id");
+        JsonNode modInfoJsonFromSteamApi = getModInfoFromSteamApi(modId);
+        if (modInfoJsonFromSteamApi == null) {
+            return Optional.empty();
+        }
+
+        String modName = getValueFromJson("title", modInfoJsonFromSteamApi);
+        String consumerAppIdString = getValueFromJson("consumer_app_id", modInfoJsonFromSteamApi);
         Long consumerAppId = consumerAppIdString != null ?
                 Long.parseLong(consumerAppIdString)
                 : null;
@@ -46,14 +51,9 @@ public class WorkshopFileDetailsService {
         return Optional.of(new ModMetadata(modName, consumerAppId));
     }
 
-    private String getValueFromInfo(Long modId, String key) {
-        JsonNode modInfo = getModInfoFromSteamApi(modId);
-        if (modInfo == null) {
-            return null;
-        }
-
-        JsonNode titleNode = modInfo.findValue(key);
-        return titleNode == null ? null : titleNode.asText();
+    private String getValueFromJson(String key, JsonNode modInfoJson) {
+        JsonNode value = modInfoJson.findValue(key);
+        return value != null ? value.asText() : null;
     }
 
     private JsonNode getModInfoFromSteamApi(Long modId) {
