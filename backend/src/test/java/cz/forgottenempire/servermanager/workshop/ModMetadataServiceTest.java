@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.workshop;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.workshop.metadata.HtmlScraperMetadataProvider;
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadata;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import cz.forgottenempire.servermanager.workshop.metadata.WorkshopApiMetadataProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +71,7 @@ class ModMetadataServiceTest {
                         }
                         """);
 
-        ModMetadataService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+        ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");
@@ -103,7 +104,7 @@ class ModMetadataServiceTest {
                 </html>
                 """);
 
-        ModMetadataService.ModMetadata metadata = fileDetailsService.fetchModMetadata(UNLISTED_MOD_ID);
+        ModMetadata metadata = fileDetailsService.fetchModMetadata(UNLISTED_MOD_ID);
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");

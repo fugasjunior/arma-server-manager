@@ -26,7 +26,7 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
     }
 
     @Override
-    public Optional<ModMetadataService.ModMetadata> fetchModMetadata(long modId) {
+    public Optional<ModMetadata> fetchModMetadata(long modId) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://steamcommunity.com/sharedfiles/filedetails/?id=" + modId))
                 .build();
@@ -41,7 +41,7 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
                 return Optional.empty();
             }
 
-            return Optional.of(new ModMetadataService.ModMetadata(
+            return Optional.of(new ModMetadata(
                     modNameElement.text(),
                     consumerAppIdElement.attr("data-appid"))
             );
