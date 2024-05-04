@@ -47,7 +47,7 @@ public class WorkshopFileDetailsService {
     }
 
     private String getValueFromInfo(Long modId, String key) {
-        JsonNode modInfo = getModInfo(modId);
+        JsonNode modInfo = getModInfoFromSteamApi(modId);
         if (modInfo == null) {
             return null;
         }
@@ -56,7 +56,7 @@ public class WorkshopFileDetailsService {
         return titleNode == null ? null : titleNode.asText();
     }
 
-    private JsonNode getModInfo(Long modId) {
+    private JsonNode getModInfoFromSteamApi(Long modId) {
         log.debug("Getting info for mod {} from Steam Workshop", modId);
 
         HttpHeaders headers = new HttpHeaders();
