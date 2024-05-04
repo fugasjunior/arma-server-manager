@@ -7,6 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import cz.forgottenempire.servermanager.common.Constants;
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +44,10 @@ public class WorkshopFileDetailsService {
     public WorkshopFileDetailsService(@Value("${steam.api.key}") String steamApiKey, RestTemplate restTemplate) {
         this.steamApiKey = steamApiKey;
         this.restTemplate = restTemplate;
+    }
+
+    public ModMetadata fetchModMetadata(long modId) {
+        return new ModMetadata(getModName(modId), getModAppId(modId));
     }
 
     public String getModName(Long modId) {
@@ -109,4 +114,6 @@ public class WorkshopFileDetailsService {
             return null;
         }
     }
+
+    record ModMetadata(@Nonnull String name, Long consumerAppId) {}
 }
