@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class ModMetadataService {
@@ -24,7 +26,8 @@ public class ModMetadataService {
 
     public ModMetadata fetchModMetadata(long modId) {
         return apiMetadataProvider.fetchModMetadata(modId)
-                .orElseThrow(() -> new NotFoundException("Mod ID " + modId + " not found."));
+                .orElseGet(() -> htmlScraperMetadataProvider.fetchModMetadata(modId)
+                        .orElseThrow(() -> new NotFoundException("Mod ID " + modId + " not found.")));
     }
 
     public record ModMetadata(@Nonnull String name, @Nonnull String consumerAppId) {

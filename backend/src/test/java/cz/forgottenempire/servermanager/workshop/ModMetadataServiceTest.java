@@ -18,8 +18,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,13 +39,15 @@ class ModMetadataServiceTest {
     private RestTemplate restTemplate;
     @Mock(stubOnly = true)
     private ResponseEntity<String> response;
+    @Mock(stubOnly = true)
+    private HttpClient httpClient;
 
     private ModMetadataService fileDetailsService;
 
     @BeforeEach
     void setUp() {
         WorkshopApiMetadataProvider workshopApiMetadataProvider = new WorkshopApiMetadataProvider(STEAM_API_KEY, restTemplate);
-        HtmlScraperMetadataProvider htmlScraperMetadataProvider = new HtmlScraperMetadataProvider();
+        HtmlScraperMetadataProvider htmlScraperMetadataProvider = new HtmlScraperMetadataProvider(httpClient);
         fileDetailsService = new ModMetadataService(workshopApiMetadataProvider, htmlScraperMetadataProvider);
     }
 
@@ -69,7 +76,7 @@ class ModMetadataServiceTest {
     }
 
     @Test
-    void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreFetchedFromSteamApi() {
+    void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreScrapedFromModPageHtml() {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(UNLISTED_MOD_ID), String.class))
                 .thenReturn(response);
         when(response.getBody()).thenReturn(
@@ -88,7 +95,7 @@ class ModMetadataServiceTest {
     }
 
     @Test
-    void whenFetchingModMetadataForNonExistingMod_thenNotFoundExceptionIsThrown() {
+    void whenFetchingModMetadataForNonExistingMod_thenNotFoundExceptionIsThrown() throws Exception {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
                 .thenReturn(response);
         when(response.getBody()).thenReturn(
@@ -99,6 +106,7 @@ class ModMetadataServiceTest {
                           }
                         }
                         """);
+        when(httpClient.send(any(), any())).thenReturn(mock(HttpResponse.class, withSettings().stubOnly()));
 
         assertThatThrownBy(() -> fileDetailsService.fetchModMetadata(NON_EXISTING_MOD_ID))
                 .isInstanceOf(NotFoundException.class)
