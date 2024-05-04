@@ -1,22 +1,34 @@
 package cz.forgottenempire.servermanager.workshop;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class WorkshopFileDetailsServiceTest {
+
+    @Mock(stubOnly = true)
+    private RestTemplate restTemplate;
+    @Mock(stubOnly = true)
+    private ResponseEntity<String> response;
+
+    private WorkshopFileDetailsService fileDetailsService;
+
+    @BeforeEach
+    void setUp() {
+        fileDetailsService = new WorkshopFileDetailsService(restTemplate);
+    }
 
     @Test
     void whenGettingModNameOfExistingPublicMod_thenModNameReturned() {
-        RestTemplate restTemplate = mock(RestTemplate.class);
-        WorkshopFileDetailsService fileDetailsService = new WorkshopFileDetailsService(restTemplate);
-
-        @SuppressWarnings("unchecked")
-        ResponseEntity<String> response = (ResponseEntity<String>) mock(ResponseEntity.class, withSettings().stubOnly());
-        when(response.getBody()).thenReturn(
+        when(response .getBody()).thenReturn(
                 """
                         {
                           "response": {
