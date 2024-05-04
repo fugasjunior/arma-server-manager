@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class SteamWorkshopFileDetailsApiService {
+public class SteamWorkshopFileDetailsApiService implements ModMetadataProvider {
     private final String steamApiKey;
     private final RestTemplate restTemplate;
 
@@ -30,7 +30,8 @@ public class SteamWorkshopFileDetailsApiService {
         this.restTemplate = restTemplate;
     }
 
-    Optional<WorkshopFileDetailsService.ModMetadata> fetchModMetadata(long modId) {
+    @Override
+    public Optional<WorkshopFileDetailsService.ModMetadata> fetchModMetadata(long modId) {
         JsonNode modInfoJsonFromSteamApi = getModInfoFromSteamApi(modId);
         if (modInfoJsonFromSteamApi == null) {
             return Optional.empty();
