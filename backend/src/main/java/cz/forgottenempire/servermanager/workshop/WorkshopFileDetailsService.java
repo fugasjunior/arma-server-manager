@@ -33,6 +33,10 @@ public class WorkshopFileDetailsService {
     }
 
     public Optional<ModMetadata> fetchModMetadata(long modId) {
+        return fetchMetadataFromSteamApi(modId);
+    }
+
+    private Optional<ModMetadata> fetchMetadataFromSteamApi(long modId) {
         JsonNode modInfoJsonFromSteamApi = getModInfoFromSteamApi(modId);
         if (modInfoJsonFromSteamApi == null) {
             return Optional.empty();
