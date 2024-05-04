@@ -1,11 +1,17 @@
 package cz.forgottenempire.servermanager.workshop;
 
+import cz.forgottenempire.servermanager.common.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +38,8 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenGettingModNameOfExistingPublicMod_thenModNameReturned() {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(MOD_ID), String.class))
+                .thenReturn(response);
         when(response.getBody()).thenReturn(
                 """
                         {
@@ -44,7 +52,6 @@ class WorkshopFileDetailsServiceTest {
                           }
                         }
                         """);
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
 
         String modName = fileDetailsService.getModName(MOD_ID);
 
@@ -53,6 +60,8 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenGettingModNameOfNonExistingMod_thenNullReturned() {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
+                .thenReturn(response);
         when(response.getBody()).thenReturn(
                 """
                         {
@@ -61,7 +70,6 @@ class WorkshopFileDetailsServiceTest {
                           }
                         }
                         """);
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
 
         String modName = fileDetailsService.getModName(NON_EXISTING_MOD_ID);
 
@@ -70,6 +78,8 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenGettingAppIdOfExistingPublicMod_thenAppIdReturned() {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(MOD_ID), String.class))
+                .thenReturn(response);
         when(response.getBody()).thenReturn(
                 """
                         {
@@ -82,7 +92,6 @@ class WorkshopFileDetailsServiceTest {
                           }
                         }
                         """);
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
 
         Long appId = fileDetailsService.getModAppId(MOD_ID);
 
@@ -91,6 +100,8 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenGettingAppIdOfNonExistingMod_thenNullReturned() {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
+                .thenReturn(response);
         when(response.getBody()).thenReturn(
                 """
                         {
@@ -99,10 +110,21 @@ class WorkshopFileDetailsServiceTest {
                           }
                         }
                         """);
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
 
         Long appId = fileDetailsService.getModAppId(NON_EXISTING_MOD_ID);
 
         assertThat(appId).isNull();
+    }
+
+    private static HttpEntity<MultiValueMap<String, String>> prepareRequest(long modId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("key", STEAM_API_KEY);
+        map.add("itemcount", "1");
+        map.add("publishedfileids[0]", String.valueOf(modId));
+
+        return new HttpEntity<>(map, headers);
     }
 }
