@@ -64,23 +64,6 @@ public class WorkshopFileDetailsService {
         return appId;
     }
 
-    // the data about mod size from workshop is unreliable
-    @Deprecated
-    public Long getFileSize(Long modId) {
-        String value = getValueFromInfo(modId, "file_size");
-        if (value == null) {
-            return null;
-        }
-
-        Long size = null;
-        try {
-            size = Long.parseLong(value);
-        } catch (NumberFormatException ignored) {
-        }
-
-        return size;
-    }
-
     private String getValueFromInfo(Long modId, String key) {
         JsonNode modInfo = loadModInfoFromCache(modId);
         if (modInfo == null) {
