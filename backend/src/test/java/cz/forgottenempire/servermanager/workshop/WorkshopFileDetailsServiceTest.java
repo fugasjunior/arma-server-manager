@@ -15,8 +15,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -37,7 +35,8 @@ class WorkshopFileDetailsServiceTest {
 
     @BeforeEach
     void setUp() {
-        fileDetailsService = new WorkshopFileDetailsService(STEAM_API_KEY, restTemplate);
+        SteamWorkshopFileDetailsApiService fileDetailsApiService = new SteamWorkshopFileDetailsApiService(STEAM_API_KEY, restTemplate);
+        fileDetailsService = new WorkshopFileDetailsService(fileDetailsApiService);
     }
 
     @Test
