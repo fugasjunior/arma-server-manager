@@ -1,6 +1,9 @@
 package cz.forgottenempire.servermanager.workshop.metadata;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +33,18 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            String html = response.body();
-            System.out.println("HTML Content:\n" + html);
+            Document document = Jsoup.parse(response.body());
+            Element modNameElement = document.selectFirst(".workshopItemTitle");
+            Element consumerAppIdElement = document.selectFirst("[data-appid]");
+
+            if (modNameElement == null || consumerAppIdElement == null) {
+                return Optional.empty();
+            }
+
+            return Optional.of(new ModMetadataService.ModMetadata(
+                    modNameElement.text(),
+                    consumerAppIdElement.attr("data-appid"))
+            );
         } catch (IOException | InterruptedException e) {
             log.error("Failed to do stuff"); // TODO log message
         }

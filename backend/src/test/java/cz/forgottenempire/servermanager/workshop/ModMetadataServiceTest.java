@@ -18,7 +18,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
@@ -38,7 +37,9 @@ class ModMetadataServiceTest {
     @Mock(stubOnly = true)
     private RestTemplate restTemplate;
     @Mock(stubOnly = true)
-    private ResponseEntity<String> response;
+    private ResponseEntity<String> restResponse;
+    @Mock(stubOnly = true)
+    private HttpResponse<String> htmlResponse;
     @Mock(stubOnly = true)
     private HttpClient httpClient;
 
@@ -54,8 +55,8 @@ class ModMetadataServiceTest {
     @Test
     void whenFetchingModMetadataForExistingPublicMod_thenDataAreFetchedFromSteamApi() {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(MOD_ID), String.class))
-                .thenReturn(response);
-        when(response.getBody()).thenReturn(
+                .thenReturn(restResponse);
+        when(restResponse.getBody()).thenReturn(
                 """
                         {
                           "response": {
@@ -76,10 +77,10 @@ class ModMetadataServiceTest {
     }
 
     @Test
-    void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreScrapedFromModPageHtml() {
+    void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreScrapedFromModPageHtml() throws Exception {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(UNLISTED_MOD_ID), String.class))
-                .thenReturn(response);
-        when(response.getBody()).thenReturn(
+                .thenReturn(restResponse);
+        when(restResponse.getBody()).thenReturn(
                 """
                         {
                           "response": {
@@ -87,6 +88,20 @@ class ModMetadataServiceTest {
                           }
                         }
                         """);
+        when(httpClient.send(any(), eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(htmlResponse); // TODO proper parameters
+        when(htmlResponse.body()).thenReturn("""
+                <html>
+                    <head>
+                        <title>Steam Workshop::Mod Name</title>
+                    </head>
+                    <body>
+                        <a data-appid="107410">
+                            <span>Store Page</span>
+                        </a>
+                        <div class="workshopItemTitle">Mod Name</div>
+                    </body>
+                </html>
+                """);
 
         ModMetadataService.ModMetadata metadata = fileDetailsService.fetchModMetadata(UNLISTED_MOD_ID);
 
@@ -97,8 +112,8 @@ class ModMetadataServiceTest {
     @Test
     void whenFetchingModMetadataForNonExistingMod_thenNotFoundExceptionIsThrown() throws Exception {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
-                .thenReturn(response);
-        when(response.getBody()).thenReturn(
+                .thenReturn(restResponse);
+        when(restResponse.getBody()).thenReturn(
                 """
                         {
                           "response": {
@@ -106,7 +121,17 @@ class ModMetadataServiceTest {
                           }
                         }
                         """);
-        when(httpClient.send(any(), any())).thenReturn(mock(HttpResponse.class, withSettings().stubOnly()));
+        when(httpClient.send(any(), eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(htmlResponse); // TODO proper parameters
+        when(htmlResponse.body()).thenReturn("""
+                <html>
+                    <head>
+                        <title>Steam Community :: Error</title>
+                    </head>
+                    <body>
+                        <h2>Error</h2>
+                    </body>
+                </html>
+                """);
 
         assertThatThrownBy(() -> fileDetailsService.fetchModMetadata(NON_EXISTING_MOD_ID))
                 .isInstanceOf(NotFoundException.class)
