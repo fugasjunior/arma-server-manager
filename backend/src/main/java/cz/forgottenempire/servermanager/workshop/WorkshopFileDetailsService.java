@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WorkshopFileDetailsService {
 
-    private final SteamWorkshopFileDetailsApiService steamWorkshopFileDetailsApiService;
+    private final WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService;
 
     @Autowired
-    public WorkshopFileDetailsService(SteamWorkshopFileDetailsApiService steamWorkshopFileDetailsApiService) {
+    public WorkshopFileDetailsService(WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService) {
         this.steamWorkshopFileDetailsApiService = steamWorkshopFileDetailsApiService;
     }
 

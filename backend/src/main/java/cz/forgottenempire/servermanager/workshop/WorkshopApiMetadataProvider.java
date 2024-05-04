@@ -20,12 +20,12 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class SteamWorkshopFileDetailsApiService implements ModMetadataProvider {
+public class WorkshopApiMetadataProvider implements ModMetadataProvider {
     private final String steamApiKey;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public SteamWorkshopFileDetailsApiService(@Value("${steam.api.key}") String steamApiKey, RestTemplate restTemplate) {
+    public WorkshopApiMetadataProvider(@Value("${steam.api.key}") String steamApiKey, RestTemplate restTemplate) {
         this.steamApiKey = steamApiKey;
         this.restTemplate = restTemplate;
     }

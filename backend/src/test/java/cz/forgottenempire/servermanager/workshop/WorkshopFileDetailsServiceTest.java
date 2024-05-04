@@ -23,8 +23,9 @@ import static org.mockito.Mockito.*;
 class WorkshopFileDetailsServiceTest {
 
     private static final String STEAM_API_KEY = "ABCD1234";
+    private static final long MOD_ID = 1L;
+    private static final long UNLISTED_MOD_ID = 2L;
     private static final long NON_EXISTING_MOD_ID = 1L;
-    private static final long MOD_ID = 2L;
 
     @Mock(stubOnly = true)
     private RestTemplate restTemplate;
@@ -35,7 +36,7 @@ class WorkshopFileDetailsServiceTest {
 
     @BeforeEach
     void setUp() {
-        SteamWorkshopFileDetailsApiService fileDetailsApiService = new SteamWorkshopFileDetailsApiService(STEAM_API_KEY, restTemplate);
+        WorkshopApiMetadataProvider fileDetailsApiService = new WorkshopApiMetadataProvider(STEAM_API_KEY, restTemplate);
         fileDetailsService = new WorkshopFileDetailsService(fileDetailsApiService);
     }
 
@@ -76,7 +77,7 @@ class WorkshopFileDetailsServiceTest {
                         }
                         """);
 
-        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(UNLISTED_MOD_ID);
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");
