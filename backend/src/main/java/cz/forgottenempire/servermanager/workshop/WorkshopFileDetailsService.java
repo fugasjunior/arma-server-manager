@@ -116,5 +116,5 @@ public class WorkshopFileDetailsService {
         }
     }
 
-    record ModMetadata(@Nonnull String name, Long consumerAppId) {}
+    record ModMetadata(@Nonnull String name, long consumerAppId) {}
 }
