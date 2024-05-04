@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.workshop;
 
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.workshop.metadata.HtmlScraperMetadataProvider;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import cz.forgottenempire.servermanager.workshop.metadata.WorkshopApiMetadataProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +39,9 @@ class ModMetadataServiceTest {
 
     @BeforeEach
     void setUp() {
-        WorkshopApiMetadataProvider fileDetailsApiService = new WorkshopApiMetadataProvider(STEAM_API_KEY, restTemplate);
-        fileDetailsService = new ModMetadataService(fileDetailsApiService);
+        WorkshopApiMetadataProvider workshopApiMetadataProvider = new WorkshopApiMetadataProvider(STEAM_API_KEY, restTemplate);
+        HtmlScraperMetadataProvider htmlScraperMetadataProvider = new HtmlScraperMetadataProvider();
+        fileDetailsService = new ModMetadataService(workshopApiMetadataProvider, htmlScraperMetadataProvider);
     }
 
     @Test

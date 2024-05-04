@@ -10,15 +10,20 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ModMetadataService {
 
-    private final WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService;
+    private final WorkshopApiMetadataProvider apiMetadataProvider;
+    private final HtmlScraperMetadataProvider htmlScraperMetadataProvider;
 
     @Autowired
-    public ModMetadataService(WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService) {
-        this.steamWorkshopFileDetailsApiService = steamWorkshopFileDetailsApiService;
+    public ModMetadataService(
+            WorkshopApiMetadataProvider apiMetadataProvider,
+            HtmlScraperMetadataProvider htmlScraperMetadataProvider
+    ) {
+        this.apiMetadataProvider = apiMetadataProvider;
+        this.htmlScraperMetadataProvider = htmlScraperMetadataProvider;
     }
 
     public ModMetadata fetchModMetadata(long modId) {
-        return steamWorkshopFileDetailsApiService.fetchModMetadata(modId)
+        return apiMetadataProvider.fetchModMetadata(modId)
                 .orElseThrow(() -> new NotFoundException("Mod ID " + modId + " not found."));
     }
 
