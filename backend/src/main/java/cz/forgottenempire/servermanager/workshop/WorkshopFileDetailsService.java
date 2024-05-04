@@ -48,14 +48,17 @@ public class WorkshopFileDetailsService {
     }
 
     public Optional<ModMetadata> fetchModMetadata(long modId) {
-        String modName = getModName(modId);
-        Long modAppId = getModAppId(modId);
+        String modName = getValueFromInfo(modId, "title");
+        String consumerAppIdString = getValueFromInfo(modId, "consumer_app_id");
+        Long consumerAppId = consumerAppIdString != null ?
+                Long.parseLong(consumerAppIdString)
+                : null;
 
-        if (modName == null || modAppId == null) {
+        if (modName == null || consumerAppId == null) {
             return Optional.empty();
         }
 
-        return Optional.of(new ModMetadata(modName, modAppId));
+        return Optional.of(new ModMetadata(modName, consumerAppId));
     }
 
     public String getModName(Long modId) {
@@ -123,5 +126,6 @@ public class WorkshopFileDetailsService {
         }
     }
 
-    record ModMetadata(@Nonnull String name, long consumerAppId) {}
+    record ModMetadata(@Nonnull String name, long consumerAppId) {
+    }
 }
