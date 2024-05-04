@@ -32,7 +32,7 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenGettingModNameOfExistingPublicMod_thenModNameReturned() {
-        when(response .getBody()).thenReturn(
+        when(response.getBody()).thenReturn(
                 """
                         {
                           "response": {
@@ -53,7 +53,7 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenGettingModNameOfNonExistingMod_thenNullReturned() {
-        when(response .getBody()).thenReturn(
+        when(response.getBody()).thenReturn(
                 """
                         {
                           "response": {
@@ -66,5 +66,43 @@ class WorkshopFileDetailsServiceTest {
         String modName = fileDetailsService.getModName(NON_EXISTING_MOD_ID);
 
         assertThat(modName).isNull();
+    }
+
+    @Test
+    void whenGettingAppIdOfExistingPublicMod_thenAppIdReturned() {
+        when(response.getBody()).thenReturn(
+                """
+                        {
+                          "response": {
+                            "publishedfiledetails": [
+                              {
+                                "consumer_app_id": "107410"
+                              }
+                            ]
+                          }
+                        }
+                        """);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
+
+        Long appId = fileDetailsService.getModAppId(MOD_ID);
+
+        assertThat(appId).isEqualTo(107410L);
+    }
+
+    @Test
+    void whenGettingAppIdOfNonExistingMod_thenNullReturned() {
+        when(response.getBody()).thenReturn(
+                """
+                        {
+                          "response": {
+                              "publishedfiledetails": []
+                          }
+                        }
+                        """);
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
+
+        Long appId = fileDetailsService.getModAppId(NON_EXISTING_MOD_ID);
+
+        assertThat(appId).isNull();
     }
 }
