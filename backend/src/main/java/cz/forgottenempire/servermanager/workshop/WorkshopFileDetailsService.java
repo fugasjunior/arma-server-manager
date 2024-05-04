@@ -61,25 +61,6 @@ public class WorkshopFileDetailsService {
         return Optional.of(new ModMetadata(modName, consumerAppId));
     }
 
-    public String getModName(Long modId) {
-        return getValueFromInfo(modId, "title");
-    }
-
-    public Long getModAppId(Long modId) {
-        String value = getValueFromInfo(modId, "consumer_app_id");
-        if (value == null) {
-            return null;
-        }
-
-        Long appId = null;
-        try {
-            appId = Long.parseLong(value);
-        } catch (NumberFormatException ignored) {
-        }
-
-        return appId;
-    }
-
     private String getValueFromInfo(Long modId, String key) {
         JsonNode modInfo = loadModInfoFromCache(modId);
         if (modInfo == null) {
