@@ -3,9 +3,6 @@ package cz.forgottenempire.servermanager.workshop;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import cz.forgottenempire.servermanager.common.Constants;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
@@ -15,30 +12,18 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class WorkshopFileDetailsService {
 
     private final String steamApiKey;
-
-    private final LoadingCache<Long, JsonNode> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(6, TimeUnit.HOURS)
-            .build(new CacheLoader<>() {
-                @Override
-                public JsonNode load(@NonNull Long key) {
-                    return getModInfo(key);
-                }
-            });
     private final RestTemplate restTemplate;
 
     @Autowired
@@ -62,7 +47,7 @@ public class WorkshopFileDetailsService {
     }
 
     private String getValueFromInfo(Long modId, String key) {
-        JsonNode modInfo = loadModInfoFromCache(modId);
+        JsonNode modInfo = getModInfo(modId);
         if (modInfo == null) {
             return null;
         }
@@ -95,16 +80,6 @@ public class WorkshopFileDetailsService {
         }
 
         return modInfo;
-    }
-
-    private JsonNode loadModInfoFromCache(Long modId) {
-        // the mod info is cached to avoid unnecessary calls to the Workshop API
-        try {
-            return cache.get(modId);
-        } catch (ExecutionException e) {
-            log.error("Could not get mod info for mod id {}", modId, e);
-            return null;
-        }
     }
 
     record ModMetadata(@Nonnull String name, long consumerAppId) {
