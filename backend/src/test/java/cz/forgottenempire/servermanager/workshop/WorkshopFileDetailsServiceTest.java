@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.workshop;
 
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,15 +58,14 @@ class WorkshopFileDetailsServiceTest {
                         }
                         """);
 
-        Optional<WorkshopFileDetailsService.ModMetadata> metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
 
-        assertThat(metadata).isPresent();
-        assertThat(metadata.get().name()).isEqualTo("Mod Name");
-        assertThat(metadata.get().consumerAppId()).isEqualTo("107410");
+        assertThat(metadata.name()).isEqualTo("Mod Name");
+        assertThat(metadata.consumerAppId()).isEqualTo("107410");
     }
 
     @Test
-    void whenFetchingModMetadataForNonExistingMod_thenEmptyOptionalIsReturned() {
+    void whenFetchingModMetadataForNonExistingMod_thenNotFoundExceptionIsThrown() {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
                 .thenReturn(response);
         when(response.getBody()).thenReturn(
@@ -76,9 +77,9 @@ class WorkshopFileDetailsServiceTest {
                         }
                         """);
 
-        Optional<WorkshopFileDetailsService.ModMetadata> metadata = fileDetailsService.fetchModMetadata(NON_EXISTING_MOD_ID);
-
-        assertThat(metadata).isEmpty();
+        assertThatThrownBy(() -> fileDetailsService.fetchModMetadata(NON_EXISTING_MOD_ID))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Mod ID " + NON_EXISTING_MOD_ID + " not found.");
     }
 
     private static HttpEntity<MultiValueMap<String, String>> prepareRequest(long modId) {

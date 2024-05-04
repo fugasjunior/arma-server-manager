@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,9 @@ public class WorkshopFileDetailsService {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<ModMetadata> fetchModMetadata(long modId) {
-        return fetchMetadataFromSteamApi(modId);
+    public ModMetadata fetchModMetadata(long modId) {
+        return fetchMetadataFromSteamApi(modId)
+                .orElseThrow(() -> new NotFoundException("Mod ID " + modId + " not found."));
     }
 
     private Optional<ModMetadata> fetchMetadataFromSteamApi(long modId) {

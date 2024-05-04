@@ -58,9 +58,7 @@ public class WorkshopModsFacade {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
                 .peek((mod) -> {
-                    WorkshopFileDetailsService.ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId())
-                            .orElseThrow(() -> new NotFoundException("Mod ID " + mod.getId() + " not found."));
-
+                    WorkshopFileDetailsService.ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
                     mod.setName(modMetadata.name());
                     setModServerType(mod, modMetadata.consumerAppId());
                     validateServerInitialized(mod);
