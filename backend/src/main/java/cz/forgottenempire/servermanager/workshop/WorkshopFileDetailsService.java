@@ -27,8 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class WorkshopFileDetailsService {
 
-    @Value("${steam.api.key}")
-    private String steamApiKey;
+    private final String steamApiKey;
 
     private final LoadingCache<Long, JsonNode> cache = CacheBuilder.newBuilder()
             .expireAfterWrite(6, TimeUnit.HOURS)
