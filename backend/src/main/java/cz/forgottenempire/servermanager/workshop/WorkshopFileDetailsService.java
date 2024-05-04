@@ -7,9 +7,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import cz.forgottenempire.servermanager.common.Constants;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -36,6 +38,12 @@ public class WorkshopFileDetailsService {
                     return getModInfo(key);
                 }
             });
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public WorkshopFileDetailsService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public String getModName(Long modId) {
         return getValueFromInfo(modId, "title");
@@ -96,7 +104,6 @@ public class WorkshopFileDetailsService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> test = restTemplate.postForEntity(Constants.STEAM_API_URL, request, String.class);
 
         JsonNode modInfo = null;
