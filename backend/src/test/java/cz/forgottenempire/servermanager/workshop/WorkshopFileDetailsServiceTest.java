@@ -14,6 +14,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -134,10 +136,11 @@ class WorkshopFileDetailsServiceTest {
                         }
                         """);
 
-        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+        Optional<WorkshopFileDetailsService.ModMetadata> metadata = fileDetailsService.fetchModMetadata(MOD_ID);
 
-        assertThat(metadata.name()).isEqualTo("Mod Name");
-        assertThat(metadata.consumerAppId()).isEqualTo(107410L);
+        assertThat(metadata).isPresent();
+        assertThat(metadata.get().name()).isEqualTo("Mod Name");
+        assertThat(metadata.get().consumerAppId()).isEqualTo(107410L);
     }
 
     private static HttpEntity<MultiValueMap<String, String>> prepareRequest(long modId) {

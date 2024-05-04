@@ -21,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -46,8 +47,8 @@ public class WorkshopFileDetailsService {
         this.restTemplate = restTemplate;
     }
 
-    public ModMetadata fetchModMetadata(long modId) {
-        return new ModMetadata(getModName(modId), getModAppId(modId));
+    public Optional<ModMetadata> fetchModMetadata(long modId) {
+        return Optional.of(new ModMetadata(getModName(modId), getModAppId(modId)));
     }
 
     public String getModName(Long modId) {
