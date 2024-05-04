@@ -14,6 +14,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WorkshopFileDetailsServiceTest {
 
+    private static final long NON_EXISTING_MOD_ID = 1L;
+    private static final long MOD_ID = 2L;
+
     @Mock(stubOnly = true)
     private RestTemplate restTemplate;
     @Mock(stubOnly = true)
@@ -42,7 +45,7 @@ class WorkshopFileDetailsServiceTest {
                         """);
         when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
 
-        String modName = fileDetailsService.getModName(1234L);
+        String modName = fileDetailsService.getModName(MOD_ID);
 
         assertThat(modName).isEqualTo("Mod Name");
     }
@@ -59,7 +62,7 @@ class WorkshopFileDetailsServiceTest {
                         """);
         when(restTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(response);
 
-        String modName = fileDetailsService.getModName(1234L);
+        String modName = fileDetailsService.getModName(NON_EXISTING_MOD_ID);
 
         assertThat(modName).isNull();
     }
