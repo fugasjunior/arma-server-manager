@@ -30,7 +30,7 @@ public class SteamWorkshopFileDetailsApiService {
         this.restTemplate = restTemplate;
     }
 
-    Optional<WorkshopFileDetailsService.ModMetadata> fetchMetadataFromSteamApi(long modId) {
+    Optional<WorkshopFileDetailsService.ModMetadata> fetchModMetadata(long modId) {
         JsonNode modInfoJsonFromSteamApi = getModInfoFromSteamApi(modId);
         if (modInfoJsonFromSteamApi == null) {
             return Optional.empty();

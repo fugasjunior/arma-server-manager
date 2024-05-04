@@ -64,6 +64,25 @@ class WorkshopFileDetailsServiceTest {
     }
 
     @Test
+    void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreFetchedFromSteamApi() {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(MOD_ID), String.class))
+                .thenReturn(response);
+        when(response.getBody()).thenReturn(
+                """
+                        {
+                          "response": {
+                            "publishedfiledetails": []
+                          }
+                        }
+                        """);
+
+        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+
+        assertThat(metadata.name()).isEqualTo("Mod Name");
+        assertThat(metadata.consumerAppId()).isEqualTo("107410");
+    }
+
+    @Test
     void whenFetchingModMetadataForNonExistingMod_thenNotFoundExceptionIsThrown() {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
                 .thenReturn(response);

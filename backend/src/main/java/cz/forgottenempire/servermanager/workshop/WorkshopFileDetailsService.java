@@ -18,7 +18,7 @@ public class WorkshopFileDetailsService {
     }
 
     public ModMetadata fetchModMetadata(long modId) {
-        return steamWorkshopFileDetailsApiService.fetchMetadataFromSteamApi(modId)
+        return steamWorkshopFileDetailsApiService.fetchModMetadata(modId)
                 .orElseThrow(() -> new NotFoundException("Mod ID " + modId + " not found."));
     }
 
