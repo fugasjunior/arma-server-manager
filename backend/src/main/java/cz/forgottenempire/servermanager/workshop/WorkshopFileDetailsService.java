@@ -48,7 +48,14 @@ public class WorkshopFileDetailsService {
     }
 
     public Optional<ModMetadata> fetchModMetadata(long modId) {
-        return Optional.of(new ModMetadata(getModName(modId), getModAppId(modId)));
+        String modName = getModName(modId);
+        Long modAppId = getModAppId(modId);
+
+        if (modName == null || modAppId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ModMetadata(modName, modAppId));
     }
 
     public String getModName(Long modId) {

@@ -143,6 +143,24 @@ class WorkshopFileDetailsServiceTest {
         assertThat(metadata.get().consumerAppId()).isEqualTo(107410L);
     }
 
+    @Test
+    void whenFetchingModMetadataForNonExistingMod_thenEmptyOptionalIsReturned() {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
+                .thenReturn(response);
+        when(response.getBody()).thenReturn(
+                """
+                        {
+                          "response": {
+                            "publishedfiledetails": []
+                          }
+                        }
+                        """);
+
+        Optional<WorkshopFileDetailsService.ModMetadata> metadata = fileDetailsService.fetchModMetadata(NON_EXISTING_MOD_ID);
+
+        assertThat(metadata).isEmpty();
+    }
+
     private static HttpEntity<MultiValueMap<String, String>> prepareRequest(long modId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
