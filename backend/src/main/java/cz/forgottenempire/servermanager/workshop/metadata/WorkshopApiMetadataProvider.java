@@ -1,4 +1,4 @@
-package cz.forgottenempire.servermanager.workshop;
+package cz.forgottenempire.servermanager.workshop.metadata;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,7 +31,7 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
     }
 
     @Override
-    public Optional<WorkshopFileDetailsService.ModMetadata> fetchModMetadata(long modId) {
+    public Optional<ModMetadataService.ModMetadata> fetchModMetadata(long modId) {
         JsonNode modInfoJsonFromSteamApi = getModInfoFromSteamApi(modId);
         if (modInfoJsonFromSteamApi == null) {
             return Optional.empty();
@@ -44,7 +44,7 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
             return Optional.empty();
         }
 
-        return Optional.of(new WorkshopFileDetailsService.ModMetadata(modName, consumerAppId));
+        return Optional.of(new ModMetadataService.ModMetadata(modName, consumerAppId));
     }
 
     String getValueFromJson(String key, JsonNode modInfoJson) {

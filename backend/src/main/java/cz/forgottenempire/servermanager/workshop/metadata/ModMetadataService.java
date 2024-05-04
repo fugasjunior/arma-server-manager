@@ -1,4 +1,4 @@
-package cz.forgottenempire.servermanager.workshop;
+package cz.forgottenempire.servermanager.workshop.metadata;
 
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import jakarta.annotation.Nonnull;
@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class WorkshopFileDetailsService {
+public class ModMetadataService {
 
     private final WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService;
 
     @Autowired
-    public WorkshopFileDetailsService(WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService) {
+    public ModMetadataService(WorkshopApiMetadataProvider steamWorkshopFileDetailsApiService) {
         this.steamWorkshopFileDetailsApiService = steamWorkshopFileDetailsApiService;
     }
 
@@ -22,6 +22,6 @@ public class WorkshopFileDetailsService {
                 .orElseThrow(() -> new NotFoundException("Mod ID " + modId + " not found."));
     }
 
-    record ModMetadata(@Nonnull String name, @Nonnull String consumerAppId) {
+    public record ModMetadata(@Nonnull String name, @Nonnull String consumerAppId) {
     }
 }

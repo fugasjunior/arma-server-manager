@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,14 @@ public class WorkshopModsFacade {
 
     private final WorkshopModsService modsService;
     private final WorkshopInstallerService installerService;
-    private final WorkshopFileDetailsService fileDetailsService;
+    private final ModMetadataService fileDetailsService;
     private final ServerInstallationService serverInstallationService;
 
     @Autowired
     public WorkshopModsFacade(
             WorkshopModsService modsService,
             WorkshopInstallerService installerService,
-            WorkshopFileDetailsService fileDetailsService,
+            ModMetadataService fileDetailsService,
             ServerInstallationService serverInstallationService) {
         this.modsService = modsService;
         this.installerService = installerService;
@@ -58,7 +59,7 @@ public class WorkshopModsFacade {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
                 .peek((mod) -> {
-                    WorkshopFileDetailsService.ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
+                    ModMetadataService.ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
                     mod.setName(modMetadata.name());
                     setModServerType(mod, modMetadata.consumerAppId());
                     validateServerInitialized(mod);

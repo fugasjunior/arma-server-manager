@@ -2,6 +2,8 @@ package cz.forgottenempire.servermanager.workshop;
 
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
+import cz.forgottenempire.servermanager.workshop.metadata.WorkshopApiMetadataProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class WorkshopFileDetailsServiceTest {
+class ModMetadataServiceTest {
 
     private static final String STEAM_API_KEY = "ABCD1234";
     private static final long MOD_ID = 1L;
@@ -32,12 +34,12 @@ class WorkshopFileDetailsServiceTest {
     @Mock(stubOnly = true)
     private ResponseEntity<String> response;
 
-    private WorkshopFileDetailsService fileDetailsService;
+    private ModMetadataService fileDetailsService;
 
     @BeforeEach
     void setUp() {
         WorkshopApiMetadataProvider fileDetailsApiService = new WorkshopApiMetadataProvider(STEAM_API_KEY, restTemplate);
-        fileDetailsService = new WorkshopFileDetailsService(fileDetailsApiService);
+        fileDetailsService = new ModMetadataService(fileDetailsApiService);
     }
 
     @Test
@@ -58,7 +60,7 @@ class WorkshopFileDetailsServiceTest {
                         }
                         """);
 
-        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+        ModMetadataService.ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");
@@ -66,7 +68,7 @@ class WorkshopFileDetailsServiceTest {
 
     @Test
     void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreFetchedFromSteamApi() {
-        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(MOD_ID), String.class))
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(UNLISTED_MOD_ID), String.class))
                 .thenReturn(response);
         when(response.getBody()).thenReturn(
                 """
@@ -77,7 +79,7 @@ class WorkshopFileDetailsServiceTest {
                         }
                         """);
 
-        WorkshopFileDetailsService.ModMetadata metadata = fileDetailsService.fetchModMetadata(UNLISTED_MOD_ID);
+        ModMetadataService.ModMetadata metadata = fileDetailsService.fetchModMetadata(UNLISTED_MOD_ID);
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");
