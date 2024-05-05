@@ -34,6 +34,11 @@ public class ServerInstallationService {
         return getServerInstallation(type).getInstallationStatus() == InstallationStatus.FINISHED;
     }
 
+    public void setServerBranch(ServerInstallation serverInstallation, ServerInstallation.Branch branch) {
+        serverInstallation.setBranch(branch);
+        installationRepository.save(serverInstallation);
+    }
+
     private List<ServerType> getAvailableServerTypes() {
         return ServerType.getAll();
     }
