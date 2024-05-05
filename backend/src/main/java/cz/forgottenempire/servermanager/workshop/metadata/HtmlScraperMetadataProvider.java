@@ -29,27 +29,43 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
     @Override
     public Optional<ModMetadata> fetchModMetadata(long modId) {
+        Document document = fetchWorkshopPageHtml(modId);
+        if (document == null) {
+            return Optional.empty();
+        }
+
+        String modName = findModName(document);
+        String consumerAppId = findConsumerAppId(document);
+        if (modName == null || consumerAppId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ModMetadata(
+                modName,
+                consumerAppId)
+        );
+    }
+
+    private Document fetchWorkshopPageHtml(long modId) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(WORKSHOP_PAGE_URL_BASE + modId))
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            Document document = Jsoup.parse(response.body());
-            Element modNameElement = document.selectFirst(".workshopItemTitle");
-            Element consumerAppIdElement = document.selectFirst("[data-appid]");
-
-            if (modNameElement == null || consumerAppIdElement == null) {
-                return Optional.empty();
-            }
-
-            return Optional.of(new ModMetadata(
-                    modNameElement.text(),
-                    consumerAppIdElement.attr("data-appid"))
-            );
+            return Jsoup.parse(response.body());
         } catch (IOException | InterruptedException e) {
             log.error("Failed to fetch mod metadata from workshop page", e);
+            return null;
         }
+    }
 
-        return Optional.empty();
+    private static String findModName(Document document) {
+        Element modNameElement = document.selectFirst(".workshopItemTitle");
+        return modNameElement == null ? null : modNameElement.text();
+    }
+
+    private static String findConsumerAppId(Document document) {
+        Element consumerAppIdElement = document.selectFirst("[data-appid]");
+        return consumerAppIdElement == null ? null : consumerAppIdElement.attr("data-appid");
     }
 }
