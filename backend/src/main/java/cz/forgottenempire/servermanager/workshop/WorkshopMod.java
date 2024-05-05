@@ -5,10 +5,8 @@ import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import java.time.LocalDateTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +24,9 @@ public class WorkshopMod {
     private String name;
     private LocalDateTime lastUpdated;
     private Long fileSize;
+
+    @Column(name = "server_only")
+    private boolean serverOnly;
 
     @Enumerated(EnumType.STRING)
     private InstallationStatus installationStatus;
