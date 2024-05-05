@@ -28,7 +28,7 @@ class DifficultyPresets
             detectedMines = ${detectedMines};                       // Detected mines (0 = never, 1 = limited distance, 2 = always)
             commands = ${commands};                                 // Commands (0 = never, 1 = fade out, 2 = always)
             waypoints = ${waypoints};                               // Waypoints (0 = never, 1 = fade out, 2 = always)
-            tacticalPing = ${tacticalPing?then('1', '0')};          // Tactical ping
+            tacticalPing = ${tacticalPing};                         // Tactical ping (0 = disabled, 1 = in 3D scene, 2 = on map, 3 = both)
 
             /* Personal awareness */
             weaponInfo = ${weaponInfo};                             // Weapon info (0 = never, 1 = fade out, 2 = always)
@@ -48,7 +48,7 @@ class DifficultyPresets
 
             /* Misc */
             mapContent = ${mapContent?then('1', '0')};              // Extended map content
-            autoReport = ${autoReport?then('1', '0')};              // Automatic reporting of spotted enemied by players only. This doesn't have any effect on AIs.
+            autoReport = ${autoReport?then('1', '0')};              // Automatic reporting of spotted enemies by players only. This doesn't have any effect on AIs.
             multipleSaves = 0;                                      // Multiple saves
         };
 

@@ -52,8 +52,12 @@ public class Arma3DifficultySettingsDto {
     @Max(2)
     private byte thirdPersonView;
 
+    // (0 = disabled, 1 = in 3D scene, 2 = on map, 3 = both)
+    @Min(0)
+    @Max(3)
+    private byte tacticalPing;
+
     private boolean reducedDamage;
-    private boolean tacticalPing;
     private boolean staminaBar;
     private boolean weaponCrosshair;
     private boolean visionAid;
