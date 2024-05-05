@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class HtmlScraperMetadataProvider implements ModMetadataProvider {
+public class HtmlScraperMetadataProvider extends ModMetadataProvider {
 
     private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
 
@@ -27,20 +27,12 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
     }
 
     @Override
-    public Optional<ModMetadata> fetchModMetadata(long modId) {
+    PropertyProvider createPropertyProvider(long modId) {
         Document document = fetchWorkshopPageHtml(modId);
         if (document == null) {
-            return Optional.empty();
+            return null;
         }
-        PropertyProvider propertyProvider = new HtmlPropertyProvider(document);
-
-        String modName = propertyProvider.findName();
-        String consumerAppId = propertyProvider.findConsumerAppId();
-        if (modName == null || consumerAppId == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new ModMetadata(modName, consumerAppId));
+        return new HtmlPropertyProvider(document);
     }
 
     private Document fetchWorkshopPageHtml(long modId) {

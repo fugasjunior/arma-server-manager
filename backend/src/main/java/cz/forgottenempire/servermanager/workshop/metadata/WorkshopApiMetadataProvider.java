@@ -16,11 +16,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
-
 @Service
 @Slf4j
-public class WorkshopApiMetadataProvider implements ModMetadataProvider {
+public class WorkshopApiMetadataProvider extends ModMetadataProvider {
     private final String steamApiKey;
     private final RestTemplate restTemplate;
 
@@ -31,21 +29,12 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
     }
 
     @Override
-    public Optional<ModMetadata> fetchModMetadata(long modId) {
+    PropertyProvider createPropertyProvider(long modId) {
         JsonNode modInfoJson = getModInfoFromSteamApi(modId);
         if (modInfoJson == null) {
-            return Optional.empty();
+            return null;
         }
-
-        PropertyProvider propertyProvider = new JsonPropertyProvider(modInfoJson);
-
-        String modName = propertyProvider.findName();
-        String consumerAppId = propertyProvider.findConsumerAppId();
-        if (modName == null || consumerAppId == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new ModMetadata(modName, consumerAppId));
+        return new JsonPropertyProvider(modInfoJson);
     }
 
     private JsonNode getModInfoFromSteamApi(Long modId) {
