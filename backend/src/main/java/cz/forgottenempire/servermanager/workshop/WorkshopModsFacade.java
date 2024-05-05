@@ -5,10 +5,14 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.servermanager.installation.ServerInstallationService;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadata;
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +23,14 @@ public class WorkshopModsFacade {
 
     private final WorkshopModsService modsService;
     private final WorkshopInstallerService installerService;
-    private final WorkshopFileDetailsService fileDetailsService;
+    private final ModMetadataService fileDetailsService;
     private final ServerInstallationService serverInstallationService;
 
     @Autowired
     public WorkshopModsFacade(
             WorkshopModsService modsService,
             WorkshopInstallerService installerService,
-            WorkshopFileDetailsService fileDetailsService,
+            ModMetadataService fileDetailsService,
             ServerInstallationService serverInstallationService) {
         this.modsService = modsService;
         this.installerService = installerService;
@@ -53,14 +57,16 @@ public class WorkshopModsFacade {
     }
 
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
-
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
-                .peek(this::setModServerType)
-                .peek(this::validateServerInitialized)
+                .peek((mod) -> {
+                    ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
+                    mod.setName(modMetadata.name());
+                    setModServerType(mod, modMetadata.consumerAppId());
+                    validateServerInitialized(mod);
+                })
                 .toList();
 
-        workshopMods.forEach(this::setModNameFromWorkshop);
         modsService.saveAllMods(workshopMods);
 
         installerService.installOrUpdateMods(workshopMods);
@@ -81,15 +87,10 @@ public class WorkshopModsFacade {
         modsService.deleteMod(workshopMod);
     }
 
-    private void setModNameFromWorkshop(WorkshopMod mod) {
-        mod.setName(fileDetailsService.getModName(mod.getId()));
-    }
-
-    private void setModServerType(WorkshopMod mod) {
-        Long appId = fileDetailsService.getModAppId(mod.getId());
-        if (Constants.GAME_IDS.get(ServerType.ARMA3).equals(appId)) {
+    private void setModServerType(WorkshopMod mod, String consumerAppId) {
+        if (Constants.GAME_IDS.get(ServerType.ARMA3).toString().equals(consumerAppId)) {
             mod.setServerType(ServerType.ARMA3);
-        } else if (Constants.GAME_IDS.get(ServerType.DAYZ).equals(appId)) {
+        } else if (Constants.GAME_IDS.get(ServerType.DAYZ).toString().equals(consumerAppId)) {
             mod.setServerType(ServerType.DAYZ);
         } else {
             log.warn("Tried to install mod ID {} which is not consumed by any of the supported servers", mod.getId());

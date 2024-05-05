@@ -13,11 +13,16 @@ node {
 
 tasks.register('appNpmInstall', NpmTask) {
     description = "Installs all dependencies from package.json"
-    workingDir = file("${project.projectDir}/src/main/webapp")
+
+    inputs.file('package.json')
+    outputs.dir('node_modules')
+
     args = ["install"]
 }
 
 tasks.register('appNpmBuild', NpmTask) {
+    description = "Builds production version of the webapp"
+
     inputs.files(fileTree('node_modules'))
     inputs.files(fileTree('src'))
     inputs.file('package.json')
@@ -28,8 +33,6 @@ tasks.register('appNpmBuild', NpmTask) {
 
     outputs.dir('build')
 
-    description = "Builds production version of the webapp"
-    workingDir = file("${project.projectDir}/src/main/webapp")
     args = ["run", "build"]
 }
 
