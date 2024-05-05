@@ -19,6 +19,7 @@ import java.util.Optional;
 public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
     private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
+
     private final HttpClient httpClient;
 
     @Autowired
@@ -47,7 +48,7 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
                     consumerAppIdElement.attr("data-appid"))
             );
         } catch (IOException | InterruptedException e) {
-            log.error("Failed to do stuff"); // TODO log message
+            log.error("Failed to fetch mod metadata from workshop page", e);
         }
 
         return Optional.empty();
