@@ -103,11 +103,38 @@ public class Arma3Server extends Server {
     public List<String> getModsAsParameters() {
         return Stream.concat(
                 Stream.concat(
-                        getActiveMods().stream().map(mod -> "-mod=" + mod.getNormalizedName()),
-                        getActiveDLCs().stream().map(dlc -> "-mod=" + dlc.getId())
+                        getWorkshopModsAsParameters(),
+                        getCreatorDlcsAsParameters()
                 ),
-                Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod)
+                getAdditionalModsAsParameters()
         ).toList();
+    }
+
+    private Stream<String> getWorkshopModsAsParameters() {
+        return Stream.concat(
+                getActiveServerMods().stream().map(mod -> "-serverMod=" + mod.getNormalizedName()),
+                getActiveClientMods().stream().map(mod -> "-mod=" + mod.getNormalizedName())
+        );
+    }
+
+    private Stream<String> getCreatorDlcsAsParameters() {
+        return getActiveDLCs().stream().map(dlc -> "-mod=" + dlc.getId());
+    }
+
+    private Stream<String> getAdditionalModsAsParameters() {
+        return Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod);
+    }
+
+    private List<WorkshopMod> getActiveClientMods() {
+        return getActiveMods().stream()
+                .filter(mod -> !mod.isServerOnly())
+                .toList();
+    }
+
+    private List<WorkshopMod> getActiveServerMods() {
+        return getActiveMods().stream()
+                .filter(WorkshopMod::isServerOnly)
+                .toList();
     }
 
     private File getConfigFile() {
