@@ -40,10 +40,6 @@ public class ServerInstallation {
     @CollectionTable(name = "available_branches", joinColumns = @JoinColumn(name = "type"))
     private Set<Branch> availableBranches;
 
-    public ServerInstallation(ServerType type) {
-        this.type = type;
-    }
-
     public enum Branch {
         PUBLIC,
         PROFILING,

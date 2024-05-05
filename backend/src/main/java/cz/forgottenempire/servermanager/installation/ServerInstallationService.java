@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.installation;
 
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.util.SystemUtils.OSType;
 import java.util.List;
@@ -26,7 +27,7 @@ public class ServerInstallationService {
 
     public ServerInstallation getServerInstallation(ServerType type) {
         return installationRepository.findById(type)
-                .orElseGet(() -> installationRepository.save(new ServerInstallation(type)));
+                .orElseThrow(() -> new NotFoundException("Server of type '" + type + "' not found."));
     }
 
     public boolean isServerInstalled(ServerType type) {
