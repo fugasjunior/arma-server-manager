@@ -1,11 +1,7 @@
-package cz.forgottenempire.servermanager.workshop;
+package cz.forgottenempire.servermanager.workshop.metadata;
 
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.workshop.metadata.HtmlScraperMetadataProvider;
-import cz.forgottenempire.servermanager.workshop.metadata.ModMetadata;
-import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
-import cz.forgottenempire.servermanager.workshop.metadata.WorkshopApiMetadataProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +21,8 @@ import java.net.http.HttpResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ModMetadataServiceTest {

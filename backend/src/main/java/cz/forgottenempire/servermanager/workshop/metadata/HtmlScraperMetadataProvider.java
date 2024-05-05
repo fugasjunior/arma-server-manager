@@ -14,14 +14,14 @@ import java.net.http.HttpResponse;
 
 @Service
 @Slf4j
-public class HtmlScraperMetadataProvider extends AbstractModMetadataProvider {
+class HtmlScraperMetadataProvider extends AbstractModMetadataProvider {
 
     private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
 
     private final HttpClient httpClient;
 
     @Autowired
-    public HtmlScraperMetadataProvider(HttpClient httpClient) {
+    HtmlScraperMetadataProvider(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

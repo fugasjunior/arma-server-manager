@@ -18,12 +18,12 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
-public class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
+class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
     private final String steamApiKey;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public WorkshopApiMetadataProvider(@Value("${steam.api.key}") String steamApiKey, RestTemplate restTemplate) {
+    WorkshopApiMetadataProvider(@Value("${steam.api.key}") String steamApiKey, RestTemplate restTemplate) {
         this.steamApiKey = steamApiKey;
         this.restTemplate = restTemplate;
     }
