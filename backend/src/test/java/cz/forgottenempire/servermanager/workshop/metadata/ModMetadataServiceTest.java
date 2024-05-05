@@ -15,22 +15,23 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ModMetadataServiceTest {
 
+    private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
     private static final String STEAM_API_KEY = "ABCD1234";
     private static final long MOD_ID = 1L;
     private static final long UNLISTED_MOD_ID = 2L;
-    private static final long NON_EXISTING_MOD_ID = 1L;
+    private static final long NON_EXISTING_MOD_ID = 3L;
 
     @Mock(stubOnly = true)
     private RestTemplate restTemplate;
@@ -52,7 +53,7 @@ class ModMetadataServiceTest {
 
     @Test
     void whenFetchingModMetadataForExistingPublicMod_thenDataAreFetchedFromSteamApi() {
-        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(MOD_ID), String.class))
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRestRequest(MOD_ID), String.class))
                 .thenReturn(restResponse);
         when(restResponse.getBody()).thenReturn(
                 """
@@ -76,7 +77,7 @@ class ModMetadataServiceTest {
 
     @Test
     void whenFetchingModMetadataForExistingUnlistedMod_thenDataAreScrapedFromModPageHtml() throws Exception {
-        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(UNLISTED_MOD_ID), String.class))
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRestRequest(UNLISTED_MOD_ID), String.class))
                 .thenReturn(restResponse);
         when(restResponse.getBody()).thenReturn(
                 """
@@ -86,7 +87,8 @@ class ModMetadataServiceTest {
                           }
                         }
                         """);
-        when(httpClient.send(any(), eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(htmlResponse); // TODO proper parameters
+        when(httpClient.send(prepareHttpRequest(UNLISTED_MOD_ID), HttpResponse.BodyHandlers.ofString()))
+                .thenReturn(htmlResponse);
         when(htmlResponse.body()).thenReturn("""
                 <html>
                     <head>
@@ -109,7 +111,7 @@ class ModMetadataServiceTest {
 
     @Test
     void whenFetchingModMetadataForNonExistingMod_thenNotFoundExceptionIsThrown() throws Exception {
-        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(NON_EXISTING_MOD_ID), String.class))
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRestRequest(NON_EXISTING_MOD_ID), String.class))
                 .thenReturn(restResponse);
         when(restResponse.getBody()).thenReturn(
                 """
@@ -119,7 +121,8 @@ class ModMetadataServiceTest {
                           }
                         }
                         """);
-        when(httpClient.send(any(), eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(htmlResponse); // TODO proper parameters
+        when(httpClient.send(prepareHttpRequest(NON_EXISTING_MOD_ID), HttpResponse.BodyHandlers.ofString()))
+                .thenReturn(htmlResponse);
         when(htmlResponse.body()).thenReturn("""
                 <html>
                     <head>
@@ -136,7 +139,7 @@ class ModMetadataServiceTest {
                 .hasMessage("Mod ID " + NON_EXISTING_MOD_ID + " not found.");
     }
 
-    private static HttpEntity<MultiValueMap<String, String>> prepareRequest(long modId) {
+    private static HttpEntity<MultiValueMap<String, String>> prepareRestRequest(long modId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -146,5 +149,11 @@ class ModMetadataServiceTest {
         map.add("publishedfileids[0]", String.valueOf(modId));
 
         return new HttpEntity<>(map, headers);
+    }
+
+    private static HttpRequest prepareHttpRequest(long modId) {
+        return HttpRequest.newBuilder()
+                .uri(URI.create(WORKSHOP_PAGE_URL_BASE + modId))
+                .build();
     }
 }
