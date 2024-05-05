@@ -6,7 +6,8 @@ import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
 import {ThreeStateFlagField} from "../../../UI/Form/ThreeStateFlagField.tsx";
 import {Arma3AiSkillSettings} from "./Arma3AiSkillSettings.tsx";
 import {SwitchField} from "../../../UI/Form/SwitchField.tsx";
-import {BOOLEAN_FIELDS, THREE_STATE_FLAG_FIELDS} from "./fieldDefinitions.ts";
+import {BOOLEAN_FIELDS, FOUR_STATE_FLAG_FIELDS, THREE_STATE_FLAG_FIELDS} from "./fieldDefinitions.ts";
+import {FourStateFlagField} from "../../../UI/Form/FourStateFlagField.tsx";
 
 type Arma3DifficultySettingsFormProps = {
     formik: FormikProps<Arma3ServerDto>
@@ -39,6 +40,9 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3DifficultySettingsFormProps)
                 <Grid item xs={12} md={4}>
                     {THREE_STATE_FLAG_FIELDS.map((field, index) =>
                         index >= 4 && <ThreeStateFlagField key={field.id} {...field} formik={formik}/>
+                    )}
+                    {FOUR_STATE_FLAG_FIELDS.map((field) =>
+                        <FourStateFlagField key={field.id} {...field} formik={formik}/>
                     )}
                 </Grid>
             </Grid>

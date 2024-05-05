@@ -1,6 +1,5 @@
 export const BOOLEAN_FIELDS = [
     {id: 'difficultySettings.reducedDamage', label: 'Reduced damage'},
-    {id: 'difficultySettings.tacticalPing', label: 'Tactical ping'},
     {id: 'difficultySettings.staminaBar', label: 'Stamina bar'},
     {id: 'difficultySettings.weaponCrosshair', label: 'Weapon crosshair'},
     {id: 'difficultySettings.visionAid', label: 'Vision aid'},
@@ -76,4 +75,15 @@ export const THREE_STATE_FLAG_FIELDS = [
         middleLabel: 'Enabled',
         offLabel: 'Disabled'
     }
+];
+
+export const FOUR_STATE_FLAG_FIELDS = [
+    {
+        id: 'difficultySettings.tacticalPing',
+        label: 'Tactical ping',
+        zeroLabel: 'Disabled',
+        oneLabel: 'In 3D scene',
+        twoLabel: 'On map',
+        threeLabel: 'Both',
+    },
 ];
