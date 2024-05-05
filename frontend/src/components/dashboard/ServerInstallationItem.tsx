@@ -6,10 +6,7 @@ import {
     CardActions,
     CardContent,
     CardMedia,
-    FormControl,
-    InputLabel,
     LinearProgress,
-    Select,
     SelectChangeEvent,
     Stack,
     Typography
@@ -24,7 +21,7 @@ import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
-import MenuItem from "@mui/material/MenuItem";
+import {ServerBranchSelect} from "./ServerBranchSelect.tsx";
 
 const SERVER_IMAGE_URLS = new Map<ServerType, string>([
     [ServerType.ARMA3, arma3Logo],
@@ -42,23 +39,6 @@ type ServerInstallationItemProps = {
     onUpdateClicked: (serverType: ServerType) => void,
     onBranchChanged: (e: SelectChangeEvent, serverType: ServerType) => Promise<void>
 }
-
-const ServerBranchSelect = (props: {
-    installation: ServerInstallationDto,
-    onChange: (e: SelectChangeEvent) => Promise<void>,
-}) => <FormControl sx={{m: 1, minWidth: 120}} size="small">
-    <InputLabel id={`${props.installation}_branch`}>Branch</InputLabel>
-    <Select
-        labelId={`${props.installation}_branch`}
-        value={props.installation.branch}
-        label="Branch"
-        disabled={props.installation.installationStatus === "INSTALLATION_IN_PROGRESS"}
-        autoWidth
-        onChange={props.onChange}
-    >
-        {props.installation.availableBranches.map(branch => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem>)}
-    </Select>
-</FormControl>;
 
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
     const {installation, onUpdateClicked, onBranchChanged} = props;
