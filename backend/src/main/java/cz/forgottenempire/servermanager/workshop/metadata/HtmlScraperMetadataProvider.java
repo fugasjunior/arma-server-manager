@@ -19,6 +19,9 @@ import java.util.Optional;
 public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
     private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
+    private static final String MOD_NAME_SELECTOR = ".workshopItemTitle";
+    private static final String CONSUMER_APP_ID_ATTRIBUTE_KEY = "data-appid";
+    private static final String CONSUMER_APP_ID_SELECTOR = "[" + CONSUMER_APP_ID_ATTRIBUTE_KEY + "]";
 
     private final HttpClient httpClient;
 
@@ -60,12 +63,12 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
     }
 
     private static String findModName(Document document) {
-        Element modNameElement = document.selectFirst(".workshopItemTitle");
+        Element modNameElement = document.selectFirst(MOD_NAME_SELECTOR);
         return modNameElement == null ? null : modNameElement.text();
     }
 
     private static String findConsumerAppId(Document document) {
-        Element consumerAppIdElement = document.selectFirst("[data-appid]");
-        return consumerAppIdElement == null ? null : consumerAppIdElement.attr("data-appid");
+        Element consumerAppIdElement = document.selectFirst(CONSUMER_APP_ID_SELECTOR);
+        return consumerAppIdElement == null ? null : consumerAppIdElement.attr(CONSUMER_APP_ID_ATTRIBUTE_KEY);
     }
 }
