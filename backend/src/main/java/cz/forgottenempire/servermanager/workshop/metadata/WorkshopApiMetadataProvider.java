@@ -32,13 +32,13 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
 
     @Override
     public Optional<ModMetadata> fetchModMetadata(long modId) {
-        JsonNode modInfoJsonFromSteamApi = getModInfoFromSteamApi(modId);
-        if (modInfoJsonFromSteamApi == null) {
+        JsonNode modInfoJson = getModInfoFromSteamApi(modId);
+        if (modInfoJson == null) {
             return Optional.empty();
         }
 
-        String modName = findModName(modInfoJsonFromSteamApi);
-        String consumerAppId = findConsumerAppId(modInfoJsonFromSteamApi);
+        String modName = findModName(modInfoJson);
+        String consumerAppId = findConsumerAppId(modInfoJson);
 
         if (modName == null || consumerAppId == null) {
             return Optional.empty();
