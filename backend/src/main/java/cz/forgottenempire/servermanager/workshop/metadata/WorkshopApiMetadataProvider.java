@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.workshop.metadata;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.forgottenempire.servermanager.common.Constants;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -40,10 +42,13 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
     private JsonNode getModInfoFromSteamApi(long modId) {
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(modId), String.class);
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readTree(response.getBody()).findValue("publishedfiledetails");
-        } catch (Exception e) {
-            log.warn("Could not load info for mod id: " + modId);
+            JsonNode parsedResponse = new ObjectMapper().readTree(response.getBody());
+            return parsedResponse.findValue("publishedfiledetails");
+        } catch (RestClientException e) {
+            log.error("Request to Steam Workshop API for mod ID '{}' failed", modId, e);
+            return null;
+        } catch (JsonProcessingException e) {
+            log.error("Failed to process Workshop API response for mod ID '{}'", modId, e);
             return null;
         }
     }
