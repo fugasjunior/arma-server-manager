@@ -3,7 +3,6 @@ package cz.forgottenempire.servermanager.workshop.metadata;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +18,6 @@ import java.util.Optional;
 public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
     private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
-    private static final String MOD_NAME_SELECTOR = ".workshopItemTitle";
-    private static final String CONSUMER_APP_ID_ATTRIBUTE_KEY = "data-appid";
-    private static final String CONSUMER_APP_ID_SELECTOR = "[" + CONSUMER_APP_ID_ATTRIBUTE_KEY + "]";
 
     private final HttpClient httpClient;
 
@@ -36,17 +32,15 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
         if (document == null) {
             return Optional.empty();
         }
+        PropertyProvider propertyProvider = new HtmlPropertyProvider(document);
 
-        String modName = findModName(document);
-        String consumerAppId = findConsumerAppId(document);
+        String modName = propertyProvider.findName();
+        String consumerAppId = propertyProvider.findConsumerAppId();
         if (modName == null || consumerAppId == null) {
             return Optional.empty();
         }
 
-        return Optional.of(new ModMetadata(
-                modName,
-                consumerAppId)
-        );
+        return Optional.of(new ModMetadata(modName, consumerAppId));
     }
 
     private Document fetchWorkshopPageHtml(long modId) {
@@ -60,15 +54,5 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
             log.error("Failed to fetch mod metadata from workshop page", e);
             return null;
         }
-    }
-
-    private static String findModName(Document document) {
-        Element modNameElement = document.selectFirst(MOD_NAME_SELECTOR);
-        return modNameElement == null ? null : modNameElement.text();
-    }
-
-    private static String findConsumerAppId(Document document) {
-        Element consumerAppIdElement = document.selectFirst(CONSUMER_APP_ID_SELECTOR);
-        return consumerAppIdElement == null ? null : consumerAppIdElement.attr(CONSUMER_APP_ID_ATTRIBUTE_KEY);
     }
 }
