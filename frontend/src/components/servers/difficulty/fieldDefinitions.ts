@@ -72,8 +72,8 @@ export const THREE_STATE_FLAG_FIELDS = [
     {
         id: 'difficultySettings.thirdPersonView',
         label: 'Third person view',
-        onLabel: 'Enabled',
-        middleLabel: 'Vehicles only',
+        onLabel: 'Vehicles only',
+        middleLabel: 'Enabled',
         offLabel: 'Disabled'
     }
 ];
