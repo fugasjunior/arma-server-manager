@@ -15,7 +15,6 @@ VALUES ('ARMA3', 'CREATORDLC'),
        ('DAYZ_EXP', 'PUBLIC'),
        ('REFORGER', 'PUBLIC');
 
--- Add new columns
 ALTER TABLE server_installation
     ADD branch VARCHAR(255) NOT NULL DEFAULT 'PUBLIC';
 
