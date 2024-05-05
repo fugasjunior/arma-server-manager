@@ -57,7 +57,6 @@ class ServerInstallationController {
     public ResponseEntity<?> setServerBranch(@PathVariable ServerType type, @RequestBody ActiveBranchDto activeBranchDto) {
         ServerInstallation installation = installationService.getServerInstallation(type);
         installationService.setServerBranch(installation, activeBranchDto.branch());
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
