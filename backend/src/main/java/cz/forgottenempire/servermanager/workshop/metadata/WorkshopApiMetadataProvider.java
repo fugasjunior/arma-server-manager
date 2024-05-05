@@ -37,8 +37,10 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
             return Optional.empty();
         }
 
-        String modName = findModName(modInfoJson);
-        String consumerAppId = findConsumerAppId(modInfoJson);
+        PropertyProvider propertyProvider = new JsonPropertyProvider(modInfoJson);
+
+        String modName = propertyProvider.findName();
+        String consumerAppId = propertyProvider.findConsumerAppId();
         if (modName == null || consumerAppId == null) {
             return Optional.empty();
         }
@@ -68,18 +70,5 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
         }
 
         return modInfo;
-    }
-
-    private String findModName(JsonNode modInfoJson) {
-        return getValueFromJson("title", modInfoJson);
-    }
-
-    private String findConsumerAppId(JsonNode modInfoJson) {
-        return getValueFromJson("consumer_app_id", modInfoJson);
-    }
-
-    private String getValueFromJson(String key, JsonNode modInfoJson) {
-        JsonNode value = modInfoJson.findValue(key);
-        return value != null ? value.asText() : null;
     }
 }
