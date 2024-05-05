@@ -9,5 +9,7 @@ export interface ServerInstallationDto {
     version: string,
     installationStatus: string,
     errorStatus: string | null,
-    lastUpdatedAt: string
+    lastUpdatedAt: string,
+    branch: string,
+    availableBranches: string[]
 }

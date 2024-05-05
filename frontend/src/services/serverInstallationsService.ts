@@ -15,3 +15,6 @@ export function installServer(type: string) {
     return http.post(apiEndpoint + "/" + type);
 }
 
+export function changeServerBranch(type: string, branch: string) {
+    return http.patch(apiEndpoint + "/" + type, {branch});
+}

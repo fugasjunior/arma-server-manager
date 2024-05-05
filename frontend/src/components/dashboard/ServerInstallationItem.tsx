@@ -6,7 +6,11 @@ import {
     CardActions,
     CardContent,
     CardMedia,
+    FormControl,
+    InputLabel,
     LinearProgress,
+    Select,
+    SelectChangeEvent,
     Stack,
     Typography
 } from "@mui/material";
@@ -20,6 +24,7 @@ import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
+import MenuItem from "@mui/material/MenuItem";
 
 const SERVER_IMAGE_URLS = new Map<ServerType, string>([
     [ServerType.ARMA3, arma3Logo],
@@ -34,11 +39,12 @@ const isInstalling = (installation: ServerInstallationDto) => {
 
 type ServerInstallationItemProps = {
     installation: ServerInstallationDto,
-    onUpdateClicked: (serverType: ServerType) => void
+    onUpdateClicked: (serverType: ServerType) => void,
+    onBranchChanged: (e: SelectChangeEvent, serverType: ServerType) => Promise<void>
 }
 
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
-    const {installation, onUpdateClicked} = props;
+    const {installation, onUpdateClicked, onBranchChanged} = props;
 
     return (
         <Card sx={{maxWidth: "540px"}}>
@@ -57,9 +63,27 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                             ?? "Unknown error"}
                     </Alert>
                 }
-                <Typography gutterBottom variant="h5">
-                    {SERVER_NAMES.get(installation.type)}
-                </Typography>
+
+                <Stack direction="row" justifyContent="space-between">
+                    <Typography gutterBottom variant="h5">
+                        {SERVER_NAMES.get(installation.type)}
+                    </Typography>
+
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <InputLabel id={`${installation}_branch`}>Branch</InputLabel>
+                        <Select
+                            labelId={`${installation}_branch`}
+                            value={installation.branch}
+                            label="Branch"
+                            disabled={installation.availableBranches.length < 2}
+                            autoWidth
+                            onChange={(e) => onBranchChanged(e, installation.type)}
+                        >
+                            {installation.availableBranches.map((branch) => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+                </Stack>
+
                 {!isInstalling(installation) ?
                     <Stack>
                         {installation.version &&
