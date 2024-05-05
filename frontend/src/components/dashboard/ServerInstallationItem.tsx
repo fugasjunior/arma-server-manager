@@ -43,6 +43,23 @@ type ServerInstallationItemProps = {
     onBranchChanged: (e: SelectChangeEvent, serverType: ServerType) => Promise<void>
 }
 
+const ServerBranchSelect = (props: {
+    installation: ServerInstallationDto,
+    onChange: (e: SelectChangeEvent) => Promise<void>,
+}) => <FormControl sx={{m: 1, minWidth: 120}} size="small">
+    <InputLabel id={`${props.installation}_branch`}>Branch</InputLabel>
+    <Select
+        labelId={`${props.installation}_branch`}
+        value={props.installation.branch}
+        label="Branch"
+        disabled={props.installation.availableBranches.length < 2}
+        autoWidth
+        onChange={props.onChange}
+    >
+        {props.installation.availableBranches.map(branch => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem> )}
+    </Select>
+</FormControl>;
+
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
     const {installation, onUpdateClicked, onBranchChanged} = props;
 
@@ -69,19 +86,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                         {SERVER_NAMES.get(installation.type)}
                     </Typography>
 
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <InputLabel id={`${installation}_branch`}>Branch</InputLabel>
-                        <Select
-                            labelId={`${installation}_branch`}
-                            value={installation.branch}
-                            label="Branch"
-                            disabled={installation.availableBranches.length < 2}
-                            autoWidth
-                            onChange={(e) => onBranchChanged(e, installation.type)}
-                        >
-                            {installation.availableBranches.map((branch) => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+                    <ServerBranchSelect installation={installation} onChange={(e) => onBranchChanged(e, installation.type)}/>
                 </Stack>
 
                 {!isInstalling(installation) ?
