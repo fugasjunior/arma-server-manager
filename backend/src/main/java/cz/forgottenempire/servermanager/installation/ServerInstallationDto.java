@@ -17,6 +17,6 @@ class ServerInstallationDto {
     private InstallationStatus installationStatus;
     private ErrorStatus errorStatus;
     private String lastUpdatedAt;
-    private ServerInstallation.Branch activeBranch;
+    private ServerInstallation.Branch branch;
     private Set<ServerInstallation.Branch> availableBranches;
 }
