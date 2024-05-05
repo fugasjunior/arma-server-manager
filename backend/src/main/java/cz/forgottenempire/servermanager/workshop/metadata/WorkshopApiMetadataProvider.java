@@ -48,7 +48,7 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
             log.error("Request to Steam Workshop API for mod ID '{}' failed", modId, e);
             return null;
         } catch (JsonProcessingException e) {
-            log.error("Failed to process Workshop API response for mod ID '{}'", modId, e);
+            log.error("Failed to process Workshop API response for mod ID {}", modId, e);
             return null;
         }
     }

@@ -42,7 +42,7 @@ class HtmlScraperMetadataProvider extends AbstractModMetadataProvider {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Jsoup.parse(response.body());
         } catch (IOException | InterruptedException e) {
-            log.error("Failed to fetch mod metadata from workshop page", e);
+            log.error("Failed to fetch Workshop page for mod ID {}", modId, e);
             return null;
         }
     }
