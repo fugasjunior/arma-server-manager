@@ -18,6 +18,7 @@ import java.util.Optional;
 @Slf4j
 public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
+    private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
     private final HttpClient httpClient;
 
     @Autowired
@@ -28,7 +29,7 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
     @Override
     public Optional<ModMetadata> fetchModMetadata(long modId) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://steamcommunity.com/sharedfiles/filedetails/?id=" + modId))
+                .uri(URI.create(WORKSHOP_PAGE_URL_BASE + modId))
                 .build();
 
         try {
