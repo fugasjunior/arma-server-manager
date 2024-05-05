@@ -48,13 +48,12 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        ResponseEntity<String> test = restTemplate.postForEntity(Constants.STEAM_API_URL, request, String.class);
-
         JsonNode modInfo = null;
         try {
+            ResponseEntity<String> response = restTemplate.postForEntity(Constants.STEAM_API_URL, request, String.class);
             ObjectMapper objectMapper = new ObjectMapper();
-            modInfo = objectMapper.readTree(test.getBody()).findValue("publishedfiledetails");
-        } catch (JsonProcessingException e) {
+            modInfo = objectMapper.readTree(response.getBody()).findValue("publishedfiledetails");
+        } catch (Exception e) {
             log.warn("Could not load info for mod id: " + modId);
         }
 

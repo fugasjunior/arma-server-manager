@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -137,6 +138,33 @@ class ModMetadataServiceTest {
         assertThatThrownBy(() -> fileDetailsService.fetchModMetadata(NON_EXISTING_MOD_ID))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Mod ID " + NON_EXISTING_MOD_ID + " not found.");
+    }
+
+
+    @Test
+    void whenFetchingFromSteamApiFails_thenHtmlScraperIsUsedInstead() throws Exception {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRestRequest(MOD_ID), String.class))
+                .thenThrow(new RestClientException("REST call failed."));
+        when(httpClient.send(prepareHttpRequest(MOD_ID), HttpResponse.BodyHandlers.ofString()))
+                .thenReturn(htmlResponse);
+        when(htmlResponse.body()).thenReturn("""
+                <html>
+                    <head>
+                        <title>Steam Workshop::Mod Name</title>
+                    </head>
+                    <body>
+                        <a data-appid="107410">
+                            <span>Store Page</span>
+                        </a>
+                        <div class="workshopItemTitle">Mod Name</div>
+                    </body>
+                </html>
+                """);
+
+        ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+
+        assertThat(metadata.name()).isEqualTo("Mod Name");
+        assertThat(metadata.consumerAppId()).isEqualTo("107410");
     }
 
     private static HttpEntity<MultiValueMap<String, String>> prepareRestRequest(long modId) {
