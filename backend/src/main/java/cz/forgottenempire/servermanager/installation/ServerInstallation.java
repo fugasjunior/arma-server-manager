@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-class ServerInstallation {
+public class ServerInstallation {
 
     @Id
     @Enumerated(EnumType.STRING)
@@ -44,7 +44,7 @@ class ServerInstallation {
         this.type = type;
     }
 
-    enum Branch {
+    public enum Branch {
         PUBLIC,
         PROFILING,
         CONTACT,

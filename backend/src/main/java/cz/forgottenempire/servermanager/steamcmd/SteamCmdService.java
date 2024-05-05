@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.steamcmd;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.installation.ServerInstallation;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,9 @@ public class SteamCmdService {
         this.pathsFactory = pathsFactory;
     }
 
-    public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerType serverType) {
-        String betaBranchParameter = serverType == ServerType.ARMA3 ? "-beta creatordlc" : null;
+    public CompletableFuture<SteamCmdJob> installOrUpdateServer(ServerInstallation server) {
+        ServerType serverType = server.getType();
+        String betaBranchParameter = "-beta " + server.getBranch().toString().toLowerCase();
 
         SteamCmdParameters parameters = new SteamCmdParameters.Builder()
                 .withInstallDir(pathsFactory.getServerPath(serverType).toAbsolutePath().toString())

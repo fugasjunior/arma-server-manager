@@ -1,9 +1,7 @@
 package cz.forgottenempire.servermanager.installation;
 
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.common.exceptions.ServerUnsupportedOnOsException;
-import cz.forgottenempire.servermanager.util.SystemUtils;
-import cz.forgottenempire.servermanager.util.SystemUtils.OSType;
+
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -50,8 +48,8 @@ class ServerInstallationController {
 
     @PostMapping("/{type}")
     public ResponseEntity<ServerInstallationDto> installOrUpdateServer(@PathVariable ServerType type) {
-        installerService.installServer(type);
-        ServerInstallation installation = installationService.getServerInstallation(type);
-        return ResponseEntity.ok(mapper.map(installation));
+        ServerInstallation serverInstallation = installationService.getServerInstallation(type);
+        installerService.installServer(serverInstallation);
+        return ResponseEntity.ok(mapper.map(serverInstallation));
     }
 }
