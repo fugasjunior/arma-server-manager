@@ -52,11 +52,11 @@ const ServerBranchSelect = (props: {
         labelId={`${props.installation}_branch`}
         value={props.installation.branch}
         label="Branch"
-        disabled={props.installation.availableBranches.length < 2}
+        disabled={props.installation.installationStatus === "INSTALLATION_IN_PROGRESS"}
         autoWidth
         onChange={props.onChange}
     >
-        {props.installation.availableBranches.map(branch => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem> )}
+        {props.installation.availableBranches.map(branch => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem>)}
     </Select>
 </FormControl>;
 
@@ -86,7 +86,10 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                         {SERVER_NAMES.get(installation.type)}
                     </Typography>
 
-                    <ServerBranchSelect installation={installation} onChange={(e) => onBranchChanged(e, installation.type)}/>
+                    {installation.availableBranches.length > 1 &&
+                        <ServerBranchSelect installation={installation}
+                                            onChange={(e) => onBranchChanged(e, installation.type)}/>
+                    }
                 </Stack>
 
                 {!isInstalling(installation) ?
