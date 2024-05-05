@@ -16,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -140,7 +141,6 @@ class ModMetadataServiceTest {
                 .hasMessage("Mod ID " + NON_EXISTING_MOD_ID + " not found.");
     }
 
-
     @Test
     void whenFetchingFromSteamApiFails_thenHtmlScraperIsUsedInstead() throws Exception {
         when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRestRequest(MOD_ID), String.class))
@@ -165,6 +165,18 @@ class ModMetadataServiceTest {
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");
+    }
+
+    @Test
+    void whenFetchingFromBothSteamApiAndWorkshopPageFails_thenNotFoundExceptionIsThrown() throws Exception {
+        when(restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRestRequest(MOD_ID), String.class))
+                .thenThrow(new RestClientException("REST call failed."));
+        when(httpClient.send(prepareHttpRequest(MOD_ID), HttpResponse.BodyHandlers.ofString()))
+                .thenThrow(new IOException("HTTP call failed."));
+
+        assertThatThrownBy(() -> fileDetailsService.fetchModMetadata(MOD_ID))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Mod ID " + MOD_ID + " not found.");
     }
 
     private static HttpEntity<MultiValueMap<String, String>> prepareRestRequest(long modId) {
