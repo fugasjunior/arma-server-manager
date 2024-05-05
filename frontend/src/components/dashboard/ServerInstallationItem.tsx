@@ -43,6 +43,8 @@ type ServerInstallationItemProps = {
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
     const {installation, onUpdateClicked, onBranchChanged} = props;
 
+    const hasMultipleAvailableBranches = () => installation.availableBranches.length > 1;
+
     return (
         <Card sx={{maxWidth: "540px"}}>
             <CardMedia
@@ -66,7 +68,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                         {SERVER_NAMES.get(installation.type)}
                     </Typography>
 
-                    {installation.availableBranches.length > 1 &&
+                    {hasMultipleAvailableBranches() &&
                         <ServerBranchSelect installation={installation}
                                             onChange={(e) => onBranchChanged(e, installation.type)}/>
                     }
