@@ -1,11 +1,12 @@
 package cz.forgottenempire.servermanager.installation;
 
 import cz.forgottenempire.servermanager.common.InstallationStatus;
-import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
+
 import java.time.LocalDateTime;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,14 +29,12 @@ class ServerInstallerService {
         this.testRunService = testRunService;
     }
 
-    public void installServer(ServerType serverType) {
-        ServerInstallation server = installationRepository.findById(serverType)
-                .orElse(new ServerInstallation(serverType));
+    public void installServer(ServerInstallation server) {
         server.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
         server.setErrorStatus(null);
         installationRepository.save(server);
-        log.info("Starting download of server '{}'", serverType);
-        steamCmdService.installOrUpdateServer(serverType)
+        log.info("Starting download of server '{}' (branch '{}')", server.getType(), server.getBranch().toString().toLowerCase());
+        steamCmdService.installOrUpdateServer(server)
                 .thenAcceptAsync(steamCmdJob -> handleInstallation(steamCmdJob, server));
     }
 

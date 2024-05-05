@@ -6,6 +6,8 @@ import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Set;
+
 @Data
 @Builder
 class ServerInstallationDto {
@@ -15,4 +17,6 @@ class ServerInstallationDto {
     private InstallationStatus installationStatus;
     private ErrorStatus errorStatus;
     private String lastUpdatedAt;
+    private ServerInstallation.Branch branch;
+    private Set<ServerInstallation.Branch> availableBranches;
 }

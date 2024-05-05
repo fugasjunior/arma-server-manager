@@ -4,10 +4,9 @@ import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import java.time.LocalDateTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import java.util.Set;
+
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-class ServerInstallation {
+public class ServerInstallation {
 
     @Id
     @Enumerated(EnumType.STRING)
@@ -31,7 +30,20 @@ class ServerInstallation {
     @Enumerated(EnumType.STRING)
     private ErrorStatus errorStatus;
 
-    public ServerInstallation(ServerType type) {
-        this.type = type;
+    @Column(name = "branch", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Branch branch;
+
+    @Column(name = "branch")
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Branch.class)
+    @CollectionTable(name = "available_branches", joinColumns = @JoinColumn(name = "type"))
+    private Set<Branch> availableBranches;
+
+    public enum Branch {
+        PUBLIC,
+        PROFILING,
+        CONTACT,
+        CREATORDLC
     }
 }

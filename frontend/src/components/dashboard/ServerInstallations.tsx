@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid, SelectChangeEvent} from "@mui/material";
 import {useInterval} from "../../hooks/use-interval";
-import {getServerInstallations, installServer} from "../../services/serverInstallationsService";
+import {changeServerBranch, getServerInstallations, installServer} from "../../services/serverInstallationsService";
 import ServerInstallationItem from "./ServerInstallationItem";
 import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
@@ -10,7 +10,7 @@ const ServerInstallations = () => {
     const [serverInstallations, setServerInstallations] = useState<Array<ServerInstallationDto>>([]);
 
     useEffect(() => {
-        fetchServerInstallations();
+        void fetchServerInstallations();
     }, []);
 
     useInterval(() => fetchServerInstallations(), 5000);
@@ -36,7 +36,24 @@ const ServerInstallations = () => {
             installation.errorStatus = null;
             return newState;
         });
-    }
+    };
+
+    const handleBranchChanged = async (e: SelectChangeEvent, serverType: ServerType) => {
+        const selectedBranch = e.target.value;
+
+        setServerInstallations(prevState => {
+            const newState = [...prevState];
+            const installation = newState.find(i => i.type === serverType);
+            if (!installation) {
+                return prevState;
+            }
+
+            installation.branch = selectedBranch;
+            return newState;
+        });
+
+        await changeServerBranch(serverType, selectedBranch);
+    };
 
     return (
         <>
@@ -44,6 +61,7 @@ const ServerInstallations = () => {
                 {serverInstallations.map(installation => (
                     <Grid item xs={12} md={6} key={installation.type}>
                         <ServerInstallationItem installation={installation}
+                                                onBranchChanged={handleBranchChanged}
                                                 onUpdateClicked={handleUpdateClicked}
                         />
                     </Grid>

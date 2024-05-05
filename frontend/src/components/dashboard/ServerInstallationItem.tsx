@@ -7,6 +7,7 @@ import {
     CardContent,
     CardMedia,
     LinearProgress,
+    SelectChangeEvent,
     Stack,
     Typography
 } from "@mui/material";
@@ -20,6 +21,7 @@ import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
+import {ServerBranchSelect} from "./ServerBranchSelect.tsx";
 
 const SERVER_IMAGE_URLS = new Map<ServerType, string>([
     [ServerType.ARMA3, arma3Logo],
@@ -34,11 +36,14 @@ const isInstalling = (installation: ServerInstallationDto) => {
 
 type ServerInstallationItemProps = {
     installation: ServerInstallationDto,
-    onUpdateClicked: (serverType: ServerType) => void
+    onUpdateClicked: (serverType: ServerType) => void,
+    onBranchChanged: (e: SelectChangeEvent, serverType: ServerType) => Promise<void>
 }
 
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
-    const {installation, onUpdateClicked} = props;
+    const {installation, onUpdateClicked, onBranchChanged} = props;
+
+    const hasMultipleAvailableBranches = () => installation.availableBranches.length > 1;
 
     return (
         <Card sx={{maxWidth: "540px"}}>
@@ -57,9 +62,18 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                             ?? "Unknown error"}
                     </Alert>
                 }
-                <Typography gutterBottom variant="h5">
-                    {SERVER_NAMES.get(installation.type)}
-                </Typography>
+
+                <Stack direction="row" justifyContent="space-between">
+                    <Typography gutterBottom variant="h5">
+                        {SERVER_NAMES.get(installation.type)}
+                    </Typography>
+
+                    {hasMultipleAvailableBranches() &&
+                        <ServerBranchSelect installation={installation}
+                                            onChange={(e) => onBranchChanged(e, installation.type)}/>
+                    }
+                </Stack>
+
                 {!isInstalling(installation) ?
                     <Stack>
                         {installation.version &&
