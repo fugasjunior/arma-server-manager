@@ -37,7 +37,7 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
         return new JsonPropertyProvider(modInfoJson);
     }
 
-    private JsonNode getModInfoFromSteamApi(Long modId) {
+    private JsonNode getModInfoFromSteamApi(long modId) {
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(modId), String.class);
             ObjectMapper objectMapper = new ObjectMapper();
@@ -48,15 +48,15 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
         }
     }
 
-    private HttpEntity<MultiValueMap<String, String>> prepareRequest(Long modId) {
+    private HttpEntity<MultiValueMap<String, String>> prepareRequest(long modId) {
         return new HttpEntity<>(prepareRequestBody(modId), prepareRequestHeaders());
     }
 
-    private MultiValueMap<String, String> prepareRequestBody(Long modId) {
+    private MultiValueMap<String, String> prepareRequestBody(long modId) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("key", steamApiKey);
         map.add("itemcount", "1");
-        map.add("publishedfileids[0]", modId.toString());
+        map.add("publishedfileids[0]", String.valueOf(modId));
         return map;
     }
 
