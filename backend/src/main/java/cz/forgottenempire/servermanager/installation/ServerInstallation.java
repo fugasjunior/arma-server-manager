@@ -30,13 +30,14 @@ class ServerInstallation {
     @Enumerated(EnumType.STRING)
     private ErrorStatus errorStatus;
 
-    @Column(name = "active_branch", nullable = false)
+    @Column(name = "branch", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Branch activeBranch;
+    private Branch branch;
 
-    @Column(name = "available_branches", nullable = false)
+    @Column(name = "branch")
     @Enumerated(EnumType.STRING)
     @ElementCollection(targetClass = Branch.class)
+    @CollectionTable(name = "available_branches", joinColumns = @JoinColumn(name = "type"))
     private Set<Branch> availableBranches;
 
     public ServerInstallation(ServerType type) {
