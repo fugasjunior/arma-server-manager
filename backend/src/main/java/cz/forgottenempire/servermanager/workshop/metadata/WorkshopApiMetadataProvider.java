@@ -39,7 +39,6 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
 
         String modName = findModName(modInfoJson);
         String consumerAppId = findConsumerAppId(modInfoJson);
-
         if (modName == null || consumerAppId == null) {
             return Optional.empty();
         }
@@ -47,12 +46,12 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
         return Optional.of(new ModMetadata(modName, consumerAppId));
     }
 
-    private String findModName(JsonNode modInfoJsonFromSteamApi) {
-        return getValueFromJson("title", modInfoJsonFromSteamApi);
+    private String findModName(JsonNode modInfoJson) {
+        return getValueFromJson("title", modInfoJson);
     }
 
-    private String findConsumerAppId(JsonNode modInfoJsonFromSteamApi) {
-        return getValueFromJson("consumer_app_id", modInfoJsonFromSteamApi);
+    private String findConsumerAppId(JsonNode modInfoJson) {
+        return getValueFromJson("consumer_app_id", modInfoJson);
     }
 
     String getValueFromJson(String key, JsonNode modInfoJson) {
