@@ -87,6 +87,11 @@ public class WorkshopModsFacade {
         modsService.deleteMod(workshopMod);
     }
 
+    public void setModServerOnly(WorkshopMod mod, boolean serverOnly) {
+        mod.setServerOnly(serverOnly);
+        modsService.saveMod(mod);
+    }
+
     private void setModServerType(WorkshopMod mod, String consumerAppId) {
         if (Constants.GAME_IDS.get(ServerType.ARMA3).toString().equals(consumerAppId)) {
             mod.setServerType(ServerType.ARMA3);
