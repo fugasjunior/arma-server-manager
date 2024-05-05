@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Slf4j
 @Configurable
@@ -61,7 +63,16 @@ public class HeadlessClient {
         if (Strings.isNotBlank(server.getPassword())) {
             parameters.add("-password=" + server.getPassword());
         }
-        parameters.addAll(server.getModsAsParameters());
+
+        List<String> modParameters = Stream.of(
+                        server.getClientModsAsParameters(),
+                        server.getCreatorDlcsAsParameters(),
+                        server.getAdditionalModsAsParameters()
+                )
+                .flatMap(Function.identity())
+                .toList();
+
+        parameters.addAll(modParameters);
         return parameters;
     }
 

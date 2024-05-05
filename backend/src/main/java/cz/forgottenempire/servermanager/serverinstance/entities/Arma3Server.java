@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Getter
@@ -101,27 +102,29 @@ public class Arma3Server extends Server {
     }
 
     public List<String> getModsAsParameters() {
-        return Stream.concat(
-                Stream.concat(
-                        getWorkshopModsAsParameters(),
-                        getCreatorDlcsAsParameters()
-                ),
-                getAdditionalModsAsParameters()
-        ).toList();
+        return Stream.of(
+                        getServerModsAsParameters(),
+                        getClientModsAsParameters(),
+                        getCreatorDlcsAsParameters(),
+                        getAdditionalModsAsParameters()
+                )
+                .flatMap(Function.identity())
+                .toList();
     }
 
-    private Stream<String> getWorkshopModsAsParameters() {
-        return Stream.concat(
-                getActiveServerMods().stream().map(mod -> "-serverMod=" + mod.getNormalizedName()),
-                getActiveClientMods().stream().map(mod -> "-mod=" + mod.getNormalizedName())
-        );
+    public Stream<String> getServerModsAsParameters() {
+        return getActiveServerMods().stream().map(mod -> "-serverMod=" + mod.getNormalizedName());
     }
 
-    private Stream<String> getCreatorDlcsAsParameters() {
+    public Stream<String> getClientModsAsParameters() {
+        return getActiveClientMods().stream().map(mod -> "-mod=" + mod.getNormalizedName());
+    }
+
+    public Stream<String> getCreatorDlcsAsParameters() {
         return getActiveDLCs().stream().map(dlc -> "-mod=" + dlc.getId());
     }
 
-    private Stream<String> getAdditionalModsAsParameters() {
+    public Stream<String> getAdditionalModsAsParameters() {
         return Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod);
     }
 
