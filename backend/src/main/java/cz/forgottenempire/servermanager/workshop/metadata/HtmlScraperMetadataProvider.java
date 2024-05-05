@@ -29,11 +29,10 @@ public class HtmlScraperMetadataProvider implements ModMetadataProvider {
 
     @Override
     public Optional<ModMetadata> fetchModMetadata(long modId) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(WORKSHOP_PAGE_URL_BASE + modId))
-                .build();
-
         try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(WORKSHOP_PAGE_URL_BASE + modId))
+                    .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             Document document = Jsoup.parse(response.body());
             Element modNameElement = document.selectFirst(".workshopItemTitle");
