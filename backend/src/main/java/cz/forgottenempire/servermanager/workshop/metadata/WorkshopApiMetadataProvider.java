@@ -46,22 +46,7 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
         return Optional.of(new ModMetadata(modName, consumerAppId));
     }
 
-    private String findModName(JsonNode modInfoJson) {
-        return getValueFromJson("title", modInfoJson);
-    }
-
-    private String findConsumerAppId(JsonNode modInfoJson) {
-        return getValueFromJson("consumer_app_id", modInfoJson);
-    }
-
-    String getValueFromJson(String key, JsonNode modInfoJson) {
-        JsonNode value = modInfoJson.findValue(key);
-        return value != null ? value.asText() : null;
-    }
-
-    JsonNode getModInfoFromSteamApi(Long modId) {
-        log.debug("Getting info for mod {} from Steam Workshop", modId);
-
+    private JsonNode getModInfoFromSteamApi(Long modId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -83,5 +68,18 @@ public class WorkshopApiMetadataProvider implements ModMetadataProvider {
         }
 
         return modInfo;
+    }
+
+    private String findModName(JsonNode modInfoJson) {
+        return getValueFromJson("title", modInfoJson);
+    }
+
+    private String findConsumerAppId(JsonNode modInfoJson) {
+        return getValueFromJson("consumer_app_id", modInfoJson);
+    }
+
+    private String getValueFromJson(String key, JsonNode modInfoJson) {
+        JsonNode value = modInfoJson.findValue(key);
+        return value != null ? value.asText() : null;
     }
 }
