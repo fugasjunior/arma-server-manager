@@ -38,25 +38,31 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
     }
 
     private JsonNode getModInfoFromSteamApi(Long modId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(Constants.STEAM_API_URL, prepareRequest(modId), String.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readTree(response.getBody()).findValue("publishedfiledetails");
+        } catch (Exception e) {
+            log.warn("Could not load info for mod id: " + modId);
+            return null;
+        }
+    }
 
+    private HttpEntity<MultiValueMap<String, String>> prepareRequest(Long modId) {
+        return new HttpEntity<>(prepareRequestBody(modId), prepareRequestHeaders());
+    }
+
+    private MultiValueMap<String, String> prepareRequestBody(Long modId) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("key", steamApiKey);
         map.add("itemcount", "1");
         map.add("publishedfileids[0]", modId.toString());
+        return map;
+    }
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
-        JsonNode modInfo = null;
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity(Constants.STEAM_API_URL, request, String.class);
-            ObjectMapper objectMapper = new ObjectMapper();
-            modInfo = objectMapper.readTree(response.getBody()).findValue("publishedfiledetails");
-        } catch (Exception e) {
-            log.warn("Could not load info for mod id: " + modId);
-        }
-
-        return modInfo;
+    private static HttpHeaders prepareRequestHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return headers;
     }
 }
