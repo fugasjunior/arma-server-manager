@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
-public class WorkshopApiMetadataProvider extends ModMetadataProvider {
+public class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
     private final String steamApiKey;
     private final RestTemplate restTemplate;
 

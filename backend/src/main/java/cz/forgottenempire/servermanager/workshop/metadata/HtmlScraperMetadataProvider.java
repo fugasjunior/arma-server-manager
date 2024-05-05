@@ -11,11 +11,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 
 @Service
 @Slf4j
-public class HtmlScraperMetadataProvider extends ModMetadataProvider {
+public class HtmlScraperMetadataProvider extends AbstractModMetadataProvider {
 
     private static final String WORKSHOP_PAGE_URL_BASE = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
 

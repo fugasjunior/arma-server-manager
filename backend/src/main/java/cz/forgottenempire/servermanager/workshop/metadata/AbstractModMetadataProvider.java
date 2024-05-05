@@ -2,7 +2,7 @@ package cz.forgottenempire.servermanager.workshop.metadata;
 
 import java.util.Optional;
 
-public abstract class ModMetadataProvider {
+public abstract class AbstractModMetadataProvider {
     public Optional<ModMetadata> fetchModMetadata(long modId) {
         PropertyProvider propertyProvider = createPropertyProvider(modId);
         if (propertyProvider == null) {
