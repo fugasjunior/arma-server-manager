@@ -68,38 +68,17 @@ class HeadlessClientTest {
     }
 
     @Test
-    void whenHeadlessClientIsStartedWithClientMods_thenModsArePresentInParameters() throws IOException {
+    void whenHeadlessClientIsStartedWithModsAndDlcs_thenOnlyClientModsAdditionalModsAndDlcsArePresentInParameters() throws IOException {
         when(server.getId()).thenReturn(SERVER_ID);
         when(server.getPort()).thenReturn(SERVER_PORT);
-        when(server.getClientModsAsParameters()).thenReturn(Stream.of("-mod=@CBA", "-mod=@ACE3"));
-
-        headlessClient.start();
-
-        List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-mod=@CBA", "-mod=@ACE3");
-        verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
-    }
-
-    @Test
-    void whenHeadlessClientIsStartedWithAdditionalMods_thenModsArePresentInParameters() throws IOException {
-        when(server.getId()).thenReturn(SERVER_ID);
-        when(server.getPort()).thenReturn(SERVER_PORT);
-        when(server.getAdditionalModsAsParameters()).thenReturn(Stream.of("-mod=@CBA", "-mod=@ACE3"));
-
-        headlessClient.start();
-
-        List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-mod=@CBA", "-mod=@ACE3");
-        verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
-    }
-
-    @Test
-    void whenHeadlessClientIsStartedOnServerWithServerMods_thenServerModsAreNotPresentInParameters() throws IOException {
-        when(server.getId()).thenReturn(SERVER_ID);
-        when(server.getPort()).thenReturn(SERVER_PORT);
+        when(server.getClientModsAsParameters()).thenReturn(Stream.of("-mod=@CBA"));
+        when(server.getAdditionalModsAsParameters()).thenReturn(Stream.of("-mod=@custom_mod"));
+        when(server.getCreatorDlcsAsParameters()).thenReturn(Stream.of("-mod=vn"));
         when(server.getServerModsAsParameters()).thenReturn(Stream.of("-mod=@ZeusEnhanced"));
 
         headlessClient.start();
 
-        List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302");
+        List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-mod=@CBA", "-mod=vn", "-mod=@custom_mod");
         verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
     }
 }
