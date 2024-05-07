@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Getter
@@ -101,13 +102,42 @@ public class Arma3Server extends Server {
     }
 
     public List<String> getModsAsParameters() {
-        return Stream.concat(
-                Stream.concat(
-                        getActiveMods().stream().map(mod -> "-mod=" + mod.getNormalizedName()),
-                        getActiveDLCs().stream().map(dlc -> "-mod=" + dlc.getId())
-                ),
-                Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod)
-        ).toList();
+        return Stream.of(
+                        getServerModsAsParameters(),
+                        getClientModsAsParameters(),
+                        getCreatorDlcsAsParameters(),
+                        getAdditionalModsAsParameters()
+                )
+                .flatMap(Function.identity())
+                .toList();
+    }
+
+    public Stream<String> getServerModsAsParameters() {
+        return getActiveServerMods().stream().map(mod -> "-serverMod=" + mod.getNormalizedName());
+    }
+
+    public Stream<String> getClientModsAsParameters() {
+        return getActiveClientMods().stream().map(mod -> "-mod=" + mod.getNormalizedName());
+    }
+
+    public Stream<String> getCreatorDlcsAsParameters() {
+        return getActiveDLCs().stream().map(dlc -> "-mod=" + dlc.getId());
+    }
+
+    public Stream<String> getAdditionalModsAsParameters() {
+        return Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod);
+    }
+
+    private List<WorkshopMod> getActiveClientMods() {
+        return getActiveMods().stream()
+                .filter(mod -> !mod.isServerOnly())
+                .toList();
+    }
+
+    private List<WorkshopMod> getActiveServerMods() {
+        return getActiveMods().stream()
+                .filter(WorkshopMod::isServerOnly)
+                .toList();
     }
 
     private File getConfigFile() {

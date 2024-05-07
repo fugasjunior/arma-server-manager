@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
 import {ModDto} from "../../dtos/ModDto.ts";
 import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
-import {Button, CircularProgress, Stack, TextField} from "@mui/material";
+import {Button, CircularProgress, Stack, Switch, TextField} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
@@ -35,6 +35,10 @@ const headCells: Array<EnhancedTableHeadCell> = [
         type: 'numeric'
     },
     {
+        id: 'serverOnly',
+        label: 'Server only'
+    },
+    {
         id: 'lastUpdated',
         label: 'Last updated',
         type: 'date'
@@ -48,11 +52,11 @@ const headCells: Array<EnhancedTableHeadCell> = [
 type ModsTableProps = {
     rows: Array<ModDto>,
     selected: Array<number>,
-    filter: string
-    arma3ModsCount: number
-    dayZModsCount: number
-    mixedModsSelected: boolean
-    loading: boolean
+    filter: string,
+    arma3ModsCount: number,
+    dayZModsCount: number,
+    mixedModsSelected: boolean,
+    loading: boolean,
     onModInstallClicked: (modId: number) => void,
     onModUpdateClicked: () => void,
     onCreatePresetClicked: () => void,
@@ -60,6 +64,7 @@ type ModsTableProps = {
     onFilterChange: (_: any, newValue: string) => void,
     onRowClick: (rowId: number | string) => void,
     onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
+    onServerOnlyChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void
 }
 
 const ModsTable = (props: ModsTableProps) => {
@@ -110,6 +115,14 @@ const ModsTable = (props: ModsTableProps) => {
                         id: "fileSize",
                         value: modDto.fileSize,
                         displayValue: humanFileSize(modDto.fileSize)
+                    },
+                    {
+                        id: "serverOnly",
+                        value: "serverOnly",
+                        displayValue: <Switch
+                            checked={modDto.serverOnly}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => props.onServerOnlyChanged(e, modDto.id)}/>
                     },
                     {
                         id: "lastUpdated",

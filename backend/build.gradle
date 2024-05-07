@@ -63,8 +63,6 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
     aspect group: 'org.springframework', name: 'spring-aspects', version: '6.0.13'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance.headlessclient;
 
+import com.google.common.base.Joiner;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessCreator;
@@ -13,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Slf4j
 @Configurable
@@ -35,7 +38,9 @@ public class HeadlessClient {
         File logFile = pathsFactory.getHeadlessClientLogFile(server.getId(), id);
 
         try {
-            process = serverProcessCreator.startProcessWithRedirectedOutput(executable, prepareParameters(), logFile);
+            List<String> parameters = prepareParameters();
+            log.info("Starting headless client with options: {}", Joiner.on(" ").join(parameters));
+            process = serverProcessCreator.startProcessWithRedirectedOutput(executable, parameters, logFile);
         } catch (IOException e) {
             log.error("Failed to start headless client", e);
         }
@@ -61,7 +66,16 @@ public class HeadlessClient {
         if (Strings.isNotBlank(server.getPassword())) {
             parameters.add("-password=" + server.getPassword());
         }
-        parameters.addAll(server.getModsAsParameters());
+
+        List<String> modParameters = Stream.of(
+                        server.getClientModsAsParameters(),
+                        server.getCreatorDlcsAsParameters(),
+                        server.getAdditionalModsAsParameters()
+                )
+                .flatMap(Function.identity())
+                .toList();
+
+        parameters.addAll(modParameters);
         return parameters;
     }
 

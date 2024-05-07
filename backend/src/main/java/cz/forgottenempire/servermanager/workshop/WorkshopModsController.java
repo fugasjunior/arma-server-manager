@@ -9,13 +9,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -45,8 +39,7 @@ class WorkshopModsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ModDto> getMod(@PathVariable Long id) {
-        WorkshopMod mod = modsFacade.getMod(id)
-                .orElseThrow(() -> new NotFoundException("Mod ID " + id + " does not exist or is not installed"));
+        WorkshopMod mod = findMod(id);
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
 
@@ -76,5 +69,17 @@ class WorkshopModsController {
         log.info("Uninstalling mod {}", id);
         modsFacade.uninstallMod(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> setModServerOnly(@PathVariable Long id, @RequestBody ServerOnlyDto serverOnlyDto) {
+        WorkshopMod mod = findMod(id);
+        modsFacade.setModServerOnly(mod, serverOnlyDto.serverOnly());
+        return ResponseEntity.ok().build();
+    }
+
+    private WorkshopMod findMod(Long id) {
+        return modsFacade.getMod(id)
+                .orElseThrow(() -> new NotFoundException("Mod ID " + id + " does not exist or is not installed"));
     }
 }

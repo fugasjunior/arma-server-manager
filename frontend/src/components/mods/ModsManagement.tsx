@@ -2,7 +2,7 @@ import ModsErrorAlertMessage from "./ModsErrorAlertMessage";
 import ModsTable from "./ModsTable";
 import CreatePresetDialog from "./CreatePresetDialog";
 import {ChangeEvent, useEffect, useState} from "react";
-import {getMods, installMod, uninstallMods, updateMods} from "../../services/modsService";
+import {getMods, installMod, setModServerOnly, uninstallMods, updateMods} from "../../services/modsService";
 import {useInterval} from "../../hooks/use-interval";
 import {toast} from "material-react-toastify";
 import {createModPreset} from "../../services/modPresetsService";
@@ -28,7 +28,7 @@ export default function ModsManagement() {
     };
 
     useEffect(() => {
-        fetchMods();
+        void fetchMods();
     }, []);
 
     useInterval(fetchMods, 5000);
@@ -134,6 +134,22 @@ export default function ModsManagement() {
         toast.success(`Preset '${presetName}' successfully created`);
     }
 
+    const handleServerOnlyChanged = async (e: ChangeEvent<HTMLInputElement>, modId: number) => {
+        const isServerOnly = e.target.checked;
+        setMods(prevState => {
+            const newMods = [...prevState];
+            const foundMod = newMods.find(mod => mod.id === modId);
+            if (!foundMod) {
+                return prevState;
+            }
+
+            foundMod.serverOnly = isServerOnly;
+            return newMods;
+        });
+
+        await setModServerOnly(modId, isServerOnly);
+    };
+
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
     const filteredMods = filterMods();
     const arma3ModsCount = mods.filter(mod => mod.serverType === "ARMA3").length;
@@ -150,6 +166,7 @@ export default function ModsManagement() {
                    onModUpdateClicked={handleModUpdate}
                    onModUninstallClicked={handleUninstall} onModInstallClicked={handleInstall}
                    onFilterChange={handleFilterChange} onCreatePresetClicked={handlePresedDialogOpen}
+                   onServerOnlyChanged={handleServerOnlyChanged}
         />
         <CreatePresetDialog open={newPresetDialogOpen} onClose={handlePresedDialogClose}
                             onConfirmClicked={handleCreateNewPreset}
