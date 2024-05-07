@@ -100,9 +100,25 @@ class HeadlessClientTest {
     }
 
     @Test
-    void whenIsAliveAndProcessIsNull_thenReturnFalse() {
+    void whenIsAliveIsCalledAndProcessIsNull_thenReturnFalse() {
         assertThat(headlessClient.isAlive())
                 .as("Headless client that has not been started yet should not be alive")
+                .isFalse();
+    }
+
+    @Test
+    void whenIsAliveIsCalledAndProcessIsNotAlive_thenReturnFalse() throws IOException {
+        when(server.getId()).thenReturn(SERVER_ID);
+        when(server.getPort()).thenReturn(SERVER_PORT);
+        List<String> parameters = List.of("-client", "-connect=127.0.0.1:2302");
+        Process headlessClientProcess = mock(Process.class);
+        when(headlessClientProcess.isAlive()).thenReturn(false);
+        when(serverProcessCreator.startProcessWithRedirectedOutput(serverExecutable, parameters, logFile))
+                .thenReturn(headlessClientProcess);
+        headlessClient.start();
+
+        assertThat(headlessClient.isAlive())
+                .as("Headless client with dead process should not be alive")
                 .isFalse();
     }
 }
