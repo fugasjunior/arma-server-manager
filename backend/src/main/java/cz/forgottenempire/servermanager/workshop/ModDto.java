@@ -15,4 +15,5 @@ public class ModDto {
     private String lastUpdated;
     private String installationStatus;
     private String errorStatus;
+    private boolean serverOnly;
 }
