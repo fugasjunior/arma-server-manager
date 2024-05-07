@@ -79,13 +79,16 @@ public class DayZServer extends Server {
             return;
         }
 
-        StringBuilder serverModsList = new StringBuilder("-serverMod=");
-        getActiveServerMods().forEach(mod -> serverModsList.append(mod.getNormalizedName()).append(";"));
-        parameters.add(serverModsList.toString());
+        addModsToParameters(getActiveServerMods(), "-serverMod=", parameters);
+        addModsToParameters(getActiveClientMods(), "-mod=", parameters);
+    }
 
-        StringBuilder clientModsList = new StringBuilder("-mod=");
-        getActiveClientMods().forEach(mod -> clientModsList.append(mod.getNormalizedName()).append(";"));
-        parameters.add(clientModsList.toString());
+    private static void addModsToParameters(List<WorkshopMod> mods, String parameterPrefix, List<String> parameters) {
+        if (!mods.isEmpty()) {
+            StringBuilder serverModsList = new StringBuilder(parameterPrefix);
+            mods.forEach(mod -> serverModsList.append(mod.getNormalizedName()).append(";"));
+            parameters.add(serverModsList.toString());
+        }
     }
 
     private List<WorkshopMod> getActiveClientMods() {
