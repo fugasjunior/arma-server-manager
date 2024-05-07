@@ -19,3 +19,7 @@ export function updateMods(modIdsList: string) {
 export function uninstallMods(modIdsList: string) {
     return http.delete(apiEndpoint + "?modIds=" + modIdsList);
 }
+
+export function setModServerOnly(modId: number, isServerOnly: boolean) {
+    return http.patch(apiEndpoint + "/" + modId, {serverOnly: isServerOnly});
+}
