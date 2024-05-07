@@ -78,4 +78,16 @@ class HeadlessClientTest {
         List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-mod=@CBA", "-mod=@ACE3");
         verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
     }
+
+    @Test
+    void whenHeadlessClientIsStartedWithAdditionalMods_thenModsArePresentInParameters() throws IOException {
+        when(server.getId()).thenReturn(SERVER_ID);
+        when(server.getPort()).thenReturn(SERVER_PORT);
+        when(server.getAdditionalModsAsParameters()).thenReturn(Stream.of("-mod=@CBA", "-mod=@ACE3"));
+
+        headlessClient.start();
+
+        List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-mod=@CBA", "-mod=@ACE3");
+        verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
+    }
 }
