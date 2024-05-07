@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 class HeadlessClientTest {
@@ -96,5 +97,12 @@ class HeadlessClientTest {
         headlessClient.stop();
 
         verify(headlessClientProcess).destroy();
+    }
+
+    @Test
+    void whenIsAliveAndProcessIsNull_thenReturnFalse() {
+        assertThat(headlessClient.isAlive())
+                .as("Headless client that has not been started yet should not be alive")
+                .isFalse();
     }
 }
