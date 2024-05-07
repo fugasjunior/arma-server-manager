@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
 
@@ -63,6 +64,18 @@ class HeadlessClientTest {
         headlessClient.start();
 
         List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-password=" + SERVER_PASSWORD);
+        verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
+    }
+
+    @Test
+    void whenHeadlessClientIsStartedWithClientMods_thenModsArePresentInParameters() throws IOException {
+        when(server.getId()).thenReturn(SERVER_ID);
+        when(server.getPort()).thenReturn(SERVER_PORT);
+        when(server.getClientModsAsParameters()).thenReturn(Stream.of("-mod=@CBA", "-mod=@ACE3"));
+
+        headlessClient.start();
+
+        List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302", "-mod=@CBA", "-mod=@ACE3");
         verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
     }
 }
