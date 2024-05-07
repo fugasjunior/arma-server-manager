@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessCreator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -19,49 +20,45 @@ class HeadlessClientTest {
     public static final int SERVER_PORT = 2302;
     public static final String SERVER_PASSWORD = "hunter2";
 
-    @Test
-    void whenHeadlessClientIsStarted_thenProcessCreatedWithCorrectParameters() throws IOException {
-        Arma3Server server = mock(Arma3Server.class, withSettings().stubOnly());
-        when(server.getId()).thenReturn(SERVER_ID);
-        when(server.getPort()).thenReturn(SERVER_PORT);
+    private File logFile;
+    private File serverExecutable;
+    private Arma3Server server;
+    private ServerProcessCreator serverProcessCreator;
 
-        HeadlessClient headlessClient = new HeadlessClient(HEADLESS_CLIENT_ID, server);
+    private HeadlessClient headlessClient;
+
+    @BeforeEach
+    void setUp() {
+        server = mock(Arma3Server.class, withSettings().stubOnly());
+        logFile = mock(File.class, withSettings().stubOnly());
+        serverExecutable = mock(File.class, withSettings().stubOnly());
+        serverProcessCreator = mock(ServerProcessCreator.class);
+
         PathsFactory pathsFactory = mock(PathsFactory.class);
-
-        File logFile = mock(File.class, withSettings().stubOnly());
         when(pathsFactory.getHeadlessClientLogFile(SERVER_ID, HEADLESS_CLIENT_ID)).thenReturn(logFile);
-
-        File serverExecutable = mock(File.class, withSettings().stubOnly());
         when(pathsFactory.getServerExecutableWithFallback(ServerType.ARMA3)).thenReturn(serverExecutable);
 
+        headlessClient = new HeadlessClient(HEADLESS_CLIENT_ID, server);
         headlessClient.setPathsFactory(pathsFactory);
-        ServerProcessCreator serverProcessCreator = mock(ServerProcessCreator.class);
         headlessClient.setServerProcessCreator(serverProcessCreator);
+    }
+
+    @Test
+    void whenHeadlessClientIsStarted_thenProcessCreatedWithCorrectParameters() throws IOException {
+        when(server.getId()).thenReturn(SERVER_ID);
+        when(server.getPort()).thenReturn(SERVER_PORT);
 
         headlessClient.start();
 
         List<String> expectedParameters = List.of("-client", "-connect=127.0.0.1:2302");
         verify(serverProcessCreator).startProcessWithRedirectedOutput(serverExecutable, expectedParameters, logFile);
     }
+
     @Test
     void whenHeadlessClientIsStartedWithPasswordProtectedServer_thenProcessCreatedWithPasswordParameter() throws IOException {
-        Arma3Server server = mock(Arma3Server.class, withSettings().stubOnly());
         when(server.getId()).thenReturn(SERVER_ID);
         when(server.getPort()).thenReturn(SERVER_PORT);
         when(server.getPassword()).thenReturn(SERVER_PASSWORD);
-
-        HeadlessClient headlessClient = new HeadlessClient(HEADLESS_CLIENT_ID, server);
-        PathsFactory pathsFactory = mock(PathsFactory.class);
-
-        File logFile = mock(File.class, withSettings().stubOnly());
-        when(pathsFactory.getHeadlessClientLogFile(SERVER_ID, HEADLESS_CLIENT_ID)).thenReturn(logFile);
-
-        File serverExecutable = mock(File.class, withSettings().stubOnly());
-        when(pathsFactory.getServerExecutableWithFallback(ServerType.ARMA3)).thenReturn(serverExecutable);
-
-        headlessClient.setPathsFactory(pathsFactory);
-        ServerProcessCreator serverProcessCreator = mock(ServerProcessCreator.class);
-        headlessClient.setServerProcessCreator(serverProcessCreator);
 
         headlessClient.start();
 
