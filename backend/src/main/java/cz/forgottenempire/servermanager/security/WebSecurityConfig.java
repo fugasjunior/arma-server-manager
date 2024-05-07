@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import static org.springframework.security.web.util.matcher.RequestMatchers.not;
 
 @Configuration
 @EnableWebSecurity
@@ -77,11 +78,7 @@ class WebSecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers(
                                 antMatcher("/api/login"),
-                                antMatcher("/assets/**"),
-                                antMatcher("/{spring:[^(api)]}/**"),
-                                antMatcher("/static/**"),
-                                antMatcher("/*"),
-                                antMatcher("/h2-console/**")
+                                not(antMatcher("/api/**"))
                         ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
