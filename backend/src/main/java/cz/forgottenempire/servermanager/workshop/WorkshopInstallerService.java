@@ -10,8 +10,10 @@ import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
 import cz.forgottenempire.servermanager.util.FileSystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,11 +47,12 @@ class WorkshopInstallerService {
         this.installationService = installationService;
     }
 
+    @Transactional
     public void installOrUpdateMods(Collection<WorkshopMod> mods) {
         mods.forEach(mod -> {
             mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
             mod.setErrorStatus(null);
-            modsService.saveMod(mod);
+            modsService.saveModForInstallation(mod);
         });
 
         steamCmdService.installOrUpdateWorkshopMods(mods)
@@ -87,6 +90,7 @@ class WorkshopInstallerService {
                     mod.getName(), mod.getId());
             installMod(mod);
         }
+
         modsService.saveMod(mod);
     }
 
@@ -116,6 +120,7 @@ class WorkshopInstallerService {
 
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
+            mod.addBiKey(key.getName());
             for (ServerType serverType : getRelevantServerTypes(mod)) {
                 log.debug("Copying BiKey {} to server {}", key.getName(), serverType);
                 FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), serverType).toFile());
