@@ -84,7 +84,7 @@ export const ScenariosTable = (
                 mb: 2
             }}>
                 <EnhancedTable rows={getRows()} selectedRowIds={selectedScenarioIds} headCells={headCells}
-                               onRowSelect={onRowClick} title="Scenarios"
+                               onRowSelect={onRowClick} title="Scenarios" id="scenarios"
                                onSelectAllRowsClick={onSelectAllRowsClick}
                                defaultSortColumnId="name"
                                customTopControls={<ScenariosTableToolbar

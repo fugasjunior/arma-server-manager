@@ -30,6 +30,7 @@ export type EnhancedTableHeadCell = {
 }
 
 type EnhancedTableProps = {
+    id: string,
     rows: Array<EnhancedTableRow>,
     selectedRowIds: Array<string | number>,
     title: string,
@@ -44,6 +45,7 @@ type EnhancedTableProps = {
 
 export const EnhancedTable = (
     {
+        id,
         rows,
         selectedRowIds,
         title,
@@ -58,7 +60,7 @@ export const EnhancedTable = (
 ) => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [pageNumber, setPageNumber] = useState<number>(0);
-    const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+    const [rowsPerPage, setRowsPerPage] = useState<number>(getInitialRowsPerPage());
     const [orderByColumnId, setOrderByColumnId] = useState<string>(defaultSortColumnId ?? headCells[0].id);
     const [order, setOrder] = useState<"asc" | "desc">("asc");
 
@@ -76,6 +78,23 @@ export const EnhancedTable = (
                 }
             };
         });
+
+    const rowsPerPageLocalStorageKey = id + "_rows_per_page";
+
+    function getInitialRowsPerPage() {
+        const rowsPerPageSetting = localStorage.getItem(rowsPerPageLocalStorageKey);
+        if (rowsPerPageSetting === null) {
+            return 10;
+        }
+
+        const rowsPerPage = Number(rowsPerPageSetting);
+        if (isNaN(rowsPerPage)) {
+            localStorage.removeItem(rowsPerPageLocalStorageKey);
+            return 10;
+        }
+
+        return rowsPerPage;
+    }
 
     const getFilteredRows = () => {
         if (searchTerm) {
@@ -104,7 +123,10 @@ export const EnhancedTable = (
     };
 
     const handleRowsPerPageChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        const rowsPerPage = event.target.value;
+        localStorage.setItem(rowsPerPageLocalStorageKey, rowsPerPage);
+
+        setRowsPerPage(parseInt(rowsPerPage, 10));
         setPageNumber(0);
     };
 
