@@ -79,15 +79,18 @@ export const EnhancedTable = (
             };
         });
 
+    const rowsPerPageLocalStorageKey = id + "_rows_per_page";
+
     function getInitialRowsPerPage() {
-        const rowsPerPageSetting = localStorage.getItem(id + "_rows_per_page");
+        const rowsPerPageSetting = localStorage.getItem(rowsPerPageLocalStorageKey);
         if (rowsPerPageSetting === null) {
             return 10;
         }
 
         const rowsPerPage = Number(rowsPerPageSetting);
         if (isNaN(rowsPerPage)) {
-            localStorage.removeItem(id + "_rows_per_page");
+            localStorage.removeItem(rowsPerPageLocalStorageKey);
+            return 10;
         }
 
         return rowsPerPage;
@@ -121,7 +124,7 @@ export const EnhancedTable = (
 
     const handleRowsPerPageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const rowsPerPage = event.target.value;
-        localStorage.setItem(id + "_rows_per_page", rowsPerPage);
+        localStorage.setItem(rowsPerPageLocalStorageKey, rowsPerPage);
 
         setRowsPerPage(parseInt(rowsPerPage, 10));
         setPageNumber(0);
