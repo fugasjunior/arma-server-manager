@@ -30,6 +30,7 @@ export type EnhancedTableHeadCell = {
 }
 
 type EnhancedTableProps = {
+    id: string,
     rows: Array<EnhancedTableRow>,
     selectedRowIds: Array<string | number>,
     title: string,

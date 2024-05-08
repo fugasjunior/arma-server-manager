@@ -145,7 +145,7 @@ const ModsTable = (props: ModsTableProps) => {
                 mb: 2
             }}>
                 <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={props.selected} headCells={headCells}
-                               title="Workshop mods"
+                               id="workshop_mods" title="Workshop mods"
                                onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}
 
                                customTopControls={<ModsTableToolbar
