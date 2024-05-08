@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
-import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,6 +39,11 @@ public class WorkshopMod {
     @Enumerated(EnumType.STRING)
     private ServerType serverType;
 
+    @ElementCollection
+    @CollectionTable(name = "workshop_mod_bikey")
+    @Column(name = "bikey")
+    private Set<String> biKeys = new HashSet<>();
+
     public WorkshopMod(Long id) {
         this.id = id;
     }
@@ -51,5 +58,9 @@ public class WorkshopMod {
         retVal = "@".concat(retVal);
 
         return retVal;
+    }
+
+    public void addBiKey(String biKey) {
+        biKeys.add(biKey);
     }
 }

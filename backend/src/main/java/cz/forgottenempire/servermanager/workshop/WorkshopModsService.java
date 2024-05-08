@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,11 @@ public class WorkshopModsService {
 
     public WorkshopMod saveMod(WorkshopMod mod) {
         return modRepository.save(mod);
+    }
+
+    public void saveModForInstallation(WorkshopMod mod) {
+        modRepository.save(mod);
+        Hibernate.initialize(mod.getBiKeys());
     }
 
     public List<WorkshopMod> saveAllMods(List<WorkshopMod> mods) {

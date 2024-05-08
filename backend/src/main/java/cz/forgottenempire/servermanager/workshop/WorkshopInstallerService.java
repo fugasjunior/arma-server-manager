@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,11 +46,12 @@ class WorkshopInstallerService {
         this.installationService = installationService;
     }
 
+    @Transactional
     public void installOrUpdateMods(Collection<WorkshopMod> mods) {
         mods.forEach(mod -> {
             mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
             mod.setErrorStatus(null);
-            modsService.saveMod(mod);
+            modsService.saveModForInstallation(mod);
         });
 
         steamCmdService.installOrUpdateWorkshopMods(mods)
@@ -61,6 +63,7 @@ class WorkshopInstallerService {
     public void uninstallMod(WorkshopMod mod) {
         File modDirectory = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
         try {
+            deleteBiKeys(mod);
             deleteSymlink(mod);
             FileUtils.deleteDirectory(modDirectory);
         } catch (NoSuchFileException ignored) {
@@ -83,17 +86,17 @@ class WorkshopInstallerService {
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.GENERIC);
         } else {
-            log.info("Mod {} (id {}) successfully downloaded, now installing",
-                    mod.getName(), mod.getId());
+            log.info("Mod '{}' (ID {}) successfully downloaded, now installing", mod.getName(), mod.getId());
             installMod(mod);
         }
+
         modsService.saveMod(mod);
     }
 
     private void installMod(WorkshopMod mod) {
         try {
             convertModFilesToLowercase(mod);
-            copyBiKeys(mod);
+            updateBiKeys(mod);
             createSymlink(mod);
             updateModInfo(mod);
             mod.setInstallationStatus(InstallationStatus.FINISHED);
@@ -110,12 +113,27 @@ class WorkshopInstallerService {
         FileSystemUtils.directoryToLowercase(modDir);
     }
 
-    private void copyBiKeys(WorkshopMod mod) throws IOException {
+    private void updateBiKeys(WorkshopMod mod) throws IOException {
+        deleteBiKeys(mod);
+        installNewBiKeys(mod);
+    }
+
+    private void deleteBiKeys(WorkshopMod mod) {
+        mod.getBiKeys().forEach(biKey -> {
+            for (ServerType serverType : getRelevantServerTypes(mod)) {
+                File keyFile = pathsFactory.getServerKeyPath(biKey, serverType).toFile();
+                FileUtils.deleteQuietly(keyFile);
+            }
+        });
+    }
+
+    private void installNewBiKeys(WorkshopMod mod) throws IOException {
         String[] extensions = new String[]{"bikey"};
         File modDirectory = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
 
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
+            mod.addBiKey(key.getName());
             for (ServerType serverType : getRelevantServerTypes(mod)) {
                 log.debug("Copying BiKey {} to server {}", key.getName(), serverType);
                 FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), serverType).toFile());
