@@ -49,7 +49,8 @@ localClient[] = { "127.0.0.1"};`,
         automaticRestart: {
             enabled: false,
             time: null
-        }
+        },
+        networkSettings: null
     };
 }
 

@@ -34,7 +34,8 @@ export interface Arma3ServerDto extends ServerDto {
     activeMods: Array<ServerWorkshopModDto>,
     activeDLCs: Array<CreatorDlcDto>,
     additionalOptions: string,
-    difficultySettings: Arma3DifficultySettings
+    difficultySettings: Arma3DifficultySettings,
+    networkSettings: Arma3NetworkSettings | null
 }
 
 export interface Arma3DifficultySettings {
@@ -61,6 +62,18 @@ export interface Arma3DifficultySettings {
     aiLevelPreset: number,
     skillAI: number,
     precisionAI: number
+}
+
+export interface Arma3NetworkSettings {
+    maxMessagesSend: number | null
+    maxSizeGuaranteed: number | null
+    maxSizeNonguaranteed: number | null
+    minBandwidth: number | null
+    maxBandwidth: number | null
+    maxCustomFileSize: number | null
+    minErrorToSend: number | null
+    minErrorToSendNear: number | null
+    maxPacketSize: number | null
 }
 
 export interface DayZServerDto extends ServerDto {
