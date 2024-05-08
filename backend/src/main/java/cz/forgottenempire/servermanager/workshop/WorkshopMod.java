@@ -5,6 +5,8 @@ import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -36,6 +38,11 @@ public class WorkshopMod {
 
     @Enumerated(EnumType.STRING)
     private ServerType serverType;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "workshop_mod_bikey")
+    @Column(name = "bikey")
+    private Set<String> biKeys = new HashSet<>();
 
     public WorkshopMod(Long id) {
         this.id = id;
