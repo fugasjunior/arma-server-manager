@@ -43,6 +43,8 @@ type EnhancedTableProps = {
     customBottomControls?: ReactNode
 };
 
+const getRowsPerPageLocalStorageKey = (id: string) => id + "_rows_per_page";
+
 export const EnhancedTable = (
     {
         id,
@@ -79,17 +81,15 @@ export const EnhancedTable = (
             };
         });
 
-    const rowsPerPageLocalStorageKey = id + "_rows_per_page";
-
     function getInitialRowsPerPage() {
-        const rowsPerPageSetting = localStorage.getItem(rowsPerPageLocalStorageKey);
+        const rowsPerPageSetting = localStorage.getItem(getRowsPerPageLocalStorageKey(id));
         if (rowsPerPageSetting === null) {
             return 10;
         }
 
         const rowsPerPage = Number(rowsPerPageSetting);
         if (isNaN(rowsPerPage)) {
-            localStorage.removeItem(rowsPerPageLocalStorageKey);
+            localStorage.removeItem(getRowsPerPageLocalStorageKey(id));
             return 10;
         }
 
@@ -124,7 +124,7 @@ export const EnhancedTable = (
 
     const handleRowsPerPageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const rowsPerPage = event.target.value;
-        localStorage.setItem(rowsPerPageLocalStorageKey, rowsPerPage);
+        localStorage.setItem(getRowsPerPageLocalStorageKey(id), rowsPerPage);
 
         setRowsPerPage(parseInt(rowsPerPage, 10));
         setPageNumber(0);
