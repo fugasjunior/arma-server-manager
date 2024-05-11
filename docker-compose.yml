@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   db:
-    image: mysql
+    image: mysql:8.3.0
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
@@ -26,15 +26,14 @@ services:
     # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host
     # uncomment when running on Windows and add additional ports according to your needs
-    # ports:
-    #   - "8080:8080"
-    #   - "2302:2303/udp"
-    #   - "2303:2303/udp"
+    #    ports:
+    #      - "8080:8080"
+    #      - "2302-2305:2302-2305/udp"
+    #      - "27016:27016/udp"
     depends_on:
       - db
     volumes:
-      # Change the path where the servers will be stored on your server (first part before semicolon)
-      - /home/armaservermanager/storage:/home/steam/armaservermanager/
+      - "${STORAGE_PATH}:/home/steam/armaservermanager/"
     environment:
       AUTH_USERNAME: "${AUTH_USERNAME}"
       AUTH_PASSWORD: "${AUTH_PASSWORD}"
@@ -44,6 +43,7 @@ services:
       STEAM_API_KEY: "${STEAM_API_KEY}"
       JWT_SECRET: "${JWT_SECRET}"
       DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
+      TZ: "${TIMEZONE}"
 
 volumes:
   armaservermanager-db:

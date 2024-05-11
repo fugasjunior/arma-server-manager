@@ -1,1 +1,3 @@
 rootProject.name = 'arma3-server-gui'
+include(':frontend')
+include(':backend')

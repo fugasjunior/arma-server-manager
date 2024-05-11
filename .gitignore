@@ -4,6 +4,7 @@ config/*
 !config/application-docker.properties
 logs/
 .env
+docker-compose-dev.yml
 
 HELP.md
 .gradle

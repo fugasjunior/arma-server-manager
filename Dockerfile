@@ -1,5 +1,5 @@
 # --- Build ---
-FROM openjdk:17-jdk-slim-buster AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 
 ENV NODE_VERSION=16.13.0
 ENV NVM_DIR=/root/.nvm
@@ -25,7 +25,8 @@ COPY ./build.gradle /app
 COPY ./gradle /app/gradle
 COPY ./gradlew /app
 COPY ./settings.gradle /app
-COPY ./src /app/src
+COPY ./frontend /app/frontend
+COPY ./backend /app/backend
 
 # Build
 RUN chmod 555 ./gradlew \
@@ -36,7 +37,7 @@ RUN chmod 555 ./gradlew \
 # -- Create runtime image ---
 FROM cm2network/steamcmd AS runtime
 
-ENV APP_VERSION=1.2.0
+ENV APP_VERSION=1.3.0
 
 # TODO try to make the user not root. currently there are problems with mounted volumes ownership
 USER root
@@ -54,7 +55,7 @@ RUN dpkg --add-architecture i386 \
 
 WORKDIR /home/steam
 COPY ./config/application-docker.properties /home/steam/config/application.properties
-COPY --from=build /app/build/libs/arma3-server-gui-$APP_VERSION.jar /home/steam/app.jar
+COPY --from=build /app/backend/build/libs/backend-$APP_VERSION.jar /home/steam/app.jar
 
 RUN chown -R root:root /home/steam \
     && chmod -R 755 /home/steam
@@ -70,4 +71,4 @@ ENV DIRECTORY_LOGS=/home/steam/armaservermanager/logs
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["java"]
-CMD ["-jar", "./app.jar"]
+CMD ["-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "./app.jar"]
