@@ -25,7 +25,7 @@ For more comprehensive list of features, see [Features](#features).
     - [Scenarios](#scenarios)
     - [Additional game servers](#additional-game-servers)
 - [Installation](#installation)
-    - [Docker setup (recommended)](#docker-setup-recommended)
+    - [Docker setup](#docker-setup-recommended) _(recommended)_
         - [Prerequisites](#prerequisites)
         - [Installation](#installation)
     - [Custom installation without Docker](#custom-installation-without-docker)
@@ -54,9 +54,6 @@ For more comprehensive list of features, see [Features](#features).
 ### Host multiple game servers
 Manage multiple **Arma 3**, **DayZ***, **DayZ Experimental** and **Arma Reforger** servers. With SteamCMD running in 
 the background, server installation is fully automated and installing and updating the server takes just a single click.
-
-*\* Unfortunately, DayZ (stable) server is currently only available on Windows and is not available when using Docker 
-to run the manager because of this.*
 
 ### Server configuration
 You can create multiple servers for each supported game.
@@ -107,11 +104,9 @@ To run the manager, you can use the following files:
 
 `docker-compose.yml`
 ```yml
-version: '3.3'
-
 services:
   db:
-    image: mysql
+    image: mysql:8.3.0
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
@@ -134,16 +129,15 @@ services:
     restart: always
     # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host
-    # uncomment when running on Windows and add additional ports according to your needs 
-    # ports:
-    #   - "8080:8080"
-    #   - "2302:2303/udp"
-    #   - "2303:2303/udp"
+    # uncomment when running on Windows and add additional ports according to your needs
+    #    ports:
+    #      - "8080:8080"
+    #      - "2302-2305:2302-2305/udp"
+    #      - "27016:27016/udp"
     depends_on:
       - db
     volumes:
-      # Change the path where the servers will be stored on your server (first part before semicolon)
-      - /home/armaservermanager/storage:/home/steam/armaservermanager/
+      - "${STORAGE_PATH}:/home/steam/armaservermanager/"
     environment:
       AUTH_USERNAME: "${AUTH_USERNAME}"
       AUTH_PASSWORD: "${AUTH_PASSWORD}"
@@ -153,6 +147,7 @@ services:
       STEAM_API_KEY: "${STEAM_API_KEY}"
       JWT_SECRET: "${JWT_SECRET}"
       DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
+      TZ: "${TIMEZONE}"
 
 volumes:
   armaservermanager-db:
@@ -163,6 +158,9 @@ volumes:
 # App version
 VERSION=latest
 
+# Change the path where the servers files and mods will be stored on your server
+STORAGE_PATH=/home/armaservermanager/storage
+
 # Username and password for accessing the web interface
 AUTH_USERNAME=test
 AUTH_PASSWORD=password
@@ -170,6 +168,8 @@ AUTH_PASSWORD=password
 # Database settings. Make sure to change the password and root password
 MYSQL_DB_NAME=armaservermanager_db
 MYSQL_DB_URL=jdbc:mysql://localhost:3306/armaservermanager_db
+# For Windows, use the following URL instead:
+# MYSQL_DB_URL=jdbc:mysql://db:3306/armaservermanager_db
 MYSQL_USER=armaservermanager
 MYSQL_PASSWORD=example
 MYSQL_ROOT_PASSWORD=change_me
@@ -188,6 +188,9 @@ JWT_SECRET=
 # This setting is optional. In case the secret is not provided, the password will be stored in plain text form.
 # Also make sure there are no '$' symbols in the secret which cause issues when being passed through the .env file
 DATABASE_ENCRYPTION_SECRET=
+
+# Set the right Timezone from https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, example Europe/London , US/Pacific , etc
+TIMEZONE=
 ```
 
 You can also find these files for download in the root of the repository.
@@ -200,8 +203,7 @@ the database and the server manager up. It should then be accessible on http://l
 
 ### Custom installation without Docker
 While the Docker approach is recommended because of the ease of setup, there might be reasons why you'd wish to run
-the manager natively. A noteworthy reason for this would be if you have a Windows server and wish to run DayZ stable
-server, which is currently unsupported on Linux.
+the manager natively.
 
 You can find the `.jar` file in releases section of this repository. Follow the next steps to set it up manually.
 
@@ -284,7 +286,7 @@ Setup of an additional server requires you to access the database directly and i
 
 1. Install and configure the server you wish to control with the app.
 2. Create a shell script used to start the server executable with necessary parameters.
-3. Execute the following statement in the database (e.g. using PgAdmin which comes with the basic docker-compose file)
+3. Execute the following statement in the database (e.g. using Adminer which comes with the basic docker-compose file)
 
 ```sql
 INSERT INTO `additional_server` (`id`, `name`, `command`, `server_dir`, `image_url`)
