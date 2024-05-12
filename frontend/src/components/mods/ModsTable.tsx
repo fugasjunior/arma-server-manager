@@ -10,9 +10,12 @@ import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
 import {ServerType} from "../../dtos/ServerDto.ts";
 import SERVER_NAMES from "../../util/serverNames.ts";
 import {humanFileSize} from "../../util/util.ts";
+import {SteamCmdItemInfoDto, SteamCmdStatus} from "../../dtos/SteamCmdItemInfoDto.ts";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
@@ -57,6 +60,7 @@ type ModsTableProps = {
     dayZModsCount: number,
     mixedModsSelected: boolean,
     loading: boolean,
+    steamCmdItemInfo: { [id: number]: SteamCmdItemInfoDto }
     onModInstallClicked: (modId: number) => void,
     onModUpdateClicked: () => void,
     onCreatePresetClicked: () => void,
@@ -64,7 +68,7 @@ type ModsTableProps = {
     onFilterChange: (_: any, newValue: string) => void,
     onRowClick: (rowId: number | string) => void,
     onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
-    onServerOnlyChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void
+    onServerOnlyChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void,
 }
 
 const ModsTable = (props: ModsTableProps) => {
@@ -81,7 +85,16 @@ const ModsTable = (props: ModsTableProps) => {
         const status = mod.installationStatus;
         const error = mod.errorStatus;
 
+        const modItemInfo = props.steamCmdItemInfo[mod.id];
+
         if (status === "INSTALLATION_IN_PROGRESS") {
+            if (modItemInfo?.status === SteamCmdStatus.IN_QUEUE) {
+                return <Tooltip title="In queue"><HourglassBottomIcon/></Tooltip>;
+            }
+            if (modItemInfo?.status === SteamCmdStatus.FINISHED) {
+                return <Tooltip title="Waiting for installation"><DownloadDoneIcon/></Tooltip>;
+            }
+
             return <CircularProgress size={20}/>;
         }
         if (status === "ERROR") {
@@ -90,7 +103,7 @@ const ModsTable = (props: ModsTableProps) => {
         }
 
         if (status === "FINISHED") {
-            return <CheckIcon/>;
+            return <Tooltip title="Installed"><CheckIcon/></Tooltip>;
         }
     };
 
