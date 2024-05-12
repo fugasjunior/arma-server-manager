@@ -8,13 +8,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 @Component
-public class SteamCmdOutputProcessor {
-    void processSteamCmdOutput(StringBuilder result, InputStream processOutput) throws IOException {
+class SteamCmdOutputProcessor {
+    String processSteamCmdOutput(InputStream processOutput) throws IOException {
+        StringBuilder result = new StringBuilder();
+
         try (BufferedReader steamCmdOuput = new BufferedReader(new InputStreamReader(processOutput))) {
             String line;
             while ((line = steamCmdOuput.readLine()) != null) {
                 result.append(line);
             }
         }
+
+        return result.toString();
     }
 }

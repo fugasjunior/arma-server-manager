@@ -64,16 +64,16 @@ class SteamCmdExecutor {
         try {
             int attempts = 0;
             int exitCode;
-            StringBuilder output = new StringBuilder();
+            String output;
 
             do {
                 attempts++;
                 Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
-                steamCmdOutputProcessor.processSteamCmdOutput(output, process.getInputStream());
+                output = steamCmdOutputProcessor.processSteamCmdOutput(process.getInputStream());
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
-            handleProcessResult(output.toString(), job);
+            handleProcessResult(output, job);
         } catch (SteamAuthNotSetException e) {
             log.error("SteamAuth is not set up");
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
