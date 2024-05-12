@@ -18,11 +18,17 @@ public class SteamCmdOutputProcessor {
 
     private final PathsFactory pathsFactory;
     private final SteamCmdOutputLineFactory steamCmdOutputLineFactory;
+    private final SteamCmdItemInfoRepository itemInfoRepository;
 
     @Autowired
-    SteamCmdOutputProcessor(PathsFactory pathsFactory, SteamCmdOutputLineFactory steamCmdOutputLineFactory) {
+    SteamCmdOutputProcessor(
+            PathsFactory pathsFactory,
+            SteamCmdOutputLineFactory steamCmdOutputLineFactory,
+            SteamCmdItemInfoRepository itemInfoRepository
+    ) {
         this.pathsFactory = pathsFactory;
         this.steamCmdOutputLineFactory = steamCmdOutputLineFactory;
+        this.itemInfoRepository = itemInfoRepository;
     }
 
     public String processSteamCmdOutput(InputStream processOutput, SteamCmdJob job) throws IOException {
@@ -51,8 +57,10 @@ public class SteamCmdOutputProcessor {
 
         SteamCmdOutputLine lineObject = steamCmdOutputLineFactory.createSteamCmdOutputLine(normalizedLine, job);
 
+        // TODO remove logs
         if (lineObject != null) {
             SteamCmdItemInfo itemInfo = lineObject.parseInfo();
+            itemInfoRepository.store(itemInfo.itemId(), itemInfo);
             log.info("{}: {}", itemInfo.itemId(), itemInfo);
         } else {
             log.info("itemInfo was null");
