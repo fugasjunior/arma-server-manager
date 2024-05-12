@@ -1,20 +1,19 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.steamcmd.lines.WorkshopItemDownloadSuccessLine;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 @Slf4j
-class SteamCmdOutputProcessor {
+public class SteamCmdOutputProcessor {
 
     private final PathsFactory pathsFactory;
     private final Pattern itemIdFromSuccess = Pattern.compile("downloaded item (\\d+)");
@@ -48,28 +47,17 @@ class SteamCmdOutputProcessor {
 
     private void processLine(String line) {
         String lowerCaseLine = line.toLowerCase();
+        SteamCmdItemInfo itemInfo = null;
 
         if (lowerCaseLine.startsWith("success. downloaded item")) {
-            Matcher matcher = itemIdFromSuccess.matcher(lowerCaseLine);
-            matcher.find();
-            String idString = matcher.group(1);
-            if (StringUtils.isBlank(idString)) {
-                log.error("Failed to parse item ID from line '{}'", lowerCaseLine);
-            }
+            WorkshopItemDownloadSuccessLine line2 = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
+            itemInfo = line2.parseInfo();
+        }
 
-            try {
-                long itemId = Long.parseLong(idString);
-
-                Matcher bytesMatcher = bytesFromSuccess.matcher(lowerCaseLine);
-                bytesMatcher.find();
-                long bytes = Long.parseLong(bytesMatcher.group(1));
-
-                SteamCmdItemInfo itemInfo = new SteamCmdItemInfo(SteamCmdStatus.FINISHED, 100, bytes, bytes);
-
-                log.info("{}: {}", itemId, itemInfo);
-            } catch (NumberFormatException e) {
-                log.error("Failed to parse item ID '{}' to long", idString, e);
-            }
+        if (itemInfo != null) {
+            log.info("{}: {}", itemInfo.itemId(), itemInfo);
+        } else {
+            log.info("itemInfo was null");
         }
     }
 
@@ -97,7 +85,7 @@ class SteamCmdOutputProcessor {
         return timeFormat.format(new Date());
     }
 
-    public record SteamCmdItemInfo(SteamCmdStatus status, long progressPercent, long bytesFinished, long bytesDone) {
+    public record SteamCmdItemInfo(long itemId, SteamCmdStatus status, long progressPercent, long bytesFinished, long bytesDone) {
     }
 
     public enum SteamCmdStatus {
