@@ -65,7 +65,7 @@ class SteamCmdExecutor {
 
             do {
                 attempts++;
-                Process process = processFactory.startProcess(steamCmdFile, getCommands(job.getSteamCmdParameters()));
+                Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
                 output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
