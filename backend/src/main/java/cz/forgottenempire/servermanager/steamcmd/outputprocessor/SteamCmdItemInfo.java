@@ -3,9 +3,9 @@ package cz.forgottenempire.servermanager.steamcmd.outputprocessor;
 public record SteamCmdItemInfo(
         long itemId,
         SteamCmdStatus status,
-        long progressPercent,
+        double progressPercent,
         long bytesFinished,
-        long bytesDone
+        long bytesTotal
 ) {
     public enum SteamCmdStatus {
         FINISHED,

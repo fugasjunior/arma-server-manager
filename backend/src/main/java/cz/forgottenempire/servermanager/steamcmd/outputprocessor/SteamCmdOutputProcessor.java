@@ -1,7 +1,10 @@
 package cz.forgottenempire.servermanager.steamcmd.outputprocessor;
 
+import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.AppDownloadSuccessLine;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.AppUpdateProgressLine;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLine;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.WorkshopItemDownloadSuccessLine;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +26,7 @@ public class SteamCmdOutputProcessor {
         this.pathsFactory = pathsFactory;
     }
 
-    public String processSteamCmdOutput(InputStream processOutput) throws IOException {
+    public String processSteamCmdOutput(InputStream processOutput, SteamCmdJob job) throws IOException {
         StringBuilder result = new StringBuilder();
 
         File logFile = prepareLogFile();
@@ -32,7 +35,7 @@ public class SteamCmdOutputProcessor {
              BufferedWriter fileLogger = new BufferedWriter(new FileWriter(logFile, true))) {
             String line;
             while ((line = steamCmdOuput.readLine()) != null) {
-                processLine(line);
+                processLine(line, job);
                 result.append(line);
                 log.debug(line);
                 writeLineIntoLogFile(fileLogger, line);
@@ -44,14 +47,16 @@ public class SteamCmdOutputProcessor {
         return result.toString();
     }
 
-    private void processLine(String line) {
-        String lowerCaseLine = line.toLowerCase();
+    private void processLine(String line, SteamCmdJob job) {
+        String lowerCaseLine = line.toLowerCase().trim();
 
         SteamCmdOutputLine lineObject = null;
         if (lowerCaseLine.startsWith("success. downloaded item")) {
             lineObject = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
         } else if (lowerCaseLine.startsWith("success! app")) {
             lineObject = new AppDownloadSuccessLine(lowerCaseLine, 0);
+        } else if (lowerCaseLine.startsWith("update state (0x61) downloading")) {
+            lineObject = new AppUpdateProgressLine(lowerCaseLine, Constants.GAME_IDS.get(job.getRelatedServer()));
         }
 
         if (lineObject != null) {
