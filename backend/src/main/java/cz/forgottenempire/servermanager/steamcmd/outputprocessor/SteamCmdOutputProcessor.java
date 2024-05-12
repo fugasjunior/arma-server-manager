@@ -70,7 +70,8 @@ public class SteamCmdOutputProcessor {
     private static String[] normalizeLine(String line) {
         String normalizedLine = line.toLowerCase().trim();
         String[] lines;
-        if (!normalizedLine.startsWith("downloading item") && normalizedLine.contains("downloading item")) {
+        boolean isTwoLinesWithoutLineBreak = !normalizedLine.startsWith("downloading item") && normalizedLine.contains("downloading item");
+        if (isTwoLinesWithoutLineBreak) {
             lines = normalizedLine.split("downloading item");
             lines[1] = "downloading item" + lines[1];
         } else {
