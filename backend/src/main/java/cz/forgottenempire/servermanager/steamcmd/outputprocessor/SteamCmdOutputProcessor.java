@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.steamcmd.outputprocessor;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.AppDownloadSuccessLine;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLine;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.WorkshopItemDownloadSuccessLine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,17 +46,16 @@ public class SteamCmdOutputProcessor {
 
     private void processLine(String line) {
         String lowerCaseLine = line.toLowerCase();
-        SteamCmdItemInfo itemInfo = null;
 
+        SteamCmdOutputLine lineObject = null;
         if (lowerCaseLine.startsWith("success. downloaded item")) {
-            WorkshopItemDownloadSuccessLine lineObject = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
-            itemInfo = lineObject.parseInfo();
+            lineObject = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
         } else if (lowerCaseLine.startsWith("success! app")) {
-            AppDownloadSuccessLine lineObject = new AppDownloadSuccessLine(lowerCaseLine, 0);
-            itemInfo = lineObject.parseInfo();
+            lineObject = new AppDownloadSuccessLine(lowerCaseLine, 0);
         }
 
-        if (itemInfo != null) {
+        if (lineObject != null) {
+            SteamCmdItemInfo itemInfo = lineObject.parseInfo();
             log.info("{}: {}", itemInfo.itemId(), itemInfo);
         } else {
             log.info("itemInfo was null");
