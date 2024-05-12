@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.modpreset.ModPresetsService;
 import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -24,8 +25,11 @@ public class WorkshopModsService {
     private final ModPresetsService modPresetsService;
 
     @Autowired
-    public WorkshopModsService(WorkshopModRepository modRepository, ServerRepository serverRepository,
-            ModPresetsService modPresetsService) {
+    public WorkshopModsService(
+            WorkshopModRepository modRepository,
+            ServerRepository serverRepository,
+            ModPresetsService modPresetsService
+    ) {
         this.modRepository = modRepository;
         this.serverRepository = serverRepository;
         this.modPresetsService = modPresetsService;
@@ -47,9 +51,9 @@ public class WorkshopModsService {
         return modRepository.save(mod);
     }
 
-    public void saveModForInstallation(WorkshopMod mod) {
-        modRepository.save(mod);
-        Hibernate.initialize(mod.getBiKeys());
+    public void saveAllModsForInstallation(List<WorkshopMod> mods) {
+        saveAllMods(mods);
+        mods.forEach(mod -> Hibernate.initialize(mod.getBiKeys()));
     }
 
     public List<WorkshopMod> saveAllMods(List<WorkshopMod> mods) {

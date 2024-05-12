@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.workshop;
 
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
@@ -59,15 +60,21 @@ public class WorkshopModsFacade {
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
-                .peek((mod) -> {
-                    ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
-                    mod.setName(modMetadata.name());
-                    setModServerType(mod, modMetadata.consumerAppId());
-                    validateServerInitialized(mod);
-                })
                 .toList();
 
+        workshopMods.forEach(mod -> {
+            mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+            mod.setErrorStatus(null);
+        });
         modsService.saveAllMods(workshopMods);
+
+        workshopMods.forEach(mod -> {
+            ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
+            mod.setName(modMetadata.name());
+            setModServerType(mod, modMetadata.consumerAppId());
+            validateServerInitialized(mod);
+        });
+        modsService.saveAllModsForInstallation(workshopMods);
 
         installerService.installOrUpdateMods(workshopMods);
         return workshopMods;
