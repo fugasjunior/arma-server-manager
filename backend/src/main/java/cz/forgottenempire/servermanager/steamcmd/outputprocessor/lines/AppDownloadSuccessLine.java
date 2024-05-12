@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-public class AppDownloadSuccessLine {
+public class AppDownloadSuccessLine implements SteamCmdOutputLine {
     private static final Pattern ITEM_ID_PATTERN = Pattern.compile("'(\\d+)'");
     private final String lowerCaseLine;
     private final long bytes;
@@ -18,6 +18,7 @@ public class AppDownloadSuccessLine {
         this.bytes = bytes;
     }
 
+    @Override
     public SteamCmdItemInfo parseInfo() {
         SteamCmdItemInfo itemInfo = null;
         Matcher matcher = ITEM_ID_PATTERN.matcher(lowerCaseLine);
