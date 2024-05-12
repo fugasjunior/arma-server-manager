@@ -1,9 +1,9 @@
 package cz.forgottenempire.servermanager.steamcmd.outputprocessor;
 
-import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
-import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.*;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLine;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLineFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,10 +17,12 @@ import java.util.Date;
 public class SteamCmdOutputProcessor {
 
     private final PathsFactory pathsFactory;
+    private final SteamCmdOutputLineFactory steamCmdOutputLineFactory;
 
     @Autowired
-    SteamCmdOutputProcessor(PathsFactory pathsFactory) {
+    SteamCmdOutputProcessor(PathsFactory pathsFactory, SteamCmdOutputLineFactory steamCmdOutputLineFactory) {
         this.pathsFactory = pathsFactory;
+        this.steamCmdOutputLineFactory = steamCmdOutputLineFactory;
     }
 
     public String processSteamCmdOutput(InputStream processOutput, SteamCmdJob job) throws IOException {
@@ -47,16 +49,7 @@ public class SteamCmdOutputProcessor {
     private void processLine(String line, SteamCmdJob job) {
         String normalizedLine = line.toLowerCase().trim();
 
-        SteamCmdOutputLine lineObject = null;
-        if (normalizedLine.startsWith("success. downloaded item")) {
-            lineObject = new WorkshopItemDownloadSuccessLine(normalizedLine);
-        } else if (normalizedLine.startsWith("success! app")) {
-            lineObject = new AppDownloadSuccessLine(normalizedLine, 0);
-        } else if (normalizedLine.startsWith("update state (0x61) downloading")) {
-            lineObject = new AppUpdateProgressLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
-        } else if (normalizedLine.startsWith("update state (0x81) verifying update")) {
-            lineObject = new AppUpdateVerificationLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
-        }
+        SteamCmdOutputLine lineObject = steamCmdOutputLineFactory.createSteamCmdOutputLine(normalizedLine, job);
 
         if (lineObject != null) {
             SteamCmdItemInfo itemInfo = lineObject.parseInfo();
