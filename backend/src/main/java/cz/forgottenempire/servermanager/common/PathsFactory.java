@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Component
 public class PathsFactory {
@@ -110,6 +112,13 @@ public class PathsFactory {
 
     public File getHeadlessClientLogFile(long serverId, int headlessClientId) {
         return Path.of(logsBasePath.toString(), "ARMA3_" + serverId + "_HC " + headlessClientId + ".log").toFile();
+    }
+
+    public File getSteamCmdLogFile() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
+        String formattedDate = dateFormat.format(new Date());
+
+        return Path.of(logsBasePath.toString(), "steamcmd", "steamcmd_" + formattedDate + ".log").toFile();
     }
 
     private Path getServerExecutable(ServerType type) {
