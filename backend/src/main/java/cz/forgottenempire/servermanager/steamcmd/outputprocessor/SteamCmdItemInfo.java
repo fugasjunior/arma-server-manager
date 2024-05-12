@@ -9,7 +9,8 @@ public record SteamCmdItemInfo(
 ) {
     public enum SteamCmdStatus {
         FINISHED,
-        IN_PROGRESS,
+        VERIFYING,
+        DOWNLOADING,
         ERROR
     }
 }

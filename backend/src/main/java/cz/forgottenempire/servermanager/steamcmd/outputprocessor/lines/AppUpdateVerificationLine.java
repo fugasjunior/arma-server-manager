@@ -7,13 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-public class AppUpdateProgressLine implements SteamCmdOutputLine {
-
+public class AppUpdateVerificationLine implements SteamCmdOutputLine {
     private static final Pattern BYTES_PATTERN = Pattern.compile("\\((\\d+)\\s/\\s(\\d+)\\)");
     private final String lowerCaseLine;
     private final long appId;
 
-    public AppUpdateProgressLine(String lowerCaseLine, long appId) {
+    public AppUpdateVerificationLine(String lowerCaseLine, long appId) {
         this.lowerCaseLine = lowerCaseLine;
         this.appId = appId;
     }
@@ -26,7 +25,7 @@ public class AppUpdateProgressLine implements SteamCmdOutputLine {
             matcher.find();
             long bytesFinished = Long.parseLong(matcher.group(1));
             long bytesTotal = Long.parseLong(matcher.group(2));
-            itemInfo = new SteamCmdItemInfo(appId, SteamCmdItemInfo.SteamCmdStatus.DOWNLOADING, (double) bytesFinished / bytesTotal, bytesFinished, bytesTotal);
+            itemInfo = new SteamCmdItemInfo(appId, SteamCmdItemInfo.SteamCmdStatus.VERIFYING, (double) bytesFinished / bytesTotal, bytesFinished, bytesTotal);
         } catch (NumberFormatException e) {
             log.error("Failed to parse line");
         }

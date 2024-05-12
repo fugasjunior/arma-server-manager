@@ -3,10 +3,7 @@ package cz.forgottenempire.servermanager.steamcmd.outputprocessor;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
-import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.AppDownloadSuccessLine;
-import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.AppUpdateProgressLine;
-import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLine;
-import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.WorkshopItemDownloadSuccessLine;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,6 +54,8 @@ public class SteamCmdOutputProcessor {
             lineObject = new AppDownloadSuccessLine(normalizedLine, 0);
         } else if (normalizedLine.startsWith("update state (0x61) downloading")) {
             lineObject = new AppUpdateProgressLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
+        } else if (normalizedLine.startsWith("update state (0x81) verifying update")) {
+            lineObject = new AppUpdateVerificationLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
         }
 
         if (lineObject != null) {
