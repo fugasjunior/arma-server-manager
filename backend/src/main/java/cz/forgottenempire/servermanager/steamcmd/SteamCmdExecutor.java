@@ -32,14 +32,18 @@ class SteamCmdExecutor {
     private final File steamCmdFile;
     private final SteamAuthService steamAuthService;
     private final ProcessFactory processFactory;
+    private final SteamCmdOutputProcessor steamCmdOutputProcessor;
 
     @Autowired
     public SteamCmdExecutor(
             @Value("${steamcmd.path}") String steamCmdFilePath,
             SteamAuthService steamAuthService,
-            ProcessFactory processFactory) {
+            ProcessFactory processFactory,
+            SteamCmdOutputProcessor steamCmdOutputProcessor
+    ) {
         this.steamAuthService = steamAuthService;
         this.processFactory = processFactory;
+        this.steamCmdOutputProcessor = steamCmdOutputProcessor;
         steamCmdFile = new File(steamCmdFilePath);
         if (!steamCmdFile.exists()) {
             throw new IllegalStateException("Invalid path to SteamCMD executable given");
@@ -65,7 +69,7 @@ class SteamCmdExecutor {
             do {
                 attempts++;
                 Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
-                processSteamCmdOutput(output, process.getInputStream());
+                steamCmdOutputProcessor.processSteamCmdOutput(output, process.getInputStream());
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
@@ -79,15 +83,6 @@ class SteamCmdExecutor {
         } catch (Exception e) {
             log.error("SteamCMD job failed", e);
             job.setErrorStatus(ErrorStatus.GENERIC);
-        }
-    }
-
-    private void processSteamCmdOutput(StringBuilder result, InputStream processOutput) throws IOException {
-        try (BufferedReader steamCmdOuput = new BufferedReader(new InputStreamReader(processOutput))) {
-            String line;
-            while ((line = steamCmdOuput.readLine()) != null) {
-                result.append(line);
-            }
         }
     }
 
