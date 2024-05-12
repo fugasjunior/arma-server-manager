@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
+@Slf4j
 class SteamCmdOutputProcessor {
 
     private final PathsFactory pathsFactory;
@@ -28,6 +30,7 @@ class SteamCmdOutputProcessor {
             String line;
             while ((line = steamCmdOuput.readLine()) != null) {
                 result.append(line);
+                log.debug(line);
                 writeLineIntoLogFile(fileLogger, line);
             }
 
