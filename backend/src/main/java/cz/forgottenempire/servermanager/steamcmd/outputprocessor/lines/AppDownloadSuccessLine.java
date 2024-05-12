@@ -1,6 +1,6 @@
-package cz.forgottenempire.servermanager.steamcmd.lines;
+package cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines;
 
-import cz.forgottenempire.servermanager.steamcmd.SteamCmdOutputProcessor;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdOutputProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

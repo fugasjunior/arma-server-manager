@@ -1,8 +1,8 @@
-package cz.forgottenempire.servermanager.steamcmd;
+package cz.forgottenempire.servermanager.steamcmd.outputprocessor;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.steamcmd.lines.AppDownloadSuccessLine;
-import cz.forgottenempire.servermanager.steamcmd.lines.WorkshopItemDownloadSuccessLine;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.AppDownloadSuccessLine;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.WorkshopItemDownloadSuccessLine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 @Component
 @Slf4j
@@ -23,7 +22,7 @@ public class SteamCmdOutputProcessor {
         this.pathsFactory = pathsFactory;
     }
 
-    String processSteamCmdOutput(InputStream processOutput) throws IOException {
+    public String processSteamCmdOutput(InputStream processOutput) throws IOException {
         StringBuilder result = new StringBuilder();
 
         File logFile = prepareLogFile();
