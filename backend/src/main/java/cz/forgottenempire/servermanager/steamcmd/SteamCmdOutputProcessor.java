@@ -30,6 +30,8 @@ class SteamCmdOutputProcessor {
                 result.append(line);
                 writeLineIntoLogFile(fileLogger, line);
             }
+
+            writeSeparatorIntoLogFile(fileLogger);
         }
 
         return result.toString();
@@ -44,6 +46,12 @@ class SteamCmdOutputProcessor {
 
     private static void writeLineIntoLogFile(BufferedWriter fileLogger, String line) throws IOException {
         fileLogger.write(getCurrentTime() + " " + line);
+        fileLogger.newLine();
+        fileLogger.flush();
+    }
+
+    private static void writeSeparatorIntoLogFile(BufferedWriter fileLogger) throws IOException {
+        fileLogger.newLine();
         fileLogger.newLine();
         fileLogger.flush();
     }
