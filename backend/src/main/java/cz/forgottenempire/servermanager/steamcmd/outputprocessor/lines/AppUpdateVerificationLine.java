@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo.*;
+
 @Slf4j
 public class AppUpdateVerificationLine implements SteamCmdOutputLine {
     private static final Pattern BYTES_PATTERN = Pattern.compile("\\((\\d+)\\s/\\s(\\d+)\\)");
@@ -25,7 +27,7 @@ public class AppUpdateVerificationLine implements SteamCmdOutputLine {
             matcher.find();
             long bytesFinished = Long.parseLong(matcher.group(1));
             long bytesTotal = Long.parseLong(matcher.group(2));
-            itemInfo = new SteamCmdItemInfo(appId, SteamCmdItemInfo.SteamCmdStatus.VERIFYING, (double) bytesFinished / bytesTotal, bytesFinished, bytesTotal);
+            itemInfo = new SteamCmdItemInfo(appId, SteamCmdStatus.VERIFYING, (double) bytesFinished / bytesTotal, bytesFinished, bytesTotal);
         } catch (NumberFormatException e) {
             log.error("Failed to parse line");
         }

@@ -9,8 +9,11 @@ import java.util.regex.Pattern;
 @Component
 public class SteamCmdOutputLineFactory {
 
-    public static Pattern UPDATE_STATE_DOWNLOADING = Pattern.compile("update state \\(0x\\d+\\) downloading");
-    public static Pattern UPDATE_STATE_VERIFYING = Pattern.compile("update state \\(0x\\d+\\) verifying");
+    private static final String UPDATE_STATE_REGEX_PREFIX = "update state \\(0x\\d+\\) ";
+    private final static Pattern UPDATE_STATE_DOWNLOADING = Pattern.compile(UPDATE_STATE_REGEX_PREFIX + "downloading");
+    private final static Pattern UPDATE_STATE_VERIFYING = Pattern.compile(UPDATE_STATE_REGEX_PREFIX + "verifying");
+    private final static Pattern UPDATE_STATE_PREALLOCATING = Pattern.compile(UPDATE_STATE_REGEX_PREFIX + "preallocating");
+    private final static Pattern UPDATE_STATE_COMMITTING = Pattern.compile(UPDATE_STATE_REGEX_PREFIX + "committing");
 
     public SteamCmdOutputLine createSteamCmdOutputLine(String normalizedLine, SteamCmdJob job) {
         SteamCmdOutputLine lineObject;
@@ -22,6 +25,10 @@ public class SteamCmdOutputLineFactory {
             lineObject = new AppUpdateProgressLine(normalizedLine, Constants.SERVER_IDS.get(job.getRelatedServer()));
         } else if (UPDATE_STATE_VERIFYING.matcher(normalizedLine).find()) {
             lineObject = new AppUpdateVerificationLine(normalizedLine, Constants.SERVER_IDS.get(job.getRelatedServer()));
+        } else if (UPDATE_STATE_PREALLOCATING.matcher(normalizedLine).find()) {
+            lineObject = new AppUpdatePreallocatingLine(normalizedLine, Constants.SERVER_IDS.get(job.getRelatedServer()));
+        } else if (UPDATE_STATE_COMMITTING.matcher(normalizedLine).find()) {
+            lineObject = new AppUpdateCommittingLine(normalizedLine, Constants.SERVER_IDS.get(job.getRelatedServer()));
         } else {
             lineObject = null;
         }

@@ -11,6 +11,7 @@ public record SteamCmdItemInfo(
         FINISHED,
         VERIFYING,
         DOWNLOADING,
-        ERROR
+        PREALLOCATING,
+        COMMITTING
     }
 }
