@@ -22,6 +22,8 @@ import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ErrorStatus} from "../../dtos/Status.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
 import {ServerBranchSelect} from "./ServerBranchSelect.tsx";
+import {SteamCmdItemInfoDto, SteamCmdStatus} from "../../dtos/SteamCmdItemInfoDto.ts";
+import {humanFileSize} from "../../util/util.ts";
 
 const SERVER_IMAGE_URLS = new Map<ServerType, string>([
     [ServerType.ARMA3, arma3Logo],
@@ -37,13 +39,47 @@ const isInstalling = (installation: ServerInstallationDto) => {
 type ServerInstallationItemProps = {
     installation: ServerInstallationDto,
     onUpdateClicked: (serverType: ServerType) => void,
-    onBranchChanged: (e: SelectChangeEvent, serverType: ServerType) => Promise<void>
+    onBranchChanged: (e: SelectChangeEvent, serverType: ServerType) => Promise<void>,
+    steamCmdItemInfo: SteamCmdItemInfoDto | undefined
 }
 
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
-    const {installation, onUpdateClicked, onBranchChanged} = props;
+    const {installation, steamCmdItemInfo, onUpdateClicked, onBranchChanged} = props;
 
     const hasMultipleAvailableBranches = () => installation.availableBranches.length > 1;
+
+    const getProgressBar = () => {
+        if (steamCmdItemInfo && steamCmdItemInfo.bytesTotal) {
+            const progressPercent = (steamCmdItemInfo.bytesFinished / steamCmdItemInfo.bytesTotal) * 100;
+            return <LinearProgress variant="determinate" value={progressPercent}/>
+        }
+        return <LinearProgress/>;
+    };
+
+    const getActionButton = () => {
+        if (isInstalling(installation) && steamCmdItemInfo === undefined) {
+            return <Button fullWidth variant="contained" disabled>
+                {installation.lastUpdatedAt === null ?
+                    "Installing..." : "Updating..."
+                }
+            </Button>
+        }
+
+        if (isInstalling(installation) && steamCmdItemInfo !== undefined) {
+            return <Button fullWidth variant="contained" disabled>
+                {steamCmdItemInfo.status === SteamCmdStatus.FINISHED ? "STARTING UP FOR TEST" : steamCmdItemInfo.status}&nbsp;
+                {steamCmdItemInfo.status !== SteamCmdStatus.FINISHED && `(${humanFileSize(steamCmdItemInfo.bytesFinished)} / ${humanFileSize(steamCmdItemInfo.bytesTotal)})`}
+            </Button>
+        }
+
+        return <Button fullWidth variant="contained"
+                       onClick={() => onUpdateClicked(ServerType[installation.type])}
+                       color={installation.errorStatus === null ? "primary" : "error"}
+        >
+            {installation.errorStatus !== null && "Retry "}
+            {installation.lastUpdatedAt === null ? "Install" : "Update"}
+        </Button>
+    }
 
     return (
         <Card sx={{maxWidth: "540px"}}>
@@ -91,27 +127,12 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                             </Typography>
                         }
                     </Stack>
-
                     :
-                    <LinearProgress/>
+                    getProgressBar()
                 }
             </CardContent>
             <CardActions>
-                {isInstalling(installation) ?
-                    <Button fullWidth variant="contained" disabled>
-                        {installation.lastUpdatedAt === null ?
-                            "Installing..." : "Updating..."
-                        }
-                    </Button>
-                    :
-                    <Button fullWidth variant="contained"
-                            onClick={() => onUpdateClicked(ServerType[installation.type])}
-                            color={installation.errorStatus === null ? "primary" : "error"}
-                    >
-                        {installation.errorStatus !== null && "Retry "}
-                        {installation.lastUpdatedAt === null ? "Install" : "Update"}
-                    </Button>
-                }
+                {getActionButton()}
             </CardActions>
         </Card>
     );
