@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.steamcmd.lines.AppDownloadSuccessLine;
 import cz.forgottenempire.servermanager.steamcmd.lines.WorkshopItemDownloadSuccessLine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,6 @@ import java.util.regex.Pattern;
 public class SteamCmdOutputProcessor {
 
     private final PathsFactory pathsFactory;
-    private final Pattern itemIdFromSuccess = Pattern.compile("downloaded item (\\d+)");
-    private final Pattern bytesFromSuccess = Pattern.compile("\\((\\d+)\\sbytes\\)");
 
     @Autowired
     SteamCmdOutputProcessor(PathsFactory pathsFactory) {
@@ -50,8 +49,11 @@ public class SteamCmdOutputProcessor {
         SteamCmdItemInfo itemInfo = null;
 
         if (lowerCaseLine.startsWith("success. downloaded item")) {
-            WorkshopItemDownloadSuccessLine line2 = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
-            itemInfo = line2.parseInfo();
+            WorkshopItemDownloadSuccessLine lineObject = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
+            itemInfo = lineObject.parseInfo();
+        } else if (lowerCaseLine.startsWith("success! app")) {
+            AppDownloadSuccessLine lineObject = new AppDownloadSuccessLine(lowerCaseLine, 0);
+            itemInfo = lineObject.parseInfo();
         }
 
         if (itemInfo != null) {
