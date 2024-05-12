@@ -53,18 +53,30 @@ public class SteamCmdOutputProcessor {
     }
 
     private void processLine(String line, SteamCmdJob job) {
-        String normalizedLine = line.toLowerCase().trim();
+        for (String normalizedLine : normalizeLine(line)) {
+            SteamCmdOutputLine lineObject = steamCmdOutputLineFactory.createSteamCmdOutputLine(normalizedLine, job);
 
-        SteamCmdOutputLine lineObject = steamCmdOutputLineFactory.createSteamCmdOutputLine(normalizedLine, job);
-
-        // TODO remove logs
-        if (lineObject != null) {
-            SteamCmdItemInfo itemInfo = lineObject.parseInfo();
-            itemInfoRepository.store(itemInfo.itemId(), itemInfo);
-            log.info("{}: {}", itemInfo.itemId(), itemInfo);
-        } else {
-            log.info("itemInfo was null");
+            // TODO remove logs
+            if (lineObject != null) {
+                SteamCmdItemInfo itemInfo = lineObject.parseInfo();
+                itemInfoRepository.store(itemInfo.itemId(), itemInfo);
+                log.info("{}: {}", itemInfo.itemId(), itemInfo);
+            } else {
+                log.info("itemInfo was null");
+            }
         }
+    }
+
+    private static String[] normalizeLine(String line) {
+        String normalizedLine = line.toLowerCase().trim();
+        String[] lines;
+        if (!normalizedLine.startsWith("downloading item") && normalizedLine.contains("downloading item")) {
+            lines = normalizedLine.split("downloading item");
+            lines[1] = "downloading item" + lines[1];
+        } else {
+            lines = new String[]{normalizedLine};
+        }
+        return lines;
     }
 
     private File prepareLogFile() throws IOException {
