@@ -4,9 +4,8 @@ import com.google.common.base.Strings;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.steamauth.SteamAuth;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -61,16 +60,16 @@ class SteamCmdExecutor {
         try {
             int attempts = 0;
             int exitCode;
-            String output;
+            StringBuilder output = new StringBuilder();
 
             do {
                 attempts++;
                 Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
-                output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
+                processSteamCmdOutput(output, process.getInputStream());
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
-            handleProcessResult(output, job);
+            handleProcessResult(output.toString(), job);
         } catch (SteamAuthNotSetException e) {
             log.error("SteamAuth is not set up");
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
@@ -80,6 +79,15 @@ class SteamCmdExecutor {
         } catch (Exception e) {
             log.error("SteamCMD job failed", e);
             job.setErrorStatus(ErrorStatus.GENERIC);
+        }
+    }
+
+    private void processSteamCmdOutput(StringBuilder result, InputStream processOutput) throws IOException {
+        try (BufferedReader steamCmdOuput = new BufferedReader(new InputStreamReader(processOutput))) {
+            String line;
+            while ((line = steamCmdOuput.readLine()) != null) {
+                result.append(line);
+            }
         }
     }
 
