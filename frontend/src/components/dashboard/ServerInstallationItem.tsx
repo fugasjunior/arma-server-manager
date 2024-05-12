@@ -66,9 +66,19 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
         }
 
         if (isInstalling(installation) && steamCmdItemInfo !== undefined) {
+            let displayText = "";
+            if (steamCmdItemInfo.status === SteamCmdStatus.FINISHED) {
+                displayText = "Dry running";
+            } else if (steamCmdItemInfo.status === SteamCmdStatus.IN_QUEUE) {
+                displayText = "In queue";
+            } else {
+                displayText = steamCmdItemInfo.status;
+            }
+
             return <Button fullWidth variant="contained" disabled>
-                {steamCmdItemInfo.status === SteamCmdStatus.FINISHED ? "STARTING UP FOR TEST" : steamCmdItemInfo.status}&nbsp;
-                {steamCmdItemInfo.status !== SteamCmdStatus.FINISHED && `(${humanFileSize(steamCmdItemInfo.bytesFinished)} / ${humanFileSize(steamCmdItemInfo.bytesTotal)})`}
+                {displayText.toUpperCase()}&nbsp;
+                {steamCmdItemInfo.status !== SteamCmdStatus.FINISHED && steamCmdItemInfo.status !== SteamCmdStatus.IN_QUEUE &&
+                    `(${humanFileSize(steamCmdItemInfo.bytesFinished)} / ${humanFileSize(steamCmdItemInfo.bytesTotal)})`}
             </Button>
         }
 

@@ -7,6 +7,7 @@ export interface SteamCmdItemInfoDto {
 }
 
 export enum SteamCmdStatus {
+    IN_QUEUE = "IN_QUEUE",
     FINISHED = "FINISHED",
     VERIFYING = "VERIFYING",
     DOWNLOADING = "DOWNLOADING",

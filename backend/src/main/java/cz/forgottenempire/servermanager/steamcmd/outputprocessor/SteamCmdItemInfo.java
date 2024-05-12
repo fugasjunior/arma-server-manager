@@ -8,6 +8,7 @@ public record SteamCmdItemInfo(
         long bytesTotal
 ) {
     public enum SteamCmdStatus {
+        IN_QUEUE,
         FINISHED,
         VERIFYING,
         DOWNLOADING,
