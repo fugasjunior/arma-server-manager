@@ -48,15 +48,15 @@ public class SteamCmdOutputProcessor {
     }
 
     private void processLine(String line, SteamCmdJob job) {
-        String lowerCaseLine = line.toLowerCase().trim();
+        String normalizedLine = line.toLowerCase().trim();
 
         SteamCmdOutputLine lineObject = null;
-        if (lowerCaseLine.startsWith("success. downloaded item")) {
-            lineObject = new WorkshopItemDownloadSuccessLine(lowerCaseLine);
-        } else if (lowerCaseLine.startsWith("success! app")) {
-            lineObject = new AppDownloadSuccessLine(lowerCaseLine, 0);
-        } else if (lowerCaseLine.startsWith("update state (0x61) downloading")) {
-            lineObject = new AppUpdateProgressLine(lowerCaseLine, Constants.GAME_IDS.get(job.getRelatedServer()));
+        if (normalizedLine.startsWith("success. downloaded item")) {
+            lineObject = new WorkshopItemDownloadSuccessLine(normalizedLine);
+        } else if (normalizedLine.startsWith("success! app")) {
+            lineObject = new AppDownloadSuccessLine(normalizedLine, 0);
+        } else if (normalizedLine.startsWith("update state (0x61) downloading")) {
+            lineObject = new AppUpdateProgressLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
         }
 
         if (lineObject != null) {
