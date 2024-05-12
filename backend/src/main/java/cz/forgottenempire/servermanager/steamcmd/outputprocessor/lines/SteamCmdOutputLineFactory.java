@@ -17,7 +17,9 @@ public class SteamCmdOutputLineFactory {
 
     public SteamCmdOutputLine createSteamCmdOutputLine(String normalizedLine, SteamCmdJob job) {
         SteamCmdOutputLine lineObject;
-        if (normalizedLine.startsWith("success. downloaded item")) {
+        if (normalizedLine.startsWith("downloading item")) {
+            lineObject = new WorkshopItemDownloadingLine(normalizedLine);
+        } else if (normalizedLine.startsWith("success. downloaded item")) {
             lineObject = new WorkshopItemDownloadSuccessLine(normalizedLine);
         } else if (normalizedLine.startsWith("success! app")) {
             lineObject = new AppDownloadSuccessLine(normalizedLine, 0);
