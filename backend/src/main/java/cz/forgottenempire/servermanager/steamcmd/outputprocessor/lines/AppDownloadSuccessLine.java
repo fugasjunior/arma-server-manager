@@ -1,6 +1,6 @@
 package cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines;
 
-import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdOutputProcessor;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,8 +18,8 @@ public class AppDownloadSuccessLine {
         this.bytes = bytes;
     }
 
-    public SteamCmdOutputProcessor.SteamCmdItemInfo parseInfo() {
-        SteamCmdOutputProcessor.SteamCmdItemInfo itemInfo = null;
+    public SteamCmdItemInfo parseInfo() {
+        SteamCmdItemInfo itemInfo = null;
         Matcher matcher = ITEM_ID_PATTERN.matcher(lowerCaseLine);
         matcher.find();
         String idString = matcher.group(1);
@@ -29,7 +29,7 @@ public class AppDownloadSuccessLine {
 
         try {
             long itemId = Long.parseLong(idString);
-            itemInfo = new SteamCmdOutputProcessor.SteamCmdItemInfo(itemId, SteamCmdOutputProcessor.SteamCmdStatus.FINISHED, 100, bytes, bytes);
+            itemInfo = new SteamCmdItemInfo(itemId, SteamCmdItemInfo.SteamCmdStatus.FINISHED, 100, bytes, bytes);
 
         } catch (NumberFormatException e) {
             log.error("Failed to parse item ID '{}' to long", idString, e);

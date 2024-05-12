@@ -85,13 +85,4 @@ public class SteamCmdOutputProcessor {
         SimpleDateFormat timeFormat = new SimpleDateFormat("[HH:mm:ss]");
         return timeFormat.format(new Date());
     }
-
-    public record SteamCmdItemInfo(long itemId, SteamCmdStatus status, long progressPercent, long bytesFinished, long bytesDone) {
-    }
-
-    public enum SteamCmdStatus {
-        FINISHED,
-        IN_PROGRESS,
-        ERROR
-    }
 }
