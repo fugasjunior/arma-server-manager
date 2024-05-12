@@ -14,9 +14,9 @@ public class SteamCmdOutputLineFactory {
         } else if (normalizedLine.startsWith("success! app")) {
             lineObject = new AppDownloadSuccessLine(normalizedLine, 0);
         } else if (normalizedLine.startsWith("update state (0x61) downloading")) {
-            lineObject = new AppUpdateProgressLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
+            lineObject = new AppUpdateProgressLine(normalizedLine, Constants.SERVER_IDS.get(job.getRelatedServer()));
         } else if (normalizedLine.startsWith("update state (0x81) verifying update")) {
-            lineObject = new AppUpdateVerificationLine(normalizedLine, Constants.GAME_IDS.get(job.getRelatedServer()));
+            lineObject = new AppUpdateVerificationLine(normalizedLine, Constants.SERVER_IDS.get(job.getRelatedServer()));
         } else {
             lineObject = null;
         }
