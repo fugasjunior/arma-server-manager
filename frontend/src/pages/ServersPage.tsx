@@ -1,4 +1,5 @@
 import {
+    createServer,
     deleteServer,
     getServers,
     getServerStatus,
@@ -106,7 +107,13 @@ const ServersPage = () => {
         }
 
         instance.status = {
-            description: "", map: "", maxPlayers: 0, playersOnline: 0, startedAt: "", version: "", headlessClientsCount: 0,
+            description: "",
+            map: "",
+            maxPlayers: 0,
+            playersOnline: 0,
+            startedAt: "",
+            version: "",
+            headlessClientsCount: 0,
             ...instance.status,
             alive: isNewServerAlive
         };
@@ -145,6 +152,13 @@ const ServersPage = () => {
         setIsLogOpen(false);
     }
 
+    const handleDuplicateServer = async (server: ServerDto) => {
+        const duplicatedServer = {...server, name: server.name + " (duplicated)"};
+        const {data: createdServer} = await createServer(duplicatedServer);
+        setServerInstances(prevState => [...prevState, {server: createdServer, status: null}]);
+        toast.success(`Server ${server.name}' successfully duplicated`);
+    };
+
     return (
         <>
             <NewServerButton/>
@@ -159,6 +173,7 @@ const ServersPage = () => {
                                              onStartServer={handleStartServer}
                                              onStopServer={handleStopServer}
                                              onRestartServer={handleRestartServer}
+                                             onDuplicateServer={handleDuplicateServer}
                                              onOpenLogs={handleOpenLogs}
                                              onDeleteServer={() => handleDeleteServerClicked(instance.server)}
                                              serverWithSamePortRunning={isServerWithSamePortRunning(instance.server)}
