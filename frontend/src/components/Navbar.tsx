@@ -3,8 +3,16 @@ import {NavLink, useNavigate} from "react-router-dom";
 import {AppBar, Button, CssBaseline, Stack, Toolbar} from "@mui/material";
 import {AuthContext} from "../store/auth-context";
 import logo from "../img/asm_logo.png"
+import IconButton from "@mui/material/IconButton";
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 
-const Navbar = () => {
+type NavbarProps = {
+    onModeChange: () => void,
+    mode: "light" | "dark"
+}
+
+const Navbar = ({onModeChange, mode}: NavbarProps) => {
     const authCtx = useContext(AuthContext);
     const isLoggedIn = authCtx.isLoggedIn;
     const navigate = useNavigate();
@@ -55,6 +63,9 @@ const Navbar = () => {
                         </Button>
                     </Stack>
                     <Stack direction="row" sx={{flexGrow: 0}}>
+                        <IconButton onClick={onModeChange}>
+                            {mode === "dark" ? <LightModeIcon/> : <DarkModeIcon style={{color: "white"}}/>}
+                        </IconButton>
                         <Button component={NavLink} to="/about" sx={{color: '#fff'}}>
                             About
                         </Button>
