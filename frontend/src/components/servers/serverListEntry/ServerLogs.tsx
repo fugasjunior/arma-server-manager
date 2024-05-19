@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Box, Modal, Typography} from "@mui/material";
+import {Box, Modal, TextField, Typography} from "@mui/material";
 import {downloadLogFile, getServerLogs} from "../../../services/serverLogService.ts";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -27,7 +27,7 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
     const logTextArea = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
-        fetchLogs();
+        void fetchLogs();
     }, []);
 
     async function fetchLogs() {
@@ -52,8 +52,7 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
                 {isLogEmpty() ?
                     <Typography m={2}>No logs available for this server</Typography>
                     :
-                    <textarea value={logs} disabled style={{"width": "100%", "height": "80vh", "resize": "none"}}
-                              ref={logTextArea}/>
+                    <TextField multiline value={logs} disabled fullWidth rows={25}/>
                 }
                 <IconButton color="primary" aria-label="refresh logs" component="label" onClick={fetchLogs}>
                     <RefreshIcon/>
