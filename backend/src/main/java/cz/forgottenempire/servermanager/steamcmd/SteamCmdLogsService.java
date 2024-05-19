@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ class SteamCmdLogsService {
         this.pathsFactory = pathsFactory;
     }
 
-    ServerLog getLogFile() {
-        return new ServerLog(pathsFactory.getSteamCmdLogFile());
+    LogFile getLogFile() {
+        return new LogFile(pathsFactory.getSteamCmdLogFile());
     }
 }

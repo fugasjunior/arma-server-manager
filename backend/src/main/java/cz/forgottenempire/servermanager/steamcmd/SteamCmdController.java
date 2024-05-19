@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ class SteamCmdController {
 
     @GetMapping("/log")
     public ResponseEntity<String> getLastLinesFromLog(@RequestParam(required = false, defaultValue = DEFAULT_LOG_LINES_COUNT) int count) {
-        ServerLog logFile = logsService.getLogFile();
+        LogFile logFile = logsService.getLogFile();
         String logLines = logFile.getLastLines(count);
         return ResponseEntity.ok(logLines);
     }

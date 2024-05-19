@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,10 +50,10 @@ class SteamCmdControllerTest {
 
     @Test
     void downloadExistingLogFile() throws IOException {
-        ServerLog serverLog = mock(ServerLog.class, withSettings().stubOnly());
-        when(logsService.getLogFile()).thenReturn(serverLog);
+        LogFile logFile = mock(LogFile.class, withSettings().stubOnly());
+        when(logsService.getLogFile()).thenReturn(logFile);
         Resource resource = mock(Resource.class, withSettings().stubOnly());
-        when(serverLog.asResource()).thenReturn(Optional.of(resource));
+        when(logFile.asResource()).thenReturn(Optional.of(resource));
         File file = mock(File.class, withSettings().stubOnly());
         when(resource.getFile()).thenReturn(file);
         when(file.getName()).thenReturn("log_file.log");
@@ -72,9 +72,9 @@ class SteamCmdControllerTest {
 
     @Test
     void downloadNonExistentLogFileThrowsNotFoundException() throws IOException {
-        ServerLog serverLog = mock(ServerLog.class, withSettings().stubOnly());
-        when(logsService.getLogFile()).thenReturn(serverLog);
-        when(serverLog.asResource()).thenReturn(Optional.empty());
+        LogFile logFile = mock(LogFile.class, withSettings().stubOnly());
+        when(logsService.getLogFile()).thenReturn(logFile);
+        when(logFile.asResource()).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> steamCmdController.downloadLogFile())
                 .isInstanceOf(NotFoundException.class)
@@ -83,14 +83,14 @@ class SteamCmdControllerTest {
 
     @Test
     void getLastFilesFromLog() {
-        ServerLog serverLog = mock(ServerLog.class, withSettings().stubOnly());
+        LogFile logFile = mock(LogFile.class, withSettings().stubOnly());
         String expectedLogLines = """
                 Line 1
                 Line 2
                 Line 3
                 """;
-        when(serverLog.getLastLines(3)).thenReturn(expectedLogLines);
-        when(logsService.getLogFile()).thenReturn(serverLog);
+        when(logFile.getLastLines(3)).thenReturn(expectedLogLines);
+        when(logsService.getLogFile()).thenReturn(logFile);
 
         ResponseEntity<String> response = steamCmdController.getLastLinesFromLog(3);
 

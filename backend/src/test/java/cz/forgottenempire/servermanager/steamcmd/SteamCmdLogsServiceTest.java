@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -18,8 +18,8 @@ class SteamCmdLogsServiceTest {
         when(pathsFactory.getSteamCmdLogFile()).thenReturn(logFile);
         SteamCmdLogsService logsService = new SteamCmdLogsService(pathsFactory);
 
-        ServerLog log = logsService.getLogFile();
+        LogFile log = logsService.getLogFile();
 
-        assertThat(log).isEqualTo(new ServerLog(logFile));
+        assertThat(log).isEqualTo(new LogFile(logFile));
     }
 }

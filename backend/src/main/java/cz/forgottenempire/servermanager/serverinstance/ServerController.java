@@ -129,7 +129,7 @@ class ServerController {
         }
 
         Server server = getServerEntity(id);
-        ServerLog logFile = server.getLog();
+        LogFile logFile = server.getLog();
         String logLines = logFile.getLastLines(count);
         return ResponseEntity.ok(logLines);
     }
