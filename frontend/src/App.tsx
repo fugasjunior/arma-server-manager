@@ -8,7 +8,7 @@ import ServersPage from "./pages/ServersPage";
 import ServerSettingsPage from "./pages/ServerSettingsPage";
 import ModsPage from "./pages/ModsPage";
 import NewServerPage from "./pages/NewServerPage";
-import {Container} from "@mui/material";
+import {Container, createTheme, CssBaseline, ThemeProvider, useMediaQuery} from "@mui/material";
 import 'material-react-toastify/dist/ReactToastify.css'
 import ScenariosPage from "./pages/ScenariosPage";
 import AppConfigPage from "./pages/AppConfigPage";
@@ -16,11 +16,41 @@ import AdditionalServersPage from "./pages/AdditionalServersPage";
 import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage.tsx";
 import ToolsPage from "./pages/ToolsPage.tsx";
+import {useState} from "react";
+
+const getDefaultMode = (): "light" | "dark" => {
+    const storedMode = localStorage.getItem("mode");
+    if (storedMode === "light" || storedMode === "dark") {
+        return storedMode;
+    }
+
+    const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+    return prefersDarkMode ? "dark" : "light";
+}
+
 
 const App = () => {
+    const [mode, setMode] = useState<"light" | "dark">(getDefaultMode());
+
+    const getTheme = () => createTheme({
+        palette: {
+            mode,
+        },
+    });
+
+    const toggleMode = () => {
+        setMode(prevState => {
+            const newState = prevState === "light" ? "dark" : "light";
+            localStorage.setItem("mode", newState);
+            return newState;
+        });
+    };
+
     return (
-            <>
-                <Navbar/>
+        <>
+            <ThemeProvider theme={getTheme()}>
+                <CssBaseline/>
+                <Navbar mode={mode} onModeChange={toggleMode}/>
                 <Container>
                     <Routes>
                         <Route index element={
@@ -60,18 +90,20 @@ const App = () => {
                     </Routes>
                 </Container>
                 <ToastContainer
-                        position="bottom-left"
-                        autoClose={3000}
-                        hideProgressBar
-                        newestOnTop={false}
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
+                    position="bottom-left"
+                    autoClose={3000}
+                    hideProgressBar
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
                 />
-            </>
+            </ThemeProvider>
+        </>
     );
 }
+
 
 export default App;
