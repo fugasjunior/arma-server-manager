@@ -48,7 +48,7 @@ const App = () => {
                         <Route path="tools" element={
                             <ProtectedRoute><ToolsPage/></ProtectedRoute>
                         }/>
-                        <Route path="config" element={
+                        <Route path="settings" element={
                             <ProtectedRoute><AppConfigPage/></ProtectedRoute>
                         }/>
                         <Route path="additionalServers" element={

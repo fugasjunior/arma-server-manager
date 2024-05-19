@@ -47,8 +47,8 @@ const Navbar = () => {
                         <Button component={NavLink} to="/tools" sx={{color: '#fff'}}>
                             Tools
                         </Button>
-                        <Button component={NavLink} to="/config" sx={{color: '#fff'}}>
-                            App config
+                        <Button component={NavLink} to="/settings" sx={{color: '#fff'}}>
+                            Settings
                         </Button>
                         <Button component={NavLink} to="/additionalServers" sx={{color: '#fff'}}>
                             Additional servers

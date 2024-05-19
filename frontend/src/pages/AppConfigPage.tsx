@@ -5,7 +5,7 @@ const AppConfigPage = () => {
 
     return (
         <>
-            <Typography variant="h4" component="h2" mb={2}>App configuration</Typography>
+            <Typography variant="h4" component="h2" mb={2}>Settings</Typography>
             <SteamAuthForm/>
         </>
     )
