@@ -34,6 +34,7 @@ export function ServerListEntryDetails(props: {
         <Stack direction="row" sx={{flexGrow: 0}}>
             <Button
                 variant="outlined"
+                size="small"
                 startIcon={<ContentCopyIcon/>} onClick={() => props.onDuplicateServer(props.server)}
                 color="info">
                 Duplicate
