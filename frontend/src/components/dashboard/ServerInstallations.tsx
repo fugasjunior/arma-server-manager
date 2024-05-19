@@ -6,7 +6,7 @@ import ServerInstallationItem from "./ServerInstallationItem";
 import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
 import {SteamCmdItemInfoDto} from "../../dtos/SteamCmdItemInfoDto.ts";
-import {getItemInfo} from "../../services/steamCmdItemInfoService.ts";
+import {getItemInfo} from "../../services/steamCmdService.ts";
 
 type WorkshopItemInfoResponse = {
     [id: number]: SteamCmdItemInfoDto
