@@ -18,8 +18,18 @@ import AboutPage from "./pages/AboutPage.tsx";
 import ToolsPage from "./pages/ToolsPage.tsx";
 import {useState} from "react";
 
+const getDefaultMode = (): "light" | "dark" => {
+    const storedMode = localStorage.getItem("mode");
+    if (storedMode === "light" || storedMode === "dark") {
+        return storedMode;
+    }
+
+    return "light";
+}
+
+
 const App = () => {
-    const [mode, setMode] = useState<"light" | "dark">("light");
+    const [mode, setMode] = useState<"light" | "dark">(getDefaultMode());
 
     const getTheme = () => createTheme({
         palette: {
@@ -28,7 +38,11 @@ const App = () => {
     });
 
     const toggleMode = () => {
-        setMode(prevState => prevState === "light" ? "dark" : "light");
+        setMode(prevState => {
+            const newState = prevState === "light" ? "dark" : "light";
+            localStorage.setItem("mode", newState);
+            return newState
+        });
     };
 
     return (
@@ -89,5 +103,6 @@ const App = () => {
         </>
     );
 }
+
 
 export default App;
