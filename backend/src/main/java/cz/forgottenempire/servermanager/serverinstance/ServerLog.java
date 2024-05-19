@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -101,5 +102,18 @@ public class ServerLog {
 
         raf.close();
         return result.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServerLog serverLog = (ServerLog) o;
+        return Objects.equals(logFile, serverLog.logFile);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(logFile);
     }
 }
