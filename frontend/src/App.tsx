@@ -15,6 +15,7 @@ import AppConfigPage from "./pages/AppConfigPage";
 import AdditionalServersPage from "./pages/AdditionalServersPage";
 import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage.tsx";
+import ToolsPage from "./pages/ToolsPage.tsx";
 
 const App = () => {
     return (
@@ -43,6 +44,9 @@ const App = () => {
                         }/>
                         <Route path="mods" element={
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
+                        }/>
+                        <Route path="tools" element={
+                            <ProtectedRoute><ToolsPage/></ProtectedRoute>
                         }/>
                         <Route path="config" element={
                             <ProtectedRoute><AppConfigPage/></ProtectedRoute>
