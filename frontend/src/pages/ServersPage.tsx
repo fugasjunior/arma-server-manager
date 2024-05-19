@@ -153,7 +153,7 @@ const ServersPage = () => {
     }
 
     const handleDuplicateServer = async (server: ServerDto) => {
-        const duplicatedServer = {...server, name: server.name + " (duplicated)"};
+        const duplicatedServer = {...server, name: server.name + " (copy)"};
         const {data: createdServer} = await createServer(duplicatedServer);
         setServerInstances(prevState => [...prevState, {server: createdServer, status: null}]);
         toast.success(`Server ${server.name}' successfully duplicated`);
