@@ -12,12 +12,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/steamcmd")
-class SteamCmdItemInfoController {
+class SteamCmdController {
 
     private final SteamCmdItemInfoRepository itemInfoRepository;
 
     @Autowired
-    public SteamCmdItemInfoController(SteamCmdItemInfoRepository itemInfoRepository) {
+    public SteamCmdController(SteamCmdItemInfoRepository itemInfoRepository) {
         this.itemInfoRepository = itemInfoRepository;
     }
 
