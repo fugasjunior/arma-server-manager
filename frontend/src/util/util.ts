@@ -1,4 +1,8 @@
 export function humanFileSize(bytes: number): string {
+    if (bytes === 0) {
+        return "0 B"
+    }
+
     if (!bytes) {
         return "N/A";
     }

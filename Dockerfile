@@ -49,6 +49,7 @@ RUN dpkg --add-architecture i386 \
           lib32stdc++6  \
           libcap2 \
           openjdk-17-jre \
+          expect \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/apt/lists/*

@@ -1,24 +1,32 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
 import com.google.common.base.Strings;
+import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
+import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamauth.SteamAuth;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdOutputProcessor;
+import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import static cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo.*;
 
 @Service
 @Slf4j
@@ -33,14 +41,21 @@ class SteamCmdExecutor {
     private final File steamCmdFile;
     private final SteamAuthService steamAuthService;
     private final ProcessFactory processFactory;
+    private final SteamCmdOutputProcessor steamCmdOutputProcessor;
+    private final SteamCmdItemInfoRepository itemInfoRepository;
 
     @Autowired
     public SteamCmdExecutor(
             @Value("${steamcmd.path}") String steamCmdFilePath,
             SteamAuthService steamAuthService,
-            ProcessFactory processFactory) {
+            ProcessFactory processFactory,
+            SteamCmdOutputProcessor steamCmdOutputProcessor,
+            SteamCmdItemInfoRepository itemInfoRepository
+    ) {
         this.steamAuthService = steamAuthService;
         this.processFactory = processFactory;
+        this.steamCmdOutputProcessor = steamCmdOutputProcessor;
+        this.itemInfoRepository = itemInfoRepository;
         steamCmdFile = new File(steamCmdFilePath);
         if (!steamCmdFile.exists()) {
             throw new IllegalStateException("Invalid path to SteamCMD executable given");
@@ -51,10 +66,27 @@ class SteamCmdExecutor {
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
     public void processJob(SteamCmdJob job, CompletableFuture<SteamCmdJob> future) {
+        setItemInfoAsQueued(job);
+
         executor.submit(() -> {
             execute(job);
             future.complete(job);
         });
+    }
+
+    private void setItemInfoAsQueued(SteamCmdJob job) {
+        ServerType relatedServerType = job.getRelatedServer();
+        if (relatedServerType != null) {
+            long serverAppId = Constants.SERVER_IDS.get(relatedServerType);
+            itemInfoRepository.store(serverAppId,
+                    new SteamCmdItemInfo(serverAppId, SteamCmdStatus.IN_QUEUE, 0, 0, 0));
+        }
+
+        Collection<WorkshopMod> relatedWorkshopMods = job.getRelatedWorkshopMods();
+        if (relatedWorkshopMods != null) {
+            relatedWorkshopMods.forEach(mod -> itemInfoRepository.store(mod.getId(),
+                    new SteamCmdItemInfo(mod.getId(), SteamCmdStatus.IN_QUEUE, 0, 0, 0)));
+        }
     }
 
     private void execute(SteamCmdJob job) {
@@ -65,8 +97,8 @@ class SteamCmdExecutor {
 
             do {
                 attempts++;
-                Process process = processFactory.startProcess(steamCmdFile, getCommands(job.getSteamCmdParameters()));
-                output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
+                Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
+                output = steamCmdOutputProcessor.processSteamCmdOutput(process.getInputStream(), job);
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 

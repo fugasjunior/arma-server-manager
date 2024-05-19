@@ -7,6 +7,12 @@ import {useInterval} from "../../hooks/use-interval";
 import {toast} from "material-react-toastify";
 import {createModPreset} from "../../services/modPresetsService";
 import {ModDto} from "../../dtos/ModDto.ts";
+import {SteamCmdItemInfoDto} from "../../dtos/SteamCmdItemInfoDto.ts";
+import {getItemInfo} from "../../services/steamCmdService.ts";
+
+type WorkshopItemInfoResponse = {
+    [id: number]: SteamCmdItemInfoDto
+}
 
 export default function ModsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
@@ -14,6 +20,17 @@ export default function ModsManagement() {
     const [selectedModsIds, setSelectedModsIds] = useState<Array<number>>([]);
     const [filter, setFilter] = useState("");
     const [newPresetDialogOpen, setNewPresetDialogOpen] = useState(false);
+    const [steamCmdItemInfo, setSteamCmdItemInfo] = useState<WorkshopItemInfoResponse>({});
+
+    useEffect(() => {
+        void fetchMods();
+        void fetchSteamCmdItemInfo();
+    }, []);
+
+    useInterval(() => {
+        void fetchMods();
+        void fetchSteamCmdItemInfo();
+    }, 5000);
 
     const fetchMods = async () => {
         const {data: modsDto} = await getMods();
@@ -27,11 +44,10 @@ export default function ModsManagement() {
         setInitialLoading(false);
     };
 
-    useEffect(() => {
-        void fetchMods();
-    }, []);
-
-    useInterval(fetchMods, 5000);
+    const fetchSteamCmdItemInfo = async () => {
+        const {data} = await getItemInfo();
+        setSteamCmdItemInfo(data);
+    };
 
     const handleInstall = async (modId: number) => {
         const {data: mod} = await installMod(modId);
@@ -41,6 +57,14 @@ export default function ModsManagement() {
     };
 
     const handleModUpdate = async () => {
+        setSteamCmdItemInfo(prevState => {
+            const newState = {...prevState};
+            for (const selectedModId of selectedModsIds) {
+                delete newState[selectedModId];
+            }
+            return newState;
+        })
+
         setMods(prevState => {
             const newMods = [...prevState];
             for (const selectedModId of selectedModsIds) {
@@ -162,6 +186,7 @@ export default function ModsManagement() {
         <ModsTable rows={filteredMods} selected={selectedModsIds} filter={filter} loading={initialLoading}
                    arma3ModsCount={arma3ModsCount}
                    dayZModsCount={dayZModsCount} mixedModsSelected={mixedModsSelected}
+                   steamCmdItemInfo={steamCmdItemInfo}
                    onRowClick={handleRowClick} onSelectAllRowsClick={handleSelectAllRowsClick}
                    onModUpdateClicked={handleModUpdate}
                    onModUninstallClicked={handleUninstall} onModInstallClicked={handleInstall}

@@ -3,7 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
-import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -64,8 +64,8 @@ public abstract class Server {
 
     public abstract Collection<ServerConfig> getConfigFiles();
 
-    public ServerLog getLog() {
-        return new ServerLog(pathsFactory.getServerLogFile(type, id));
+    public LogFile getLog() {
+        return new LogFile(pathsFactory.getServerLogFile(type, id));
     }
 
     public ServerProcess getProcess() {

@@ -48,12 +48,6 @@ class WorkshopInstallerService {
 
     @Transactional
     public void installOrUpdateMods(Collection<WorkshopMod> mods) {
-        mods.forEach(mod -> {
-            mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
-            mod.setErrorStatus(null);
-            modsService.saveModForInstallation(mod);
-        });
-
         steamCmdService.installOrUpdateWorkshopMods(mods)
                 .thenAcceptAsync(steamCmdJob -> steamCmdJob.getRelatedWorkshopMods().forEach(
                         mod -> handleInstallation(mod, steamCmdJob)

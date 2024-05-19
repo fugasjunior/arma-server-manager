@@ -4,7 +4,7 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
-import cz.forgottenempire.servermanager.serverinstance.ServerLog;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +27,8 @@ class ServerProcessTest {
 
     private ServerProcess serverProcess;
     private Server server;
-    private File logFile;
-    private ServerLog serverLog;
+    private File file;
+    private LogFile logFile;
     private File executable;
     private ServerProcessCreator processCreator;
     private Process process;
@@ -37,10 +37,10 @@ class ServerProcessTest {
     void setUp() throws IOException {
         server = mock(Server.class);
         when(server.getType()).thenReturn(ServerType.ARMA3);
-        serverLog = mock(ServerLog.class);
-        logFile = mock(File.class);
-        when(serverLog.getFile()).thenReturn(logFile);
-        when(server.getLog()).thenReturn(serverLog);
+        file = mock(File.class);
+        logFile = mock(LogFile.class);
+        when(logFile.getFile()).thenReturn(file);
+        when(server.getLog()).thenReturn(logFile);
         ServerRepository serverRepository = mock(ServerRepository.class);
         when(serverRepository.findById(SERVER_ID)).thenReturn(Optional.of(server));
         PathsFactory pathsFactory = mock(PathsFactory.class);
@@ -69,7 +69,7 @@ class ServerProcessTest {
         Process actualProcess = serverProcess.start();
 
         assertThat(actualProcess).isEqualTo(process);
-        verify(processCreator).startProcessWithRedirectedOutput(executable, parameters, logFile);
+        verify(processCreator).startProcessWithRedirectedOutput(executable, parameters, file);
     }
 
     @Test
@@ -88,7 +88,7 @@ class ServerProcessTest {
     void start_whenServerIsStarted_thenServerLogIsPrepared() {
         serverProcess.start();
 
-        verify(serverLog).prepare();
+        verify(logFile).prepare();
     }
 
     @Test

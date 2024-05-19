@@ -8,14 +8,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-public class ServerLog {
+public class LogFile {
 
     private final File logFile;
 
-    public ServerLog(File logFile) {
+    public LogFile(File logFile) {
         this.logFile = logFile;
     }
 
@@ -101,5 +102,18 @@ public class ServerLog {
 
         raf.close();
         return result.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LogFile logFile = (LogFile) o;
+        return Objects.equals(this.logFile, logFile.logFile);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(logFile);
     }
 }
