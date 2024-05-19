@@ -8,7 +8,7 @@ import ServersPage from "./pages/ServersPage";
 import ServerSettingsPage from "./pages/ServerSettingsPage";
 import ModsPage from "./pages/ModsPage";
 import NewServerPage from "./pages/NewServerPage";
-import {Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import {Container, createTheme, CssBaseline, ThemeProvider, useMediaQuery} from "@mui/material";
 import 'material-react-toastify/dist/ReactToastify.css'
 import ScenariosPage from "./pages/ScenariosPage";
 import AppConfigPage from "./pages/AppConfigPage";
@@ -24,7 +24,8 @@ const getDefaultMode = (): "light" | "dark" => {
         return storedMode;
     }
 
-    return "light";
+    const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+    return prefersDarkMode ? "dark" : "light";
 }
 
 
@@ -41,7 +42,7 @@ const App = () => {
         setMode(prevState => {
             const newState = prevState === "light" ? "dark" : "light";
             localStorage.setItem("mode", newState);
-            return newState
+            return newState;
         });
     };
 
