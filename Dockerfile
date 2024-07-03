@@ -37,7 +37,7 @@ RUN chmod 555 ./gradlew \
 # -- Create runtime image ---
 FROM cm2network/steamcmd AS runtime
 
-ENV APP_VERSION=1.3.0
+ENV APP_VERSION=1.4.0
 
 # TODO try to make the user not root. currently there are problems with mounted volumes ownership
 USER root
