@@ -18,19 +18,18 @@ import AboutPage from "./pages/AboutPage.tsx";
 import ToolsPage from "./pages/ToolsPage.tsx";
 import {useState} from "react";
 
-const getDefaultMode = (): "light" | "dark" => {
+const getDefaultMode = (prefersDarkMode: boolean): "light" | "dark" => {
     const storedMode = localStorage.getItem("mode");
     if (storedMode === "light" || storedMode === "dark") {
         return storedMode;
     }
 
-    const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
     return prefersDarkMode ? "dark" : "light";
 }
 
-
 const App = () => {
-    const [mode, setMode] = useState<"light" | "dark">(getDefaultMode());
+    const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+    const [mode, setMode] = useState<"light" | "dark">(getDefaultMode(prefersDarkMode));
 
     const getTheme = () => createTheme({
         palette: {
