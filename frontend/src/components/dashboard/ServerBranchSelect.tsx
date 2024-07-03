@@ -18,6 +18,6 @@ export const ServerBranchSelect = ({installation, onChange}: ServerBranchSelectP
             autoWidth
             onChange={onChange}
         >
-            {installation.availableBranches.map(branch => <MenuItem value={branch}>{branch.toLowerCase()}</MenuItem>)}
+            {installation.availableBranches.map(branch => <MenuItem key={branch} value={branch}>{branch.toLowerCase()}</MenuItem>)}
         </Select>
     </FormControl>);
