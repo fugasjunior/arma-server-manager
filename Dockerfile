@@ -1,7 +1,7 @@
 # --- Build ---
-FROM eclipse-temurin:17-jdk-jammy AS build
+FROM eclipse-temurin:17-jdk AS build
 
-ENV NODE_VERSION=16.13.0
+ENV NODE_VERSION=20.15.0
 ENV NVM_DIR=/root/.nvm
 
 # Install Node
@@ -72,4 +72,4 @@ ENV DIRECTORY_LOGS=/home/steam/armaservermanager/logs
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["java"]
-CMD ["-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "./app.jar"]
+CMD ["-jar", "./app.jar"]

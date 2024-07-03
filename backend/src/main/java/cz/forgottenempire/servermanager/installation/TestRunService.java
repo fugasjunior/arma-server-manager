@@ -1,7 +1,8 @@
 package cz.forgottenempire.servermanager.installation;
 
-import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
-import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
+import com.ibasco.agql.protocols.valve.source.query.SourceQueryClient;
+import com.ibasco.agql.protocols.valve.source.query.info.SourceQueryInfoResponse;
+import com.ibasco.agql.protocols.valve.source.query.info.SourceServer;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
@@ -57,8 +58,10 @@ class TestRunService {
         while (attempts < 10) {
             try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
                 InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, queryPort);
-                SourceServer queryServerInfo = sourceQueryClient.getServerInfo(serverAddress).get(30, TimeUnit.SECONDS);
-                serverInstallation.setVersion(queryServerInfo.getGameVersion());
+
+                SourceQueryInfoResponse sourceQueryInfoResponse = sourceQueryClient.getInfo(serverAddress).get(30, TimeUnit.SECONDS);;
+                SourceServer sourceServer = sourceQueryInfoResponse.getResult();
+                serverInstallation.setVersion(sourceServer.getGameVersion());
                 break;
             } catch (Exception e) {
                 if (!serverProcess.isAlive()) {

@@ -1,8 +1,8 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import com.ibasco.agql.core.exceptions.ReadTimeoutException;
-import com.ibasco.agql.protocols.valve.source.query.client.SourceQueryClient;
-import com.ibasco.agql.protocols.valve.source.query.pojos.SourceServer;
+import com.ibasco.agql.protocols.valve.source.query.SourceQueryClient;
+import com.ibasco.agql.protocols.valve.source.query.info.SourceQueryInfoResponse;
+import com.ibasco.agql.protocols.valve.source.query.info.SourceServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
@@ -59,8 +59,9 @@ class CheckServerInstancesStatusCronJob {
         ServerInstanceInfo instanceInfo = process.getInstanceInfo();
         try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
             InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, server.getQueryPort());
-            SourceServer queryServerInfo = sourceQueryClient.getServerInfo(serverAddress).get(30, TimeUnit.SECONDS);
-            updateInstanceInfoFromQueryResult(instanceInfo, queryServerInfo);
+            SourceQueryInfoResponse sourceQueryInfoResponse = sourceQueryClient.getInfo(serverAddress).get(30, TimeUnit.SECONDS);
+            SourceServer sourceServer = sourceQueryInfoResponse.getResult();
+            updateInstanceInfoFromQueryResult(instanceInfo, sourceServer);
         } catch (ExecutionException e) {
             // ignore any timeouts that happen during the first minute of starting the server
             LocalDateTime startedAt = instanceInfo.getStartedAt();

@@ -29,6 +29,8 @@
         </rollingPolicy>
     </appender>
 
+    <logger name="com.ibasco.agql.core.util.Option" level="WARN" />
+
     <!-- LOG everything at INFO level -->
     <root level="info">
         <appender-ref ref="Console"/>
