@@ -56,13 +56,9 @@ public class SteamCmdOutputProcessor {
         for (String normalizedLine : normalizeLine(line)) {
             SteamCmdOutputLine lineObject = steamCmdOutputLineFactory.createSteamCmdOutputLine(normalizedLine, job);
 
-            // TODO remove logs
             if (lineObject != null) {
                 SteamCmdItemInfo itemInfo = lineObject.parseInfo();
                 itemInfoRepository.store(itemInfo.itemId(), itemInfo);
-                log.info("{}: {}", itemInfo.itemId(), itemInfo);
-            } else {
-                log.info("itemInfo was null");
             }
         }
     }
