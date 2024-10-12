@@ -35,5 +35,5 @@ public class Constants {
     public static final String ARMA3_PROFILE_TEMPLATE = "arma3ServerProfile.ftl";
     public static final String ARMA3_NETWORK_SETTINGS = "arma3NetworkSettings.ftl";
 
-    public final static String STEAM_API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/";
+    public final static String STEAM_API_URL = "https://api.steampowered.com/IPublishedFileService/GetDetails/v1/";
 }

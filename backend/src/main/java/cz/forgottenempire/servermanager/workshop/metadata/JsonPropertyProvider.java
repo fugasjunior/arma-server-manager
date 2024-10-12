@@ -19,7 +19,7 @@ class JsonPropertyProvider implements PropertyProvider {
 
     @Override
     public String findConsumerAppId() {
-        return getValueFromJson("consumer_app_id", modInfoJson);
+        return getValueFromJson("consumer_appid", modInfoJson);
     }
 
     private String getValueFromJson(String key, JsonNode modInfoJson) {

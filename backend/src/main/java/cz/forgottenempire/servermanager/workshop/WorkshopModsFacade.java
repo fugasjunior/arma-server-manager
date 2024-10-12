@@ -17,6 +17,7 @@ import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -57,6 +58,7 @@ public class WorkshopModsFacade {
         return modsService.getAllMods(filter);
     }
 
+    @Transactional
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
