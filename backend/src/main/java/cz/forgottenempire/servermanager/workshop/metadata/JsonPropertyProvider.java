@@ -1,8 +1,6 @@
 package cz.forgottenempire.servermanager.workshop.metadata;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 class JsonPropertyProvider implements PropertyProvider {
 

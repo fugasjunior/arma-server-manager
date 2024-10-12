@@ -82,6 +82,7 @@ public class WorkshopModsFacade {
         return workshopMods;
     }
 
+    @Transactional
     public void updateAllMods() {
         List<Long> allModIds = modsService.getAllMods().stream()
                 .map(WorkshopMod::getId)
