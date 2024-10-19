@@ -40,6 +40,7 @@ public class ArmaLauncherPresetExportServiceTest {
         InOrder inOrder = inOrder(freeMarkerConfigurer, configuration, template);
         inOrder.verify(freeMarkerConfigurer).getConfiguration();
         inOrder.verify(configuration).getTemplate(TEMPLATE_FILE_NAME);
+        inOrder.verify(template).setNumberFormat("computer");
         inOrder.verify(template).process(eq(expectedModel), any());
         verifyNoMoreInteractions(freeMarkerConfigurer, configuration, template);
     }
