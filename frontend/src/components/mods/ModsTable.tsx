@@ -89,21 +89,21 @@ const ModsTable = (props: ModsTableProps) => {
 
         if (status === "INSTALLATION_IN_PROGRESS") {
             if (modItemInfo?.status === SteamCmdStatus.IN_QUEUE) {
-                return <Tooltip title="In queue"><HourglassBottomIcon/></Tooltip>;
+                return <Tooltip title="In queue"><HourglassBottomIcon color='info'/></Tooltip>;
             }
             if (modItemInfo?.status === SteamCmdStatus.FINISHED) {
-                return <Tooltip title="Waiting for installation"><DownloadDoneIcon/></Tooltip>;
+                return <Tooltip title="Waiting for installation"><DownloadDoneIcon color='info'/></Tooltip>;
             }
 
             return <CircularProgress size={20}/>;
         }
         if (status === "ERROR") {
             return <Tooltip
-                title={workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}><ReportProblemIcon/></Tooltip>
+                title={workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}><ReportProblemIcon color='error'/></Tooltip>
         }
 
         if (status === "FINISHED") {
-            return <Tooltip title="Installed"><CheckIcon/></Tooltip>;
+            return <Tooltip title="Installed"><CheckIcon color='success'/></Tooltip>;
         }
     };
 
