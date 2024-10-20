@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import { FormikProps } from "formik";
 import { Add, Delete, Warning } from "@mui/icons-material";
 
-type Arma3ScenariosFormProps = {
+type Arma3ScenarioRotationFormProps = {
     formik: FormikProps<Arma3ServerDto>
 }
 
-export const Arma3ScenariosForm = ({ formik }: Arma3ScenariosFormProps) => {
+export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormProps) => {
     const [scenarios, setScenarios] = useState<Array<Arma3ScenarioDto>>([]);
     const [selectedScenario, setSelectedScenario] = useState<string>();
 
@@ -58,7 +58,7 @@ export const Arma3ScenariosForm = ({ formik }: Arma3ScenariosFormProps) => {
     return (
         <Grid container spacing={1}>
             <Grid item xs={12}>
-                <Typography>Scenarios</Typography>
+                <Typography>Scenario rotation</Typography>
             </Grid>
             <Grid item xs={12}>
                 <Stack
@@ -130,9 +130,6 @@ export const Arma3ScenariosForm = ({ formik }: Arma3ScenariosFormProps) => {
                             })}
                         </List>
                     </Card>
-                }
-                {formik.values.scenarios.length === 0 &&
-                    <Typography>No scenarios</Typography>
                 }
             </Grid>
         </Grid>
