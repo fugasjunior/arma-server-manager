@@ -33,6 +33,7 @@ export interface Arma3ServerDto extends ServerDto {
     verifySignatures: boolean,
     activeMods: Array<ServerWorkshopModDto>,
     activeDLCs: Array<CreatorDlcDto>,
+    scenarios: Array<string>,
     additionalOptions: string,
     difficultySettings: Arma3DifficultySettings,
     networkSettings: Arma3NetworkSettings | null

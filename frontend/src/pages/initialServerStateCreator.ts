@@ -18,6 +18,7 @@ export function arma3ServerInitialState(): Arma3ServerDto {
         verifySignatures: true,
         activeMods: [],
         activeDLCs: [],
+        scenarios: [],
         additionalOptions: `headlessClients[] = {"127.0.0.1"}; 
 localClient[] = { "127.0.0.1"};`,
         difficultySettings: {

@@ -8,6 +8,7 @@ import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
 import Arma3NetworkSettingsForm from "./Arma3NetworkSettingsForm.tsx";
 import {useState} from "react";
 import {CustomLaunchParametersInput} from "./CustomLaunchParametersInput.tsx";
+import {Arma3ScenariosForm} from "./Arma3ScenariosForm.tsx";
 
 type EditArma3ServerSettingsFormProps = {
     server: Arma3ServerDto,
@@ -66,6 +67,11 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                             <SwitchField id='persistent' label='Persistent' formik={formik}/>
                         </FormGroup>
                     </Grid>
+                    
+                    <Grid item xs={6}>
+                        <Arma3ScenariosForm formik={formik}/>
+                    </Grid>
+
                     <CustomTextField id='additionalOptions' label='Additional options' multiline
                                      formik={formik} containerMd={12}/>
 
