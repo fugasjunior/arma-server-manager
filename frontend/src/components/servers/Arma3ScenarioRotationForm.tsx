@@ -1,4 +1,4 @@
-import { Add, Delete } from "@mui/icons-material";
+import { Add, ArrowDownward, ArrowUpward, Delete } from "@mui/icons-material";
 import { AutocompleteValue, Button, Card, Grid, IconButton, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { FormikProps } from "formik";
 import { useState } from "react";
@@ -37,6 +37,30 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
         formik.setFieldValue("scenarios", [...formik.values.scenarios].filter(scenario => scenario !== scenarioName));
     }
 
+    const shiftScenarioUp = (index: number) => {
+        if (index <= 0 || index >= formik.values.scenarios.length) {
+            return;
+        }
+
+        formik.setFieldValue("scenarios", [...formik.values.scenarios].map((scenario, i, scenarios) => {
+            if (i === index) return scenarios[index - 1];
+            if (i === index - 1) return scenarios[index];
+            return scenario;
+        }));
+    }
+
+    const shiftScenarioDown = (index: number) => {
+        if (index < 0 || index >= formik.values.scenarios.length - 1) {
+            return;
+        }
+
+        formik.setFieldValue("scenarios", [...formik.values.scenarios].map((scenario, i, scenarios) => {
+            if (i === index) return scenarios[index + 1];
+            if (i === index + 1) return scenarios[index];
+            return scenario;
+        }));
+    }
+
     return (
         <Grid container spacing={1}>
             <Grid item xs={12}>
@@ -63,16 +87,29 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
                 {formik.values.scenarios.length > 0 &&
                     <Card>
                         <List>
-                            {formik.values.scenarios.map((value) => {
+                            {formik.values.scenarios.map((value, i) => {
                                 return (
                                     <ListItem key={value}
                                         secondaryAction={
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="delete"
-                                                onClick={() => removeScenario(value)}>
-                                                <Delete />
-                                            </IconButton>
+                                            <Stack direction="row">
+                                                <IconButton
+                                                    disabled={i <= 0}
+                                                    aria-label="shift-up"
+                                                    onClick={() => shiftScenarioUp(i)}>
+                                                    <ArrowUpward />
+                                                </IconButton>
+                                                <IconButton
+                                                    disabled={i >= formik.values.scenarios.length - 1}
+                                                    aria-label="shift-down"
+                                                    onClick={() => shiftScenarioDown(i)}>
+                                                    <ArrowDownward />
+                                                </IconButton>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    onClick={() => removeScenario(value)}>
+                                                    <Delete />
+                                                </IconButton>
+                                            </Stack>
                                         }>
                                         <ListItemText primary={value} />
                                     </ListItem>
