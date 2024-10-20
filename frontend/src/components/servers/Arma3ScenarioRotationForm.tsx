@@ -1,10 +1,10 @@
-import { Autocomplete, AutocompleteValue, Avatar, Badge, Box, Button, Card, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { Add, Delete } from "@mui/icons-material";
+import { Autocomplete, AutocompleteValue, Box, Button, Card, Grid, IconButton, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { FormikProps } from "formik";
+import { useEffect, useState } from "react";
 import { Arma3ScenarioDto } from "../../dtos/Arma3ScenarioDto";
 import { Arma3ServerDto } from "../../dtos/ServerDto";
 import { getScenarios } from "../../services/scenarioService";
-import { useEffect, useState } from "react";
-import { FormikProps } from "formik";
-import { Add, Delete, Warning } from "@mui/icons-material";
 
 type Arma3ScenarioRotationFormProps = {
     formik: FormikProps<Arma3ServerDto>
