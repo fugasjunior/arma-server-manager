@@ -28,6 +28,7 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
 
         values.customLaunchParameters = [...launchParameters];
         props.onSubmit(values);
+        console.log(values);
     }
 
     const formik = useFormik<Arma3ServerDto>({

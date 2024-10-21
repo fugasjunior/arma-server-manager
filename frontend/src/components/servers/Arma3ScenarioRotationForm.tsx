@@ -13,6 +13,14 @@ type Arma3ScenarioRotationFormProps = {
 export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormProps) => {
     const [selectedScenario, setSelectedScenario] = useState<string>();
 
+    const getSplitScenarios = () => { // FIXME: Does not return empty array on blank string
+        return formik.values.scenarioRotation.split(";");
+    }
+
+    const setScenarios = (scenarios: string[]) => {
+        formik.setFieldValue("scenarioRotation", scenarios.join(";"));
+    }
+
     const setScenarioAutocomplete = (_: any, value: AutocompleteValue<Arma3ScenarioDto | string, false, false, true> | null): void => {
         if (!value) {
             setSelectedScenario("");
@@ -26,7 +34,7 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
             return;
         }
 
-        formik.setFieldValue("scenarios", [...formik.values.scenarios, scenarioName]);
+        setScenarios([...getSplitScenarios(), scenarioName]);
     }
 
     const removeScenario = (scenarioName: string) => {
@@ -34,33 +42,33 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
             return;
         }
 
-        formik.setFieldValue("scenarios", [...formik.values.scenarios].filter(scenario => scenario !== scenarioName));
+        setScenarios(getSplitScenarios().filter(scenario => scenario !== scenarioName));
     }
 
     const shiftScenarioUp = (index: number) => {
-        if (index <= 0 || index >= formik.values.scenarios.length) {
+        let scenarios = getSplitScenarios();
+        if (index <= 0 || index >= scenarios.length) {
             return;
         }
 
-        let scenarios = [...formik.values.scenarios];
         let temp = scenarios[index];
         scenarios[index] = scenarios[index - 1];
         scenarios[index - 1] = temp;
 
-        formik.setFieldValue("scenarios", scenarios);
+        setScenarios(scenarios);
     }
 
     const shiftScenarioDown = (index: number) => {
-        if (index < 0 || index >= formik.values.scenarios.length - 1) {
+        let scenarios = getSplitScenarios();
+        if (index < 0 || index >= scenarios.length - 1) {
             return;
         }
 
-        let scenarios = [...formik.values.scenarios];
         let temp = scenarios[index];
         scenarios[index] = scenarios[index + 1];
         scenarios[index + 1] = temp;
 
-        formik.setFieldValue("scenarios", scenarios);
+       setScenarios(scenarios);
     }
 
     return (
@@ -80,16 +88,16 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
                         variant="contained"
                         startIcon={<Add />}
                         onClick={() => addScenario(selectedScenario ?? "")}
-                        disabled={selectedScenario ? Boolean(formik.values.scenarios.find((scenario) => scenario === selectedScenario)) : true}>
+                        disabled={selectedScenario ? Boolean(getSplitScenarios().find((scenario) => scenario === selectedScenario)) : true}>
                         Add
                     </Button>
                 </Stack>
             </Grid>
             <Grid item xs={12}>
-                {formik.values.scenarios.length > 0 &&
+                {getSplitScenarios().length > 0 &&
                     <Card>
                         <List>
-                            {formik.values.scenarios.map((value, i) => {
+                            {getSplitScenarios().map((value, i) => {
                                 return (
                                     <ListItem key={value}
                                         secondaryAction={
@@ -101,7 +109,7 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
                                                     <KeyboardArrowUp />
                                                 </IconButton>
                                                 <IconButton
-                                                    disabled={i >= formik.values.scenarios.length - 1}
+                                                    disabled={i >= getSplitScenarios().length - 1}
                                                     aria-label="shift-down"
                                                     onClick={() => shiftScenarioDown(i)}>
                                                     <KeyboardArrowDown />
