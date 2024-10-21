@@ -35,6 +35,8 @@ public class Arma3ServerDto implements ServerDto {
     private boolean vonEnabled;
     private boolean verifySignatures;
 
+    private String scenarioRotation;
+
     private String additionalOptions;
 
     private List<ServerWorkshopModDto> activeMods;
