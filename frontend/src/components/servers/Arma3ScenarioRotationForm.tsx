@@ -42,11 +42,12 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
             return;
         }
 
-        formik.setFieldValue("scenarios", [...formik.values.scenarios].map((scenario, i, scenarios) => {
-            if (i === index) return scenarios[index - 1];
-            if (i === index - 1) return scenarios[index];
-            return scenario;
-        }));
+        let scenarios = [...formik.values.scenarios];
+        let temp = scenarios[index];
+        scenarios[index] = scenarios[index - 1];
+        scenarios[index - 1] = temp;
+
+        formik.setFieldValue("scenarios", scenarios);
     }
 
     const shiftScenarioDown = (index: number) => {
@@ -54,11 +55,12 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
             return;
         }
 
-        formik.setFieldValue("scenarios", [...formik.values.scenarios].map((scenario, i, scenarios) => {
-            if (i === index) return scenarios[index + 1];
-            if (i === index + 1) return scenarios[index];
-            return scenario;
-        }));
+        let scenarios = [...formik.values.scenarios];
+        let temp = scenarios[index];
+        scenarios[index] = scenarios[index + 1];
+        scenarios[index + 1] = temp;
+
+        formik.setFieldValue("scenarios", scenarios);
     }
 
     return (
