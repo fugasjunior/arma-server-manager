@@ -1,4 +1,4 @@
-import { Add, Delete, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { Add, Close, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { AutocompleteValue, Button, Card, Grid, IconButton, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { FormikProps } from "formik";
 import { useState } from "react";
@@ -107,9 +107,9 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
                                                     <KeyboardArrowDown />
                                                 </IconButton>
                                                 <IconButton
-                                                    aria-label="delete"
+                                                    aria-label="remove"
                                                     onClick={() => removeScenario(value)}>
-                                                    <Delete />
+                                                    <Close />
                                                 </IconButton>
                                             </Stack>
                                         }>
