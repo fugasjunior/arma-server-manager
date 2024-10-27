@@ -1,8 +1,6 @@
 package cz.forgottenempire.servermanager.workshop.metadata;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 class JsonPropertyProvider implements PropertyProvider {
 
@@ -19,7 +17,7 @@ class JsonPropertyProvider implements PropertyProvider {
 
     @Override
     public String findConsumerAppId() {
-        return getValueFromJson("consumer_app_id", modInfoJson);
+        return getValueFromJson("consumer_appid", modInfoJson);
     }
 
     private String getValueFromJson(String key, JsonNode modInfoJson) {
