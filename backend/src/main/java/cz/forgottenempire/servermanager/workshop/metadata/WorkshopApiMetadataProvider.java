@@ -7,18 +7,19 @@ import cz.forgottenempire.servermanager.common.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
-class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
+class WorkshopApiMetadataProvider {
+
+    private static final String REQUEST_URL = Constants.STEAM_API_URL + "?key=%s&itemcount=1&publishedfileids[0]=%d";
+
     private final String steamApiKey;
     private final RestTemplate restTemplate;
 
@@ -28,8 +29,22 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
         this.restTemplate = restTemplate;
     }
 
-    @Override
-    PropertyProvider createPropertyProvider(long modId) {
+    Optional<ModMetadata> fetchModMetadata(long modId) {
+        JsonPropertyProvider propertyProvider = createPropertyProvider(modId);
+        if (propertyProvider == null) {
+            return Optional.empty();
+        }
+
+        String modName = propertyProvider.findName();
+        String consumerAppId = propertyProvider.findConsumerAppId();
+        if (modName == null || consumerAppId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ModMetadata(modName, consumerAppId));
+    }
+
+    private JsonPropertyProvider createPropertyProvider(long modId) {
         JsonNode modInfoJson = getModInfoFromSteamApi(modId);
         if (modInfoJson == null) {
             return null;
@@ -52,22 +67,6 @@ class WorkshopApiMetadataProvider extends AbstractModMetadataProvider {
     }
 
     private String prepareRequest(long modId) {
-        return Constants.STEAM_API_URL + "?key=$steamApiKey&itemcount=1&publishedfileids[0]=$modId"
-                .replace("$steamApiKey", steamApiKey)
-                .replace("$modId", String.valueOf(modId));
-    }
-
-    private MultiValueMap<String, String> prepareRequestBody(long modId) {
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("key", steamApiKey);
-        map.add("itemcount", "1");
-        map.add("publishedfileids[0]", String.valueOf(modId));
-        return map;
-    }
-
-    private static HttpHeaders prepareRequestHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        return headers;
+        return REQUEST_URL.formatted(steamApiKey, modId);
     }
 }
