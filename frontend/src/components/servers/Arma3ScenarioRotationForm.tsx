@@ -1,5 +1,5 @@
-import { Add, Close, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
-import { AutocompleteValue, Button, Card, Grid, IconButton, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
+import { Add, ArrowDropDown, Close, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { Accordion, AccordionDetails, AccordionSummary, AutocompleteValue, Button, Card, Chip, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { FormikProps } from "formik";
 import { useState } from "react";
 import { Arma3ScenarioDto } from "../../dtos/Arma3ScenarioDto";
@@ -68,7 +68,7 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
         scenarios[index] = scenarios[index + 1];
         scenarios[index + 1] = temp;
 
-       setScenarios(scenarios);
+        setScenarios(scenarios);
     }
 
     return (
@@ -96,11 +96,12 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
             <Grid item xs={12}>
                 {getSplitScenarios().length > 0 &&
                     <Card>
-                        <List>
-                            {getSplitScenarios().map((value, i) => {
-                                return (
-                                    <ListItem key={value}
-                                        secondaryAction={
+                        {getSplitScenarios().map((value, i) => {
+                            return (
+                                <Accordion >
+                                    <AccordionSummary expandIcon={<ArrowDropDown />} >
+                                        <Stack direction="row" alignItems="center" justifyContent="space-between" flex="1" paddingRight={1}>
+                                            <Typography>{value}</Typography>
                                             <Stack direction="row">
                                                 <IconButton
                                                     disabled={i <= 0}
@@ -120,12 +121,51 @@ export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormP
                                                     <Close />
                                                 </IconButton>
                                             </Stack>
-                                        }>
-                                        <ListItemText primary={value} />
-                                    </ListItem>
-                                )
-                            })}
-                        </List>
+                                        </Stack>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Grid container spacing={1}>
+                                            <Grid item xs={5}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="param-name"
+                                                    type="text"
+                                                    label="Param name"
+                                                    size="small">
+                                                </TextField>
+                                            </Grid>
+                                            <Grid item xs={5}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="param-value"
+                                                    type="number"
+                                                    label="Param value"
+                                                    size="small">
+                                                </TextField>
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <Button aria-label="add" variant="contained" startIcon={<Add />}>
+                                                    <Typography>Add</Typography>
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Stack direction="row" spacing={1} rowGap={1} flexWrap="wrap" >
+                                                    {[
+                                                        {name: "testParam1", value: 123}, 
+                                                        {name: "test2", value: 1}, 
+                                                        {name: "testParameterLong3", value: 1512}
+                                                    ].map((param) => {
+                                                        return (
+                                                            <Chip label={`${param.name} = ${param.value}`} onDelete={() => {}} />
+                                                        );
+                                                    })}
+                                                </Stack>
+                                            </Grid>
+                                        </Grid>
+                                    </AccordionDetails>
+                                </Accordion>
+                            )
+                        })}
                     </Card>
                 }
             </Grid>
