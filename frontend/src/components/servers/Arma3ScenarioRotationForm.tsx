@@ -13,8 +13,8 @@ type Arma3ScenarioRotationFormProps = {
 export const Arma3ScenarioRotationForm = ({ formik }: Arma3ScenarioRotationFormProps) => {
     const [selectedScenario, setSelectedScenario] = useState<string>();
 
-    const getSplitScenarios = () => { // FIXME: Does not return empty array on blank string
-        return formik.values.scenarioRotation.split(";");
+    const getSplitScenarios = () => {
+        return formik.values.scenarioRotation.split(";").filter(scenario => scenario.trim().length > 0);
     }
 
     const setScenarios = (scenarios: string[]) => {
