@@ -67,10 +67,7 @@ public class WorkshopModsFacade {
         workshopMods.forEach(mod -> {
             mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
             mod.setErrorStatus(null);
-        });
-        modsService.saveAllMods(workshopMods);
 
-        workshopMods.forEach(mod -> {
             ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
             mod.setName(modMetadata.name());
             setModServerType(mod, modMetadata.consumerAppId());
