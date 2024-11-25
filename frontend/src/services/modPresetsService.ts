@@ -1,6 +1,6 @@
 import http from "./httpService";
 import config from "../config";
-import {ModPresetRequestDto} from "../dtos/ModPresetDto.ts";
+import {ModPresetRequestDto, ModPresetRenameDto} from "../dtos/ModPresetDto.ts";
 
 const apiEndpoint = config.apiUrl + "/mod/preset";
 
@@ -23,6 +23,10 @@ export function createModPreset(preset: ModPresetRequestDto) {
 
 export function updateModPreset(id: string, preset: ModPresetRequestDto) {
     return http.put(apiEndpoint + "/" + id, preset);
+}
+
+export function renameModPreset(id: string, preset: ModPresetRenameDto) {
+    return http.put(apiEndpoint + "/rename/" + id, preset);
 }
 
 export function deleteModPreset(id: string) {

@@ -7,6 +7,7 @@ import cz.forgottenempire.servermanager.modpreset.dtos.CreatePresetRequestDto;
 import cz.forgottenempire.servermanager.modpreset.dtos.PresetListResponseDto;
 import cz.forgottenempire.servermanager.modpreset.dtos.PresetResponseDto;
 import cz.forgottenempire.servermanager.modpreset.dtos.UpdatePresetRequestDto;
+import cz.forgottenempire.servermanager.modpreset.dtos.RenamePresetRequestDto;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsService;
 import java.util.Collection;
@@ -88,6 +89,24 @@ class ModPresetsController {
         modPreset = modPresetsService.updatePreset(modPreset);
         return ResponseEntity.ok(modPresetMapper.mapToModPresetDto(modPreset));
     }
+
+    @PutMapping("/rename/{id}")
+    public ResponseEntity<PresetResponseDto> renamePreset(
+            @PathVariable Long id,
+            @Valid @RequestBody RenamePresetRequestDto requestDto
+    ) {
+        ModPreset modPreset = modPresetsService.getModPreset(id)
+                .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
+
+        if (!modPreset.getName().equals(requestDto.getName())) {
+            validatePresetName(requestDto.getName());
+        }
+
+        modPreset.setName(requestDto.getName());
+        modPreset = modPresetsService.updatePreset(modPreset);
+        return ResponseEntity.ok(modPresetMapper.mapToModPresetDto(modPreset));
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePreset(@PathVariable Long id) {
