@@ -24,4 +24,21 @@ onUnsignedData = "kick (_this select 0)";
 onHackedData = "kick (_this select 0)";
 onDifferentData = "";
 
+<#if scenarioRotation?has_content>
+// SCENARIO ROTATION
+<#assign scenarios = scenarioRotation?split(";")>
+<#assign index = 0>
+class Missions
+{
+    <#list scenarios as scenario>
+    class Mission${index}
+    {
+        template = "${scenario?replace(".pbo", "")}";
+        difficulty = "CUSTOM";
+    };
+    <#assign index = index + 1>
+    </#list>
+};
+</#if>
+
 ${additionalOptions!}
