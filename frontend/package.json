@@ -10,7 +10,7 @@
         "@mui/x-date-pickers": "^6.18.2",
         "@react-buddy/ide-toolbox": "^2.2.1",
         "@react-buddy/palette-mui": "^1.2.2",
-        "axios": "^1.6.2",
+        "axios": "^1.7.4",
         "dayjs": "^1.11.10",
         "font-awesome": "^4.7.0",
         "formik": "^2.2.9",
