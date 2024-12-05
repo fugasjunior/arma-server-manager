@@ -17,6 +17,7 @@ import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -57,6 +58,7 @@ public class WorkshopModsFacade {
         return modsService.getAllMods(filter);
     }
 
+    @Transactional
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
@@ -65,10 +67,7 @@ public class WorkshopModsFacade {
         workshopMods.forEach(mod -> {
             mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
             mod.setErrorStatus(null);
-        });
-        modsService.saveAllMods(workshopMods);
 
-        workshopMods.forEach(mod -> {
             ModMetadata modMetadata = fileDetailsService.fetchModMetadata(mod.getId());
             mod.setName(modMetadata.name());
             setModServerType(mod, modMetadata.consumerAppId());
@@ -80,6 +79,7 @@ public class WorkshopModsFacade {
         return workshopMods;
     }
 
+    @Transactional
     public void updateAllMods() {
         List<Long> allModIds = modsService.getAllMods().stream()
                 .map(WorkshopMod::getId)

@@ -6,6 +6,7 @@ import java.util.List;
 
 public enum Arma3CDLC {
     CSLA_IRON_CURTAIN("CSLA Iron Curtain", "csla"),
+    EXPEDITIONARY_FORCES("Expeditionary Forces", "ef"),
     GLOBAL_MOBILIZATION("Global Mobilization", "gm"),
     REACTION_FORCES("Reaction Forces", "rf"),
     SOG_PRAIRIE_FIRE("S.O.G. Prairie Fire", "vn"),
@@ -29,13 +30,14 @@ public enum Arma3CDLC {
     }
 
     public static List<Arma3CDLC> getAll() {
-        return List.of(CSLA_IRON_CURTAIN, GLOBAL_MOBILIZATION, REACTION_FORCES, SOG_PRAIRIE_FIRE, SPEARHEAD_1944, WESTERN_SAHARA);
+        return List.of(CSLA_IRON_CURTAIN, EXPEDITIONARY_FORCES, GLOBAL_MOBILIZATION, REACTION_FORCES, SOG_PRAIRIE_FIRE, SPEARHEAD_1944, WESTERN_SAHARA);
     }
 
     public static Arma3CDLC fromId(String id) {
         return switch (id) {
             case "csla" -> CSLA_IRON_CURTAIN;
             case "gm" -> GLOBAL_MOBILIZATION;
+            case "ef" -> EXPEDITIONARY_FORCES;
             case "rf" -> REACTION_FORCES;
             case "vn" -> SOG_PRAIRIE_FIRE;
             case "spe" -> SPEARHEAD_1944;

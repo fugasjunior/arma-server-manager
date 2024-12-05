@@ -39,7 +39,7 @@ public class WorkshopMod {
     @Enumerated(EnumType.STRING)
     private ServerType serverType;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "workshop_mod_bikey")
     @Column(name = "bikey")
     private Set<String> biKeys = new HashSet<>();
