@@ -80,6 +80,7 @@ public class ServerProcess {
 
         if (isAlive()) {
             process.destroy();
+            process = null;
         }
 
         cancelRestartJob();
