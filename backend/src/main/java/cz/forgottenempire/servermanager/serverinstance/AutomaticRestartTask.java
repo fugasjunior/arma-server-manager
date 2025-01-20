@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.scheduling.TaskScheduler;
@@ -9,6 +10,7 @@ import java.time.*;
 import java.util.concurrent.ScheduledFuture;
 
 @Configurable
+@Slf4j
 public class AutomaticRestartTask {
 
     private Clock clock;
@@ -23,7 +25,10 @@ public class AutomaticRestartTask {
     }
 
     public AutomaticRestartTask schedule() {
-        job = taskScheduler.scheduleAtFixedRate(serverProcess::restart, getNearestFutureInstantOf(restartTime), Duration.ofDays(1));
+        Instant nextRestartTime = getNearestFutureInstantOf(restartTime);
+        job = taskScheduler.scheduleAtFixedRate(serverProcess::restart, nextRestartTime, Duration.ofDays(1));
+        log.info("Scheduling restart for server ID {} at {}", serverProcess.getServerId(),
+                nextRestartTime.atZone(ZoneId.systemDefault()).toLocalDateTime());
         return this;
     }
 
