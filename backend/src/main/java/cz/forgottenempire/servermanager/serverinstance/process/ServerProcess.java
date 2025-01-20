@@ -76,6 +76,8 @@ public class ServerProcess {
     }
 
     public void stop() {
+        log.info("Stopping server ID {}", serverId);
+
         if (isAlive()) {
             process.destroy();
         }
@@ -85,6 +87,8 @@ public class ServerProcess {
     }
 
     public void restart() {
+        log.info("Restarting server ID {}", serverId);
+
         stop();
         start();
     }
