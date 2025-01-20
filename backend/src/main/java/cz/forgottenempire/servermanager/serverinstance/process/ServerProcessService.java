@@ -49,8 +49,9 @@ class ServerProcessService {
     }
 
     public void restartServer(Long id) {
-        shutDownServer(id);
-        startServer(id);
+        Server server = getServer(id);
+        ServerProcess serverProcess = getServerProcess(server);
+        serverProcess.restart();
     }
 
     public ServerInstanceInfo getServerInstanceInfo(Long id) {
