@@ -35,7 +35,7 @@ export const CustomLaunchParametersInput = (props: CustomLaunchParametersInputPr
     return (
         <>
             <Typography>Custom launch parameters</Typography>
-            <MuiChipsInput value={convertLaunchParameters()} onChange={handleParameterInput}/>
+            <MuiChipsInput value={convertLaunchParameters()} onChange={handleParameterInput} addOnBlur/>
         </>
     );
 };
