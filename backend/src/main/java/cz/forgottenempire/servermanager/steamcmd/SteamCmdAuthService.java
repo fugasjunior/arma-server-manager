@@ -1,12 +1,10 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
-import com.google.common.io.Files;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
 import cz.forgottenempire.servermanager.steamauth.SteamAuth;
-import cz.forgottenempire.servermanager.steamcmd.SteamAuthNotSetException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +19,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +30,7 @@ import java.util.stream.Collectors;
 public class SteamCmdAuthService {
 
     private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
+    public static final Pattern LOGIN_SUCCESS_PATTERN = Pattern.compile("logging in user .* to steam public\\.{3}OK");
     private final ProcessFactory processFactory;
     private final File steamCmdFile;
 
@@ -53,7 +53,7 @@ public class SteamCmdAuthService {
      * @throws IOException If an I/O error occurs
      * @throws InterruptedException If the process is interrupted
      */
-    public String executeSteamCmd(SteamCmdParameters parameters, SteamAuth auth) 
+    public AuthVerificationResult verifyCredentials(SteamCmdParameters parameters, SteamAuth auth)
             throws IOException, InterruptedException {
         List<String> commands = getCommands(parameters, auth);
 
@@ -71,7 +71,7 @@ public class SteamCmdAuthService {
             throw new RuntimeException("SteamCMD execution timed out");
         }
         
-        return output;
+        return analyzeSteamCmdOutput(output);
     }
 
     /**
@@ -79,57 +79,82 @@ public class SteamCmdAuthService {
      * @param output Output from SteamCMD execution
      * @return Result of verification with status, message, and auth type
      */
-    public AuthVerificationResult analyzeSteamCmdOutput(String output) {
+    private AuthVerificationResult analyzeSteamCmdOutput(String output) {
         String lowerOutput = output.toLowerCase();
-        
-        // Check for successful login
-        if (lowerOutput.contains("success") && !lowerOutput.contains("failed")) {
+
+        if (lowerOutput.contains("to steam public...ok")) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.SUCCESS)
                     .authType(AuthType.NONE)
-                    .message("Login successful")
+                    .message("Login successful.")
+                    .build();
+        }
+
+        if (lowerOutput.contains("steam guard code was invalid")) {
+            return AuthVerificationResult.builder()
+                    .status(AuthStatus.INVALID_CREDENTIALS)
+                    .authType(AuthType.EMAIL)
+                    .message("Invalid Steam Guard code.")
                     .build();
         }
         
-        // Check for 2FA requirements
-        if (lowerOutput.contains("steam guard") && !lowerOutput.contains("steam guard code provided")) {
-            // Determine 2FA type
-            if (lowerOutput.contains("check your email")) {
-                return AuthVerificationResult.builder()
-                        .status(AuthStatus.REQUIRES_2FA)
-                        .authType(AuthType.EMAIL)
-                        .message("Steam Guard code required. Please check your email.")
-                        .build();
-            } else if (lowerOutput.contains("mobile authenticator")) {
-                return AuthVerificationResult.builder()
-                        .status(AuthStatus.REQUIRES_2FA)
-                        .authType(AuthType.MOBILE)
-                        .message("Mobile authenticator detected. This form of authentication is not supported.")
-                        .build();
-            } else {
-                return AuthVerificationResult.builder()
-                        .status(AuthStatus.REQUIRES_2FA)
-                        .authType(AuthType.UNKNOWN)
-                        .message("Unknown 2FA type detected.")
-                        .build();
-            }
-        }
-        
         // Check for invalid credentials
-        if (lowerOutput.contains("invalid login") || lowerOutput.contains("incorrect password")) {
+        if (lowerOutput.contains("invalid password")) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.INVALID_CREDENTIALS)
                     .authType(AuthType.NONE)
                     .message("Invalid username or password.")
                     .build();
         }
-        
-        // Default to error
+
+        // Check for 2FA requirements
+        if (lowerOutput.contains("steam guard") && !lowerOutput.contains("steam guard code provided")) {
+            // Determine 2FA type
+            return determine2FAtype(lowerOutput);
+        }
+
+        if (lowerOutput.contains("rate limit exceeded")) {
+            return AuthVerificationResult.builder()
+                    .status(AuthStatus.INVALID_CREDENTIALS)
+                    .authType(AuthType.NONE)
+                    .message("Too many login attempts. Please try again later.")
+                    .build();
+        }
+
+        String errorMessage = """
+                ======== SteamCMD ERROR OUTPUT START ========
+                %s
+                "======== SteamCMD ERROR OUTPUT END ========
+                """.formatted(output);
+        log.error(errorMessage);
+
         return AuthVerificationResult.builder()
                 .status(AuthStatus.ERROR)
                 .authType(AuthType.UNKNOWN)
                 .message("Unknown error occurred during verification.")
                 .build();
+    }
+
+    private static AuthVerificationResult determine2FAtype(String lowerOutput) {
+        if (lowerOutput.contains("check your email for the message")) {
+            return AuthVerificationResult.builder()
+                    .status(AuthStatus.REQUIRES_2FA)
+                    .authType(AuthType.EMAIL)
+                    .message("Steam Guard code required. Please check your email.")
+                    .build();
+        } else if (lowerOutput.contains("mobile authenticator")) {
+            return AuthVerificationResult.builder()
+                    .status(AuthStatus.REQUIRES_2FA)
+                    .authType(AuthType.MOBILE)
+                    .message("Mobile authenticator detected. This form of authentication is not supported.")
+                    .build();
+        } else {
+            return AuthVerificationResult.builder()
+                    .status(AuthStatus.REQUIRES_2FA)
+                    .authType(AuthType.UNKNOWN)
+                    .message("Unknown 2FA type detected.")
+                    .build();
+        }
     }
 
     private List<String> getCommands(SteamCmdParameters parameters, SteamAuth auth) {

@@ -20,7 +20,7 @@ public class SteamAuthVerifier {
     private final SteamCmdAuthService steamCmdAuthService;
 
     @Autowired
-    public SteamAuthVerifier(
+    SteamAuthVerifier(
             SteamAuthRepository authRepository,
             SteamCmdAuthService steamCmdAuthService) {
         this.authRepository = authRepository;
@@ -52,10 +52,7 @@ public class SteamAuthVerifier {
                     .build();
             
             // Execute SteamCMD with login command and capture output
-            String output = steamCmdAuthService.executeSteamCmd(parameters, tempAuth);
-            
-            // Analyze the output to determine auth status and type
-            return steamCmdAuthService.analyzeSteamCmdOutput(output);
+            return steamCmdAuthService.verifyCredentials(parameters, tempAuth);
         } catch (Exception e) {
             log.error("Error during credential verification", e);
             return AuthVerificationResult.builder()
@@ -63,47 +60,6 @@ public class SteamAuthVerifier {
                     .authType(AuthType.UNKNOWN)
                     .message("Verification failed: " + e.getMessage())
                     .build();
-        } finally {
-            // Restore the original auth
-            authRepository.deleteAll();
-            if (originalAuth.getId() != null) {
-                authRepository.save(originalAuth);
-            }
-        }
-    }
-
-    /**
-     * Generates a Steam Guard token by triggering an email from Steam
-     * @param auth Steam credentials to use
-     * @return true if email was triggered, false otherwise
-     */
-    public boolean generateSteamGuardToken(SteamAuthDto auth) {
-        // Create a temporary SteamAuth object for this operation
-        SteamAuth tempAuth = new SteamAuth();
-        tempAuth.setUsername(auth.getUsername());
-        tempAuth.setPassword(auth.getPassword());
-        
-        // Store the temporary auth for the duration of this operation
-        SteamAuth originalAuth = authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
-        try {
-            // Replace the auth temporarily
-            authRepository.deleteAll();
-            authRepository.save(tempAuth);
-            
-            // Create login parameters
-            SteamCmdParameters parameters = new SteamCmdParameters.Builder()
-                    .withLogin()
-                    .build();
-            
-            // Execute SteamCMD to trigger the email
-            String output = steamCmdAuthService.executeSteamCmd(parameters, tempAuth);
-            
-            // Check if the email was triggered
-            return output.toLowerCase().contains("steam guard code") && 
-                   output.toLowerCase().contains("email address");
-        } catch (Exception e) {
-            log.error("Error generating Steam Guard token", e);
-            return false;
         } finally {
             // Restore the original auth
             authRepository.deleteAll();

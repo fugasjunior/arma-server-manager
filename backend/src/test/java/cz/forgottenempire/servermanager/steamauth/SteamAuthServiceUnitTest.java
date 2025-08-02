@@ -21,7 +21,7 @@ class SteamAuthServiceUnitTest {
         steamAuthRepository = mock(SteamAuthRepository.class);
         steamCmdAuthService = mock(SteamCmdAuthService.class);
 
-        service = new SteamAuthService(steamAuthRepository, steamCmdAuthService);
+        service = new SteamAuthService(steamAuthRepository);
     }
 
     @Test

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, Button, CircularProgress, TextField, Typography, Alert } from '@mui/material';
 import { SteamAuthDto } from '../../dtos/SteamAuthDto';
-import { verifyCredentials, generateSteamGuardToken, setAuth } from '../../services/configService';
+import { verifyCredentials, setAuth } from '../../services/configService';
 
 interface TokenStepProps {
     credentials: SteamAuthDto;
@@ -30,35 +30,6 @@ const TokenStep: React.FC<TokenStepProps> = ({
     setError,
     authType
 }) => {
-    // Generate token on component mount
-    useEffect(() => {
-        const generateToken = async () => {
-            if (authType === 'EMAIL') {
-                setLoading(true);
-                setError(null);
-                
-                try {
-                    const { data } = await generateSteamGuardToken({
-                        username: credentials.username,
-                        password: credentials.password,
-                        steamGuardToken: ''
-                    });
-                    
-                    if (!data.success) {
-                        setError('Failed to generate Steam Guard token: ' + data.message);
-                    }
-                } catch (err) {
-                    console.error(err);
-                    setError('Failed to generate Steam Guard token. Please try again.');
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-        
-        generateToken();
-    }, [authType, credentials.username, credentials.password, setError, setLoading]);
-    
     // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials(prev => ({
@@ -101,6 +72,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
     
     // If not using email authentication, skip this step
     if (authType !== 'EMAIL') {
+        onNext();
         return (
             <Box sx={{ textAlign: 'center', py: 4 }}>
                 <CircularProgress />
@@ -121,11 +93,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
                 A Steam Guard code has been sent to the email address associated with your Steam account.
                 Please check your email and enter the code below.
             </Typography>
-            
-            <Typography variant="body1" paragraph>
-                <strong>Note:</strong> The code is time-sensitive and will expire after a few minutes.
-            </Typography>
-            
+
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}

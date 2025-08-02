@@ -32,12 +32,3 @@ export function getAuthStatus() {
 export function verifyCredentials(auth: SteamAuthDto) {
     return http.post(apiEndpoint + "/auth/verify", auth);
 }
-
-/**
- * Generates a Steam Guard token by triggering an email from Steam
- * @param auth Steam credentials to use
- * @returns Promise with result indicating if email was triggered
- */
-export function generateSteamGuardToken(auth: SteamAuthDto) {
-    return http.post(apiEndpoint + "/auth/generate-token", auth);
-}

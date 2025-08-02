@@ -85,30 +85,4 @@ class SteamAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
-    /**
-     * Generates a Steam Guard token by triggering an email from Steam
-     * @param auth Steam credentials to use
-     * @return Result indicating if email was triggered
-     */
-    @PostMapping("/generate-token")
-    public ResponseEntity<Map<String, Object>> generateSteamGuardToken(@RequestBody SteamAuthDto auth) {
-        Map<String, Object> response = new HashMap<>();
-        
-        try {
-            boolean success = authVerifier.generateSteamGuardToken(auth);
-            response.put("success", success);
-            if (success) {
-                response.put("message", "Steam Guard token has been sent to your email.");
-            } else {
-                response.put("message", "Failed to generate Steam Guard token.");
-            }
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
 }
