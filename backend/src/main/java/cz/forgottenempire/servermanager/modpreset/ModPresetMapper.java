@@ -22,4 +22,13 @@ interface ModPresetMapper {
     List<PresetResponseModDto> mapModsToDtos(Collection<WorkshopMod> mods);
 
     void updateModPresetFromDto(@MappingTarget ModPreset modPreset, PresetResponseDto presetResponseDto);
+
+    @Mapping(target = "lastUpdated", ignore = true)
+    @Mapping(target = "fileSize", ignore = true)
+    @Mapping(target = "serverOnly", ignore = true)
+    @Mapping(target = "installationStatus", ignore = true)
+    @Mapping(target = "errorStatus", ignore = true)
+    @Mapping(target = "serverType", ignore = true)
+    @Mapping(target = "biKeys", ignore = true)
+    WorkshopMod presetResponseModDtoToWorkshopMod(PresetResponseModDto modDto);
 }
