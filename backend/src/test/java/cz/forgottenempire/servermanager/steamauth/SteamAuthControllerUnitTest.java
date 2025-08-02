@@ -13,11 +13,13 @@ import static org.mockito.Mockito.when;
 class SteamAuthControllerUnitTest {
 
     private final SteamAuthService steamAuthService;
+    private final SteamAuthVerifier steamAuthVerifier;
     private final SteamAuthController controller;
 
     public SteamAuthControllerUnitTest() {
         steamAuthService = mock(SteamAuthService.class);
-        controller = new SteamAuthController(steamAuthService);
+        steamAuthVerifier = mock(SteamAuthVerifier.class);
+        controller = new SteamAuthController(steamAuthService, steamAuthVerifier);
     }
 
     @Test

@@ -6,57 +6,25 @@ import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdParameters;
 import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
- * Service for managing Steam authentication credentials and verification.
+ * Service for verifying Steam credentials and detecting 2FA requirements
  */
 @Service
 @Slf4j
-public class SteamAuthService {
+public class SteamAuthVerifier {
 
     private final SteamAuthRepository authRepository;
     private final SteamCmdAuthService steamCmdAuthService;
 
     @Autowired
-    public SteamAuthService(
+    public SteamAuthVerifier(
             SteamAuthRepository authRepository,
             SteamCmdAuthService steamCmdAuthService) {
         this.authRepository = authRepository;
         this.steamCmdAuthService = steamCmdAuthService;
-    }
-
-    @Cacheable("steamAuthAccount")
-    public SteamAuth getAuthAccount() {
-        return authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
-    }
-
-    @CacheEvict(value = "steamAuthAccount", allEntries = true)
-    public void setAuthAccount(SteamAuthDto auth) {
-        log.info("Setting new Steam Auth account: username '{}'",
-                auth.getUsername());
-        SteamAuth persistedAuth = getAuthAccount();
-        populateAuth(auth, persistedAuth);
-        authRepository.save(persistedAuth);
-    }
-
-    @CacheEvict(value = "steamAuthAccount", allEntries = true)
-    public void clearAuthAccount() {
-        log.info("Clearing Steam Auth");
-        authRepository.deleteAll();
-    }
-
-    /**
-     * Checks if Steam authentication is configured
-     * @return true if Steam auth is configured, false otherwise
-     */
-    public boolean isAuthConfigured() {
-        SteamAuth auth = getAuthAccount();
-        return auth.getId() != null && auth.getUsername() != null && auth.getPassword() != null;
     }
 
     /**
@@ -65,11 +33,6 @@ public class SteamAuthService {
      * @return Result of verification with status, message, and auth type
      */
     public AuthVerificationResult verifyCredentials(SteamAuthDto auth) {
-        // Create a temporary SteamCMD job to test login
-        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
-                .withLogin()
-                .build();
-        
         // Create a temporary SteamAuth object for this verification
         SteamAuth tempAuth = new SteamAuth();
         tempAuth.setUsername(auth.getUsername());
@@ -77,13 +40,18 @@ public class SteamAuthService {
         tempAuth.setSteamGuardToken(auth.getSteamGuardToken());
         
         // Store the temporary auth for the duration of this verification
-        SteamAuth originalAuth = getAuthAccount();
+        SteamAuth originalAuth = authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
         try {
             // Replace the auth temporarily
             authRepository.deleteAll();
             authRepository.save(tempAuth);
             
-            // Execute the job and capture output
+            // Create login parameters
+            SteamCmdParameters parameters = new SteamCmdParameters.Builder()
+                    .withLogin()
+                    .build();
+            
+            // Execute SteamCMD with login command and capture output
             String output = steamCmdAuthService.executeSteamCmd(parameters, tempAuth);
             
             // Analyze the output to determine auth status and type
@@ -110,24 +78,24 @@ public class SteamAuthService {
      * @return true if email was triggered, false otherwise
      */
     public boolean generateSteamGuardToken(SteamAuthDto auth) {
-        // Create a temporary SteamCMD job that will trigger the email token
-        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
-                .withLogin()
-                .build();
-        
         // Create a temporary SteamAuth object for this operation
         SteamAuth tempAuth = new SteamAuth();
         tempAuth.setUsername(auth.getUsername());
         tempAuth.setPassword(auth.getPassword());
         
         // Store the temporary auth for the duration of this operation
-        SteamAuth originalAuth = getAuthAccount();
+        SteamAuth originalAuth = authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
         try {
             // Replace the auth temporarily
             authRepository.deleteAll();
             authRepository.save(tempAuth);
             
-            // Execute the job to trigger the email
+            // Create login parameters
+            SteamCmdParameters parameters = new SteamCmdParameters.Builder()
+                    .withLogin()
+                    .build();
+            
+            // Execute SteamCMD to trigger the email
             String output = steamCmdAuthService.executeSteamCmd(parameters, tempAuth);
             
             // Check if the email was triggered
@@ -142,14 +110,6 @@ public class SteamAuthService {
             if (originalAuth.getId() != null) {
                 authRepository.save(originalAuth);
             }
-        }
-    }
-
-    private void populateAuth(SteamAuthDto auth, SteamAuth persistedAuth) {
-        persistedAuth.setUsername(auth.getUsername());
-        persistedAuth.setSteamGuardToken(auth.getSteamGuardToken());
-        if (StringUtils.isNotBlank(auth.getPassword())) {
-            persistedAuth.setPassword(auth.getPassword());
         }
     }
 }

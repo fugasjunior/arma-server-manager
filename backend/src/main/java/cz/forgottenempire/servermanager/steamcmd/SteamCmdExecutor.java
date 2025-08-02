@@ -6,6 +6,7 @@ import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamauth.SteamAuth;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
+import cz.forgottenempire.servermanager.steamcmd.SteamAuthNotSetException;
 
 import java.io.*;
 import java.util.ArrayList;

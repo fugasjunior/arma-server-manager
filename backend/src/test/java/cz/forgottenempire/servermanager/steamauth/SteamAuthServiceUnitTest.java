@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
 import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
 import java.util.Collections;
 import java.util.List;
@@ -13,12 +14,14 @@ import org.junit.jupiter.api.Test;
 class SteamAuthServiceUnitTest {
 
     private final SteamAuthRepository steamAuthRepository;
+    private final SteamCmdAuthService steamCmdAuthService;
     private final SteamAuthService service;
 
     public SteamAuthServiceUnitTest() {
         steamAuthRepository = mock(SteamAuthRepository.class);
+        steamCmdAuthService = mock(SteamCmdAuthService.class);
 
-        service = new SteamAuthService(steamAuthRepository);
+        service = new SteamAuthService(steamAuthRepository, steamCmdAuthService);
     }
 
     @Test

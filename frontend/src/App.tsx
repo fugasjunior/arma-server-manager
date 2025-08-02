@@ -17,6 +17,7 @@ import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage.tsx";
 import ToolsPage from "./pages/ToolsPage.tsx";
 import {useState} from "react";
+import SteamAuthWizard from "./components/steamauth/SteamAuthWizard";
 
 const getDefaultMode = (prefersDarkMode: boolean): "light" | "dark" => {
     const storedMode = localStorage.getItem("mode");
@@ -88,6 +89,8 @@ const App = () => {
                         }/>
                     </Routes>
                 </Container>
+                {/* Steam Authentication Wizard */}
+                <SteamAuthWizard />
                 <ToastContainer
                     position="bottom-left"
                     autoClose={3000}
