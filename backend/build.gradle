@@ -32,10 +32,27 @@ tasks.register('copyWebApp', Copy) {
     into "$rootDir/backend/build/resources/main/static/."
 }
 
-compileJava.dependsOn copyWebApp
-bootJar.dependsOn copyWebApp
-resolveMainClassName.dependsOn copyWebApp
-jar.dependsOn copyWebApp
+/**
+ * Skip frontend build in two cases:
+ * 1. When running from IntelliJ IDEA (automatically sets idea.active=true)
+ * 2. When explicitly requested by setting -DskipFrontendBuild=true JVM parameter
+ *
+ * Example usage:
+ * - Running from command line: ./gradlew bootRun -DskipFrontendBuild=true
+ * - Running from another IDE: Configure the run configuration to include -DskipFrontendBuild=true
+ */
+def isRunningFromIdea = System.getProperty("idea.active") == "true"
+def skipFrontendBuild = System.getProperty("skipFrontendBuild") == "true"
+
+if (!isRunningFromIdea && !skipFrontendBuild) {
+    compileJava.dependsOn copyWebApp
+    bootJar.dependsOn copyWebApp
+    resolveMainClassName.dependsOn copyWebApp
+    jar.dependsOn copyWebApp
+} else {
+    def reason = isRunningFromIdea ? "IntelliJ IDEA" : "skipFrontendBuild property"
+    println "Skipping frontend build step (reason: $reason)"
+}
 
 dependencies {
     runtimeOnly project(':frontend')
