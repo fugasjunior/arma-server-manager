@@ -68,21 +68,17 @@ class SteamAuthController {
      * @return Verification result with status, message, and auth type
      */
     @PostMapping("/verify")
-    public ResponseEntity<Map<String, Object>> verifyCredentials(@RequestBody SteamAuthDto auth) {
-        Map<String, Object> response = new HashMap<>();
-        
+    public ResponseEntity<AuthVerificationResult> verifyCredentials(@RequestBody SteamAuthDto auth) {
         try {
             AuthVerificationResult result = authVerifier.verifyCredentials(auth);
-            response.put("status", result.getStatus().toString());
-            response.put("message", result.getMessage());
-            response.put("authType", result.getAuthType().toString());
-            
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            response.put("status", AuthStatus.ERROR.toString());
-            response.put("message", "Failed to verify credentials: " + e.getMessage());
-            response.put("authType", AuthType.UNKNOWN.toString());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            AuthVerificationResult result = AuthVerificationResult.builder()
+                    .status(AuthStatus.ERROR)
+                    .message("Failed to verify credentials: " + e.getMessage())
+                    .authType(AuthType.UNKNOWN)
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
     }
 }
