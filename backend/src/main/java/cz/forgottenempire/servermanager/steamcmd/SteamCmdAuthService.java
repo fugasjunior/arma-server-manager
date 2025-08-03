@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
@@ -30,17 +31,14 @@ public class SteamCmdAuthService {
 
     public static final int TIMEOUT_SECONDS = 30;
     private final ProcessFactory processFactory;
-    private final File steamCmdFile;
+    private final PathsFactory pathsFactory;
 
     @Autowired
     public SteamCmdAuthService(
             ProcessFactory processFactory,
-            @Value("${steamcmd.path}") String steamCmdFilePath) {
+            PathsFactory pathsFactory) {
         this.processFactory = processFactory;
-        this.steamCmdFile = new File(steamCmdFilePath);
-        if (!steamCmdFile.exists()) {
-            throw new IllegalStateException("Invalid path to SteamCMD executable given");
-        }
+        this.pathsFactory = pathsFactory;
     }
 
     /**
@@ -58,11 +56,13 @@ public class SteamCmdAuthService {
     }
 
     private void deleteCachedCredentials() {
+        File steamCmdFile = pathsFactory.getSteamCmdExecutable();
         FileUtils.deleteQuietly(new File(steamCmdFile.getParent() + "/config/config.vdf"));
     }
 
     private String attemptSteamCmdLogin(SteamAuth auth) throws IOException, InterruptedException {
         List<String> commands = prepareSteamCmdLoginCommands(auth);
+        File steamCmdFile = pathsFactory.getSteamCmdExecutable();
         Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, commands);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

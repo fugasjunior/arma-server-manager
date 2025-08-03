@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.steamcmd;
 
 import com.google.common.base.Strings;
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamauth.SteamAuth;
@@ -23,7 +24,6 @@ import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdOutputP
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo.*;
@@ -37,7 +37,7 @@ class SteamCmdExecutor {
     private static final int EXIT_CODE_TIMEOUT_WINDOWS = 10;
     private static final int MAX_ATTEMPTS = 10;
 
-    private final File steamCmdFile;
+    private final PathsFactory pathsFactory;
     private final SteamAuthService steamAuthService;
     private final ProcessFactory processFactory;
     private final SteamCmdOutputProcessor steamCmdOutputProcessor;
@@ -45,20 +45,17 @@ class SteamCmdExecutor {
 
     @Autowired
     public SteamCmdExecutor(
-            @Value("${steamcmd.path}") String steamCmdFilePath,
+            PathsFactory pathsFactory,
             SteamAuthService steamAuthService,
             ProcessFactory processFactory,
             SteamCmdOutputProcessor steamCmdOutputProcessor,
             SteamCmdItemInfoRepository itemInfoRepository
     ) {
+        this.pathsFactory = pathsFactory;
         this.steamAuthService = steamAuthService;
         this.processFactory = processFactory;
         this.steamCmdOutputProcessor = steamCmdOutputProcessor;
         this.itemInfoRepository = itemInfoRepository;
-        steamCmdFile = new File(steamCmdFilePath);
-        if (!steamCmdFile.exists()) {
-            throw new IllegalStateException("Invalid path to SteamCMD executable given");
-        }
     }
 
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
@@ -96,6 +93,7 @@ class SteamCmdExecutor {
 
             do {
                 attempts++;
+                File steamCmdFile = pathsFactory.getSteamCmdExecutable();
                 Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
                 output = steamCmdOutputProcessor.processSteamCmdOutput(process.getInputStream(), job);
                 exitCode = process.waitFor();
