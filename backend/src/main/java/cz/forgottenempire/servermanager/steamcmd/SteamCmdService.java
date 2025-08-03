@@ -18,7 +18,7 @@ public class SteamCmdService {
     private final PathsFactory pathsFactory;
 
     @Autowired
-    public SteamCmdService(SteamCmdExecutor steamCmdExecutor, PathsFactory pathsFactory) {
+    SteamCmdService(SteamCmdExecutor steamCmdExecutor, PathsFactory pathsFactory) {
         this.steamCmdExecutor = steamCmdExecutor;
         this.pathsFactory = pathsFactory;
     }
