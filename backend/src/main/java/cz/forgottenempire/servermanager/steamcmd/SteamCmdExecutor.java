@@ -6,7 +6,6 @@ import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamauth.SteamAuth;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
-import cz.forgottenempire.servermanager.steamcmd.SteamAuthNotSetException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ import static cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmd
 @Slf4j
 class SteamCmdExecutor {
 
-    private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
     private static final List<String> ERROR_KEYWORDS = Arrays.asList("error", "failure", "failed");
     private static final int EXIT_CODE_TIMEOUT_LINUX = 134;
     private static final int EXIT_CODE_TIMEOUT_WINDOWS = 10;
@@ -123,8 +121,8 @@ class SteamCmdExecutor {
     private List<String> getCommands(SteamCmdParameters parameters) {
         List<String> commands = new ArrayList<>();
         parameters.get().forEach(parameter -> {
-            if (parameter.contains(STEAM_CREDENTIALS_PLACEHOLDER)) {
-                commands.add(parameter.replace(STEAM_CREDENTIALS_PLACEHOLDER, getAuthString()));
+            if (parameter.contains(SteamCmdParameters.STEAM_CREDENTIALS_PLACEHOLDER)) {
+                commands.add(parameter.replace(SteamCmdParameters.STEAM_CREDENTIALS_PLACEHOLDER, getAuthString()));
             } else {
                 commands.add(parameter);
             }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SteamCmdParameters {
 
-    private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
+    public static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
 
     private final List<String> parameters;
 

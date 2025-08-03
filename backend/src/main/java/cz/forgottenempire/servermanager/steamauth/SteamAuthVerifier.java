@@ -3,7 +3,6 @@ package cz.forgottenempire.servermanager.steamauth;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
-import cz.forgottenempire.servermanager.steamcmd.SteamCmdParameters;
 import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +44,9 @@ public class SteamAuthVerifier {
             // Replace the auth temporarily
             authRepository.deleteAll();
             authRepository.save(tempAuth);
-            
-            // Create login parameters
-            SteamCmdParameters parameters = new SteamCmdParameters.Builder()
-                    .withLogin()
-                    .build();
-            
+
             // Execute SteamCMD with login command and capture output
-            return steamCmdAuthService.verifyCredentials(parameters, tempAuth);
+            return steamCmdAuthService.verifyCredentials(tempAuth);
         } catch (Exception e) {
             log.error("Error during credential verification", e);
             return AuthVerificationResult.builder()

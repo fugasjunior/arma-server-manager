@@ -19,7 +19,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -29,8 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SteamCmdAuthService {
 
-    private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
-    public static final Pattern LOGIN_SUCCESS_PATTERN = Pattern.compile("logging in user .* to steam public\\.{3}OK");
+    public static final int TIMEOUT_SECONDS = 30;
     private final ProcessFactory processFactory;
     private final File steamCmdFile;
 
@@ -47,31 +45,51 @@ public class SteamCmdAuthService {
 
     /**
      * Executes a SteamCMD command with the provided parameters and authentication.
-     * @param parameters SteamCMD parameters to execute
      * @param auth Steam authentication credentials
      * @return Output from SteamCMD execution
      * @throws IOException If an I/O error occurs
      * @throws InterruptedException If the process is interrupted
      */
-    public AuthVerificationResult verifyCredentials(SteamCmdParameters parameters, SteamAuth auth)
+    public AuthVerificationResult verifyCredentials(SteamAuth auth)
             throws IOException, InterruptedException {
-        List<String> commands = getCommands(parameters, auth);
+        deleteCachedCredentials();
+        String output = attemptSteamCmdLogin(auth);
+        return analyzeSteamCmdOutput(output);
+    }
 
+    private void deleteCachedCredentials() {
         FileUtils.deleteQuietly(new File(steamCmdFile.getParent() + "/config/config.vdf"));
+    }
 
+    private String attemptSteamCmdLogin(SteamAuth auth) throws IOException, InterruptedException {
+        List<String> commands = prepareSteamCmdLoginCommands(auth);
         Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, commands);
-        
-        // Capture the output
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String output = reader.lines().collect(Collectors.joining("\n"));
-        
-        // Wait for process to complete with timeout
-        if (!process.waitFor(30, TimeUnit.SECONDS)) {
+
+        if (!process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
             process.destroyForcibly();
             throw new RuntimeException("SteamCMD execution timed out");
         }
-        
-        return analyzeSteamCmdOutput(output);
+
+        return output;
+    }
+
+    private List<String> prepareSteamCmdLoginCommands(SteamAuth auth) {
+        SteamCmdParameters parameters = new SteamCmdParameters.Builder()
+                .withLogin()
+                .build();
+
+        List<String> commands = new ArrayList<>();
+        parameters.get().forEach(parameter -> {
+            if (parameter.contains(SteamCmdParameters.STEAM_CREDENTIALS_PLACEHOLDER)) {
+                commands.add(parameter.replace(SteamCmdParameters.STEAM_CREDENTIALS_PLACEHOLDER, getAuthString(auth)));
+            } else {
+                commands.add(parameter);
+            }
+        });
+        return commands;
     }
 
     /**
@@ -82,7 +100,7 @@ public class SteamCmdAuthService {
     private AuthVerificationResult analyzeSteamCmdOutput(String output) {
         String lowerOutput = output.toLowerCase();
 
-        if (lowerOutput.contains("to steam public...ok")) {
+        if (isLoginSuccessful(lowerOutput)) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.SUCCESS)
                     .authType(AuthType.NONE)
@@ -90,16 +108,15 @@ public class SteamCmdAuthService {
                     .build();
         }
 
-        if (lowerOutput.contains("steam guard code was invalid")) {
+        if (isSteamGuardCodeInvalid(lowerOutput)) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.INVALID_CREDENTIALS)
                     .authType(AuthType.EMAIL)
                     .message("Invalid Steam Guard code.")
                     .build();
         }
-        
-        // Check for invalid credentials
-        if (lowerOutput.contains("invalid password")) {
+
+        if (isInvalidPassword(lowerOutput)) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.INVALID_CREDENTIALS)
                     .authType(AuthType.NONE)
@@ -107,13 +124,11 @@ public class SteamCmdAuthService {
                     .build();
         }
 
-        // Check for 2FA requirements
-        if (lowerOutput.contains("steam guard") && !lowerOutput.contains("steam guard code provided")) {
-            // Determine 2FA type
+        if (contains2FAInfo(lowerOutput)) {
             return determine2FAtype(lowerOutput);
         }
 
-        if (lowerOutput.contains("rate limit exceeded")) {
+        if (isTooManyLoginAttempts(lowerOutput)) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.INVALID_CREDENTIALS)
                     .authType(AuthType.NONE)
@@ -121,12 +136,7 @@ public class SteamCmdAuthService {
                     .build();
         }
 
-        String errorMessage = """
-                ======== SteamCMD ERROR OUTPUT START ========
-                %s
-                "======== SteamCMD ERROR OUTPUT END ========
-                """.formatted(output);
-        log.error(errorMessage);
+        logOutputAsError(output);
 
         return AuthVerificationResult.builder()
                 .status(AuthStatus.ERROR)
@@ -135,14 +145,43 @@ public class SteamCmdAuthService {
                 .build();
     }
 
+    private static void logOutputAsError(String output) {
+        String errorMessage = """
+                ======== SteamCMD ERROR OUTPUT START ========
+                %s
+                "======== SteamCMD ERROR OUTPUT END ========
+                """.formatted(output);
+        log.error(errorMessage);
+    }
+
+    private static boolean isLoginSuccessful(String lowerOutput) {
+        return lowerOutput.contains("to steam public...ok");
+    }
+
+    private static boolean isSteamGuardCodeInvalid(String lowerOutput) {
+        return lowerOutput.contains("steam guard code was invalid");
+    }
+
+    private static boolean isInvalidPassword(String lowerOutput) {
+        return lowerOutput.contains("invalid password");
+    }
+
+    private static boolean isTooManyLoginAttempts(String lowerOutput) {
+        return lowerOutput.contains("rate limit exceeded");
+    }
+
+    private static boolean contains2FAInfo(String lowerOutput) {
+        return lowerOutput.contains("steam guard") && !lowerOutput.contains("steam guard code provided");
+    }
+
     private static AuthVerificationResult determine2FAtype(String lowerOutput) {
-        if (lowerOutput.contains("check your email for the message")) {
+        if (isEmailAuthenticator(lowerOutput)) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.REQUIRES_2FA)
                     .authType(AuthType.EMAIL)
                     .message("Steam Guard code required. Please check your email.")
                     .build();
-        } else if (lowerOutput.contains("mobile authenticator")) {
+        } else if (isMobileAuthenticator(lowerOutput)) {
             return AuthVerificationResult.builder()
                     .status(AuthStatus.REQUIRES_2FA)
                     .authType(AuthType.MOBILE)
@@ -157,17 +196,12 @@ public class SteamCmdAuthService {
         }
     }
 
-    private List<String> getCommands(SteamCmdParameters parameters, SteamAuth auth) {
-        List<String> commands = new ArrayList<>();
-        parameters.get().forEach(parameter -> {
-            if (parameter.contains(STEAM_CREDENTIALS_PLACEHOLDER)) {
-                commands.add(parameter.replace(STEAM_CREDENTIALS_PLACEHOLDER, getAuthString(auth)));
-            } else {
-                commands.add(parameter);
-            }
-        });
-        commands.add("+quit");
-        return commands;
+    private static boolean isEmailAuthenticator(String lowerOutput) {
+        return lowerOutput.contains("check your email for the message");
+    }
+
+    private static boolean isMobileAuthenticator(String lowerOutput) {
+        return lowerOutput.contains("mobile authenticator");
     }
 
     private String getAuthString(SteamAuth auth) {
