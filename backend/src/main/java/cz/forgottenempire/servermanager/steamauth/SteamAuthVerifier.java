@@ -15,35 +15,27 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SteamAuthVerifier {
 
-    private final SteamAuthRepository authRepository;
     private final SteamCmdAuthService steamCmdAuthService;
 
     @Autowired
-    SteamAuthVerifier(
-            SteamAuthRepository authRepository,
-            SteamCmdAuthService steamCmdAuthService) {
-        this.authRepository = authRepository;
+    SteamAuthVerifier(SteamCmdAuthService steamCmdAuthService) {
         this.steamCmdAuthService = steamCmdAuthService;
     }
 
     /**
      * Verifies Steam credentials and detects 2FA requirements
-     * @param auth Steam credentials to verify
+     *
+     * @param authDto Steam credentials to verify
      * @return Result of verification with status, message, and auth type
      */
-    public AuthVerificationResult verifyCredentials(SteamAuthDto auth) {
-        SteamAuth tempAuth = new SteamAuth();
-        tempAuth.setUsername(auth.getUsername());
-        tempAuth.setPassword(auth.getPassword());
-        tempAuth.setSteamGuardToken(auth.getSteamGuardToken());
-        
-        SteamAuth originalAuth = authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
-        try {
-            // Replace the auth temporarily
-            authRepository.deleteAll();
-            authRepository.save(tempAuth);
+    public AuthVerificationResult verifyCredentials(SteamAuthDto authDto) {
+        SteamAuth auth = new SteamAuth();
+        auth.setUsername(authDto.getUsername());
+        auth.setPassword(authDto.getPassword());
+        auth.setSteamGuardToken(authDto.getSteamGuardToken());
 
-            return steamCmdAuthService.verifyCredentials(tempAuth);
+        try {
+            return steamCmdAuthService.verifyCredentials(auth);
         } catch (Exception e) {
             log.error("Error during credential verification", e);
             return AuthVerificationResult.builder()
@@ -51,12 +43,6 @@ public class SteamAuthVerifier {
                     .authType(AuthType.UNKNOWN)
                     .message("Verification failed: " + e.getMessage())
                     .build();
-        } finally {
-            // Restore the original auth
-            authRepository.deleteAll();
-            if (originalAuth.getId() != null) {
-                authRepository.save(originalAuth);
-            }
         }
     }
 }
