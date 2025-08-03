@@ -1,17 +1,17 @@
 const path = require('path');
 
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: path.resolve(__dirname, './tsconfig.test.json'),
+    }],
   },
-  testMatch: ['<rootDir>/__tests__/**/*.test.ts'],
+  testMatch: ['<rootDir>/__tests__/**/*.test.ts*'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  globals: {
-    'ts-jest': {
-      tsconfig: path.resolve(__dirname, './tsconfig.json'),
-    },
+  rootDir: './',
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
   },
-  rootDir: './src',
-  testOutputDir: './build/__tests__', // Specify your desired output directory here
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js']
 };

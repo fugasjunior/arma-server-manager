@@ -17,7 +17,7 @@ import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage.tsx";
 import ToolsPage from "./pages/ToolsPage.tsx";
 import {useState} from "react";
-import SteamAuthWizard from "./components/steamauth/SteamAuthWizard";
+import SteamAuthWizard from "./components/steamauthwizard/SteamAuthWizard";
 
 const getDefaultMode = (prefersDarkMode: boolean): "light" | "dark" => {
     const storedMode = localStorage.getItem("mode");
