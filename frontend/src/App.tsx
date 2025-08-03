@@ -89,7 +89,6 @@ const App = () => {
                         }/>
                     </Routes>
                 </Container>
-                {/* Steam Authentication Wizard */}
                 <SteamAuthWizard />
                 <ToastContainer
                     position="bottom-left"
