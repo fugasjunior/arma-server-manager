@@ -18,7 +18,7 @@ public class SteamAuthService {
     private final SteamAuthRepository authRepository;
 
     @Autowired
-    public SteamAuthService(SteamAuthRepository authRepository) {
+    SteamAuthService(SteamAuthRepository authRepository) {
         this.authRepository = authRepository;
     }
 
