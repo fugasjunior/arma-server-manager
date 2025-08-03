@@ -30,7 +30,6 @@ const TokenStep: React.FC<TokenStepProps> = ({
     setError,
     authType
 }) => {
-    // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials(prev => ({
             ...prev,
@@ -38,7 +37,6 @@ const TokenStep: React.FC<TokenStepProps> = ({
         }));
     };
     
-    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         

@@ -32,20 +32,17 @@ public class SteamAuthVerifier {
      * @return Result of verification with status, message, and auth type
      */
     public AuthVerificationResult verifyCredentials(SteamAuthDto auth) {
-        // Create a temporary SteamAuth object for this verification
         SteamAuth tempAuth = new SteamAuth();
         tempAuth.setUsername(auth.getUsername());
         tempAuth.setPassword(auth.getPassword());
         tempAuth.setSteamGuardToken(auth.getSteamGuardToken());
         
-        // Store the temporary auth for the duration of this verification
         SteamAuth originalAuth = authRepository.findAll().stream().findFirst().orElse(new SteamAuth());
         try {
             // Replace the auth temporarily
             authRepository.deleteAll();
             authRepository.save(tempAuth);
 
-            // Execute SteamCMD with login command and capture output
             return steamCmdAuthService.verifyCredentials(tempAuth);
         } catch (Exception e) {
             log.error("Error during credential verification", e);
