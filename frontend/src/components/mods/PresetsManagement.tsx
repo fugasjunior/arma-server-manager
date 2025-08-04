@@ -17,7 +17,6 @@ import {Backdrop, Box, CircularProgress, Divider, Modal, Stack, Toolbar} from "@
 import Typography from "@mui/material/Typography";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import SERVER_NAMES from "../../util/serverNames";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
@@ -29,6 +28,10 @@ import DownloadIcon from '@mui/icons-material/Download';
 import {ModPresetDto, ModPresetModDto} from "../../dtos/ModPresetDto";
 import {ModDto} from "../../dtos/ModDto.ts";
 import {ServerType} from "../../dtos/ServerDto.ts";
+import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
+import RenamePresetDialog from "./RenamePresetDialog";
+import MemoryIcon from "@mui/icons-material/Memory";
+import {renameModPreset} from "../../services/modPresetsService";
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
@@ -38,6 +41,8 @@ export default function PresetsManagement() {
     const [selectedMods, setSelectedMods] = useState<Array<ModPresetModDto>>([]);
     const [availableMods, setAvailableMods] = useState<Array<ModPresetModDto>>([]);
     const [isUploadInProgress, setIsUploadInProgress] = useState(false);
+    const [renamePresetDialogOpen, setRenamePresetDialogOpen] = useState(false);
+    const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchPresets() {
@@ -177,6 +182,29 @@ export default function PresetsManagement() {
         }
     }
 
+    const handlePresedDialogOpen = (presetId: string) => {
+        setSelectedPresetId(presetId);
+        setRenamePresetDialogOpen(true);
+    }
+
+    const handlePresedDialogClose = () => {
+        setRenamePresetDialogOpen(false);
+        setSelectedPresetId(null);
+    }
+
+    const handleRenameNewPreset = async (presetName: string, presetId: string) => {
+        setRenamePresetDialogOpen(false);
+        setSelectedPresetId(null);
+
+        const request = {
+            name: presetName,
+        }
+
+        await renameModPreset(presetId, request);
+        toast.success(`Preset '${presetName}' successfully renamed`);
+        window.location.reload();
+    }
+
     return (
         <>
             <Backdrop open={isUploadInProgress}>
@@ -233,7 +261,13 @@ export default function PresetsManagement() {
                                         <TableCell>
                                             <IconButton aria-label="edit"
                                                         onClick={() => handleOpenEdit(preset)}>
-                                                <EditIcon color="primary"/>
+                                                <MemoryIcon color="primary"/>
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton aria-label="rename"
+                                                        onClick={() => handlePresedDialogOpen(preset.id as string)}>
+                                                <DriveFileRenameOutlineOutlinedIcon color="primary"/>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
@@ -264,6 +298,9 @@ export default function PresetsManagement() {
                     />
                 </Box>
             </Modal>
+            <RenamePresetDialog open={renamePresetDialogOpen} onClose={handlePresedDialogClose}
+                                onConfirmClicked={handleRenameNewPreset} presetId={selectedPresetId}
+            />
         </>
     )
 }

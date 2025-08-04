@@ -22,3 +22,7 @@ export interface ModPresetModDto {
     name: string,
     shortName: string
 }
+
+export interface ModPresetRenameDto {
+    name: string
+}
