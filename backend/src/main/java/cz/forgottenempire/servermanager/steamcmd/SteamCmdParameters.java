@@ -3,7 +3,7 @@ package cz.forgottenempire.servermanager.steamcmd;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SteamCmdParameters {
+class SteamCmdParameters {
 
     public static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
 
