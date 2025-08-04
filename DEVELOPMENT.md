@@ -125,10 +125,10 @@ To build the entire application:
 
 ```bash
 # On Windows
-.\gradlew.bat assemble
+.\gradlew.bat install
 
 # On Linux/macOS
-./gradlew assemble
+./gradlew install
 ```
 
 This will:
