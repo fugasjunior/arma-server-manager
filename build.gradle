@@ -5,3 +5,9 @@ allprojects {
         mavenCentral()
     }
 }
+
+tasks.register('install') {
+    dependsOn([':backend:build', ':frontend:appNpmTest'])
+    description = 'Builds the project and runs all tests'
+    group = 'build'
+}

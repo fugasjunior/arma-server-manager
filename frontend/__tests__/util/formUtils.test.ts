@@ -1,4 +1,4 @@
-import {getValueByKeyPath} from "../src/util/formUtils";
+import {getValueByKeyPath} from "../../src/util/formUtils.ts";
 
 describe('getValueByKeyPath', () => {
     interface MyInterface {

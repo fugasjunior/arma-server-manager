@@ -8,6 +8,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for managing Steam authentication credentials and verification.
+ */
 @Service
 @Slf4j
 public class SteamAuthService {
@@ -15,7 +18,7 @@ public class SteamAuthService {
     private final SteamAuthRepository authRepository;
 
     @Autowired
-    public SteamAuthService(SteamAuthRepository authRepository) {
+    SteamAuthService(SteamAuthRepository authRepository) {
         this.authRepository = authRepository;
     }
 
@@ -37,6 +40,15 @@ public class SteamAuthService {
     public void clearAuthAccount() {
         log.info("Clearing Steam Auth");
         authRepository.deleteAll();
+    }
+
+    /**
+     * Checks if Steam authentication is configured
+     * @return true if Steam auth is configured, false otherwise
+     */
+    public boolean isAuthConfigured() {
+        SteamAuth auth = getAuthAccount();
+        return auth.getUsername() != null && auth.getPassword() != null;
     }
 
     private void populateAuth(SteamAuthDto auth, SteamAuth persistedAuth) {

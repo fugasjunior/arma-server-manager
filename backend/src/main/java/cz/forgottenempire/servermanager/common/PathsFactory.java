@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.common;
 import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.util.SystemUtils.OSType;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,27 +16,27 @@ import java.util.Date;
 @Component
 public class PathsFactory {
 
+    @Getter
     private final Path modsBasePath;
+    @Getter
     private final Path serversBasePath;
     private final Path logsBasePath;
+    private final String steamCmdPathString;
+    private final String steamCmdCacheFilePath;
 
     @Autowired
     public PathsFactory(
             @Value("${directory.servers}") String serversPathString,
             @Value("${directory.mods}") String modsPathString,
-            @Value("${directory.logs}") String logsPathString
+            @Value("${directory.logs}") String logsPathString,
+            @Value("${steamcmd.path}") String steamCmdPathString,
+            @Value("${steamcmd.cache.path}") String steamCmdCacheFilePath
     ) {
         serversBasePath = Path.of(serversPathString);
         modsBasePath = Path.of(modsPathString);
         logsBasePath = Path.of(logsPathString);
-    }
-
-    public Path getModsBasePath() {
-        return modsBasePath;
-    }
-
-    public Path getServersBasePath() {
-        return serversBasePath;
+        this.steamCmdPathString = steamCmdPathString;
+        this.steamCmdCacheFilePath = steamCmdCacheFilePath;
     }
 
     public Path getServerPath(ServerType type) {
@@ -119,6 +120,20 @@ public class PathsFactory {
         String formattedDate = dateFormat.format(new Date());
 
         return Path.of(logsBasePath.toString(), "steamcmd", "steamcmd_" + formattedDate + ".log").toFile();
+    }
+
+    public File getSteamCmdExecutable() {
+        File steamCmdFile = new File(steamCmdPathString);
+
+        if (!steamCmdFile.exists()) {
+            throw new IllegalStateException("Invalid path to SteamCMD executable given.");
+        }
+
+        return steamCmdFile;
+    }
+
+    public File getSteamCmdCacheFile() {
+        return new File(steamCmdCacheFilePath);
     }
 
     private Path getServerExecutable(ServerType type) {

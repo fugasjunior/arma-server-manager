@@ -36,5 +36,20 @@ tasks.register('appNpmBuild', NpmTask) {
     args = ["run", "build"]
 }
 
+tasks.register('appNpmTest', NpmTask) {
+    description = "Runs frontend tests"
+
+    inputs.files(fileTree('node_modules'))
+    inputs.files(fileTree('src'))
+    inputs.files(fileTree('__tests__'))
+    inputs.file('package.json')
+    inputs.file('jest.config.js')
+    inputs.file('jest.setup.js')
+    inputs.file('tsconfig.test.json')
+
+    args = ["run", "test"]
+}
+
 appNpmBuild.dependsOn(appNpmInstall)
+appNpmTest.dependsOn(appNpmInstall)
 assemble.dependsOn(appNpmBuild)

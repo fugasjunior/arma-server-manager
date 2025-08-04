@@ -2,11 +2,10 @@ package cz.forgottenempire.servermanager.steamcmd;
 
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
 
 class SteamCmdParameters {
 
-    private static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
+    static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
 
     private final List<String> parameters;
 
@@ -53,7 +52,7 @@ class SteamCmdParameters {
             return this;
         }
 
-        public Builder withAppInstall(@NotNull Long appId, boolean validate, String... args) {
+        public Builder withAppInstall(Long appId, boolean validate, String... args) {
             StringBuilder installParameter = new StringBuilder("+app_update " + appId);
             for (String arg : args) {
                 if (arg != null) {
@@ -67,7 +66,7 @@ class SteamCmdParameters {
             return this;
         }
 
-        public Builder withWorkshopItemInstall(@NotNull Long appId, @NotNull Long itemId,
+        public Builder withWorkshopItemInstall(Long appId, Long itemId,
                 boolean validate) {
             String installParameter = "+workshop_download_item " + appId + " " + itemId;
             if (validate) {

@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLine;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.lines.SteamCmdOutputLineFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,16 +41,23 @@ public class SteamCmdOutputProcessor {
              BufferedWriter fileLogger = new BufferedWriter(new FileWriter(logFile, true))) {
             String line;
             while ((line = steamCmdOuput.readLine()) != null) {
-                processLine(line, job);
-                result.append(line);
-                log.debug(line);
-                writeLineIntoLogFile(fileLogger, line);
+                String sanitizedLine = sanitize(line);
+                processLine(sanitizedLine, job);
+                result.append(sanitizedLine);
+                log.debug(sanitizedLine);
+                writeLineIntoLogFile(fileLogger, sanitizedLine);
             }
 
             writeSeparatorIntoLogFile(fileLogger);
         }
 
         return result.toString();
+    }
+
+    private static @NotNull String sanitize(String line) {
+        return line
+                .replaceAll("\u001B\\[[;\\d]*m", "") // Remove ANSI color codes
+                .replaceAll("\\p{C}", ""); // Remove control characters
     }
 
     private void processLine(String line, SteamCmdJob job) {

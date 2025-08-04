@@ -1,5 +1,7 @@
 package cz.forgottenempire.servermanager.steamauth;
 
+import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
+import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
 import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,15 +13,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/config/auth")
 class SteamAuthController {
 
     private final SteamAuthService authService;
+    private final SteamAuthVerifier authVerifier;
 
     @Autowired
-    public SteamAuthController(SteamAuthService authService) {
+    public SteamAuthController(SteamAuthService authService, SteamAuthVerifier authVerifier) {
         this.authService = authService;
+        this.authVerifier = authVerifier;
     }
 
     @PostMapping
@@ -42,5 +49,36 @@ class SteamAuthController {
     public ResponseEntity<?> clearAuthAccount() {
         authService.clearAuthAccount();
         return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Checks if Steam authentication is configured
+     * @return Status indicating if auth is configured
+     */
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Boolean>> getAuthStatus() {
+        boolean isConfigured = authService.isAuthConfigured();
+        Map<String, Boolean> response = Map.of("isConfigured", isConfigured);
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Verifies Steam credentials and detects 2FA requirements
+     * @param auth Steam credentials to verify
+     * @return Verification result with status, message, and auth type
+     */
+    @PostMapping("/verify")
+    public ResponseEntity<AuthVerificationResult> verifyCredentials(@RequestBody SteamAuthDto auth) {
+        try {
+            AuthVerificationResult result = authVerifier.verifyCredentials(auth);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            AuthVerificationResult result = AuthVerificationResult.builder()
+                    .status(AuthStatus.ERROR)
+                    .message("Failed to verify credentials: " + e.getMessage())
+                    .authType(AuthType.UNKNOWN)
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
     }
 }

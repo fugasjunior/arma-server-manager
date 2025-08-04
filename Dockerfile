@@ -32,7 +32,7 @@ COPY ./backend /app/backend
 RUN chmod 555 ./gradlew \
 #    fix CRLF line endings in gradlew
     && sed -i -e 's/\r$//' ./gradlew \
-    && ./gradlew assemble
+    && ./gradlew install
 
 # -- Create runtime image ---
 FROM cm2network/steamcmd AS runtime
