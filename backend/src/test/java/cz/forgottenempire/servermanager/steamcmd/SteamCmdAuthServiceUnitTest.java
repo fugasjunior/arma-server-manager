@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
@@ -37,7 +36,10 @@ class SteamCmdAuthServiceUnitTest {
     private PathsFactory pathsFactory;
 
     @Mock(stubOnly = true)
-    private File mockFile;
+    private File mockSteamCmdFile;
+
+    @Mock(stubOnly = true)
+    private File mockSteamCmdCacheFile;
 
     @Mock(stubOnly = true)
     private Process mockProcess;
@@ -46,8 +48,8 @@ class SteamCmdAuthServiceUnitTest {
 
     @BeforeEach
     void setUp() {
-        when(mockFile.getParent()).thenReturn("/path/to/steamcmd");
-        when(pathsFactory.getSteamCmdExecutable()).thenReturn(mockFile);
+        lenient().when(pathsFactory.getSteamCmdExecutable()).thenReturn(mockSteamCmdFile);
+        lenient().when(pathsFactory.getSteamCmdCacheFile()).thenReturn(mockSteamCmdCacheFile);
 
         service = new SteamCmdAuthService(processFactory, pathsFactory);
     }

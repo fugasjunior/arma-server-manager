@@ -16,8 +16,9 @@ import AdditionalServersPage from "./pages/AdditionalServersPage";
 import DashboardPage from "./pages/DashboardPage";
 import AboutPage from "./pages/AboutPage.tsx";
 import ToolsPage from "./pages/ToolsPage.tsx";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import SteamAuthWizard from "./components/steamauthwizard/SteamAuthWizard";
+import {AuthContext} from "./store/auth-context.tsx";
 
 const getDefaultMode = (prefersDarkMode: boolean): "light" | "dark" => {
     const storedMode = localStorage.getItem("mode");
@@ -31,6 +32,7 @@ const getDefaultMode = (prefersDarkMode: boolean): "light" | "dark" => {
 const App = () => {
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
     const [mode, setMode] = useState<"light" | "dark">(getDefaultMode(prefersDarkMode));
+    const authCtx = useContext(AuthContext);
 
     const getTheme = () => createTheme({
         palette: {
@@ -89,7 +91,7 @@ const App = () => {
                         }/>
                     </Routes>
                 </Container>
-                <SteamAuthWizard />
+                {authCtx.isLoggedIn && <SteamAuthWizard/>}
                 <ToastContainer
                     position="bottom-left"
                     autoClose={3000}

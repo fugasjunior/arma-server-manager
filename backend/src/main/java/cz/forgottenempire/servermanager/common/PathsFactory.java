@@ -22,18 +22,21 @@ public class PathsFactory {
     private final Path serversBasePath;
     private final Path logsBasePath;
     private final String steamCmdPathString;
+    private final String steamCmdCacheFilePath;
 
     @Autowired
     public PathsFactory(
             @Value("${directory.servers}") String serversPathString,
             @Value("${directory.mods}") String modsPathString,
             @Value("${directory.logs}") String logsPathString,
-            @Value("${steamcmd.path}") String steamCmdPathString
+            @Value("${steamcmd.path}") String steamCmdPathString,
+            @Value("${steamcmd.cache.path}") String steamCmdCacheFilePath
     ) {
         serversBasePath = Path.of(serversPathString);
         modsBasePath = Path.of(modsPathString);
         logsBasePath = Path.of(logsPathString);
         this.steamCmdPathString = steamCmdPathString;
+        this.steamCmdCacheFilePath = steamCmdCacheFilePath;
     }
 
     public Path getServerPath(ServerType type) {
@@ -127,6 +130,10 @@ public class PathsFactory {
         }
 
         return steamCmdFile;
+    }
+
+    public File getSteamCmdCacheFile() {
+        return new File(steamCmdCacheFilePath);
     }
 
     private Path getServerExecutable(ServerType type) {

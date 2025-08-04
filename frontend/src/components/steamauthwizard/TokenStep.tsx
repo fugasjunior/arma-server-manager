@@ -58,7 +58,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
                 await setAuth(credentials);
                 onNext();
             } else {
-                setError('Invalid Steam Guard token. Please try again.');
+                setError(data.message || 'Unknown error occurred.');
             }
         } catch (err) {
             console.error(err);

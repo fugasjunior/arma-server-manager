@@ -56,8 +56,7 @@ public class SteamCmdAuthService {
     }
 
     private void deleteCachedCredentials() {
-        File steamCmdFile = pathsFactory.getSteamCmdExecutable();
-        FileUtils.deleteQuietly(new File(steamCmdFile.getParent() + "/config/config.vdf"));
+        FileUtils.deleteQuietly(pathsFactory.getSteamCmdCacheFile());
     }
 
     private String attemptSteamCmdLogin(SteamAuth auth) throws IOException, InterruptedException {
@@ -66,7 +65,10 @@ public class SteamCmdAuthService {
         Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, commands);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String output = reader.lines().collect(Collectors.joining("\n"));
+        String output = reader.lines()
+                .map(line -> line.replaceAll("\u001B\\[[;\\d]*m", "")) // Remove ANSI color codes
+                .map(line -> line.replaceAll("\\p{C}", "")) // Remove control characters
+                .collect(Collectors.joining("\n"));
 
         if (!process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
             process.destroyForcibly();
