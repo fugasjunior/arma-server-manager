@@ -22,6 +22,7 @@ const NewServerPage = () => {
             type,
             activeMods: [],
             activeDLCs: [],
+            scenarios: []
         }
 
         try {

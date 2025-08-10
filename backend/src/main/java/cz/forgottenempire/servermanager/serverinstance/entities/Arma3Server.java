@@ -42,6 +42,8 @@ public class Arma3Server extends Server {
     private boolean vonEnabled;
     private boolean verifySignatures;
 
+    private String scenarioRotation;
+
     @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
 
