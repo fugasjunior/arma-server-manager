@@ -28,8 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-import static org.springframework.security.web.util.matcher.RequestMatchers.not;
+
 
 @Configuration
 @EnableWebSecurity
@@ -76,11 +75,10 @@ class WebSecurityConfig {
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
         return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers(
-                                antMatcher("/api/login"),
-                                not(antMatcher("/api/**"))
-                        ).permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilter(jwtAuthenticationFilter)
@@ -97,8 +95,7 @@ class WebSecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

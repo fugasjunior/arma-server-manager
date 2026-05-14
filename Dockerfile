@@ -1,5 +1,5 @@
 # --- Build ---
-FROM eclipse-temurin:17-jdk AS build
+FROM eclipse-temurin:25-jdk AS build
 
 ENV NODE_VERSION=20.15.0
 ENV NVM_DIR=/root/.nvm
@@ -34,21 +34,26 @@ RUN chmod 555 ./gradlew \
     && sed -i -e 's/\r$//' ./gradlew \
     && ./gradlew install
 
+# --- JRE layer ---
+FROM eclipse-temurin:25-jre AS jre
+
 # -- Create runtime image ---
 FROM cm2network/steamcmd AS runtime
 
-ENV APP_VERSION=1.4.0
+ENV APP_VERSION=2.0.0-SNAPSHOT
+
+COPY --from=jre /opt/java/openjdk /opt/java/openjdk
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # TODO try to make the user not root. currently there are problems with mounted volumes ownership
 USER root
 RUN dpkg --add-architecture i386 \
     && apt-get update \
     && apt-get install -y \
-          ca-certificates-java \
           lib32gcc-s1 \
           lib32stdc++6  \
           libcap2 \
-          openjdk-17-jre \
           expect \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \

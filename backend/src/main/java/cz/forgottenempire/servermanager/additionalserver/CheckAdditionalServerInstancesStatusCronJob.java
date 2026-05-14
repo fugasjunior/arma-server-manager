@@ -23,30 +23,30 @@ class CheckAdditionalServerInstancesStatusCronJob {
     @Scheduled(fixedDelay = 1000)
     public void checkServers() {
         instanceInfoRepository.getAll().stream()
-                .filter(AdditionalServerInstanceInfo::isAlive)
+                .filter(AdditionalServerInstanceInfo::alive)
                 .forEach(instance -> {
-                    Process process = instance.getProcess();
+                    Process process = instance.process();
                     if (process.isAlive()) {
                         // server process is running normally
                         return;
                     }
 
                     // the process of a server that is marked as alive is no longer running
-                    instanceInfoRepository.storeServerInstanceInfo(instance.getId(),
-                            new AdditionalServerInstanceInfo(instance.getId(), false, null, null));
+                    instanceInfoRepository.storeServerInstanceInfo(instance.id(),
+                            new AdditionalServerInstanceInfo(instance.id(), false, null, null));
                     logWarningMessage(instance);
                 });
     }
 
     private void logWarningMessage(AdditionalServerInstanceInfo instance) {
-        AdditionalServer server = additionalServersService.getServer(instance.getId())
-                .orElseThrow(() -> new IllegalStateException("Invalid ID " + instance.getId() +
+        AdditionalServer server = additionalServersService.getServer(instance.id())
+                .orElseThrow(() -> new IllegalStateException("Invalid ID " + instance.id() +
                         " in additional server instances map"));
 
         log.warn("Server '{}' (ID {}) likely crashed or was exited outside the admin UI. "
                         + "Server was started on {} with process ID {}.",
                 server.getName(), server.getId(),
-                instance.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
-                instance.getProcess().pid());
+                instance.startedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
+                instance.process().pid());
     }
 }

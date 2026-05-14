@@ -38,7 +38,7 @@ class AdditionalServersService {
 
         // add shutdown hook to stop all running servers
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
-                instanceInfoRepository.getAll().forEach(server -> destroyWithTimeout(server.getProcess()))));
+                instanceInfoRepository.getAll().forEach(server -> destroyWithTimeout(server.process()))));
     }
 
     public Optional<AdditionalServer> getServer(Long id) {
@@ -81,7 +81,7 @@ class AdditionalServersService {
 
     public void stopServer(Long serverId) {
         AdditionalServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(serverId);
-        Process process = instanceInfo.getProcess();
+        Process process = instanceInfo.process();
         if (process == null) {
             log.warn("Server ID {} could not be stopped because it's not running", serverId);
             return;
@@ -95,7 +95,7 @@ class AdditionalServersService {
 
     private boolean isAlive(Long serverId) {
         AdditionalServerInstanceInfo instanceInfo = instanceInfoRepository.getServerInstanceInfo(serverId);
-        return instanceInfo.isAlive();
+        return instanceInfo.alive();
     }
 
     // TODO split log files automatically

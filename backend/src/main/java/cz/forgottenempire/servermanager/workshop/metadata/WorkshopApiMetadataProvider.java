@@ -1,8 +1,8 @@
 package cz.forgottenempire.servermanager.workshop.metadata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import cz.forgottenempire.servermanager.common.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ class WorkshopApiMetadataProvider {
         } catch (RestClientException e) {
             log.error("Request to Steam Workshop API for mod ID '{}' failed", modId, e);
             return null;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Failed to process Workshop API response for mod ID {}", modId, e);
             return null;
         }

@@ -1,15 +1,20 @@
 plugins {
-    id 'org.springframework.boot' version '3.3.1'
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.springframework.boot' version '4.0.6'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'org.flywaydb.flyway' version '10.15.2'
-    id 'io.freefair.aspectj.post-compile-weaving' version '8.6'
+    id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
 }
 
 group = 'cz.forgottenempire'
-version = '1.4.0'
-sourceCompatibility = '17'
+version = '2.0.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 
 configurations {
     developmentOnly
@@ -57,38 +62,39 @@ if (!isRunningFromIdea && !skipFrontendBuild) {
 dependencies {
     runtimeOnly project(':frontend')
 
-    implementation group: 'org.aspectj', name: 'aspectjrt', version: '1.9.22.1'
-    implementation group: 'org.springframework', name: 'spring-aspects', version: '6.1.10'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '3.3.1'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
-    implementation group: 'com.ibasco.agql', name: 'agql-source-query', version: '1.2.2'
-    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.33'
-    implementation group: 'org.springframework', name: 'spring-context-support', version: '6.1.10'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.2.1-jre'
-    implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.0.Beta2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.15.2'
-    implementation group: 'org.jsoup', name: 'jsoup', version: '1.17.2'
-    implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '10.15.2'
+    implementation "org.aspectj:aspectjrt:1.9.25.1"
+    implementation "org.springframework:spring-aspects"
+    implementation 'org.springframework.boot:spring-boot-starter-aspectj'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation "commons-io:commons-io:2.22.0"
+    implementation "com.auth0:java-jwt:4.2.2"
+    implementation "com.ibasco.agql:agql-source-query:1.2.2"
+    implementation "org.freemarker:freemarker:2.3.34"
+    implementation "org.springframework:spring-context-support"
+    implementation "com.google.guava:guava:33.6.0-jre"
+    implementation "org.mapstruct:mapstruct:1.6.3"
+    implementation "org.flywaydb:flyway-core:12.6.1"
+    implementation "org.jsoup:jsoup:1.22.2"
+    implementation "org.flywaydb:flyway-mysql:12.6.1"
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+    compileOnly "org.projectlombok:lombok:1.18.46"
 
-    runtimeOnly group: 'com.mysql', name: 'mysql-connector-j', version: '9.0.0'
+    runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
+    runtimeOnly 'com.mysql:mysql-connector-j:9.7.0'
 
-    aspect group: 'org.springframework', name: 'spring-aspects', version: '6.1.10'
+    aspect group: 'org.springframework', name: 'spring-aspects'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0.Beta2'
+    annotationProcessor "org.projectlombok:lombok:1.18.46"
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.3.1'
-    testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '6.3.1'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 test {
