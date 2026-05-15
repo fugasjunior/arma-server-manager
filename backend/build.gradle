@@ -5,6 +5,7 @@ plugins {
     id 'org.flywaydb.flyway' version '11.14.1'
     id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'org.openapi.generator' version '7.12.0'
 }
 
 group = 'cz.forgottenempire'
@@ -104,6 +105,50 @@ dependencies {
     testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
     testCompileOnly "org.projectlombok:lombok:1.18.46"
     testAnnotationProcessor "org.projectlombok:lombok:1.18.46"
+}
+
+openApiGenerate {
+    generatorName = 'spring'
+    inputSpec = "$rootDir/openapi/openapi.yaml"
+    outputDir = "$buildDir/generated/openapi"
+    apiPackage = 'cz.forgottenempire.servermanager.api'
+    modelPackage = 'cz.forgottenempire.servermanager.api.model'
+    invokerPackage = 'cz.forgottenempire.servermanager.api.invoker'
+    configOptions = [
+        interfaceOnly          : 'true',
+        useSpringBoot3         : 'true',
+        useTags                : 'true',
+        skipDefaultInterface   : 'true',
+        openApiNullable        : 'false',
+        useBeanValidation      : 'true',
+        dateLibrary            : 'java8',
+        useJakartaEe           : 'true',
+        serializationLibrary   : 'jackson',
+        enumUnknownDefaultCase : 'false',
+    ]
+    typeMappings = [
+        'set': 'java.util.Set'
+    ]
+    importMappings = [
+        'ServerType'       : 'cz.forgottenempire.servermanager.common.ServerType',
+        'InstallationStatus': 'cz.forgottenempire.servermanager.common.InstallationStatus',
+        'ErrorStatus'      : 'cz.forgottenempire.servermanager.steamcmd.ErrorStatus',
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated/openapi/src/main/java"
+        }
+    }
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+dependencies {
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.28'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
 }
 
 test {

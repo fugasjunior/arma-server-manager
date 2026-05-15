@@ -1,0 +1,6 @@
+ApiError:
+  description: Error response
+  content:
+    application/json:
+      schema:
+        $ref: './schemas/common.yaml#/ApiErrorDto'

@@ -2,7 +2,8 @@ import {useEffect, useRef, useState} from "react";
 import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import {downloadLogFile, getLogs} from "../../services/steamCmdService.ts";
+import {steamCmdApi} from "../../api/client";
+import {downloadSteamCmdLog} from "../../api/downloads";
 import {TextField} from "@mui/material";
 
 export const SteamCmdLogsTool = () => {
@@ -14,7 +15,7 @@ export const SteamCmdLogsTool = () => {
     }, []);
 
     async function fetchLogs() {
-        const {data: downloadedLogs} = await getLogs();
+        const {data: downloadedLogs} = await steamCmdApi.getSteamCmdLog();
         setLogs(downloadedLogs);
         if (logTextArea.current) {
             logTextArea.current.scrollTop = logTextArea.current.scrollHeight;
@@ -22,7 +23,7 @@ export const SteamCmdLogsTool = () => {
     }
 
     async function handleDownloadLogFile() {
-        downloadLogFile();
+        downloadSteamCmdLog();
     }
 
     function isLogEmpty() {

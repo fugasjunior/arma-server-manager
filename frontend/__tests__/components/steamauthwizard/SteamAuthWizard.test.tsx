@@ -2,14 +2,17 @@ import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SteamAuthWizard from '../../../src/components/steamauthwizard/SteamAuthWizard.tsx';
-import * as configService from '../../../src/services/configService.ts';
+import {steamAuthApi} from '../../../src/api/client';
 
-// Mock the configService
-jest.mock('../../../src/services/configService.ts', () => ({
-  getAuthStatus: jest.fn(),
-  verifyCredentials: jest.fn(),
-  setAuth: jest.fn()
+jest.mock('../../../src/api/client', () => ({
+  steamAuthApi: {
+    getSteamAuthStatus: jest.fn(),
+    verifySteamAuth: jest.fn(),
+    setSteamAuth: jest.fn()
+  }
 }));
+
+const mockedSteamAuthApi = jest.mocked(steamAuthApi);
 
 // Mock the child components
 jest.mock('../../../src/components/steamauthwizard/WelcomeStep.tsx', () => {
@@ -78,7 +81,7 @@ describe('SteamAuthWizard', () => {
     
     // Wait for useEffect to complete
     await waitFor(() => {
-      expect(configService.getAuthStatus).not.toHaveBeenCalled();
+      expect(mockedSteamAuthApi.getSteamAuthStatus).not.toHaveBeenCalled();
     });
     
     // Dialog should not be visible
@@ -90,7 +93,7 @@ describe('SteamAuthWizard', () => {
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
     
     // Mock API response
-    (configService.getAuthStatus as jest.Mock).mockResolvedValue({
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: false }
     });
     
@@ -100,7 +103,7 @@ describe('SteamAuthWizard', () => {
     
     // Wait for useEffect to complete
     await waitFor(() => {
-      expect(configService.getAuthStatus).toHaveBeenCalled();
+      expect(mockedSteamAuthApi.getSteamAuthStatus).toHaveBeenCalled();
     });
     
     // Dialog should be visible
@@ -115,7 +118,7 @@ describe('SteamAuthWizard', () => {
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
     
     // Mock API response
-    (configService.getAuthStatus as jest.Mock).mockResolvedValue({
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: true }
     });
     
@@ -125,7 +128,7 @@ describe('SteamAuthWizard', () => {
     
     // Wait for useEffect to complete
     await waitFor(() => {
-      expect(configService.getAuthStatus).toHaveBeenCalled();
+      expect(mockedSteamAuthApi.getSteamAuthStatus).toHaveBeenCalled();
     });
     
     // Dialog should not be visible
@@ -137,7 +140,7 @@ describe('SteamAuthWizard', () => {
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
     
     // Mock API response
-    (configService.getAuthStatus as jest.Mock).mockResolvedValue({
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: false }
     });
     
@@ -147,7 +150,7 @@ describe('SteamAuthWizard', () => {
     
     // Wait for useEffect to complete
     await waitFor(() => {
-      expect(configService.getAuthStatus).toHaveBeenCalled();
+      expect(mockedSteamAuthApi.getSteamAuthStatus).toHaveBeenCalled();
     });
     
     // First step (Welcome) should be visible
@@ -183,7 +186,7 @@ describe('SteamAuthWizard', () => {
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
     
     // Mock API response
-    (configService.getAuthStatus as jest.Mock).mockResolvedValue({
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: false }
     });
     
@@ -213,7 +216,7 @@ describe('SteamAuthWizard', () => {
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
     
     // Mock API response
-    (configService.getAuthStatus as jest.Mock).mockResolvedValue({
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: false }
     });
     
@@ -248,7 +251,7 @@ describe('SteamAuthWizard', () => {
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
     
     // Mock API response
-    (configService.getAuthStatus as jest.Mock).mockResolvedValue({
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: false }
     });
     

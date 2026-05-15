@@ -1,6 +1,6 @@
 import ListBuilderModEdit from "./ListBuilderModEdit";
 import ReforgerModEdit from "./ReforgerModEdit";
-import {ReforgerServerDto, ServerDto} from "../../dtos/ServerDto.ts";
+import {ReforgerServerDto, ServerDto, ServerInstanceInfoDto} from "../../api/generated";
 
 type ModEditButtonProps = {
     server: ServerDto

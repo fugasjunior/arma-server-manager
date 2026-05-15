@@ -8,12 +8,12 @@ import {
     StepLabel,
     Stepper
 } from '@mui/material';
-import { getAuthStatus } from '../../services/configService';
+import {steamAuthApi} from '../../api/client';
+import { SteamAuthDto } from '../../api/generated';
 import WelcomeStep from './WelcomeStep';
 import CredentialsStep from './CredentialsStep';
 import TokenStep from './TokenStep';
 import CompletionStep from './CompletionStep';
-import { SteamAuthDto } from '../../dtos/SteamAuthDto';
 
 /**
  * Steam Authentication Wizard component
@@ -45,7 +45,7 @@ const SteamAuthWizard: React.FC = () => {
                 }
 
                 // Check if Steam auth is already configured
-                const { data } = await getAuthStatus();
+                const { data } = await steamAuthApi.getSteamAuthStatus();
                 if (!data.isConfigured) {
                     setOpen(true);
                 }

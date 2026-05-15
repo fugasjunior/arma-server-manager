@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
 import {useInterval} from "../hooks/use-interval";
 import {Avatar, Button, Divider, Stack, Typography} from "@mui/material";
-import {getAdditionalServers, startAdditionalServer, stopAdditionalServer} from "../services/additionalServersService";
+import {additionalServersApi} from "../api/client";
+import {AdditionalServerDto} from "../api/generated";
 import Paper from "@mui/material/Paper";
 import config from "../config";
 import TableSkeletons from "../UI/TableSkeletons";
 import CircularProgress from "@mui/material/CircularProgress";
-import {AdditionalServerDto} from "../dtos/AdditionalServerDto.ts";
 
 const AdditionalServersPage = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -21,13 +21,13 @@ const AdditionalServersPage = () => {
     }, 2000);
 
     const fetchAdditionalServers = async () => {
-        const {data: servers} = await getAdditionalServers();
-        setAdditionalServers(servers.servers);
+        const {data: servers} = await additionalServersApi.getAdditionalServers();
+        setAdditionalServers(servers.servers ?? []);
         setIsLoading(false);
     }
 
     const handleStart = async (id: number) => {
-        await startAdditionalServer(id);
+        await additionalServersApi.startAdditionalServer({serverId: id as number});
         setAdditionalServers(prevState => {
             const newServers = [...prevState];
             const server = newServers.find(server => server.id === id);
@@ -39,13 +39,13 @@ const AdditionalServersPage = () => {
     };
 
     const handleStop = async (id: number) => {
-        await stopAdditionalServer(id);
+        await additionalServersApi.stopAdditionalServer({serverId: id as number});
         setAdditionalServers(prevState => {
             const newServers = [...prevState];
             const server = newServers.find(server => server.id === id);
             if (server) {
                 server.alive = false;
-                server.startedAt = null;
+                server.startedAt = undefined;
             }
             return newServers;
         })
@@ -77,13 +77,13 @@ const AdditionalServersPage = () => {
                             }
                             {server.startedAt && server.alive &&
                                 <Button variant="contained" color="error"
-                                        onClick={() => handleStop(server.id)}>
+                                        onClick={() => handleStop(server.id!)}>
                                     Stop
                                 </Button>}
                             {!server.startedAt &&
                                 <Button variant="contained" color="primary"
                                         disabled={!server.startedAt && server.alive}
-                                        onClick={() => handleStart(server.id)}>
+                                        onClick={() => handleStart(server.id!)}>
                                     {!server.startedAt && server.alive ?
                                         <CircularProgress size={24}/> : "Start"}
                                 </Button>}

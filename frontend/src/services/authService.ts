@@ -1,5 +1,5 @@
-import config from "../config"
-import http from "./httpService";
+import config from "../config";
+import {apiAxiosInstance} from "../api/client";
 
 const apiEndpoint = config.apiUrl + "/login";
 
@@ -7,6 +7,6 @@ export async function login(username: string, password: string) {
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
-    const {data} = await http.post(apiEndpoint, formData);
+    const {data} = await apiAxiosInstance.post(apiEndpoint, formData);
     return data;
 }

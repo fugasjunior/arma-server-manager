@@ -1,0 +1,37 @@
+Arma3ScenarioDto:
+  type: object
+  properties:
+    name:
+      type: string
+    fileSize:
+      type: integer
+      format: int64
+    createdOn:
+      type: string
+      format: date-time
+
+Arma3ScenariosDto:
+  type: object
+  properties:
+    scenarios:
+      type: array
+      items:
+        $ref: '#/Arma3ScenarioDto'
+
+ReforgerScenarioDto:
+  type: object
+  properties:
+    value:
+      type: string
+    name:
+      type: string
+    official:
+      type: boolean
+
+ReforgerScenariosDto:
+  type: object
+  properties:
+    scenarios:
+      type: array
+      items:
+        $ref: '#/ReforgerScenarioDto'

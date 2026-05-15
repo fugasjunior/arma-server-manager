@@ -1,12 +1,12 @@
-import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
+import {ReforgerScenarioDto} from "../../api/generated";
+import {scenariosApi} from "../../api/client";
 import {Autocomplete, AutocompleteValue, Box, TextField} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {getReforgerScenarios} from "../../services/scenarioService.ts";
+import React, {SyntheticEvent, useEffect, useState} from "react";
 import {FormikState} from "formik";
-import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
+import {ReforgerServerDto} from "../../api/serverModels";
 
 type ReforgerScenariosAutocompleteProps = {
-    onChange: (_: any, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
+    onChange: (_: SyntheticEvent | null, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
     formik: FormikState<ReforgerServerDto>
 };
 
@@ -15,8 +15,8 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
 
     useEffect(() => {
         const fetchScenarios = async () => {
-            const {data: scenariosDto} = await getReforgerScenarios();
-            setScenarios(scenariosDto.scenarios);
+            const {data: scenariosDto} = await scenariosApi.getReforgerScenarios();
+            setScenarios(scenariosDto.scenarios ?? []);
         };
 
         fetchScenarios();
@@ -44,7 +44,7 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
         getOptionLabel={(option) => {
             if (typeof option === "string")
                 return option;
-            return option.value;
+            return option.value ?? '';
         }}
         value={formik.values.scenarioId}
         onChange={onChange}

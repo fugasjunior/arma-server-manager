@@ -1,6 +1,8 @@
 import {ChangeEvent, useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal, Stack, TextField} from "@mui/material";
-import {getServer, updateServer} from "../../services/serversService";
+import {serversApi} from "../../api/client";
+import {ServerDto, ServerInstanceInfoDto} from "../../api/generated";
+import {ReforgerServerDto} from "../../api/serverModels";
 import {toast} from "material-react-toastify";
 import AddIcon from "@mui/icons-material/Add";
 import TableContainer from "@mui/material/TableContainer";
@@ -12,7 +14,6 @@ import TableBody from "@mui/material/TableBody";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MemoryIcon from '@mui/icons-material/Memory';
-import {ReforgerServerDto} from "../../dtos/ServerDto";
 
 const modalStyle = {
     position: 'absolute',
@@ -34,7 +35,7 @@ type ReforgerModEditProps = {
 const ReforgerModEdit = (props: ReforgerModEditProps) => {
     const [server, setServer] = useState<ReforgerServerDto>();
     const [isOpen, setIsOpen] = useState(false);
-    const [mods, setMods] = useState(props.server.activeMods);
+    const [mods, setMods] = useState<Array<{id: string, name: string}>>(props.server.activeMods ?? []);
     const [newModName, setNewModName] = useState("");
     const [newModId, setNewModId] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -49,9 +50,9 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
         setIsLoading(true);
         setIsOpen(false);
         try {
-            const {data: serverDto} = await getServer(props.server.id);
+            const {data: serverDto} = await serversApi.getServer({id: props.server.id});
             setServer(serverDto);
-            setMods(serverDto.activeMods);
+            setMods((serverDto as ReforgerServerDto).activeMods ?? []);
             setIsOpen(true);
         } catch (e: any) {
             console.error(e);
@@ -87,7 +88,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
 
         setIsOpen(false);
         try {
-            await updateServer(props.server.id, {...server, activeMods: mods});
+            await serversApi.updateServer({id: props.server.id, serverDto: {...server, activeMods: mods} as unknown as ServerDto});
             toast.success("Mods successfully set");
         } catch (e: any) {
             console.error(e);

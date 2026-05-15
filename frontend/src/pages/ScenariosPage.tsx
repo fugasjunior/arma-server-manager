@@ -1,8 +1,9 @@
 import {ChangeEvent, useEffect, useState} from "react";
-import {deleteScenario, downloadScenario, getScenarios, uploadScenarios} from "../services/scenarioService";
+import {scenariosApi} from "../api/client";
+import {downloadScenario} from "../api/downloads";
+import {Arma3ScenarioDto} from "../api/generated";
 import {toast} from "material-react-toastify";
 import {ScenariosTable} from "../components/scenarios/ScenariosTable";
-import {Arma3ScenarioDto} from "../dtos/Arma3ScenarioDto.ts";
 
 const ScenariosPage = () => {
     const [scenarios, setScenarios] = useState<Array<Arma3ScenarioDto>>([]);
@@ -15,21 +16,10 @@ const ScenariosPage = () => {
     }, []);
 
     const refreshScenarios = async () => {
-        const {data: scenariosDto} = await getScenarios();
-        const scenarios = scenariosDto.scenarios.map((scenario: Arma3ScenarioDto) => {
-            const createdOn = scenario.createdOn ? new Date(scenario.createdOn) : "";
-            return {
-                ...scenario,
-                createdOn
-            };
-        });
+        const {data: scenariosDto} = await scenariosApi.getArma3Scenarios();
+        const scenarios = scenariosDto.scenarios ?? [];
         setScenarios(scenarios);
     };
-
-    const handleProgress = (e: ProgressEvent) => {
-        const percentCompleted = Math.round((e.loaded * 100) / e.total);
-        setPercentUploaded(percentCompleted);
-    }
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -38,13 +28,9 @@ const ScenariosPage = () => {
         }
 
         try {
-            const formData = new FormData();
-            [...e.target.files].forEach(file => {
-                formData.append(`file`, file, file.name);
-            })
             setUploadInProgress(true);
 
-            await uploadScenarios(formData, {onUploadProgress: handleProgress});
+            await scenariosApi.uploadScenarios({file: Array.from(e.target.files)});
             await refreshScenarios();
             toast.success("Scenarios successfully uploaded");
         } catch (ex: any) {
@@ -68,12 +54,12 @@ const ScenariosPage = () => {
     const handleDelete = async () => {
         try {
             setScenarios(prevState => {
-                    return prevState.filter(scenario => selected.indexOf(scenario.name) === -1)
+                    return prevState.filter(scenario => selected.indexOf(scenario.name ?? "") === -1)
                 }
             );
 
             for (const scenario of selected) {
-                await deleteScenario(scenario);
+                await scenariosApi.deleteScenario({name: scenario});
             }
             toast.success("Scenario(s) deleted successfully");
             setSelected([]);
@@ -85,7 +71,7 @@ const ScenariosPage = () => {
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = scenarios.map((n) => n.name);
+            const newSelected = scenarios.map((n) => n.name ?? "").filter(Boolean);
             setSelected(newSelected);
             return;
         }

@@ -1,0 +1,21 @@
+/server/{id}/hc/start:
+  post:
+    tags: [HeadlessClient]
+    operationId: startHeadlessClient
+    summary: Start a headless client for a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+
+/server/{id}/hc/stop:
+  delete:
+    tags: [HeadlessClient]
+    operationId: stopHeadlessClient
+    summary: Stop the headless client for a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK

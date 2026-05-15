@@ -2,7 +2,7 @@ import {Accordion, AccordionDetails, AccordionSummary, FormGroup, Grid, Typograp
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {FormikProps} from "formik";
-import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
+import {Arma3ServerDto} from "../../../api/serverModels";
 import {ThreeStateFlagField} from "../../../UI/Form/ThreeStateFlagField.tsx";
 import {Arma3AiSkillSettings} from "./Arma3AiSkillSettings.tsx";
 import {SwitchField} from "../../../UI/Form/SwitchField.tsx";

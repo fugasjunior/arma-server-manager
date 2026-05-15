@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import {ServerDto} from "../../../dtos/ServerDto.ts";
+import {ServerDto, ServerInstanceInfoDto} from "../../../api/generated";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {useState} from "react";
@@ -59,7 +59,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                 </TableCell>
                 <TableCell>
                     <SeverControls
-                        serverRunning={status && status.alive} server={server}
+                        serverRunning={status?.alive ?? null} server={server}
                         onStartServer={() => onStartServer(server.id as number)}
                         onStopServer={() => onStopServer(server.id as number)}
                         onRestartServer={() => onRestartServer(server.id as number)}

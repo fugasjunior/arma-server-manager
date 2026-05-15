@@ -1,0 +1,50 @@
+# Build artifacts
+.gradle/
+build/
+out/
+dist/
+
+# IDE & editor
+.idea/
+.vscode/
+.jpb/
+.classpath
+.project
+.settings
+*.iws
+*.iml
+*.ipr
+
+# Dependencies
+**/node_modules/
+**/.pnp
+**/.pnp.js
+
+# Runtime & environment
+config/
+!config/application.properties.EXAMPLE
+!config/application-docker.properties
+logs/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Generated code
+backend/build/generated/
+frontend/src/api/generated/
+
+# Test artifacts
+coverage/
+**/*.lcov
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker dev
+docker-compose-dev.yml

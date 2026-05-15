@@ -1,6 +1,6 @@
 import {useFormik} from "formik";
 import {FormGroup, Grid} from "@mui/material";
-import {DayZServerDto} from "../../dtos/ServerDto.ts";
+import {DayZServerDto} from "../../api/serverModels";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
@@ -15,7 +15,7 @@ type EditDayZServerSettingsFormProps = {
 }
 const EditDayZServerSettingsForm = (props: EditDayZServerSettingsFormProps) => {
 
-    const [launchParameters, setLaunchParameters] = useState([...props.server.customLaunchParameters]);
+    const [launchParameters, setLaunchParameters] = useState([...(props.server.customLaunchParameters ?? [])]);
 
     const handleSubmit = (values: DayZServerDto) => {
         values.customLaunchParameters = [...launchParameters];

@@ -3,8 +3,8 @@ import {MuiChipsInput} from "mui-chips-input";
 
 type CustomLaunchParametersInputProps = {
     valueDelimiter: string,
-    parameters: Array<{ name: string, value: string | null }>,
-    onParametersChange: (values: Array<{ name: string, value: string | null }>) => void,
+    parameters: Array<{ name: string, value?: string }>,
+    onParametersChange: (values: Array<{ name: string, value?: string }>) => void,
 }
 
 export const CustomLaunchParametersInput = (props: CustomLaunchParametersInputProps) => {
@@ -23,7 +23,7 @@ export const CustomLaunchParametersInput = (props: CustomLaunchParametersInputPr
                 const name = split[0].startsWith("-") ? split[0].slice(1) : split[0];
 
                 if (split.length === 1) {
-                    return {name, value: null};
+                    return {name, value: undefined};
                 }
 
                 return {name, value: split.slice(1).join(' ')};

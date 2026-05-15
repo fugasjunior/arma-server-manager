@@ -1,7 +1,8 @@
 package cz.forgottenempire.servermanager.modpreset;
 
-import cz.forgottenempire.servermanager.modpreset.dtos.PresetResponseDto;
-import cz.forgottenempire.servermanager.modpreset.dtos.PresetResponseModDto;
+import cz.forgottenempire.servermanager.api.model.PresetResponseDto;
+import cz.forgottenempire.servermanager.api.model.PresetResponseModDto;
+import cz.forgottenempire.servermanager.api.model.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import java.util.Collection;
 import java.util.List;
@@ -31,4 +32,12 @@ interface ModPresetMapper {
     @Mapping(target = "serverType", ignore = true)
     @Mapping(target = "biKeys", ignore = true)
     WorkshopMod presetResponseModDtoToWorkshopMod(PresetResponseModDto modDto);
+
+    default ServerType mapServerType(cz.forgottenempire.servermanager.common.ServerType type) {
+        return type != null ? ServerType.fromValue(type.name()) : null;
+    }
+
+    default cz.forgottenempire.servermanager.common.ServerType mapServerType(ServerType type) {
+        return type != null ? cz.forgottenempire.servermanager.common.ServerType.valueOf(type.name()) : null;
+    }
 }

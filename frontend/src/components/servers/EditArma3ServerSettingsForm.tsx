@@ -1,7 +1,8 @@
 import {useFormik} from "formik";
 import {FormGroup, Grid} from "@mui/material";
 import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
-import {Arma3NetworkSettings, Arma3ServerDto} from "../../dtos/ServerDto.ts";
+import {Arma3NetworkSettingsDto} from "../../api/generated";
+import {Arma3ServerDto} from "../../api/serverModels";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
@@ -18,11 +19,11 @@ type EditArma3ServerSettingsFormProps = {
 
 const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) => {
 
-    const [launchParameters, setLaunchParameters] = useState([...props.server.customLaunchParameters]);
+    const [launchParameters, setLaunchParameters] = useState([...(props.server.customLaunchParameters ?? [])]);
 
     const handleSubmit = (values: Arma3ServerDto) => {
         if (areAllPropertiesNull(values.networkSettings)) {
-            values.networkSettings = null;
+            values.networkSettings = undefined;
         }
 
         values.customLaunchParameters = [...launchParameters];
@@ -35,8 +36,8 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
         enableReinitialize: true
     });
 
-    const areAllPropertiesNull = (networkSettings: Arma3NetworkSettings | null): boolean => {
-        if (networkSettings === null) {
+    const areAllPropertiesNull = (networkSettings: Arma3NetworkSettingsDto | null | undefined): boolean => {
+        if (networkSettings == null) {
             return true;
         }
         return Object.values(networkSettings).every(x => x === null);

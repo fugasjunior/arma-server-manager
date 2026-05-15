@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 
 import java.util.Collections;
 import java.util.List;

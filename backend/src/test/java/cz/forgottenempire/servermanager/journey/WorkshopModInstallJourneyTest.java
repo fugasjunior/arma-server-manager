@@ -3,7 +3,7 @@ package cz.forgottenempire.servermanager.journey;
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
 import cz.forgottenempire.servermanager.support.AbstractIntegrationTest;
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsService;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
@@ -37,7 +37,7 @@ class WorkshopModInstallJourneyTest extends AbstractIntegrationTest {
         jdbcTemplate.update(
                 "UPDATE server_installation SET installation_status = 'FINISHED' WHERE type = 'ARMA3'"
         );
-        SteamAuthDto auth = new SteamAuthDto("testuser", "testpass", null);
+        SteamAuthDto auth = new SteamAuthDto().username("testuser").password("testpass");
         steamAuthService.setAuthAccount(auth);
     }
 

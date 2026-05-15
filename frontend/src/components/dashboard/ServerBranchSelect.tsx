@@ -1,4 +1,4 @@
-import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
+import {ServerInstallationDto} from "../../api/generated";
 import {FormControl, InputLabel, Select, SelectChangeEvent} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -18,6 +18,6 @@ export const ServerBranchSelect = ({installation, onChange}: ServerBranchSelectP
             autoWidth
             onChange={onChange}
         >
-            {installation.availableBranches.map(branch => <MenuItem key={branch} value={branch}>{branch.toLowerCase()}</MenuItem>)}
+            {Array.from(installation.availableBranches ?? []).map(branch => <MenuItem key={branch} value={branch}>{branch.toLowerCase()}</MenuItem>)}
         </Select>
     </FormControl>);

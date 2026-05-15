@@ -1,6 +1,6 @@
 package cz.forgottenempire.servermanager.steamauth;
 
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

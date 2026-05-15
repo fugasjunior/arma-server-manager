@@ -3,7 +3,7 @@ package cz.forgottenempire.servermanager.steamauth;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

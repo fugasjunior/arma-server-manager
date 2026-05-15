@@ -1,0 +1,50 @@
+/steamcmd:
+  get:
+    tags: [SteamCmd]
+    operationId: getSteamCmdItemInfos
+    summary: Get status info for all SteamCmd items
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                $ref: '../components/schemas/steamcmd.yaml#/SteamCmdItemInfoDto'
+
+/steamcmd/log:
+  get:
+    tags: [SteamCmd]
+    operationId: getSteamCmdLog
+    summary: Get SteamCmd log (last N lines)
+    parameters:
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+    responses:
+      '200':
+        description: OK
+        content:
+          text/plain:
+            schema:
+              type: string
+
+/steamcmd/log/download:
+  get:
+    tags: [SteamCmd]
+    operationId: downloadSteamCmdLog
+    summary: Download SteamCmd log file
+    responses:
+      '200':
+        description: OK
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'

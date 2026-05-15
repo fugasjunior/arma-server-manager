@@ -1,10 +1,10 @@
 import {Button, Grid, Stack, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
 import {useFormik} from "formik";
-import {clearAuth, getAuth, setAuth} from "../../services/configService";
+import {steamAuthApi} from "../../api/client";
 import {toast} from "material-react-toastify";
 import ConfirmationDialog from "../../UI/ConfirmationDialog";
-import {SteamAuthDto} from "../../dtos/SteamAuthDto.ts";
+import {SteamAuthDto} from "../../api/generated";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
 const SteamAuthForm = () => {
@@ -19,7 +19,7 @@ const SteamAuthForm = () => {
     useEffect(() => {
         const fetchAuth = async () => {
             try {
-                const {data: auth} = await getAuth();
+                const {data: auth} = await steamAuthApi.getSteamAuth();
                 setLoadedAuth({
                     username: auth.username ?? "",
                     password: auth.password ?? "",
@@ -37,11 +37,11 @@ const SteamAuthForm = () => {
 
     const handleSubmit = async (values: SteamAuthDto) => {
         try {
-            await setAuth({
+            await steamAuthApi.setSteamAuth({steamAuthDto: {
                 username: values.username,
                 password: values.password,
-                steamGuardToken: values.steamGuardToken.trim()
-            });
+                steamGuardToken: values.steamGuardToken?.trim()
+            }});
             setLoadedAuth(prevState => {
                 return {...prevState, password: ""};
             });
@@ -70,7 +70,7 @@ const SteamAuthForm = () => {
         });
         formik.resetForm();
         setClearDialogOpen(false);
-        await clearAuth();
+        await steamAuthApi.clearSteamAuth();
         toast.success("Steam Auth successfully cleared.");
     }
 

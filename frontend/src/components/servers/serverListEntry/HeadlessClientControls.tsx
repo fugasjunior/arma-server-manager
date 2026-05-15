@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
-import {addHeadlessClient, removeHeadlessClient} from "../../../services/serversService.ts";
+import {headlessClientApi} from "../../../api/client";
+import {ServerInstanceInfoDto} from "../../../api/generated";
 import {toast} from "material-react-toastify";
 import {Avatar, Stack, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
@@ -8,21 +9,21 @@ import {blue, grey} from "@mui/material/colors";
 import AddIcon from "@mui/icons-material/Add";
 
 export function HeadlessClientControls(props: { serverStatus: ServerInstanceInfoDto, serverId: number }) {
-    const [headlessClientsCount, setHeadlessClientsCount] = useState(props.serverStatus.headlessClientsCount);
+    const [headlessClientsCount, setHeadlessClientsCount] = useState(props.serverStatus.headlessClientsCount ?? 0);
 
     useEffect(() => {
-        setHeadlessClientsCount(props.serverStatus.headlessClientsCount)
+        setHeadlessClientsCount(props.serverStatus.headlessClientsCount ?? 0)
     }, [props.serverStatus.headlessClientsCount]);
 
     const handleAddHeadlessClient = async () => {
-        setHeadlessClientsCount(prevState => ++prevState);
-        await addHeadlessClient(props.serverId);
+        setHeadlessClientsCount(prevState => (prevState ?? 0) + 1);
+        await headlessClientApi.startHeadlessClient({id: props.serverId});
         toast.success("Headless client started");
     }
 
     const handleRemoveHeadlessClient = async () => {
-        setHeadlessClientsCount(prevState => --prevState);
-        await removeHeadlessClient(props.serverId);
+        setHeadlessClientsCount(prevState => (prevState ?? 0) - 1);
+        await headlessClientApi.stopHeadlessClient({id: props.serverId});
         toast.success("Headless client stopped");
     }
 

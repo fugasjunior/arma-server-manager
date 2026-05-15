@@ -1,0 +1,32 @@
+ServerDetailsDto:
+  type: object
+  properties:
+    spaceLeft:
+      type: integer
+      format: int64
+    spaceTotal:
+      type: integer
+      format: int64
+    memoryLeft:
+      type: integer
+      format: int64
+    memoryTotal:
+      type: integer
+      format: int64
+    cpuUsage:
+      type: number
+      format: double
+    cpuCount:
+      type: integer
+    osName:
+      type: string
+    osVersion:
+      type: string
+    osArchitecture:
+      type: string
+
+ServerOSDto:
+  type: object
+  properties:
+    osType:
+      $ref: './common.yaml#/OSType'

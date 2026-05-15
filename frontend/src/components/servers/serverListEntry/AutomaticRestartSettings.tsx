@@ -1,7 +1,7 @@
-import {AutomaticRestartDto} from "../../../dtos/AutomaticRestartDto.ts";
+import {AutomaticRestartDto} from "../../../api/generated";
+import {serversApi} from "../../../api/client";
 import {useEffect, useState} from "react";
 import {TimeField} from "@mui/x-date-pickers";
-import {setAutomaticRestart} from "../../../services/serversService.ts";
 import {FormControlLabel, Stack, Switch} from "@mui/material";
 import {parseInt} from "lodash";
 import dayjs from "dayjs";
@@ -20,12 +20,12 @@ const convertTimeStringToDate = (timeString: string | null): dayjs.Dayjs | null 
 
 const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticRestartDto }) => {
 
-    const [enabled, setEnabled] = useState<boolean>(props.dto.enabled);
-    const [time, setTime] = useState<dayjs.Dayjs | null>(convertTimeStringToDate(props.dto.time));
+    const [enabled, setEnabled] = useState<boolean>(props.dto.enabled ?? false);
+    const [time, setTime] = useState<dayjs.Dayjs | null>(convertTimeStringToDate(props.dto.time ?? null));
 
     useEffect(() => {
         const updateTimeout = setTimeout(async () => {
-            await setAutomaticRestart(props.serverId, {enabled, time: time!.toDate().toLocaleTimeString("en-GB")});
+            await serversApi.setAutoRestart({id: props.serverId, automaticRestartDto: {enabled, time: time!.toDate().toLocaleTimeString("en-GB")}});
         }, 2000)
         return () => clearTimeout(updateTimeout)
     }, [enabled, time])

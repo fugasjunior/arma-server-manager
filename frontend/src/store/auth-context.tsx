@@ -1,5 +1,5 @@
 import {createContext, useState} from "react";
-import http from "../services/httpService";
+import {setJwt} from "../api/client";
 
 interface AuthContextType {
     token: string | null,
@@ -23,7 +23,7 @@ export const AuthContextProvider = (props: any) => {
     }
     const [token, setToken] = useState<string | null>(initialToken);
     if (token) {
-        http.setJwt(token);
+        setJwt(token);
     }
 
     const userIsLoggedIn = !!token;
@@ -35,7 +35,7 @@ export const AuthContextProvider = (props: any) => {
     };
 
     const logoutHandler = () => {
-        http.setJwt("");
+        setJwt("");
         setToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('expirationTime');

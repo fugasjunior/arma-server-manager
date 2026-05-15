@@ -2,12 +2,11 @@ import React from 'react';
 import {fireEvent, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TokenStep from '../../../src/components/steamauthwizard/TokenStep.tsx';
-import {SteamAuthDto} from "../../../src/dtos/SteamAuthDto.ts";
-
-// Mock the configService
-jest.mock('../../../src/services/configService.ts', () => ({
-  verifyCredentials: jest.fn().mockResolvedValue({ data: { status: 'SUCCESS' } }),
-  setAuth: jest.fn().mockResolvedValue({})
+jest.mock('../../../src/api/client', () => ({
+  steamAuthApi: {
+    verifySteamAuth: jest.fn().mockResolvedValue({ data: { status: 'SUCCESS' } }),
+    setSteamAuth: jest.fn().mockResolvedValue({})
+  }
 }));
 
 describe('TokenStep', () => {

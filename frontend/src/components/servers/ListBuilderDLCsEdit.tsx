@@ -1,12 +1,11 @@
 import {useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal} from "@mui/material";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
-import {getServer, updateServer} from "../../services/serversService";
-import {getMods} from "../../services/modsService";
+import {serversApi, modsApi} from "../../api/client";
+import {CreatorDlcDto, ServerDto, ServerInstanceInfoDto, ServerType} from "../../api/generated";
+import {Arma3ServerDto} from "../../api/serverModels";
 import {toast} from "material-react-toastify";
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import {ServerDto} from "../../dtos/ServerDto";
-import {CreatorDlcDto} from "../../dtos/CreatorDlcDto.ts";
 
 type ListBuilderDLCsEditProps = {
     server: ServerDto,
@@ -30,12 +29,12 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
         setIsLoading(true);
         setIsOpen(false);
         try {
-            const {data: serverDto} = await getServer(props.server.id);
-            const {data: dlcsDto} = await getMods(props.server.type);
+            const {data: serverDto} = await serversApi.getServer({id: props.server.id});
+            const {data: dlcsDto} = await modsApi.getMods({filter: props.server.type as ServerType});
             setServer(serverDto);
-            setSelectedDLCs(serverDto.activeDLCs);
-            setAvailableDLCs(dlcsDto.creatorDlcs.filter((mod: CreatorDlcDto) => !serverDto.activeDLCs.find((searchedDlc: CreatorDlcDto) => searchedDlc.id === mod.id))
-                .sort((a: CreatorDlcDto, b: CreatorDlcDto) => a.name.localeCompare(b.name)));
+            setSelectedDLCs((serverDto as Arma3ServerDto).activeDLCs ?? []);
+            setAvailableDLCs((dlcsDto.creatorDlcs ?? []).filter((mod: CreatorDlcDto) => !((serverDto as Arma3ServerDto).activeDLCs ?? []).find((searchedDlc: CreatorDlcDto) => searchedDlc.id === mod.id))
+                .sort((a: CreatorDlcDto, b: CreatorDlcDto) => (a.name ?? "").localeCompare(b.name ?? "")));
             setIsOpen(true);
         } catch (e: any) {
             console.error(e);
@@ -50,7 +49,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
         });
 
         setSelectedDLCs((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
         });
     }
 
@@ -60,7 +59,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
         });
 
         setAvailableDLCs((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
         });
     }
 
@@ -71,7 +70,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
 
         setIsOpen(false);
         try {
-            await updateServer(props.server.id, {...server, activeDLCs: selectedDLCs});
+            await serversApi.updateServer({id: props.server.id, serverDto: {...server, activeDLCs: selectedDLCs} as unknown as ServerDto});
             toast.success("DLCs successfully set");
         } catch (e: any) {
             console.error(e);

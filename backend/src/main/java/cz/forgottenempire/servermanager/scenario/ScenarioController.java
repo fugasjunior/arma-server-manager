@@ -1,5 +1,10 @@
 package cz.forgottenempire.servermanager.scenario;
 
+import cz.forgottenempire.servermanager.api.ScenariosApi;
+import cz.forgottenempire.servermanager.api.model.Arma3ScenarioDto;
+import cz.forgottenempire.servermanager.api.model.Arma3ScenariosDto;
+import cz.forgottenempire.servermanager.api.model.ReforgerScenarioDto;
+import cz.forgottenempire.servermanager.api.model.ReforgerScenariosDto;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
@@ -15,19 +20,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/scenarios")
-class ScenarioController {
+public class ScenarioController implements ScenariosApi {
 
     private final ScenarioService scenarioService;
     private final ServerInstallationService serverInstallationService;
@@ -44,20 +42,19 @@ class ScenarioController {
         this.pathsFactory = pathsFactory;
     }
 
-    @GetMapping
-    public ResponseEntity<Arma3ScenariosDto> getAllScenarios() {
-        return ResponseEntity.ok(new Arma3ScenariosDto(scenarioService.getAllScenarios()));
+    @Override
+    public ResponseEntity<Arma3ScenariosDto> getArma3Scenarios() {
+        List<Arma3ScenarioDto> scenarios = scenarioService.getAllScenarios();
+        return ResponseEntity.ok(new Arma3ScenariosDto().scenarios(scenarios));
     }
 
-    @GetMapping("/{name:.+}")
-    public ResponseEntity<Resource> downloadScenario(@PathVariable String name) {
+    @Override
+    public ResponseEntity<Resource> downloadScenario(String name) {
         File file = pathsFactory.getScenarioPath(name).toFile();
-
         try {
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
-                    .header("Content-Disposition",
-                            "attachment; filename=" + file.getName())
+                    .header("Content-Disposition", "attachment; filename=" + file.getName())
                     .contentLength(file.length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(resource);
@@ -67,41 +64,40 @@ class ScenarioController {
         }
     }
 
-    @GetMapping("/REFORGER")
+    @Override
     public ResponseEntity<ReforgerScenariosDto> getReforgerScenarios() {
         if (!serverInstallationService.isServerInstalled(ServerType.REFORGER)) {
             throw new ServerNotInitializedException(ServerType.REFORGER);
         }
-
-        List<ReforgerScenarioDto> reforgerScenarios = scenarioService.getReforgerScenarios();
-        return ResponseEntity.ok(new ReforgerScenariosDto(reforgerScenarios));
+        List<ReforgerScenarioDto> scenarios = scenarioService.getReforgerScenarios();
+        return ResponseEntity.ok(new ReforgerScenariosDto().scenarios(scenarios));
     }
 
-    @PostMapping
-    public ResponseEntity<?> uploadScenarios(@RequestParam("file") List<MultipartFile> files) {
-        files.forEach(file -> {
-            log.info("Receiving file upload ({})", file.getOriginalFilename());
+    @Override
+    public ResponseEntity<Void> uploadScenarios(List<MultipartFile> file) {
+        if (file != null) {
+            file.forEach(f -> {
+                log.info("Receiving file upload ({})", f.getOriginalFilename());
 
-            if (file.getOriginalFilename() == null) {
-                log.warn("Could not determine file name, skipping");
-                return;
-            }
+                if (f.getOriginalFilename() == null) {
+                    log.warn("Could not determine file name, skipping");
+                    return;
+                }
 
-            if (!file.getOriginalFilename().endsWith(".pbo")) {
-                log.warn("File {} is not a PBO file, skipping", file.getOriginalFilename());
-                return;
-            }
+                if (!f.getOriginalFilename().endsWith(".pbo")) {
+                    log.warn("File {} is not a PBO file, skipping", f.getOriginalFilename());
+                    return;
+                }
 
-            scenarioService.uploadScenarioToServer(file);
-        });
-
+                scenarioService.uploadScenarioToServer(f);
+            });
+        }
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{name:.+}")
-    public ResponseEntity<?> deleteScenario(@PathVariable String name) {
+    @Override
+    public ResponseEntity<Void> deleteScenario(String name) {
         log.info("Received request to delete scenario {}", name);
-
         if (!scenarioService.deleteScenario(name)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

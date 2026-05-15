@@ -1,24 +1,17 @@
 package cz.forgottenempire.servermanager.steamauth;
 
-import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
-import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.SteamAuthApi;
+import cz.forgottenempire.servermanager.api.model.AuthStatus;
+import cz.forgottenempire.servermanager.api.model.AuthType;
+import cz.forgottenempire.servermanager.api.model.AuthVerificationResultDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthStatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/api/config/auth")
-class SteamAuthController {
+public class SteamAuthController implements SteamAuthApi {
 
     private final SteamAuthService authService;
     private final SteamAuthVerifier authVerifier;
@@ -29,56 +22,48 @@ class SteamAuthController {
         this.authVerifier = authVerifier;
     }
 
-    @PostMapping
-    public ResponseEntity<?> setAuthAccount(@RequestBody SteamAuthDto auth) {
-        authService.setAuthAccount(auth);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @Override
+    public ResponseEntity<Void> setSteamAuth(SteamAuthDto steamAuthDto) {
+        authService.setAuthAccount(steamAuthDto);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public ResponseEntity<SteamAuthDto> getAuthAccount() {
+    @Override
+    public ResponseEntity<SteamAuthDto> getSteamAuth() {
         SteamAuth steamAuth = authService.getAuthAccount();
-        SteamAuthDto dto = new SteamAuthDto();
-        dto.setUsername(steamAuth.getUsername());
-        dto.setSteamGuardToken(steamAuth.getSteamGuardToken());
-
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+        SteamAuthDto dto = new SteamAuthDto()
+                .username(steamAuth.getUsername())
+                .steamGuardToken(steamAuth.getSteamGuardToken());
+        return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> clearAuthAccount() {
+    @Override
+    public ResponseEntity<Void> clearSteamAuth() {
         authService.clearAuthAccount();
         return ResponseEntity.noContent().build();
     }
-    
-    /**
-     * Checks if Steam authentication is configured
-     * @return Status indicating if auth is configured
-     */
-    @GetMapping("/status")
-    public ResponseEntity<Map<String, Boolean>> getAuthStatus() {
+
+    @Override
+    public ResponseEntity<SteamAuthStatusDto> getSteamAuthStatus() {
         boolean isConfigured = authService.isAuthConfigured();
-        Map<String, Boolean> response = Map.of("isConfigured", isConfigured);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new SteamAuthStatusDto().isConfigured(isConfigured));
     }
-    
-    /**
-     * Verifies Steam credentials and detects 2FA requirements
-     * @param auth Steam credentials to verify
-     * @return Verification result with status, message, and auth type
-     */
-    @PostMapping("/verify")
-    public ResponseEntity<AuthVerificationResult> verifyCredentials(@RequestBody SteamAuthDto auth) {
+
+    @Override
+    public ResponseEntity<AuthVerificationResultDto> verifySteamAuth(SteamAuthDto steamAuthDto) {
         try {
-            AuthVerificationResult result = authVerifier.verifyCredentials(auth);
-            return ResponseEntity.ok(result);
+            AuthVerificationResult result = authVerifier.verifyCredentials(steamAuthDto);
+            AuthVerificationResultDto dto = new AuthVerificationResultDto()
+                    .status(AuthStatus.fromValue(result.getStatus().name()))
+                    .message(result.getMessage())
+                    .authType(AuthType.fromValue(result.getAuthType().name()));
+            return ResponseEntity.ok(dto);
         } catch (Exception e) {
-            AuthVerificationResult result = AuthVerificationResult.builder()
+            AuthVerificationResultDto dto = new AuthVerificationResultDto()
                     .status(AuthStatus.ERROR)
                     .message("Failed to verify credentials: " + e.getMessage())
-                    .authType(AuthType.UNKNOWN)
-                    .build();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+                    .authType(AuthType.UNKNOWN);
+            return ResponseEntity.internalServerError().body(dto);
         }
     }
 }

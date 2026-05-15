@@ -1,13 +1,14 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {getServer, getServerStatus, updateServer} from "../services/serversService";
+import {serversApi} from "../api/client";
 import {toast} from "material-react-toastify";
 import {Typography} from "@mui/material";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
-import {Arma3ServerDto, DayZServerDto, ReforgerServerDto, ServerDto, ServerType} from "../dtos/ServerDto";
+import {ServerDto, ServerInstanceInfoDto, ServerType} from "../api/generated";
+import {Arma3ServerDto, DayZServerDto, ReforgerServerDto} from "../api/serverModels";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
@@ -24,10 +25,10 @@ const ServerSettingsPage = () => {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const {data: fetchedServer} = await getServer(Number(id));
+            const {data: fetchedServer} = await serversApi.getServer({id: Number(id)});
             setServer(fetchedServer);
 
-            const {data: serverStatus} = await getServerStatus(Number(id));
+            const {data: serverStatus} = await serversApi.getServerStatus({id: Number(id)});
             setStatus(serverStatus);
 
             setIsLoading(false);
@@ -37,7 +38,7 @@ const ServerSettingsPage = () => {
         }
     }
 
-    const handleSubmit = async (values: ServerDto) => {
+    const handleSubmit = async (values: Arma3ServerDto | DayZServerDto | ReforgerServerDto) => {
         if (!server) {
             return;
         }
@@ -46,11 +47,11 @@ const ServerSettingsPage = () => {
             ...server,
             ...values,
             type: server.type,
-            queryPort: server.type === "ARMA3" ? values.port + 1 : values.queryPort
+            queryPort: server.type === ServerType.Arma3 ? (values.port ?? 0) + 1 : values.queryPort
         }
 
         try {
-            await updateServer(Number(id), request);
+            await serversApi.updateServer({id: Number(id), serverDto: request});
             toast.success("Server successfully updated");
             navigate("/servers");
         } catch (e) {
@@ -68,22 +69,22 @@ const ServerSettingsPage = () => {
             {!isLoading && !!server &&
                 <>
                     <Typography variant="h4" mb={2}>Server Settings
-                        ({SERVER_NAMES.get(ServerType[server.type as keyof typeof ServerType])})</Typography>
-                    {server.type === "ARMA3" &&
+                        ({SERVER_NAMES.get(server.type as ServerType)})</Typography>
+                    {server.type === ServerType.Arma3 &&
                         <EditArma3ServerSettingsForm server={server as Arma3ServerDto} onSubmit={handleSubmit}
                                                      onCancel={handleCancel}
                                                      isServerRunning={status
                                                          && status.alive}
                         />
                     }
-                    {(server.type === "DAYZ" || server.type === "DAYZ_EXP") &&
+                    {(server.type === ServerType.Dayz || server.type === ServerType.DayzExp) &&
                         <EditDayZServerSettingsForm server={server as DayZServerDto} onSubmit={handleSubmit}
                                                     onCancel={handleCancel}
                                                     isServerRunning={status
                                                         && status.alive}
                         />
                     }
-                    {(server.type === "REFORGER") &&
+                    {(server.type === ServerType.Reforger) &&
                         <EditReforgerServerSettingsForm server={server as ReforgerServerDto} onSubmit={handleSubmit}
                                                         onCancel={handleCancel}
                                                         isServerRunning={status

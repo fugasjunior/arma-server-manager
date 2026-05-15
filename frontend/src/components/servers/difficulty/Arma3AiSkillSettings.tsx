@@ -1,12 +1,11 @@
-import {FormikState} from "formik";
-import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
-import {FormikHandlers} from "formik/dist/types";
+import {FormikProps} from "formik";
 import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@mui/material";
 import {LocationSearching, School} from "@mui/icons-material";
 import {SliderField} from "../../../UI/Form/SliderField.tsx";
+import {Arma3ServerDto} from "../../../api/serverModels";
 
 type Arma3AiSkillSettingsProps = {
-    formik: FormikState<Arma3ServerDto> & FormikHandlers
+    formik: FormikProps<Arma3ServerDto>
 }
 
 export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
@@ -19,7 +18,7 @@ export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
                     id="difficultySettings.aiLevelPreset"
                     name="difficultySettings.aiLevelPreset"
                     onChange={formik.handleChange}
-                    value={formik.values.difficultySettings.aiLevelPreset}
+                    value={formik.values.difficultySettings?.aiLevelPreset}
                 >
                     <FormControlLabel value="0" control={<Radio/>} label="Low"/>
                     <FormControlLabel value="1" control={<Radio/>} label="Normal"/>

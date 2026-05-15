@@ -1,0 +1,48 @@
+ModDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    serverType:
+      $ref: './common.yaml#/ServerType'
+    fileSize:
+      type: integer
+      format: int64
+    lastUpdated:
+      type: string
+    installationStatus:
+      type: string
+    errorStatus:
+      type: string
+    serverOnly:
+      type: boolean
+
+ModsDto:
+  type: object
+  properties:
+    workshopMods:
+      type: array
+      items:
+        $ref: '#/ModDto'
+    creatorDlcs:
+      type: array
+      items:
+        $ref: '#/CreatorDlcDto'
+
+CreatorDlcDto:
+  type: object
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+
+ServerOnlyDto:
+  type: object
+  required: [serverOnly]
+  properties:
+    serverOnly:
+      type: boolean

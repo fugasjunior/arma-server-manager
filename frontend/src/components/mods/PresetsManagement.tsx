@@ -1,11 +1,4 @@
 import {ChangeEvent, useEffect, useState} from "react";
-import {
-    deleteModPreset,
-    downloadExportedPreset,
-    getModPresets,
-    updateModPreset,
-    uploadImportedPreset
-} from "../../services/modPresetsService";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -21,35 +14,34 @@ import EditIcon from '@mui/icons-material/Edit';
 import SERVER_NAMES from "../../util/serverNames";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
-import {getMods} from "../../services/modsService";
 import TableGhosts from "../../UI/TableSkeletons";
 import Tooltip from "@mui/material/Tooltip";
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
-import {ModPresetDto, ModPresetModDto} from "../../dtos/ModPresetDto";
-import {ModDto} from "../../dtos/ModDto.ts";
-import {ServerType} from "../../dtos/ServerDto.ts";
+import {ModDto, PresetResponseDto, PresetResponseModDto, ServerType} from "../../api/generated";
+import {modPresetsApi, modsApi, armaLauncherPresetApi} from "../../api/client";
+import {downloadExportedPreset} from "../../api/downloads";
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
-    const [presets, setPresets] = useState<Array<ModPresetDto>>([]);
-    const [editedPreset, setEditedPreset] = useState<ModPresetDto | null>();
+    const [presets, setPresets] = useState<Array<PresetResponseDto>>([]);
+    const [editedPreset, setEditedPreset] = useState<PresetResponseDto | null>();
     const [presetModalOpen, setPresetModalOpen] = useState(false);
-    const [selectedMods, setSelectedMods] = useState<Array<ModPresetModDto>>([]);
-    const [availableMods, setAvailableMods] = useState<Array<ModPresetModDto>>([]);
+    const [selectedMods, setSelectedMods] = useState<Array<PresetResponseModDto>>([]);
+    const [availableMods, setAvailableMods] = useState<Array<PresetResponseModDto>>([]);
     const [isUploadInProgress, setIsUploadInProgress] = useState(false);
 
     useEffect(() => {
         async function fetchPresets() {
-            const {data: presetsDto} = await getModPresets();
-            setPresets(presetsDto.presets);
+            const {data: presetsDto} = await modPresetsApi.getPresets();
+            setPresets(presetsDto.presets ?? []);
             setInitialLoading(false);
         }
 
         fetchPresets();
     }, []);
 
-    async function handleDelete(id: string) {
+    async function handleDelete(id: number) {
         const deletedPreset = presets.find(preset => preset.id === id);
         if (!deletedPreset) {
             return;
@@ -58,7 +50,7 @@ export default function PresetsManagement() {
         setPresets(prevState => [...prevState].filter(preset => preset !== deletedPreset));
 
         try {
-            await deleteModPreset(id);
+            await modPresetsApi.deletePreset({id});
             toast.success(`Preset '${deletedPreset.name}' successfully deleted`);
         } catch (e: any) {
             console.error(e);
@@ -67,9 +59,9 @@ export default function PresetsManagement() {
         }
     }
 
-    function getSummarizedModsList(mods: Array<ModPresetModDto>) {
+    function getSummarizedModsList(mods: Array<PresetResponseModDto>) {
         const CUTOFF_LENGTH = 55;
-        const modNames = mods.map(mod => mod.shortName);
+        const modNames = mods.map(mod => mod.shortName ?? "");
         modNames.sort((a, b) => a.localeCompare(b));
         let summarizedList = modNames[0];
         let i = 1;
@@ -83,17 +75,17 @@ export default function PresetsManagement() {
     }
 
     function getSortedPresets() {
-        return presets.sort((a, b) => a.name.localeCompare(b.name));
+        return presets.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
     }
 
-    async function handleOpenEdit(preset: ModPresetDto) {
-        const {data: modsDto} = await getMods(preset.type);
-        let availableMods = modsDto.workshopMods;
-        availableMods = availableMods.filter((mod: ModDto) => !preset.mods.find(searchedMod => searchedMod.id === mod.id))
+    async function handleOpenEdit(preset: PresetResponseDto) {
+        const {data: modsDto} = await modsApi.getMods({filter: preset.type as ServerType});
+        let available = modsDto.workshopMods ?? [];
+        available = available.filter((mod: ModDto) => !(preset.mods ?? []).find(searchedMod => searchedMod.id === mod.id))
 
         setEditedPreset(preset);
-        setSelectedMods(preset.mods);
-        setAvailableMods(availableMods);
+        setSelectedMods(preset.mods ?? []);
+        setAvailableMods(available);
         setPresetModalOpen(true);
     }
 
@@ -103,15 +95,15 @@ export default function PresetsManagement() {
         }
 
         const request = {
-            name: editedPreset.name,
-            mods: selectedMods.map(mod => mod.id)
+            name: editedPreset.name!,
+            mods: selectedMods.map(mod => mod.id!)
         }
 
         if (selectedMods.length === 0) {
             await handleDelete(editedPreset.id);
         } else {
             try {
-                const {data: savedPreset} = await updateModPreset(editedPreset.id, request);
+                const {data: savedPreset} = await modPresetsApi.updatePreset({id: editedPreset.id, updatePresetRequestDto: request});
                 setPresets(prevState => {
                     const newState = [...prevState];
                     const oldPreset = newState.find(preset => preset.id === savedPreset.id);
@@ -130,23 +122,22 @@ export default function PresetsManagement() {
         setPresetModalOpen(false);
     }
 
-    function handleModSelect(option: ModPresetModDto) {
-
+    function handleModSelect(option: PresetResponseModDto) {
         setAvailableMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
         setSelectedMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
         });
     }
 
-    function handleModDeselect(option: ModPresetModDto) {
+    function handleModDeselect(option: PresetResponseModDto) {
         setSelectedMods((prevState) => {
             return prevState.filter(item => item !== option);
         });
 
         setAvailableMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
         });
     }
 
@@ -157,7 +148,7 @@ export default function PresetsManagement() {
 
         try {
             setIsUploadInProgress(true);
-            const {data: importedPreset} = await uploadImportedPreset(e.target.files[0]);
+            const {data: importedPreset} = await armaLauncherPresetApi.importLauncherPreset({preset: e.target.files[0]});
             setPresets(prevState => [...prevState, importedPreset]);
             setIsUploadInProgress(false);
             toast.success(`Preset '${importedPreset.name}' successfully imported`);
@@ -168,7 +159,7 @@ export default function PresetsManagement() {
         }
     }
 
-    function handleDownload(presetId: string) {
+    function handleDownload(presetId: number) {
         try {
             downloadExportedPreset(presetId);
         } catch (e: any) {
@@ -222,13 +213,13 @@ export default function PresetsManagement() {
                                             {preset.name}
                                         </TableCell>
                                         <TableCell>
-                                            {SERVER_NAMES.get(ServerType[preset.type as keyof typeof ServerType])}
+                                            {SERVER_NAMES.get(preset.type as ServerType)}
                                         </TableCell>
                                         <TableCell>
-                                            {getSummarizedModsList(preset.mods)}
+                                            {getSummarizedModsList(preset.mods ?? [])}
                                         </TableCell>
                                         <TableCell align="right">
-                                            {preset.mods.length}
+                                            {(preset.mods ?? []).length}
                                         </TableCell>
                                         <TableCell>
                                             <IconButton aria-label="edit"
@@ -238,13 +229,13 @@ export default function PresetsManagement() {
                                         </TableCell>
                                         <TableCell>
                                             <IconButton aria-label="export"
-                                                        onClick={() => handleDownload(preset.id as string)}>
+                                                        onClick={() => handleDownload(preset.id!)}>
                                                 <DownloadIcon color="primary"/>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
                                             <IconButton aria-label="delete"
-                                                        onClick={() => handleDelete(preset.id as string)}>
+                                                        onClick={() => handleDelete(preset.id!)}>
                                                 <DeleteIcon color="error"/>
                                             </IconButton>
                                         </TableCell>
@@ -258,8 +249,8 @@ export default function PresetsManagement() {
             </Box>
             <Modal open={presetModalOpen} onClose={handlePresetModalClosed}>
                 <Box>
-                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
+                    <ListBuilder selectedOptions={selectedMods as any} availableOptions={availableMods as any}
+                                 onSelect={handleModSelect as any} onDeselect={handleModDeselect as any}
                                  itemsLabel="mods" showFilter
                     />
                 </Box>

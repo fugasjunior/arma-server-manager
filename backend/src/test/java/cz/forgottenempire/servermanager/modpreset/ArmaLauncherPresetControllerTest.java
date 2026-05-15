@@ -2,10 +2,13 @@ package cz.forgottenempire.servermanager.modpreset;
 
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.modpreset.dtos.PresetResponseDto;
+import cz.forgottenempire.servermanager.api.model.PresetResponseDto;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +40,7 @@ class ArmaLauncherPresetControllerTest {
         importService = mock(ArmaLauncherPresetImportService.class);
         exportService = mock(ArmaLauncherPresetExportService.class);
         modPresetsService = mock(ModPresetsService.class);
-        controller = new ArmaLauncherPresetController(modPresetsService, importService, exportService);
+        controller = new ArmaLauncherPresetController(modPresetsService, importService, exportService, Mappers.getMapper(ModPresetMapper.class));
         SAMPLE_HTML_CONTENT = "<html></html>";
     }
 
@@ -48,12 +51,13 @@ class ArmaLauncherPresetControllerTest {
         byte[] expectedFile = new byte[]{'h', 't', 'm', 'l'};
         when(exportService.exportModPresetToFile(preset)).thenReturn(expectedFile);
 
-        ResponseEntity<byte[]> response = controller.exportModPreset(MOD_PRESET_ID);
+        ResponseEntity<Resource> response = controller.downloadLauncherPreset(MOD_PRESET_ID);
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(response).isNotNull();
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        softly.assertThat(response.getBody()).isEqualTo(expectedFile);
+        softly.assertThat(response.getBody()).isInstanceOf(ByteArrayResource.class);
+        softly.assertThat(((ByteArrayResource) response.getBody()).getByteArray()).isEqualTo(expectedFile);
         HttpHeaders headers = response.getHeaders();
         softly.assertThat(headers).isNotNull();
         softly.assertThat(headers.getContentType()).isEqualTo(MediaType.TEXT_HTML);
@@ -68,7 +72,7 @@ class ArmaLauncherPresetControllerTest {
         byte[] expectedFile = new byte[]{'h', 't', 'm', 'l'};
         when(exportService.exportModPresetToFile(preset)).thenReturn(expectedFile);
 
-        ResponseEntity<byte[]> response = controller.exportModPreset(MOD_PRESET_ID);
+        ResponseEntity<Resource> response = controller.downloadLauncherPreset(MOD_PRESET_ID);
 
         assertThat(response).isNotNull();
         HttpHeaders headers = response.getHeaders();
@@ -80,7 +84,7 @@ class ArmaLauncherPresetControllerTest {
     void whenExportModPresetAndNoSuchPresetExists_thenThrowNotFoundException() {
         when(modPresetsService.getModPreset(MOD_PRESET_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> controller.exportModPreset(MOD_PRESET_ID))
+        assertThatThrownBy(() -> controller.downloadLauncherPreset(MOD_PRESET_ID))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Mod preset 1 not found");
         verify(modPresetsService).getModPreset(MOD_PRESET_ID);
@@ -97,7 +101,7 @@ class ArmaLauncherPresetControllerTest {
         preset.setId(MOD_PRESET_ID);
         when(importService.importPreset(any())).thenReturn(Optional.of(preset));
 
-        ResponseEntity<PresetResponseDto> response = controller.uploadModPreset(file);
+        ResponseEntity<PresetResponseDto> response = controller.importLauncherPreset(file);
 
         PresetResponseDto expectedResponseDto = new PresetResponseDto();
         expectedResponseDto.setId(MOD_PRESET_ID);
@@ -116,7 +120,7 @@ class ArmaLauncherPresetControllerTest {
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
         when(importService.importPreset(any())).thenReturn(Optional.empty());
 
-        ResponseEntity<PresetResponseDto> response = controller.uploadModPreset(file);
+        ResponseEntity<PresetResponseDto> response = controller.importLauncherPreset(file);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -128,7 +132,7 @@ class ArmaLauncherPresetControllerTest {
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn(INVALID_FILE_NAME);
 
-        assertThatThrownBy(() -> controller.uploadModPreset(file))
+        assertThatThrownBy(() -> controller.importLauncherPreset(file))
                 .isInstanceOf(UnsupportedFileExtension.class)
                 .hasMessage("Only HTML files are allowed");
         verifyNoInteractions(importService);
@@ -139,7 +143,7 @@ class ArmaLauncherPresetControllerTest {
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn(null);
 
-        assertThatThrownBy(() -> controller.uploadModPreset(file))
+        assertThatThrownBy(() -> controller.importLauncherPreset(file))
                 .isInstanceOf(UnsupportedFileExtension.class)
                 .hasMessage("Only HTML files are allowed");
         verifyNoInteractions(importService);

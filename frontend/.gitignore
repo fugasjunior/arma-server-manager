@@ -25,3 +25,5 @@ yarn-error.log*
 pnpm*
 
 .eslintcache
+
+/src/api/generated

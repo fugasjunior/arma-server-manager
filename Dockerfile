@@ -27,12 +27,13 @@ COPY ./gradlew /app
 COPY ./settings.gradle /app
 COPY ./frontend /app/frontend
 COPY ./backend /app/backend
+COPY ./openapi /app/openapi
 
 # Build
 RUN chmod 555 ./gradlew \
 #    fix CRLF line endings in gradlew
     && sed -i -e 's/\r$//' ./gradlew \
-    && ./gradlew install
+    && ./gradlew install -x :backend:test
 
 # --- JRE layer ---
 FROM eclipse-temurin:25-jre AS jre

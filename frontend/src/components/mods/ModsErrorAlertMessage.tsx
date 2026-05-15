@@ -1,7 +1,6 @@
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap";
 import {Alert, AlertTitle} from "@mui/material";
-import {ModDto} from "../../dtos/ModDto.ts";
-import {ErrorStatus} from "../../dtos/Status.ts";
+import {ErrorStatus, ModDto} from "../../api/generated";
 
 type ModsErrorAlertMessageProps = {
     mods: Array<ModDto>
@@ -13,7 +12,7 @@ const ModsErrorAlertMessage = ({mods}: ModsErrorAlertMessageProps) => {
     }
 
     const errors = mods.filter(mod => mod.installationStatus === "ERROR")
-        .map(mod => mod.errorStatus)
+        .map(mod => mod.errorStatus ?? null)
         .filter(onlyUnique);
 
     return (
@@ -24,7 +23,7 @@ const ModsErrorAlertMessage = ({mods}: ModsErrorAlertMessageProps) => {
             </p>
             <ul>
                 {errors.map(error =>
-                    <li key={error}>{workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}</li>
+                    <li key={error}>{workshopErrorStatusMap.get(error as ErrorStatus)}</li>
                 )}
             </ul>
         </Alert>

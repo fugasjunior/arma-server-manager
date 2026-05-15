@@ -3,7 +3,7 @@ package cz.forgottenempire.servermanager.journey;
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
 import cz.forgottenempire.servermanager.support.AbstractIntegrationTest;
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ class ServerInstallationJourneyTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        steamAuthService.setAuthAccount(new SteamAuthDto("testuser", "testpass", null));
+        steamAuthService.setAuthAccount(new SteamAuthDto().username("testuser").password("testpass"));
     }
 
     @AfterEach

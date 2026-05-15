@@ -1,14 +1,11 @@
 import {useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal, SelectChangeEvent} from "@mui/material";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
-import {getModPresets} from "../../services/modPresetsService";
-import {getServer, updateServer} from "../../services/serversService";
-import {getMods} from "../../services/modsService";
+import {serversApi, modsApi, modPresetsApi} from "../../api/client";
+import {PresetResponseDto, ServerDto, ServerInstanceInfoDto, ServerType, ServerWorkshopModDto} from "../../api/generated";
+import {Arma3ServerDto, DayZServerDto} from "../../api/serverModels";
 import {toast} from "material-react-toastify";
 import MemoryIcon from "@mui/icons-material/Memory";
-import {ServerDto} from "../../dtos/ServerDto";
-import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
-import {ServerWorkshopModDto} from "../../dtos/ServerWorkshopModDto.ts";
 
 type ListBuilderModEditProps = {
     server: ServerDto
@@ -20,7 +17,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [availableMods, setAvailableMods] = useState<Array<ServerWorkshopModDto>>([]);
     const [selectedMods, setSelectedMods] = useState<Array<ServerWorkshopModDto>>([]);
-    const [presets, setPresets] = useState<Array<ModPresetDto>>([]);
+    const [presets, setPresets] = useState<Array<PresetResponseDto>>([]);
     const [selectedPreset, setSelectedPreset] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,15 +31,15 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
         setIsLoading(true);
         setIsOpen(false);
         try {
-            const {data: presetsDto} = await getModPresets(props.server.type);
-            const {data: serverDto} = await getServer(props.server.id);
-            const {data: modsDto} = await getMods(props.server.type);
-            setPresets(presetsDto.presets);
+            const {data: presetsDto} = await modPresetsApi.getPresets({filter: props.server.type as ServerType});
+            const {data: serverDto} = await serversApi.getServer({id: props.server.id});
+            const {data: modsDto} = await modsApi.getMods({filter: props.server.type as ServerType});
+            setPresets(presetsDto.presets ?? []);
             setServer(serverDto);
-            setSelectedMods(serverDto.activeMods);
-            setAvailableMods(modsDto.workshopMods.filter((mod: ServerWorkshopModDto) => !serverDto.activeMods
+            setSelectedMods((serverDto as Arma3ServerDto | DayZServerDto).activeMods ?? []);
+            setAvailableMods((modsDto.workshopMods ?? []).filter((mod: ServerWorkshopModDto) => !((serverDto as Arma3ServerDto | DayZServerDto).activeMods ?? [])
                 .find((searchedMod: ServerWorkshopModDto) => searchedMod.id === mod.id))
-                .sort((a: ServerWorkshopModDto, b: ServerWorkshopModDto) => a.name.localeCompare(b.name)));
+                .sort((a: ServerWorkshopModDto, b: ServerWorkshopModDto) => (a.name ?? "").localeCompare(b.name ?? "")));
             setSelectedPreset("");
             setIsOpen(true);
         } catch (e: any) {
@@ -60,7 +57,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
         });
 
         setSelectedMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
         });
     }
 
@@ -72,12 +69,12 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
         });
 
         setAvailableMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
+            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
         });
     }
 
     function handlePresetChange(e: SelectChangeEvent) {
-        const presetId = e.target.value;
+        const presetId = Number(e.target.value);
         const preset = presets.find(preset => preset.id === presetId);
         if (!preset) {
             return;
@@ -85,7 +82,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
 
         const newAvailableMods = [...availableMods, ...selectedMods];
         const newSelectedMods = [];
-        for (const mod of preset.mods) {
+        for (const mod of preset.mods ?? []) {
             const selectedMod = newAvailableMods.find(m => m.id === mod.id);
             if (!selectedMod) {
                 continue;
@@ -98,7 +95,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
 
         setAvailableMods(newAvailableMods);
         setSelectedMods(newSelectedMods);
-        setSelectedPreset(presetId);
+        setSelectedPreset(String(presetId));
     }
 
     async function handleConfirm() {
@@ -108,7 +105,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
 
         setIsOpen(false);
         try {
-            await updateServer(props.server.id, {...server, activeMods: selectedMods});
+            await serversApi.updateServer({id: props.server.id, serverDto: {...server, activeMods: selectedMods} as unknown as ServerDto});
             toast.success("Mods successfully set");
         } catch (e: any) {
             console.error(e);

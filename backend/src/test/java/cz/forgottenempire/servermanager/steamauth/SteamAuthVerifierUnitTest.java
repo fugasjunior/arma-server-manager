@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ class SteamAuthVerifierUnitTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String STEAM_GUARD_TOKEN = "ABCDE";
-    private static final SteamAuthDto AUTH_DTO = new SteamAuthDto(USERNAME, PASSWORD, STEAM_GUARD_TOKEN);
+    private static final SteamAuthDto AUTH_DTO = new SteamAuthDto().username(USERNAME).password(PASSWORD).steamGuardToken(STEAM_GUARD_TOKEN);
     private static final SteamAuth EXPECTED_AUTH = new SteamAuth(null, USERNAME, PASSWORD, STEAM_GUARD_TOKEN);
 
     @Mock(stubOnly = true)

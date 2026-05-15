@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, CircularProgress, TextField, Typography, Alert } from '@mui/material';
-import { SteamAuthDto } from '../../dtos/SteamAuthDto';
-import {setAuth, verifyCredentials} from '../../services/configService';
+import { SteamAuthDto } from '../../api/generated';
+import {steamAuthApi} from '../../api/client';
 
 interface CredentialsStepProps {
     credentials: SteamAuthDto;
@@ -54,11 +54,11 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
         
         try {
             // Verify credentials
-            const { data } = await verifyCredentials(credentials);
+            const { data } = await steamAuthApi.verifySteamAuth({steamAuthDto: credentials});
             
             if (data.status === 'SUCCESS') {
                 // No 2FA required, proceed to completion
-                await setAuth(credentials);
+                await steamAuthApi.setSteamAuth({steamAuthDto: credentials});
                 onNext();
             } else if (data.status === 'REQUIRES_2FA') {
                 if (data.authType === 'EMAIL') {

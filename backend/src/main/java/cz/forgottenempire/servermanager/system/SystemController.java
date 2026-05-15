@@ -1,17 +1,18 @@
 package cz.forgottenempire.servermanager.system;
 
+import cz.forgottenempire.servermanager.api.SystemApi;
+import cz.forgottenempire.servermanager.api.model.OSType;
+import cz.forgottenempire.servermanager.api.model.ServerDetailsDto;
+import cz.forgottenempire.servermanager.api.model.ServerOSDto;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/system")
 @Slf4j
-class SystemController {
+public class SystemController implements SystemApi {
 
     private final SystemService systemService;
 
@@ -20,9 +21,9 @@ class SystemController {
         this.systemService = systemService;
     }
 
-    @GetMapping
-    public ResponseEntity<ServerDetailsDto> getServerDetails() {
-        ServerDetailsDto details = ServerDetailsDto.builder()
+    @Override
+    public ResponseEntity<ServerDetailsDto> getSystemDetails() {
+        ServerDetailsDto details = new ServerDetailsDto()
                 .spaceLeft(systemService.getDiskSpaceLeft())
                 .spaceTotal(systemService.getDiskSpaceTotal())
                 .memoryLeft(systemService.getMemoryLeft())
@@ -31,14 +32,14 @@ class SystemController {
                 .cpuCount(systemService.getProcessorCount())
                 .osName(systemService.getOsName())
                 .osVersion(systemService.getOsVersion())
-                .osArchitecture(systemService.getOsArchitecture())
-                .build();
-
+                .osArchitecture(systemService.getOsArchitecture());
         return ResponseEntity.ok(details);
     }
 
-    @GetMapping("/os")
-    public ResponseEntity<ServerOSDto> getOSType() {
-        return ResponseEntity.ok(new ServerOSDto(SystemUtils.getOsType()));
+    @Override
+    public ResponseEntity<ServerOSDto> getSystemOs() {
+        SystemUtils.OSType localOsType = SystemUtils.getOsType();
+        OSType osType = OSType.fromValue(localOsType.name());
+        return ResponseEntity.ok(new ServerOSDto().osType(osType));
     }
 }

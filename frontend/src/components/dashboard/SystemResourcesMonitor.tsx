@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import Paper from "@mui/material/Paper";
 import {Divider, LinearProgress, Stack} from "@mui/material";
 import CircularProgressWithLabel from "../../UI/CircularProgressWithLabel";
-import {getSystemInfo} from "../../services/systemService";
+import {systemApi} from "../../api/client";
 import {useInterval} from "../../hooks/use-interval";
 import {humanFileSize} from "../../util/util";
 import {CircularProgressProps} from "@mui/material/CircularProgress/CircularProgress";
@@ -24,14 +24,14 @@ const SystemResourcesMonitor = () => {
     useInterval(() => fetchSystemResourceUsage(), 3000);
 
     const fetchSystemResourceUsage = async () => {
-        const {data: systemInfo} = await getSystemInfo();
-        setCpuUsage(Math.round(systemInfo.cpuUsage * 100));
-        setMemoryLeft(systemInfo.memoryLeft);
-        setMemoryTotal(systemInfo.memoryTotal);
-        setStorageLeft(systemInfo.spaceLeft);
-        setStorageTotal(systemInfo.spaceTotal);
-        setCpuCount(systemInfo.cpuCount);
-        setOsName(systemInfo.osName);
+        const {data: systemInfo} = await systemApi.getSystemDetails();
+        setCpuUsage(Math.round((systemInfo.cpuUsage ?? 0) * 100));
+        setMemoryLeft(systemInfo.memoryLeft ?? 0);
+        setMemoryTotal(systemInfo.memoryTotal ?? 0);
+        setStorageLeft(systemInfo.spaceLeft ?? 0);
+        setStorageTotal(systemInfo.spaceTotal ?? 0);
+        setCpuCount(systemInfo.cpuCount ?? 0);
+        setOsName(systemInfo.osName ?? "");
         setInfoLoaded(true);
     }
 

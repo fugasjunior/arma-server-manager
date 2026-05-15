@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, CircularProgress, TextField, Typography, Alert } from '@mui/material';
-import { SteamAuthDto } from '../../dtos/SteamAuthDto';
-import { verifyCredentials, setAuth } from '../../services/configService';
+import { SteamAuthDto } from '../../api/generated';
+import {steamAuthApi} from '../../api/client';
 
 interface TokenStepProps {
     credentials: SteamAuthDto;
@@ -51,11 +51,11 @@ const TokenStep: React.FC<TokenStepProps> = ({
         
         try {
             // Verify credentials with token
-            const { data } = await verifyCredentials(credentials);
+            const { data } = await steamAuthApi.verifySteamAuth({steamAuthDto: credentials});
             
             if (data.status === 'SUCCESS') {
                 // Save the credentials
-                await setAuth(credentials);
+                await steamAuthApi.setSteamAuth({steamAuthDto: credentials});
                 onNext();
             } else {
                 setError(data.message || 'Unknown error occurred.');

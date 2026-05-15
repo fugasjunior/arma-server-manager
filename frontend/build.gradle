@@ -50,6 +50,17 @@ tasks.register('appNpmTest', NpmTask) {
     args = ["run", "test"]
 }
 
-appNpmBuild.dependsOn(appNpmInstall)
-appNpmTest.dependsOn(appNpmInstall)
+tasks.register('appNpmGenerate', NpmTask) {
+    description = "Generates TypeScript API client from OpenAPI spec"
+
+    inputs.file('../openapi/openapi.yaml')
+    inputs.file('openapitools.json')
+    outputs.dir('src/api/generated')
+
+    dependsOn(appNpmInstall)
+    args = ["run", "generate"]
+}
+
+appNpmBuild.dependsOn(appNpmGenerate)
+appNpmTest.dependsOn(appNpmGenerate)
 assemble.dependsOn(appNpmBuild)

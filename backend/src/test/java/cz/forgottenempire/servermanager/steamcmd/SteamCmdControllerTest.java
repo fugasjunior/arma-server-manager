@@ -1,5 +1,7 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
+import cz.forgottenempire.servermanager.api.model.SteamCmdItemInfoDto;
+import cz.forgottenempire.servermanager.api.model.SteamCmdStatus;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
@@ -40,12 +42,18 @@ class SteamCmdControllerTest {
     @Test
     void getItemInfos() {
         SteamCmdItemInfo itemInfo = new SteamCmdItemInfo(1L, SteamCmdItemInfo.SteamCmdStatus.FINISHED, 100, 1000L, 1000L);
-        Map<Long, SteamCmdItemInfo> expectedItemInfos = Map.of(1L, itemInfo);
-        when(itemInfoRepository.getAll()).thenReturn(expectedItemInfos);
+        when(itemInfoRepository.getAll()).thenReturn(Map.of(1L, itemInfo));
 
-        ResponseEntity<Map<Long, SteamCmdItemInfo>> itemInfos = steamCmdController.getItemInfos();
+        ResponseEntity<Map<String, SteamCmdItemInfoDto>> response = steamCmdController.getSteamCmdItemInfos();
 
-        assertThat(itemInfos).isEqualTo(ResponseEntity.ok(expectedItemInfos));
+        SteamCmdItemInfoDto expectedDto = new SteamCmdItemInfoDto()
+                .itemId(1L)
+                .status(SteamCmdStatus.fromValue("FINISHED"))
+                .progressPercent(100.0)
+                .bytesFinished(1000L)
+                .bytesTotal(1000L);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getBody()).isEqualTo(Map.of("1", expectedDto));
     }
 
     @Test
@@ -58,7 +66,7 @@ class SteamCmdControllerTest {
         when(resource.getFile()).thenReturn(file);
         when(file.getName()).thenReturn("log_file.log");
 
-        ResponseEntity<Resource> response = steamCmdController.downloadLogFile();
+        ResponseEntity<Resource> response = steamCmdController.downloadSteamCmdLog();
 
         HttpHeaders expectedHeaders = new HttpHeaders();
         expectedHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=log_file.log");
@@ -76,7 +84,7 @@ class SteamCmdControllerTest {
         when(logsService.getLogFile()).thenReturn(logFile);
         when(logFile.asResource()).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> steamCmdController.downloadLogFile())
+        assertThatThrownBy(() -> steamCmdController.downloadSteamCmdLog())
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("SteamCMD log file doesn't exist");
     }
@@ -92,7 +100,7 @@ class SteamCmdControllerTest {
         when(logFile.getLastLines(3)).thenReturn(expectedLogLines);
         when(logsService.getLogFile()).thenReturn(logFile);
 
-        ResponseEntity<String> response = steamCmdController.getLastLinesFromLog(3);
+        ResponseEntity<String> response = steamCmdController.getSteamCmdLog(3);
 
         assertThat(response).isEqualTo(ResponseEntity.ok(expectedLogLines));
     }

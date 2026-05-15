@@ -1,0 +1,70 @@
+/additionalServers:
+  get:
+    tags: [AdditionalServers]
+    operationId: getAdditionalServers
+    summary: List all additional servers
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/additional-servers.yaml#/AdditionalServersDto'
+
+/additionalServers/{serverId}:
+  get:
+    tags: [AdditionalServers]
+    operationId: getAdditionalServer
+    summary: Get an additional server by ID
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/additional-servers.yaml#/AdditionalServerDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/additionalServers/{serverId}/start:
+  post:
+    tags: [AdditionalServers]
+    operationId: startAdditionalServer
+    summary: Start an additional server
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/additionalServers/{serverId}/stop:
+  post:
+    tags: [AdditionalServers]
+    operationId: stopAdditionalServer
+    summary: Stop an additional server
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'

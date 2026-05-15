@@ -1,12 +1,4 @@
-import {
-    createServer,
-    deleteServer,
-    getServers,
-    getServerStatus,
-    restartServer,
-    startServer,
-    stopServer
-} from "../services/serversService"
+import {serversApi} from "../api/client"
 import {useEffect, useState} from "react";
 import {useInterval} from "../hooks/use-interval";
 import ServerListEntry from "../components/servers/serverListEntry/ServerListEntry.tsx";
@@ -18,7 +10,7 @@ import TableBody from "@mui/material/TableBody";
 import {toast} from "material-react-toastify";
 import ConfirmationDialog from "../UI/ConfirmationDialog";
 import ServerLogs from "../components/servers/serverListEntry/ServerLogs.tsx";
-import {ServerDto} from "../dtos/ServerDto";
+import {ServerDto, ServerInstanceInfoDto} from "../api/generated";
 
 type ServerInstance = {
     server: ServerDto,
@@ -41,12 +33,12 @@ const ServersPage = () => {
     }, 10000);
 
     const fetchServers = async () => {
-        const {data: servers} = await getServers();
-        const instances = servers.servers.map((server: ServerDto) => {
+        const {data: servers} = await serversApi.getServers();
+        const instances: ServerInstance[] = (servers.servers ?? []).map((server: ServerDto) => {
             return {server, status: null}
         });
         for (const instance of instances) {
-            const {data: status} = await getServerStatus(instance.server.id);
+            const {data: status} = await serversApi.getServerStatus({id: instance.server.id!});
             instance.status = status;
         }
         setServerInstances(instances);
@@ -66,7 +58,7 @@ const ServersPage = () => {
         if (server.id == null) {
             return;
         }
-        const {data: instanceInfo} = await getServerStatus(server.id);
+        const {data: instanceInfo} = await serversApi.getServerStatus({id: server.id});
         const newInstances = [...serverInstances];
         const foundInstance = newInstances.find(instance => instance.server.id === server.id);
         if (!foundInstance) {
@@ -86,17 +78,17 @@ const ServersPage = () => {
 
     const handleStartServer = async (id: number) => {
         updateServerList(id, true);
-        await startServer(id);
+        await serversApi.startServer({id});
     };
 
     const handleStopServer = async (id: number) => {
         updateServerList(id, false);
-        await stopServer(id);
+        await serversApi.stopServer({id});
     };
 
     const handleRestartServer = async (id: number) => {
         updateServerList(id, false);
-        await restartServer(id);
+        await serversApi.restartServer({id});
     };
 
     const updateServerList = (targetServerId: number, isNewServerAlive: boolean): void => {
@@ -132,7 +124,7 @@ const ServersPage = () => {
         }
 
         setServerInstances(prevState => [...prevState].filter(server => server.server.id !== serverToDelete.id));
-        await deleteServer(serverToDelete.id);
+        await serversApi.deleteServer({id: serverToDelete.id});
         toast.success(`Server '${serverToDelete.name}' successfully deleted`);
         setServerToDelete(null);
         setDeleteDialogOpen(false);
@@ -154,7 +146,7 @@ const ServersPage = () => {
 
     const handleDuplicateServer = async (server: ServerDto) => {
         const duplicatedServer = {...server, name: server.name + " (copy)"};
-        const {data: createdServer} = await createServer(duplicatedServer);
+        const {data: createdServer} = await serversApi.createServer({serverDto: duplicatedServer});
         setServerInstances(prevState => [...prevState, {server: createdServer, status: null}]);
         toast.success(`Server ${server.name}' successfully duplicated`);
     };

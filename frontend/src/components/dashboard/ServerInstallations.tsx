@@ -1,12 +1,9 @@
 import {useEffect, useState} from "react";
 import {Grid, SelectChangeEvent} from "@mui/material";
 import {useInterval} from "../../hooks/use-interval";
-import {changeServerBranch, getServerInstallations, installServer} from "../../services/serverInstallationsService";
+import {serverInstallationApi, steamCmdApi} from "../../api/client";
+import {InstallationBranch, InstallationStatus, ServerInstallationDto, ServerType, SteamCmdItemInfoDto} from "../../api/generated";
 import ServerInstallationItem from "./ServerInstallationItem";
-import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
-import {ServerType} from "../../dtos/ServerDto.ts";
-import {SteamCmdItemInfoDto} from "../../dtos/SteamCmdItemInfoDto.ts";
-import {getItemInfo} from "../../services/steamCmdService.ts";
 
 type WorkshopItemInfoResponse = {
     [id: number]: SteamCmdItemInfoDto
@@ -27,19 +24,19 @@ const ServerInstallations = () => {
     }, 5000);
 
     const fetchServerInstallations = async () => {
-        const {data: serverInstallationsDto} = await getServerInstallations();
-        const installations = serverInstallationsDto.serverInstallations
-            .sort((a: ServerInstallationDto, b: ServerInstallationDto) => a.type.localeCompare(b.type));
+        const {data: serverInstallationsDto} = await serverInstallationApi.getServerInstallations();
+        const installations = (serverInstallationsDto.serverInstallations ?? [])
+            .sort((a: ServerInstallationDto, b: ServerInstallationDto) => (a.type ?? "").localeCompare(b.type ?? ""));
         setServerInstallations(installations);
     };
 
     const fetchSteamCmdItemInfo = async () => {
-        const {data} = await getItemInfo();
+        const {data} = await steamCmdApi.getSteamCmdItemInfos();
         setSteamCmdItemInfo(data);
     };
 
     const handleUpdateClicked = async (serverType: ServerType) => {
-        await installServer(serverType);
+        await serverInstallationApi.installServer({type: serverType});
 
         setSteamCmdItemInfo(prevState => {
             const newState = {...prevState};
@@ -54,8 +51,8 @@ const ServerInstallations = () => {
                 return prevState;
             }
 
-            installation.installationStatus = "INSTALLATION_IN_PROGRESS";
-            installation.errorStatus = null;
+            installation.installationStatus = InstallationStatus.InstallationInProgress;
+            installation.errorStatus = undefined;
             return newState;
         });
     };
@@ -70,23 +67,25 @@ const ServerInstallations = () => {
                 return prevState;
             }
 
-            installation.branch = selectedBranch;
+            installation.branch = selectedBranch as InstallationBranch;
             return newState;
         });
 
-        await changeServerBranch(serverType, selectedBranch);
+        await serverInstallationApi.setActiveBranch({type: serverType, activeBranchDto: {branch: selectedBranch as InstallationBranch}});
     };
 
     const serverTypeToId = (type: ServerType): number => {
         switch (type) {
-            case ServerType.ARMA3:
+            case ServerType.Arma3:
                 return 233780;
-            case ServerType.REFORGER:
+            case ServerType.Reforger:
                 return 1874900;
-            case ServerType.DAYZ:
+            case ServerType.Dayz:
                 return 223350;
-            case ServerType.DAYZ_EXP:
+            case ServerType.DayzExp:
                 return 1042420;
+            default:
+                return 0;
         }
     }
 
@@ -96,7 +95,7 @@ const ServerInstallations = () => {
                 {serverInstallations.map(installation => (
                     <Grid item xs={12} md={6} key={installation.type}>
                         <ServerInstallationItem installation={installation}
-                                                steamCmdItemInfo={steamCmdItemInfo[serverTypeToId(installation.type)]}
+                                                steamCmdItemInfo={steamCmdItemInfo[serverTypeToId(installation.type!)]}
                                                 onBranchChanged={handleBranchChanged}
                                                 onUpdateClicked={handleUpdateClicked}
                         />

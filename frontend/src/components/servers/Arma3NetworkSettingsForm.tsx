@@ -2,7 +2,7 @@ import {Accordion, AccordionDetails, AccordionSummary, Grid, InputBaseComponentP
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {FormikProps} from "formik";
-import {Arma3ServerDto} from "../../dtos/ServerDto.ts";
+import {Arma3ServerDto} from "../../api/serverModels";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
 type Arma3NetworkSettingsFormProps = {

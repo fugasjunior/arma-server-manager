@@ -1,8 +1,9 @@
-import {Arma3ServerDto, DayZServerDto, ReforgerServerDto, ServerType} from "../dtos/ServerDto";
+import {ServerType} from "../api/generated";
+import {Arma3ServerDto, DayZServerDto, ReforgerServerDto} from "../api/serverModels";
 
 export function arma3ServerInitialState(): Arma3ServerDto {
     return {
-        type: ServerType.ARMA3,
+        type: ServerType.Arma3,
         name: "",
         description: "",
         port: 2302,
@@ -48,15 +49,15 @@ localClient[] = { "127.0.0.1"};`,
         customLaunchParameters: [],
         automaticRestart: {
             enabled: false,
-            time: null
+            time: undefined
         },
-        networkSettings: null
+        networkSettings: undefined
     };
 }
 
 export function dayzServerInitialState(): DayZServerDto {
     return {
-        type: ServerType.DAYZ,
+        type: ServerType.Dayz,
         name: "",
         description: "",
         port: 2302,
@@ -85,14 +86,14 @@ export function dayzServerInitialState(): DayZServerDto {
         customLaunchParameters: [],
         automaticRestart: {
             enabled: false,
-            time: null
+            time: undefined
         }
     };
 }
 
 export function reforgerServerInitialState(): ReforgerServerDto {
     return {
-        type: ServerType.REFORGER,
+        type: ServerType.Reforger,
         name: "",
         description: "",
         scenarioId: "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
@@ -107,7 +108,7 @@ export function reforgerServerInitialState(): ReforgerServerDto {
         customLaunchParameters: [],
         automaticRestart: {
             enabled: false,
-            time: null
+            time: undefined
         }
     };
 }

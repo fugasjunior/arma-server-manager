@@ -1,7 +1,8 @@
+import React from "react";
 import {useFormik} from "formik";
 import {AutocompleteValue, FormGroup, Grid} from "@mui/material";
-import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
-import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
+import {ReforgerScenarioDto} from "../../api/generated";
+import {ReforgerServerDto} from "../../api/serverModels";
 import {ReforgerScenariosAutocomplete} from "./ReforgerScenariosAutocomplete.tsx";
 import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
@@ -18,7 +19,7 @@ type EditReforgerServerSettingsFormProps = {
 
 export default function EditReforgerServerSettingsForm(props: EditReforgerServerSettingsFormProps) {
 
-    const [launchParameters, setLaunchParameters] = useState([...props.server.customLaunchParameters]);
+    const [launchParameters, setLaunchParameters] = useState([...(props.server.customLaunchParameters ?? [])]);
 
     function handleSubmit(values: ReforgerServerDto) {
         values.customLaunchParameters = [...launchParameters];
@@ -31,7 +32,7 @@ export default function EditReforgerServerSettingsForm(props: EditReforgerServer
         enableReinitialize: true
     });
 
-    const setScenario = (_: any, value: AutocompleteValue<ReforgerScenarioDto | string, false, false, true> | null): void => {
+    const setScenario = (_: React.SyntheticEvent | null, value: AutocompleteValue<ReforgerScenarioDto | string, false, false, true> | null): void => {
         console.log(_, value);
         if (!value) {
             return;

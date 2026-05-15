@@ -4,9 +4,9 @@ import ListBuilderHeader from "./ListBuilderHeader";
 import Fuse from "fuse.js";
 import {Box, Grid, SelectChangeEvent} from "@mui/material";
 import styles from "./ListBuilder.module.css";
-import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
+import {PresetResponseDto} from "../../api/generated";
 
-export type ListBuilderElement = { id: number | string, name: string };
+export type ListBuilderElement = { id?: number | string, name?: string };
 
 type ListBuilderProps<T> = {
     availableOptions: Array<T>,
@@ -15,7 +15,7 @@ type ListBuilderProps<T> = {
     withControls?: boolean,
     confirmDisabled?: boolean,
     showFilter?: boolean,
-    presets?: Array<ModPresetDto>
+    presets?: Array<PresetResponseDto>
     selectedPreset?: string,
     onPresetChange?: (event: SelectChangeEvent) => void,
     onSelect: (element: T) => void,

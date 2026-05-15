@@ -1,13 +1,13 @@
 import {Button, FormControl, InputLabel, Select, SelectChangeEvent, Stack, Typography} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
+import {PresetResponseDto} from "../../api/generated";
 
 type ListBuilderHeaderProps = {
     itemsLabel: string,
     withControls?: boolean,
     confirmDisabled?: boolean,
     selectedPreset?: string,
-    presets?: Array<ModPresetDto>,
+    presets?: Array<PresetResponseDto>,
     onPresetChange?: (event: SelectChangeEvent) => void
     onConfirm?: () => void,
     onCancel?: () => void,

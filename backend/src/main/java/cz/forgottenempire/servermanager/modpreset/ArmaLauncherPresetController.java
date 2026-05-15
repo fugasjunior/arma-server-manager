@@ -1,41 +1,46 @@
 package cz.forgottenempire.servermanager.modpreset;
 
+import cz.forgottenempire.servermanager.api.ArmaLauncherPresetApi;
+import cz.forgottenempire.servermanager.api.model.PresetResponseDto;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.modpreset.dtos.PresetResponseDto;
-import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/mod/launcher_preset")
-class ArmaLauncherPresetController {
+class ArmaLauncherPresetController implements ArmaLauncherPresetApi {
 
     private final ModPresetsService modPresetsService;
     private final ArmaLauncherPresetImportService importService;
     private final ArmaLauncherPresetExportService exportService;
-    private final ModPresetMapper modPresetMapper = Mappers.getMapper(ModPresetMapper.class);
+    private final ModPresetMapper modPresetMapper;
 
     @Autowired
     ArmaLauncherPresetController(
             ModPresetsService modPresetsService,
             ArmaLauncherPresetImportService importService,
-            ArmaLauncherPresetExportService exportService
+            ArmaLauncherPresetExportService exportService,
+            ModPresetMapper modPresetMapper
     ) {
         this.modPresetsService = modPresetsService;
         this.importService = importService;
         this.exportService = exportService;
+        this.modPresetMapper = modPresetMapper;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<byte[]> exportModPreset(@PathVariable long id) {
+    @Override
+    public ResponseEntity<Resource> downloadLauncherPreset(Long id) {
         ModPreset modPreset = modPresetsService.getModPreset(id)
                 .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
 
@@ -49,26 +54,33 @@ class ArmaLauncherPresetController {
                         .build()
         );
 
-        return new ResponseEntity<>(modPresetHtml, headers, HttpStatus.OK);
+        return ResponseEntity.ok().headers(headers).body(new ByteArrayResource(modPresetHtml));
     }
 
-    @PostMapping
-    public ResponseEntity<PresetResponseDto> uploadModPreset(@RequestParam("preset") MultipartFile presetFile) throws IOException {
-        String filename = presetFile.getOriginalFilename();
+    @Override
+    public ResponseEntity<PresetResponseDto> importLauncherPreset(MultipartFile preset) {
+        if (preset == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        String filename = preset.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".html")) {
             throw new UnsupportedFileExtension();
         }
 
-        byte[] fileBytes = presetFile.getBytes();
-        String fileContent = new String(fileBytes);
+        String fileContent;
+        try {
+            fileContent = new String(preset.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read preset file", e);
+        }
         Optional<ModPreset> modPreset = importService.importPreset(Jsoup.parse(fileContent));
 
-        return modPreset.map(preset -> ResponseEntity.ok(modPresetMapper.mapToModPresetDto(preset)))
+        return modPreset.map(p -> ResponseEntity.ok(modPresetMapper.mapToModPresetDto(p)))
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     private String getPresetFileName(ModPreset preset) {
-        // replaces all unsupported file name characters and creates a .html file from the mod name
         return preset.getName().replaceAll("[^a-zA-Z0-9-_.]", "_") + ".html";
     }
 }
