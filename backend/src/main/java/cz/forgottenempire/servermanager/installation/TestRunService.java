@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-class TestRunService {
+public class TestRunService {
 
     private static final String LOCALHOST = "localhost";
 

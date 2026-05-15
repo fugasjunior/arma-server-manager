@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
-    id 'org.flywaydb.flyway' version '10.15.2'
+    id 'org.flywaydb.flyway' version '11.14.1'
     id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
 }
@@ -70,23 +70,23 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
     implementation "commons-io:commons-io:2.22.0"
     implementation "com.auth0:java-jwt:4.2.2"
     implementation "com.ibasco.agql:agql-source-query:1.2.2"
-    implementation "org.freemarker:freemarker:2.3.34"
     implementation "org.springframework:spring-context-support"
     implementation "com.google.guava:guava:33.6.0-jre"
     implementation "org.mapstruct:mapstruct:1.6.3"
-    implementation "org.flywaydb:flyway-core:12.6.1"
     implementation "org.jsoup:jsoup:1.22.2"
-    implementation "org.flywaydb:flyway-mysql:12.6.1"
+    implementation "org.flywaydb:flyway-mysql"
 
     compileOnly "org.projectlombok:lombok:1.18.46"
 
     runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
-    runtimeOnly 'com.mysql:mysql-connector-j:9.7.0'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-    aspect group: 'org.springframework', name: 'spring-aspects'
+    aspect "org.springframework:spring-aspects"
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor "org.projectlombok:lombok:1.18.46"
@@ -94,7 +94,16 @@ dependencies {
 
     testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
+    testImplementation 'org.testcontainers:mysql:1.20.4'
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.5.0'
+    testImplementation 'org.awaitility:awaitility:4.2.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
+    testCompileOnly "org.projectlombok:lombok:1.18.46"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.46"
 }
 
 test {

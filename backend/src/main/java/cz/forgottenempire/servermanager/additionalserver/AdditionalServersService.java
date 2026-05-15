@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,16 +30,22 @@ class AdditionalServersService {
     public AdditionalServersService(
             AdditionalServerRepository serverRepository,
             AdditionalServerInstanceInfoRepository instanceInfoRepository,
-            ProcessFactory processFactory, @Value("${directory.logs}") String logDirectory
+            ProcessFactory processFactory,
+            @Value("${directory.logs}") String logDirectory
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
         this.processFactory = processFactory;
         this.logDirectory = logDirectory;
+    }
 
-        // add shutdown hook to stop all running servers
-        Runtime.getRuntime().addShutdownHook(new Thread(() ->
-                instanceInfoRepository.getAll().forEach(server -> destroyWithTimeout(server.process()))));
+    @PreDestroy
+    void stopAllServers() {
+        instanceInfoRepository.getAll().forEach(server -> {
+            if (server.process() != null) {
+                destroyWithTimeout(server.process());
+            }
+        });
     }
 
     public Optional<AdditionalServer> getServer(Long id) {

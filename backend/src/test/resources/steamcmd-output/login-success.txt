@@ -1,0 +1,5 @@
+Logging in user 'testuser' to Steam Public...OK
+Waiting for client config...OK
+Waiting for user info...OK
+Loading Steam API...OK
+Connecting anonymously to Steam Public...OK

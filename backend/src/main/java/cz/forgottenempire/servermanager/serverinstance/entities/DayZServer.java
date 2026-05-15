@@ -7,7 +7,10 @@ import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -24,6 +27,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "dayzserver")
 public class DayZServer extends Server {
 
     @Min(0)
@@ -48,6 +52,9 @@ public class DayZServer extends Server {
     private String additionalOptions;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "dayzserver_active_mods",
+            joinColumns = @JoinColumn(name = "dayzserver_id"),
+            inverseJoinColumns = @JoinColumn(name = "active_mods_id"))
     private List<WorkshopMod> activeMods;
 
     @Override

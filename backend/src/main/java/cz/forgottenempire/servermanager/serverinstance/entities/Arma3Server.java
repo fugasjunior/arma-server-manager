@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "arma3server")
 @Configurable
 public class Arma3Server extends Server {
 
@@ -46,10 +47,15 @@ public class Arma3Server extends Server {
     private String additionalOptions;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "arma3server_active_mods",
+            joinColumns = @JoinColumn(name = "arma3server_id"),
+            inverseJoinColumns = @JoinColumn(name = "active_mods_id"))
     private List<WorkshopMod> activeMods;
 
     @ElementCollection(targetClass = Arma3CDLC.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "arma3server_activedlcs", joinColumns = @JoinColumn(name = "arma3server_id"))
+    @Column(name = "activedlcs")
     private List<Arma3CDLC> activeDLCs;
 
     @OneToOne(cascade = CascadeType.ALL)
