@@ -7,6 +7,7 @@ import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessRepository;
+import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,11 +27,15 @@ class CheckServerInstancesStatusCronJob {
 
     private final ServerProcessRepository processRepository;
     private final ServerInstanceService serverService;
+    private final ServerProcessService serverProcessService;
 
     @Autowired
-    public CheckServerInstancesStatusCronJob(ServerProcessRepository processRepository, ServerInstanceService serverService) {
+    public CheckServerInstancesStatusCronJob(ServerProcessRepository processRepository,
+                                             ServerInstanceService serverService,
+                                             ServerProcessService serverProcessService) {
         this.processRepository = processRepository;
         this.serverService = serverService;
+        this.serverProcessService = serverProcessService;
     }
 
     @Scheduled(fixedDelay = 10000)
@@ -50,8 +55,8 @@ class CheckServerInstancesStatusCronJob {
     }
 
     private void handleCrashedServer(ServerProcess serverProcess) {
-        serverProcess.stop();
         log.warn("Server ID {} crashed or was exited outside the manager.", serverProcess.getServerId());
+        serverProcessService.shutDownServer(serverProcess.getServerId());
     }
 
     private void updateServerInstanceInfo(ServerProcess process) {
@@ -63,7 +68,6 @@ class CheckServerInstancesStatusCronJob {
             SourceServer sourceServer = sourceQueryInfoResponse.getResult();
             updateInstanceInfoFromQueryResult(instanceInfo, sourceServer);
         } catch (ExecutionException e) {
-            // ignore any timeouts that happen during the first minute of starting the server
             LocalDateTime startedAt = instanceInfo.getStartedAt();
             if (startedAt.isBefore(LocalDateTime.now().minus(1, ChronoUnit.MINUTES))) {
                 log.warn("Timeout happened during querying the status of server {} (ID {}) on port {}. " +

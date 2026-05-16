@@ -1,14 +1,12 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -18,28 +16,24 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public
-class ServerInstanceService {
+public class ServerInstanceService {
 
     private final ServerRepository serverRepository;
     private final ServerProcessService processService;
     private final PathsFactory pathsFactory;
     private final FreeMarkerConfigurer freeMarkerConfigurer;
-    private final String[] additionalMods;
 
     @Autowired
     public ServerInstanceService(
             ServerRepository serverRepository,
             ServerProcessService processService,
             PathsFactory pathsFactory,
-            FreeMarkerConfigurer freeMarkerConfigurer,
-            @Value("${additionalMods:#{null}}") String[] additionalMods
+            FreeMarkerConfigurer freeMarkerConfigurer
     ) {
         this.serverRepository = serverRepository;
         this.processService = processService;
         this.pathsFactory = pathsFactory;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
-        this.additionalMods = additionalMods;
     }
 
     public List<Server> getAllServers() {
@@ -53,8 +47,8 @@ class ServerInstanceService {
     public Server createServer(Server server) {
         server.getCustomLaunchParameters().forEach(param -> param.setServer(server));
         Server persistedServer = serverRepository.save(server);
-        injectDependencies(persistedServer);
-        persistedServer.getConfigFiles().forEach(ServerConfig::generate);
+        ServerLaunchContext ctx = new ServerLaunchContext(pathsFactory, freeMarkerConfigurer);
+        persistedServer.getConfigFiles(ctx).forEach(ServerConfig::generate);
         return persistedServer;
     }
 
@@ -76,13 +70,5 @@ class ServerInstanceService {
         server.setRestartAutomatically(enabled);
         server.setAutomaticRestartTime(time);
         serverRepository.save(server);
-    }
-
-    private void injectDependencies(Server server) {
-        server.setPathsFactory(pathsFactory);
-        server.setFreeMarkerConfigurer(freeMarkerConfigurer);
-        if (server instanceof Arma3Server arma3Server) {
-            arma3Server.setAdditionalMods(additionalMods);
-        }
     }
 }

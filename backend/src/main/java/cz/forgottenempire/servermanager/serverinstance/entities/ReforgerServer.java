@@ -1,8 +1,10 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,10 +33,10 @@ public class ReforgerServer extends Server {
     private List<ReforgerMod> activeMods;
 
     @Override
-    public List<String> getLaunchParameters() {
+    public List<String> getLaunchParameters(ServerLaunchContext ctx) {
         List<String> parameters = new ArrayList<>();
         parameters.add("-config");
-        parameters.add(getConfigFile().getAbsolutePath());
+        parameters.add(getConfigFile(ctx.pathsFactory()).getAbsolutePath());
         parameters.add("-maxFPS");
         parameters.add("60");
         parameters.add("-backendlog");
@@ -44,11 +46,11 @@ public class ReforgerServer extends Server {
     }
 
     @Override
-    public Collection<ServerConfig> getConfigFiles() {
-        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.REFORGER), this, freeMarkerConfigurer));
+    public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
+        return List.of(new ServerConfig(getConfigFile(ctx.pathsFactory()), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.REFORGER), this, ctx.freeMarkerConfigurer()));
     }
 
-    private File getConfigFile() {
+    private File getConfigFile(PathsFactory pathsFactory) {
         String fileName = "REFORGER_" + getId() + ".json";
         return pathsFactory.getConfigFilePath(ServerType.REFORGER, fileName).toFile();
     }

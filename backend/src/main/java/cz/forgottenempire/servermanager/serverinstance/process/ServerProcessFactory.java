@@ -1,40 +1,35 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.time.Clock;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 @Component
 public class ServerProcessFactory {
 
     private final ServerProcessCreator serverProcessCreator;
-    private final PathsFactory pathsFactory;
-    private final ServerRepository serverRepository;
-    private final Clock clock;
-    private final TaskScheduler taskScheduler;
+    private final ServerLaunchContext launchContext;
+    private final String[] additionalMods;
 
     @Autowired
-    public ServerProcessFactory(ServerProcessCreator serverProcessCreator, PathsFactory pathsFactory,
-                                ServerRepository serverRepository, Clock clock, TaskScheduler taskScheduler) {
+    public ServerProcessFactory(ServerProcessCreator serverProcessCreator,
+                                PathsFactory pathsFactory,
+                                FreeMarkerConfigurer freeMarkerConfigurer,
+                                @Value("${additionalMods:#{null}}") String[] additionalMods) {
         this.serverProcessCreator = serverProcessCreator;
-        this.pathsFactory = pathsFactory;
-        this.serverRepository = serverRepository;
-        this.clock = clock;
-        this.taskScheduler = taskScheduler;
+        this.launchContext = new ServerLaunchContext(pathsFactory, freeMarkerConfigurer, additionalMods);
+        this.additionalMods = additionalMods;
     }
 
     public ServerProcess create(Server server) {
         if (server instanceof Arma3Server) {
-            return new Arma3ServerProcess(server.getId(), serverProcessCreator, pathsFactory,
-                    serverRepository, clock, taskScheduler);
+            return new Arma3ServerProcess(server.getId(), serverProcessCreator, launchContext, additionalMods);
         }
-        return new ServerProcess(server.getId(), serverProcessCreator, pathsFactory,
-                serverRepository, clock, taskScheduler);
+        return new ServerProcess(server.getId(), serverProcessCreator, launchContext);
     }
 }

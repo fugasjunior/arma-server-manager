@@ -1,8 +1,10 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,10 +60,10 @@ public class DayZServer extends Server {
     private List<WorkshopMod> activeMods;
 
     @Override
-    public List<String> getLaunchParameters() {
+    public List<String> getLaunchParameters(ServerLaunchContext ctx) {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=" + getConfigFile().getAbsolutePath());
+        parameters.add("-config=" + getConfigFile(ctx.pathsFactory()).getAbsolutePath());
         parameters.add("-limitFPS=60");
         parameters.add("-dologs");
         parameters.add("-adminlog");
@@ -72,11 +74,11 @@ public class DayZServer extends Server {
     }
 
     @Override
-    public Collection<ServerConfig> getConfigFiles() {
-        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this, freeMarkerConfigurer));
+    public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
+        return List.of(new ServerConfig(getConfigFile(ctx.pathsFactory()), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this, ctx.freeMarkerConfigurer()));
     }
 
-    private File getConfigFile() {
+    private File getConfigFile(PathsFactory pathsFactory) {
         String fileName = "DAYZ_" + getId() + ".cfg";
         return pathsFactory.getConfigFilePath(getType(), fileName).toFile();
     }

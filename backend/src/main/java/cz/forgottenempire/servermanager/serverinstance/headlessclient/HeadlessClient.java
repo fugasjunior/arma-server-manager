@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessCreator;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
@@ -22,14 +23,17 @@ public class HeadlessClient {
     private final Arma3Server server;
     private final PathsFactory pathsFactory;
     private final ServerProcessCreator serverProcessCreator;
+    private final String[] additionalMods;
 
     private Process process;
 
-    public HeadlessClient(int id, Arma3Server server, PathsFactory pathsFactory, ServerProcessCreator serverProcessCreator) {
+    public HeadlessClient(int id, Arma3Server server, PathsFactory pathsFactory,
+                          ServerProcessCreator serverProcessCreator, @Nullable String[] additionalMods) {
         this.id = id;
         this.server = server;
         this.pathsFactory = pathsFactory;
         this.serverProcessCreator = serverProcessCreator;
+        this.additionalMods = additionalMods;
     }
 
     public HeadlessClient start() {
@@ -69,7 +73,7 @@ public class HeadlessClient {
         List<String> modParameters = Stream.of(
                         server.getClientModsAsParameters(),
                         server.getCreatorDlcsAsParameters(),
-                        server.getAdditionalModsAsParameters()
+                        server.getAdditionalModsAsParameters(additionalMods)
                 )
                 .flatMap(Function.identity())
                 .toList();

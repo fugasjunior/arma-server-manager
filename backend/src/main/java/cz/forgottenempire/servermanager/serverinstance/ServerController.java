@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.api.model.AutomaticRestartDto;
 import cz.forgottenempire.servermanager.api.model.ServerDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.api.model.ServersDto;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
@@ -29,15 +30,18 @@ class ServerController implements ServersApi {
     private final ServerInstanceService serverInstanceService;
     private final ServerProcessService serverProcessService;
     private final ServerMapper serverMapper;
+    private final PathsFactory pathsFactory;
 
     @Autowired
     public ServerController(
             ServerInstanceService serverInstanceService,
             ServerProcessService serverProcessService,
-            ServerMapper serverMapper) {
+            ServerMapper serverMapper,
+            PathsFactory pathsFactory) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
         this.serverMapper = serverMapper;
+        this.pathsFactory = pathsFactory;
     }
 
     @Override
@@ -108,7 +112,7 @@ class ServerController implements ServersApi {
     public ResponseEntity<Resource> downloadServerLog(Long id) {
         Server server = getServerEntity(id);
         try {
-            Resource resource = server.getLog().asResource()
+            Resource resource = server.getLog(pathsFactory).asResource()
                     .orElseThrow(() -> new NotFoundException("Log file for server '" + server.getName() + "' doesn't exist"));
 
             HttpHeaders headers = new HttpHeaders();
@@ -126,7 +130,7 @@ class ServerController implements ServersApi {
     @Override
     public ResponseEntity<String> getServerLog(Long id, Integer count) {
         Server server = getServerEntity(id);
-        return ResponseEntity.ok(server.getLog().getLastLines(count));
+        return ResponseEntity.ok(server.getLog(pathsFactory).getLastLines(count));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,8 @@ class ServerControllerTest {
         serverInstanceService = mock(ServerInstanceService.class, withSettings().stubOnly());
         serverProcessService = mock(ServerProcessService.class, withSettings().stubOnly());
         serverMapper = mock(ServerMapper.class, withSettings().stubOnly());
-        controller = new ServerController(serverInstanceService, serverProcessService, serverMapper);
+        controller = new ServerController(serverInstanceService, serverProcessService, serverMapper,
+                mock(PathsFactory.class, withSettings().stubOnly()));
     }
 
     @Test

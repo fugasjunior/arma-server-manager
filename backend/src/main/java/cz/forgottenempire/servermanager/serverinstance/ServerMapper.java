@@ -38,23 +38,11 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
-    @Mapping(target = "additionalMods", ignore = true)
-    @Mapping(target = "pathsFactory", ignore = true)
-    @Mapping(target = "freeMarkerConfigurer", ignore = true)
-    @Mapping(target = "launchParameters", ignore = true)
-    @Mapping(target = "configFiles", ignore = true)
-    @Mapping(target = "modsAsParameters", ignore = true)
     Arma3Server mapArma3ServerDtoToEntity(Arma3ServerDto serverDto);
 
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
-    @Mapping(target = "additionalMods", ignore = true)
-    @Mapping(target = "pathsFactory", ignore = true)
-    @Mapping(target = "freeMarkerConfigurer", ignore = true)
-    @Mapping(target = "launchParameters", ignore = true)
-    @Mapping(target = "configFiles", ignore = true)
-    @Mapping(target = "modsAsParameters", ignore = true)
     void updateArma3ServerFromDto(Arma3ServerDto serverDto, @MappingTarget Arma3Server server);
 
     @Mapping(source = "restartAutomatically", target = "automaticRestart.enabled")
@@ -66,19 +54,11 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
-    @Mapping(target = "pathsFactory", ignore = true)
-    @Mapping(target = "freeMarkerConfigurer", ignore = true)
-    @Mapping(target = "launchParameters", ignore = true)
-    @Mapping(target = "configFiles", ignore = true)
     DayZServer mapDayZServerDtoToEntity(DayZServerDto serverDto);
 
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
-    @Mapping(target = "pathsFactory", ignore = true)
-    @Mapping(target = "freeMarkerConfigurer", ignore = true)
-    @Mapping(target = "launchParameters", ignore = true)
-    @Mapping(target = "configFiles", ignore = true)
     void updateDayZServerFromDto(DayZServerDto serverDto, @MappingTarget DayZServer server);
 
     @Mapping(source = "restartAutomatically", target = "automaticRestart.enabled")
@@ -89,19 +69,11 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
-    @Mapping(target = "pathsFactory", ignore = true)
-    @Mapping(target = "freeMarkerConfigurer", ignore = true)
-    @Mapping(target = "launchParameters", ignore = true)
-    @Mapping(target = "configFiles", ignore = true)
     ReforgerServer mapReforgerServerDtoToEntity(ReforgerServerDto serverDto);
 
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
-    @Mapping(target = "pathsFactory", ignore = true)
-    @Mapping(target = "freeMarkerConfigurer", ignore = true)
-    @Mapping(target = "launchParameters", ignore = true)
-    @Mapping(target = "configFiles", ignore = true)
     void updateReforgerServerFromDto(ReforgerServerDto serverDto, @MappingTarget ReforgerServer server);
 
     @Mapping(source = "startedAt", target = "startedAt")

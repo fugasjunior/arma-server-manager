@@ -1,5 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.headlessclient;
 
+import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessRepository;
@@ -10,20 +12,30 @@ import org.springframework.stereotype.Service;
 class HeadlessClientService {
 
     private final ServerProcessRepository processRepository;
+    private final ServerRepository serverRepository;
 
     @Autowired
-    public HeadlessClientService(ServerProcessRepository processRepository) {
+    public HeadlessClientService(ServerProcessRepository processRepository, ServerRepository serverRepository) {
         this.processRepository = processRepository;
+        this.serverRepository = serverRepository;
     }
 
     public void addHeadlessClient(Long id) {
+        Arma3Server server = getArma3Server(id);
         Arma3ServerProcess serverProcess = getServerProcess(id);
-        serverProcess.addHeadlessClient();
+        serverProcess.addHeadlessClient(server);
     }
 
     public void removeHeadlessClient(Long id) {
         Arma3ServerProcess serverProcess = getServerProcess(id);
         serverProcess.removeHeadlessClient();
+    }
+
+    private Arma3Server getArma3Server(Long id) {
+        return serverRepository.findById(id)
+                .filter(s -> s instanceof Arma3Server)
+                .map(s -> (Arma3Server) s)
+                .orElseThrow(() -> new IllegalArgumentException("Server ID " + id + " is not Arma 3 server"));
     }
 
     private Arma3ServerProcess getServerProcess(Long id) {
