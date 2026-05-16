@@ -71,9 +71,6 @@ public class AutomaticRestartTaskTest {
     }
 
     private AutomaticRestartTask createAutomaticRestartTask(LocalTime restartTime) {
-        AutomaticRestartTask automaticRestartTask = new AutomaticRestartTask(serverProcess, restartTime);
-        automaticRestartTask.setTaskScheduler(taskScheduler);
-        automaticRestartTask.setClock(fixedClock);
-        return automaticRestartTask;
+        return new AutomaticRestartTask(serverProcess, restartTime, fixedClock, taskScheduler);
     }
 }

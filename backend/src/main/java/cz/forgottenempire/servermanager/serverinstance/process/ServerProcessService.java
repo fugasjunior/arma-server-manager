@@ -18,14 +18,17 @@ class ServerProcessService {
 
     private final ServerRepository serverRepository;
     private final ServerProcessRepository processRepository;
+    private final ServerProcessFactory processFactory;
 
     @Autowired
     public ServerProcessService(
             ServerRepository serverRepository,
-            ServerProcessRepository processRepository
+            ServerProcessRepository processRepository,
+            ServerProcessFactory processFactory
     ) {
         this.serverRepository = serverRepository;
         this.processRepository = processRepository;
+        this.processFactory = processFactory;
         addShutdownHook(processRepository);
     }
 
@@ -88,7 +91,7 @@ class ServerProcessService {
     private ServerProcess getServerProcess(Server server) {
         return processRepository.get(server.getId())
                 .orElseGet(() -> {
-                    ServerProcess process = server.getProcess();
+                    ServerProcess process = processFactory.create(server);
                     processRepository.store(server.getId(), process);
                     return process;
                 });

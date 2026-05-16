@@ -73,7 +73,7 @@ public class DayZServer extends Server {
 
     @Override
     public Collection<ServerConfig> getConfigFiles() {
-        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this));
+        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this, freeMarkerConfigurer));
     }
 
     private File getConfigFile() {

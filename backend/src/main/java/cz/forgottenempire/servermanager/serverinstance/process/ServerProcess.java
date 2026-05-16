@@ -8,29 +8,36 @@ import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
 import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.scheduling.TaskScheduler;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
-@Configurable
 public class ServerProcess {
 
     private final long serverId;
-    private ServerProcessCreator serverProcessCreator;
-    private PathsFactory pathsFactory;
-    private ServerRepository serverRepository;
+    protected final ServerProcessCreator serverProcessCreator;
+    protected final PathsFactory pathsFactory;
+    protected final ServerRepository serverRepository;
+    private final Clock clock;
+    private final TaskScheduler taskScheduler;
     private Process process;
     private AutomaticRestartTask automaticRestartTask;
     protected ServerInstanceInfo instanceInfo;
 
-    public ServerProcess(long serverId) {
+    public ServerProcess(long serverId, ServerProcessCreator serverProcessCreator, PathsFactory pathsFactory,
+                         ServerRepository serverRepository, Clock clock, TaskScheduler taskScheduler) {
         this.serverId = serverId;
+        this.serverProcessCreator = serverProcessCreator;
+        this.pathsFactory = pathsFactory;
+        this.serverRepository = serverRepository;
+        this.clock = clock;
+        this.taskScheduler = taskScheduler;
     }
 
     public ServerInstanceInfo getInstanceInfo() {
@@ -102,27 +109,12 @@ public class ServerProcess {
         if (automaticRestartTask != null) {
             automaticRestartTask.cancel();
         }
-        automaticRestartTask = new AutomaticRestartTask(this, time).schedule();
+        automaticRestartTask = new AutomaticRestartTask(this, time, clock, taskScheduler).schedule();
     }
 
     public void cancelRestartJob() {
         if (automaticRestartTask != null) {
             automaticRestartTask.cancel();
         }
-    }
-
-    @Autowired
-    void setPathsFactory(PathsFactory pathsFactory) {
-        this.pathsFactory = pathsFactory;
-    }
-
-    @Autowired
-    void setServerRepository(ServerRepository serverRepository) {
-        this.serverRepository = serverRepository;
-    }
-
-    @Autowired
-    void setServerProcessCreator(ServerProcessCreator serverProcessCreator) {
-        this.serverProcessCreator = serverProcessCreator;
     }
 }

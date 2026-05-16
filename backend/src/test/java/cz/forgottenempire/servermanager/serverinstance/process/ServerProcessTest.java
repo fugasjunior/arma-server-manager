@@ -12,9 +12,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.scheduling.TaskScheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,10 +53,8 @@ class ServerProcessTest {
         process = mock(Process.class);
         when(processCreator.startProcessWithRedirectedOutput(any(), any(), any())).thenReturn(process);
 
-        serverProcess = new ServerProcess(SERVER_ID);
-        serverProcess.setServerProcessCreator(processCreator);
-        serverProcess.setServerRepository(serverRepository);
-        serverProcess.setPathsFactory(pathsFactory);
+        serverProcess = new ServerProcess(SERVER_ID, processCreator, pathsFactory, serverRepository,
+                Clock.systemDefaultZone(), mock(TaskScheduler.class));
     }
 
     @Test

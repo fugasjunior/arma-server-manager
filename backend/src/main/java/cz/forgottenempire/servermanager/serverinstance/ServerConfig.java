@@ -4,8 +4,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.BufferedWriter;
@@ -14,18 +12,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 @Slf4j
-@Configurable
 public class ServerConfig {
 
     private final File configFile;
     private final String templateName;
     private final Object templateModel;
-    private FreeMarkerConfigurer freeMarkerConfigurer;
+    private final FreeMarkerConfigurer freeMarkerConfigurer;
 
-    public ServerConfig(File configFile, String templateName, Object model) {
+    public ServerConfig(File configFile, String templateName, Object model, FreeMarkerConfigurer freeMarkerConfigurer) {
         this.configFile = configFile;
         this.templateName = templateName;
         this.templateModel = model;
+        this.freeMarkerConfigurer = freeMarkerConfigurer;
     }
 
     public void generateIfNecessary() {
@@ -69,10 +67,5 @@ public class ServerConfig {
         } catch (IOException | TemplateException e) {
             log.error("Could not write config file", e);
         }
-    }
-
-    @Autowired
-    void setFreeMarkerConfigurer(FreeMarkerConfigurer freeMarkerConfigurer) {
-        this.freeMarkerConfigurer = freeMarkerConfigurer;
     }
 }

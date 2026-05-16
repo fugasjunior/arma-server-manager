@@ -4,7 +4,6 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
-import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,8 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,10 +23,11 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Configurable
+@EntityListeners(ServerEntityListener.class)
 public abstract class Server {
 
-    protected transient PathsFactory pathsFactory;
+    transient PathsFactory pathsFactory;
+    transient FreeMarkerConfigurer freeMarkerConfigurer;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,14 +65,5 @@ public abstract class Server {
 
     public LogFile getLog() {
         return new LogFile(pathsFactory.getServerLogFile(type, id));
-    }
-
-    public ServerProcess getProcess() {
-        return new ServerProcess(id);
-    }
-
-    @Autowired
-    void setPathsFactory(PathsFactory pathsFactory) {
-        this.pathsFactory = pathsFactory;
     }
 }

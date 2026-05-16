@@ -39,6 +39,8 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
     @Mapping(target = "additionalMods", ignore = true)
+    @Mapping(target = "pathsFactory", ignore = true)
+    @Mapping(target = "freeMarkerConfigurer", ignore = true)
     @Mapping(target = "launchParameters", ignore = true)
     @Mapping(target = "configFiles", ignore = true)
     @Mapping(target = "modsAsParameters", ignore = true)
@@ -48,6 +50,8 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
     @Mapping(target = "additionalMods", ignore = true)
+    @Mapping(target = "pathsFactory", ignore = true)
+    @Mapping(target = "freeMarkerConfigurer", ignore = true)
     @Mapping(target = "launchParameters", ignore = true)
     @Mapping(target = "configFiles", ignore = true)
     @Mapping(target = "modsAsParameters", ignore = true)
@@ -62,6 +66,8 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
+    @Mapping(target = "pathsFactory", ignore = true)
+    @Mapping(target = "freeMarkerConfigurer", ignore = true)
     @Mapping(target = "launchParameters", ignore = true)
     @Mapping(target = "configFiles", ignore = true)
     DayZServer mapDayZServerDtoToEntity(DayZServerDto serverDto);
@@ -69,6 +75,8 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
+    @Mapping(target = "pathsFactory", ignore = true)
+    @Mapping(target = "freeMarkerConfigurer", ignore = true)
     @Mapping(target = "launchParameters", ignore = true)
     @Mapping(target = "configFiles", ignore = true)
     void updateDayZServerFromDto(DayZServerDto serverDto, @MappingTarget DayZServer server);
@@ -81,6 +89,8 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
+    @Mapping(target = "pathsFactory", ignore = true)
+    @Mapping(target = "freeMarkerConfigurer", ignore = true)
     @Mapping(target = "launchParameters", ignore = true)
     @Mapping(target = "configFiles", ignore = true)
     ReforgerServer mapReforgerServerDtoToEntity(ReforgerServerDto serverDto);
@@ -88,6 +98,8 @@ interface ServerMapper {
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
+    @Mapping(target = "pathsFactory", ignore = true)
+    @Mapping(target = "freeMarkerConfigurer", ignore = true)
     @Mapping(target = "launchParameters", ignore = true)
     @Mapping(target = "configFiles", ignore = true)
     void updateReforgerServerFromDto(ReforgerServerDto serverDto, @MappingTarget ReforgerServer server);

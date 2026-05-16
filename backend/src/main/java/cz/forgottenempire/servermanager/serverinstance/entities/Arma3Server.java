@@ -2,7 +2,6 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
@@ -11,8 +10,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -28,11 +25,9 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Entity
 @Table(name = "arma3server")
-@Configurable
 public class Arma3Server extends Server {
 
-    @Value("${additionalMods:#{null}}")
-    private transient String[] additionalMods;
+    transient String[] additionalMods;
 
     private boolean clientFilePatching;
     private boolean serverFilePatching;
@@ -72,11 +67,6 @@ public class Arma3Server extends Server {
     }
 
     @Override
-    public Arma3ServerProcess getProcess() {
-        return new Arma3ServerProcess(getId());
-    }
-
-    @Override
     public List<String> getLaunchParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
@@ -99,10 +89,10 @@ public class Arma3Server extends Server {
     @Override
     public Collection<ServerConfig> getConfigFiles() {
         List<ServerConfig> configs = new ArrayList<>();
-        configs.add(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this));
-        configs.add(new ServerConfig(getProfileFile(), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings));
+        configs.add(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this, freeMarkerConfigurer));
+        configs.add(new ServerConfig(getProfileFile(), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings, freeMarkerConfigurer));
         if (networkSettings != null) {
-            configs.add(new ServerConfig(getNetworkConfigFile(), Constants.ARMA3_NETWORK_SETTINGS, networkSettings));
+            configs.add(new ServerConfig(getNetworkConfigFile(), Constants.ARMA3_NETWORK_SETTINGS, networkSettings, freeMarkerConfigurer));
         }
         return configs;
     }

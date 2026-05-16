@@ -12,13 +12,11 @@ import jakarta.persistence.Converter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Converter
-@Configurable
 @Slf4j
 public class AttributeEncryptor implements AttributeConverter<String, String> {
 

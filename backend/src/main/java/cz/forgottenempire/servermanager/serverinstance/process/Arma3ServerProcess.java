@@ -1,27 +1,25 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
-import cz.forgottenempire.servermanager.serverinstance.ServerInstanceService;
+import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.headlessclient.HeadlessClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.scheduling.TaskScheduler;
 
+import java.time.Clock;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-@Configurable
 public class Arma3ServerProcess extends ServerProcess {
-    private final long serverId;
+
     private final Deque<HeadlessClient> headlessClients;
 
-    private ServerInstanceService serverInstanceService;
-
-    public Arma3ServerProcess(long serverId) {
-        super(serverId);
+    public Arma3ServerProcess(long serverId, ServerProcessCreator serverProcessCreator, PathsFactory pathsFactory,
+                              ServerRepository serverRepository, Clock clock, TaskScheduler taskScheduler) {
+        super(serverId, serverProcessCreator, pathsFactory, serverRepository, clock, taskScheduler);
         headlessClients = new LinkedList<>();
-        this.serverId = serverId;
     }
 
     @Override
@@ -42,11 +40,11 @@ public class Arma3ServerProcess extends ServerProcess {
     }
 
     public void addHeadlessClient() {
-        Server server = serverInstanceService.getServer(serverId).orElseThrow();
+        Server server = serverRepository.findById(getServerId()).orElseThrow();
         if (!(server instanceof Arma3Server arma3Server)) {
-            throw new IllegalStateException("Server ID " + server + " is not Arma 3 server");
+            throw new IllegalStateException("Server ID " + server.getId() + " is not Arma 3 server");
         }
-        headlessClients.push(new HeadlessClient(headlessClients.size() + 1, arma3Server).start());
+        headlessClients.push(new HeadlessClient(headlessClients.size() + 1, arma3Server, pathsFactory, serverProcessCreator).start());
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 
@@ -62,10 +60,5 @@ public class Arma3ServerProcess extends ServerProcess {
         List<HeadlessClient> crashedHeadlessClients = headlessClients.stream().filter(hc -> !hc.isAlive()).toList();
         crashedHeadlessClients.forEach(headlessClients::remove);
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
-    }
-
-    @Autowired
-    void setServerInstanceService(ServerInstanceService serverInstanceService) {
-        this.serverInstanceService = serverInstanceService;
     }
 }
