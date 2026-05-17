@@ -26,11 +26,12 @@ export class BackendHelper {
         await this.ctx.dispose();
     }
 
-    async reset(): Promise<void> {
+    async reset({ seedSteamAuth = true }: { seedSteamAuth?: boolean } = {}): Promise<void> {
         const token = await this.getToken();
-        const res = await this.ctx.post(`${BACKEND}/api/test/reset`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await this.ctx.post(
+            `${BACKEND}/api/test/reset?seedSteamAuth=${seedSteamAuth}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
         if (!res.ok()) {
             throw new Error(`Reset failed: ${res.status()} ${await res.text()}`);
         }
@@ -72,6 +73,21 @@ export class BackendHelper {
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
             data: opts,
         });
+    }
+
+    async scriptSteamAuthVerify(opts: {
+        status: 'SUCCESS' | 'REQUIRES_2FA' | 'INVALID_CREDENTIALS' | 'ERROR';
+        authType?: 'NONE' | 'EMAIL' | 'MOBILE' | 'UNKNOWN';
+        message?: string;
+    }): Promise<void> {
+        const token = await this.getToken();
+        const res = await this.ctx.post(`${BACKEND}/api/test/fakes/steam-auth-verify`, {
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            data: opts,
+        });
+        if (!res.ok()) {
+            throw new Error(`scriptSteamAuthVerify failed: ${res.status()} ${await res.text()}`);
+        }
     }
 }
 

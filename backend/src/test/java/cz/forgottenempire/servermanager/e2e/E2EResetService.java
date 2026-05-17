@@ -66,9 +66,11 @@ class E2EResetService {
     private String logsDir;
 
     @Transactional
-    public void reset() {
+    public void reset(boolean seedSteamAuth) {
         truncateDatabase();
-        seedFakeSteamAuth();
+        if (seedSteamAuth) {
+            seedFakeSteamAuth();
+        }
         fakeProcessFactory.reset();
         serverProcessRepository.clear();
         wipeDirs(serversDir, modsDir, logsDir);

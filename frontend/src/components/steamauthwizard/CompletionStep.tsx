@@ -36,6 +36,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({ onComplete }) => {
                     variant="contained"
                     color="primary"
                     onClick={onComplete}
+                    data-testid="completion-finish"
                 >
                     Finish
                 </Button>

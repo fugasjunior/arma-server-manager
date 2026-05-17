@@ -40,10 +40,10 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext, onSkip }) => {
             </Typography>
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-                <Button onClick={onSkip} color="secondary">
+                <Button onClick={onSkip} color="secondary" data-testid="welcome-skip">
                     Skip Setup
                 </Button>
-                <Button onClick={onNext} variant="contained" color="primary">
+                <Button onClick={onNext} variant="contained" color="primary" data-testid="welcome-continue">
                     Continue
                 </Button>
             </Box>

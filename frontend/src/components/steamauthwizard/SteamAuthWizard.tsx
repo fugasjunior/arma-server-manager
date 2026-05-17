@@ -4,10 +4,12 @@ import {
     Dialog,
     DialogContent,
     DialogTitle,
+    IconButton,
     Step,
     StepLabel,
     Stepper
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import {steamAuthApi} from '../../api/client';
 import { SteamAuthDto } from '../../api/generated';
 import WelcomeStep from './WelcomeStep';
@@ -29,7 +31,6 @@ const SteamAuthWizard: React.FC = () => {
         password: '',
         steamGuardToken: ''
     });
-    const [authType, setAuthType] = useState<string | null>(null);
 
     // Steps in the wizard
     const steps = ['Welcome', 'Steam Credentials', 'Steam Guard', 'Complete'];
@@ -38,13 +39,11 @@ const SteamAuthWizard: React.FC = () => {
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                // Check if wizard has been completed before
                 const wizardCompleted = localStorage.getItem('wizardCompleted') === 'true';
                 if (wizardCompleted) {
                     return;
                 }
 
-                // Check if Steam auth is already configured
                 const { data } = await steamAuthApi.getSteamAuthStatus();
                 if (!data.isConfigured) {
                     setOpen(true);
@@ -55,6 +54,18 @@ const SteamAuthWizard: React.FC = () => {
         };
 
         void checkAuthStatus();
+    }, []);
+
+    // Allow re-opening from Settings via custom event
+    useEffect(() => {
+        const handleReopen = () => {
+            setActiveStep(0);
+            setError(null);
+            setCredentials({ username: '', password: '', steamGuardToken: '' });
+            setOpen(true);
+        };
+        window.addEventListener('steam-auth-wizard:open', handleReopen);
+        return () => window.removeEventListener('steam-auth-wizard:open', handleReopen);
     }, []);
 
     // Handle next step button click
@@ -71,6 +82,11 @@ const SteamAuthWizard: React.FC = () => {
     const handleComplete = () => {
         localStorage.setItem('wizardCompleted', 'true');
         setOpen(false);
+    };
+
+    // Jump directly to completion step (used when no 2FA required)
+    const handleGoToCompletion = () => {
+        setActiveStep(3);
     };
 
     // Handle wizard skip
@@ -90,12 +106,12 @@ const SteamAuthWizard: React.FC = () => {
                         credentials={credentials}
                         setCredentials={setCredentials}
                         onNext={handleNext}
+                        onSuccessNoTwoFactor={handleGoToCompletion}
                         onBack={handleBack}
                         loading={loading}
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
-                        setAuthType={setAuthType}
                     />
                 );
             case 2:
@@ -109,7 +125,6 @@ const SteamAuthWizard: React.FC = () => {
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
-                        authType={authType}
                     />
                 );
             case 3:
@@ -120,8 +135,13 @@ const SteamAuthWizard: React.FC = () => {
     };
 
     return (
-        <Dialog open={open} maxWidth="md" fullWidth>
-            <DialogTitle>Steam Authentication Setup</DialogTitle>
+        <Dialog open={open} maxWidth="md" fullWidth data-testid="steam-auth-wizard">
+            <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Steam Authentication Setup
+                <IconButton onClick={handleSkip} size="small" data-testid="steam-auth-wizard-close">
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
             <DialogContent>
                 <Box sx={{ width: '100%' }}>
                     <Stepper activeStep={activeStep} alternativeLabel>

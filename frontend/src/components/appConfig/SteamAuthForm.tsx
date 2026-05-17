@@ -74,6 +74,11 @@ const SteamAuthForm = () => {
         toast.success("Steam Auth successfully cleared.");
     }
 
+    const handleReopenWizard = () => {
+        localStorage.removeItem('wizardCompleted');
+        window.dispatchEvent(new Event('steam-auth-wizard:open'));
+    };
+
     return (
         <>
             <ConfirmationDialog
@@ -106,6 +111,11 @@ const SteamAuthForm = () => {
                             <Button fullWidth variant="contained" type="submit">Submit</Button>
                             <Button fullWidth variant="outlined" color="error"
                                     onClick={handleToggleClearDialog}>Clear</Button>
+                            <Button fullWidth variant="outlined"
+                                    onClick={handleReopenWizard}
+                                    data-testid="reopen-steam-auth-wizard">
+                                Re-run setup wizard
+                            </Button>
                         </Stack>
                     </Grid>
                 </Grid>

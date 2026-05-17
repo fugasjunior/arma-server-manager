@@ -12,7 +12,6 @@ interface TokenStepProps {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     error: string | null;
     setError: React.Dispatch<React.SetStateAction<string | null>>;
-    authType: string | null;
 }
 
 /**
@@ -28,7 +27,6 @@ const TokenStep: React.FC<TokenStepProps> = ({
     setLoading,
     error,
     setError,
-    authType
 }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials(prev => ({
@@ -68,36 +66,23 @@ const TokenStep: React.FC<TokenStepProps> = ({
         }
     };
     
-    // If not using email authentication, skip this step
-    if (authType !== 'EMAIL') {
-        onNext();
-        return (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-                <CircularProgress />
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                    Processing...
-                </Typography>
-            </Box>
-        );
-    }
-    
     return (
         <Box component="form" onSubmit={handleSubmit}>
             <Typography variant="h5" gutterBottom>
                 Enter Steam Guard Token
             </Typography>
-            
+
             <Typography variant="body1" paragraph>
                 A Steam Guard code has been sent to the email address associated with your Steam account.
                 Please check your email and enter the code below.
             </Typography>
 
             {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
+                <Alert severity="error" sx={{ mb: 2 }} data-testid="token-error">
                     {error}
                 </Alert>
             )}
-            
+
             <TextField
                 fullWidth
                 margin="normal"
@@ -108,10 +93,11 @@ const TokenStep: React.FC<TokenStepProps> = ({
                 disabled={loading}
                 required
                 autoFocus
+                inputProps={{ 'data-testid': 'token-input' }}
             />
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-                <Button onClick={onBack} disabled={loading}>
+                <Button onClick={onBack} disabled={loading} data-testid="token-back">
                     Back
                 </Button>
                 <Button
@@ -120,6 +106,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
                     color="primary"
                     disabled={loading}
                     startIcon={loading ? <CircularProgress size={20} /> : null}
+                    data-testid="token-submit"
                 >
                     {loading ? 'Verifying...' : 'Continue'}
                 </Button>

@@ -37,3 +37,38 @@ export async function getAuthenticatedPage(browser: Browser): Promise<Page> {
 
     return page;
 }
+
+/**
+ * Like getAuthenticatedPage but does NOT set `wizardCompleted` in localStorage,
+ * so the SteamAuthWizard will appear if the backend reports isConfigured=false.
+ */
+export async function getAuthenticatedPageWithWizard(browser: Browser): Promise<Page> {
+    const ctx = await request.newContext();
+
+    const params = new URLSearchParams();
+    params.set('username', USERNAME);
+    params.set('password', PASSWORD);
+
+    const res = await ctx.post(`${BACKEND}/api/login`, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        data: params.toString(),
+    });
+    const body = await res.json();
+    const token: string = body.token;
+    const expiresIn: number = body.expiresIn;
+    const expirationTime = new Date().getTime() + expiresIn * 1000;
+
+    await ctx.dispose();
+
+    const page = await browser.newPage();
+    await page.addInitScript(
+        ({ token, expirationTime }: { token: string; expirationTime: number }) => {
+            localStorage.setItem('token', token);
+            localStorage.setItem('expirationTime', String(expirationTime));
+        },
+        { token, expirationTime },
+    );
+    await page.goto(FRONTEND);
+
+    return page;
+}

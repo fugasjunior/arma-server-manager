@@ -16,12 +16,12 @@ describe('CredentialsStep', () => {
     credentials: { username: '', password: '', steamGuardToken: '' },
     setCredentials: jest.fn(),
     onNext: jest.fn(),
+    onSuccessNoTwoFactor: jest.fn(),
     onBack: jest.fn(),
     loading: false,
     setLoading: jest.fn(),
     error: null,
-    setError: jest.fn(),
-    setAuthType: jest.fn()
+    setError: jest.fn()
   };
 
   beforeEach(() => {

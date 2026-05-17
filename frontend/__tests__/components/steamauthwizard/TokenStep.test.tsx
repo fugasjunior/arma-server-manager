@@ -18,8 +18,7 @@ describe('TokenStep', () => {
     loading: false,
     setLoading: jest.fn(),
     error: null,
-    setError: jest.fn(),
-    authType: 'EMAIL'
+    setError: jest.fn()
   };
 
   beforeEach(() => {
@@ -33,14 +32,6 @@ describe('TokenStep', () => {
     expect(screen.getByText('Steam Guard Token')).toBeInTheDocument();
     expect(screen.getByText('Continue')).toBeInTheDocument();
     expect(screen.getByText('Back')).toBeInTheDocument();
-  });
-
-  it('skips to next step when authType is not EMAIL', () => {
-    render(<TokenStep {...mockProps} authType="OTHER" />);
-    
-    expect(mockProps.onNext).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('Processing...')).toBeInTheDocument();
-    expect(screen.queryByText('Enter Steam Guard Token')).not.toBeInTheDocument();
   });
 
   it('updates token when input value changes', () => {

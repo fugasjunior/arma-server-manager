@@ -1,18 +1,18 @@
 import React from 'react';
 import { Box, Button, CircularProgress, TextField, Typography, Alert } from '@mui/material';
-import { SteamAuthDto } from '../../api/generated';
+import { AuthType, SteamAuthDto } from '../../api/generated';
 import {steamAuthApi} from '../../api/client';
 
 interface CredentialsStepProps {
     credentials: SteamAuthDto;
     setCredentials: React.Dispatch<React.SetStateAction<SteamAuthDto>>;
     onNext: () => void;
+    onSuccessNoTwoFactor: () => void;
     onBack: () => void;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     error: string | null;
     setError: React.Dispatch<React.SetStateAction<string | null>>;
-    setAuthType: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 /**
@@ -23,12 +23,12 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
     credentials,
     setCredentials,
     onNext,
+    onSuccessNoTwoFactor,
     onBack,
     loading,
     setLoading,
     error,
     setError,
-    setAuthType
 }) => {
     // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,13 +59,12 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
             if (data.status === 'SUCCESS') {
                 // No 2FA required, proceed to completion
                 await steamAuthApi.setSteamAuth({steamAuthDto: credentials});
-                onNext();
+                onSuccessNoTwoFactor();
             } else if (data.status === 'REQUIRES_2FA') {
-                if (data.authType === 'EMAIL') {
+                if (data.authType === AuthType.Email) {
                     // Email 2FA required, proceed to token step
-                    setAuthType('EMAIL');
                     onNext();
-                } else if (data.authType === 'MOBILE') {
+                } else if (data.authType === AuthType.Mobile) {
                     // Mobile 2FA not supported
                     setError('Mobile authenticator is not supported. Please disable it or use a different account.');
                 } else {
@@ -96,11 +95,11 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
             </Typography>
             
             {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
+                <Alert severity="error" sx={{ mb: 2 }} data-testid="credentials-error">
                     {error}
                 </Alert>
             )}
-            
+
             <TextField
                 fullWidth
                 margin="normal"
@@ -110,8 +109,9 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
                 onChange={handleChange}
                 disabled={loading}
                 required
+                inputProps={{ 'data-testid': 'credentials-username' }}
             />
-            
+
             <TextField
                 fullWidth
                 margin="normal"
@@ -122,10 +122,11 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
                 onChange={handleChange}
                 disabled={loading}
                 required
+                inputProps={{ 'data-testid': 'credentials-password' }}
             />
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-                <Button onClick={onBack} disabled={loading}>
+                <Button onClick={onBack} disabled={loading} data-testid="credentials-back">
                     Back
                 </Button>
                 <Button
@@ -134,6 +135,7 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
                     color="primary"
                     disabled={loading}
                     startIcon={loading ? <CircularProgress size={20} /> : null}
+                    data-testid="credentials-submit"
                 >
                     {loading ? 'Verifying...' : 'Continue'}
                 </Button>

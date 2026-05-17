@@ -28,11 +28,11 @@ class SteamAuthVerifierUnitTest {
     private SteamCmdAuthService steamCmdAuthService;
 
 
-    private SteamAuthVerifier verifier;
+    private SteamCmdSteamAuthVerifier verifier;
 
     @BeforeEach
     void setUp() {
-        verifier = new SteamAuthVerifier(steamCmdAuthService);
+        verifier = new SteamCmdSteamAuthVerifier(steamCmdAuthService);
     }
 
     @Test
