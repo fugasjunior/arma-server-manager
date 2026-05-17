@@ -46,3 +46,6 @@ out/
 
 # Transpiled Jest tests
 /src/main/webapp/__tests__/**.test.js
+
+# MCP
+.playwright-mcp/

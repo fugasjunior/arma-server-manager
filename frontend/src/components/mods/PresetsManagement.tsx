@@ -173,7 +173,7 @@ export default function PresetsManagement() {
             <Backdrop open={isUploadInProgress}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <input type="file" id="fileInput" onChange={handleFileInput} style={{display: 'none'}}/>
+            <input type="file" id="fileInput" data-testid="preset-import-input" onChange={handleFileInput} style={{display: 'none'}}/>
             <Box sx={{width: '100%'}}>
                 <Paper sx={{width: '100%'}}>
                     <Toolbar sx={{pl: {sm: 2}, pr: {xs: 1, sm: 1}}}>
@@ -207,6 +207,7 @@ export default function PresetsManagement() {
                                 {getSortedPresets().map((preset) => (
                                     <TableRow
                                         key={preset.id}
+                                        data-testid={`preset-row-${preset.id}`}
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
                                         <TableCell component="th" scope="row">
@@ -222,19 +223,19 @@ export default function PresetsManagement() {
                                             {(preset.mods ?? []).length}
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton aria-label="edit"
+                                            <IconButton aria-label="edit" data-testid={`preset-edit-${preset.id}`}
                                                         onClick={() => handleOpenEdit(preset)}>
                                                 <EditIcon color="primary"/>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton aria-label="export"
+                                            <IconButton aria-label="export" data-testid={`preset-export-${preset.id}`}
                                                         onClick={() => handleDownload(preset.id!)}>
                                                 <DownloadIcon color="primary"/>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton aria-label="delete"
+                                            <IconButton aria-label="delete" data-testid={`preset-delete-${preset.id}`}
                                                         onClick={() => handleDelete(preset.id!)}>
                                                 <DeleteIcon color="error"/>
                                             </IconButton>

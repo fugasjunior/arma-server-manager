@@ -35,21 +35,21 @@ function ModsTableToolbar(
             <Box>
                 <Tabs value={filter} onChange={onFilterChange}>
                     <Tab value="" label="All"/>
-                    <Tab value="ARMA3" label="Arma 3" disabled={arma3ModsCount === 0}/>
-                    <Tab value="DAYZ" label="DayZ" disabled={dayZModsCount === 0}/>
+                    <Tab value="ARMA3" label="Arma 3" data-testid="mods-tab-arma3" disabled={arma3ModsCount === 0}/>
+                    <Tab value="DAYZ" label="DayZ" data-testid="mods-tab-dayz" disabled={dayZModsCount === 0}/>
                 </Tabs>
             </Box>
 
             <Tooltip title="Update">
                         <span>
-                            <IconButton disabled={selectedModsCount === 0} onClick={onUpdateClicked}>
+                            <IconButton data-testid="mod-update-btn" disabled={selectedModsCount === 0} onClick={onUpdateClicked}>
                                 <UpdateIcon/>
                             </IconButton>
                         </span>
             </Tooltip>
             <Tooltip title="Save as preset">
                         <span>
-                            <IconButton disabled={selectedModsCount === 0 || mixedModsSelected}
+                            <IconButton data-testid="mod-save-preset-btn" disabled={selectedModsCount === 0 || mixedModsSelected}
                                         onClick={onCreatePresetClicked}>
                                 <PlaylistAddIcon/>
                             </IconButton>
@@ -57,7 +57,7 @@ function ModsTableToolbar(
             </Tooltip>
             <Tooltip title="Delete">
                         <span>
-                            <IconButton disabled={selectedModsCount === 0} onClick={onUninstallClicked}>
+                            <IconButton data-testid="mod-uninstall-btn" disabled={selectedModsCount === 0} onClick={onUninstallClicked}>
                                 <DeleteIcon/>
                             </IconButton>
                         </span>

@@ -26,7 +26,7 @@ export const EnhancedTableBody = (
         {rows.map((row) => {
             const selected = isSelected(row.id);
             return (
-                <TableRow key={row.id} hover onClick={() => onRowSelect(row.id)} role="checkbox"
+                <TableRow key={row.id} data-testid={`row-${row.id}`} hover onClick={() => onRowSelect(row.id)} role="checkbox"
                           aria-checked={selected} tabIndex={-1} selected={selected}>
                     <TableCell padding="checkbox">
                         <Checkbox checked={selected} color="primary"

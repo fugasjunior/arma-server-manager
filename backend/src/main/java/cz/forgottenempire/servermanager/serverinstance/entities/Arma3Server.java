@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -90,7 +91,12 @@ public class Arma3Server extends Server {
     public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
         List<ServerConfig> configs = new ArrayList<>();
         configs.add(new ServerConfig(getConfigFile(ctx.pathsFactory()), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this, ctx.freeMarkerConfigurer()));
-        configs.add(new ServerConfig(getProfileFile(ctx.pathsFactory()), Constants.ARMA3_PROFILE_TEMPLATE, difficultySettings, ctx.freeMarkerConfigurer()));
+        configs.add(new ServerConfig(
+                getProfileFile(ctx.pathsFactory()),
+                Constants.ARMA3_PROFILE_TEMPLATE,
+                Objects.requireNonNullElseGet(difficultySettings, Arma3DifficultySettings::new),
+                ctx.freeMarkerConfigurer())
+        );
         if (networkSettings != null) {
             configs.add(new ServerConfig(getNetworkConfigFile(ctx.pathsFactory()), Constants.ARMA3_NETWORK_SETTINGS, networkSettings, ctx.freeMarkerConfigurer()));
         }

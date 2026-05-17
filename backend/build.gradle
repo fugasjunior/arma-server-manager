@@ -148,3 +148,12 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+tasks.register('e2eApp', JavaExec) {
+    dependsOn compileTestJava, processTestResources
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cz.forgottenempire.servermanager.e2e.E2EApplication'
+    jvmArgs '--enable-preview'
+    description = 'Run backend with E2E test profile (fake SteamCMD, fake processes, Testcontainers MySQL).'
+    group = 'e2e'
+}

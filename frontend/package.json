@@ -32,7 +32,11 @@
         "build": "tsc && vite build",
         "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
-        "test": "jest"
+        "test": "jest",
+        "e2e": "playwright test --config e2e/playwright.config.ts",
+        "e2e:ui": "playwright test --config e2e/playwright.config.ts --ui",
+        "e2e:install": "playwright install chromium",
+        "e2e:install-with-deps": "playwright install --with-deps chromium"
     },
     "eslintConfig": {
         "extends": "react-app"
@@ -51,6 +55,7 @@
     },
     "devDependencies": {
         "@openapitools/openapi-generator-cli": "^2.13.4",
+        "@playwright/test": "^1.60.0",
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^14.0.0",
         "@testing-library/user-event": "^14.4.3",

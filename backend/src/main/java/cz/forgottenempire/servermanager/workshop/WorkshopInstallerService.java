@@ -13,6 +13,8 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +48,16 @@ class WorkshopInstallerService {
         this.installationService = installationService;
     }
 
-    @Transactional
     public void installOrUpdateMods(Collection<WorkshopMod> mods) {
-        steamCmdService.installOrUpdateWorkshopMods(mods)
-                .thenAcceptAsync(steamCmdJob -> steamCmdJob.getRelatedWorkshopMods().forEach(
+        var future = steamCmdService.installOrUpdateWorkshopMods(mods);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                future.thenAcceptAsync(steamCmdJob -> steamCmdJob.getRelatedWorkshopMods().forEach(
                         mod -> handleInstallation(mod, steamCmdJob)
                 ));
+            }
+        });
     }
 
     public void uninstallMod(WorkshopMod mod) {

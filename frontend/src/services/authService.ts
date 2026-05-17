@@ -1,7 +1,6 @@
-import config from "../config";
 import {apiAxiosInstance} from "../api/client";
 
-const apiEndpoint = config.apiUrl + "/login";
+const apiEndpoint = "/login";
 
 export async function login(username: string, password: string) {
     const formData = new FormData();

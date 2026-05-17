@@ -21,14 +21,14 @@ export const ScenariosTableToolbar = (
         uploadInProgress
     }: ScenariosTableToolbarProps
 ) => <>
-    {!uploadInProgress && <Button variant="contained" component="label">
+    {!uploadInProgress && <Button variant="contained" component="label" data-testid="scenario-upload-btn">
         Upload
-        <input hidden multiple type="file" onChange={onFileChange}/>
+        <input hidden multiple type="file" data-testid="scenario-upload-input" onChange={onFileChange}/>
     </Button>}
     {uploadInProgress && <CircularProgress variant="determinate" value={percentUploaded}/>}
     <Tooltip title="Delete">
                         <span>
-                            <IconButton disabled={selectedScenariosCount === 0} onClick={onDeleteClicked}>
+                            <IconButton data-testid="scenario-delete-btn" disabled={selectedScenariosCount === 0} onClick={onDeleteClicked}>
                                 <DeleteIcon/>
                             </IconButton>
                         </span>

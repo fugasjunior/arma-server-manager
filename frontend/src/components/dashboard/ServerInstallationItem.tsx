@@ -80,6 +80,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
         }
 
         return <Button fullWidth variant="contained"
+                       data-testid={`install-update-btn-${installation.type}`}
                        onClick={() => onUpdateClicked(installation.type! as ServerType)}
                        color={installation.errorStatus == null ? "primary" : "error"}
         >
@@ -89,7 +90,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
     }
 
     return (
-        <Card sx={{maxWidth: "540px"}}>
+        <Card sx={{maxWidth: "540px"}} data-testid={`install-card-${installation.type}`}>
             <CardMedia
                 component="img"
                 height="140"
@@ -138,7 +139,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                     getProgressBar()
                 }
             </CardContent>
-            <CardActions>
+            <CardActions data-testid={`install-status-${installation.type}`}>
                 {getActionButton()}
             </CardActions>
         </Card>

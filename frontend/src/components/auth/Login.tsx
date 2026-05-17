@@ -59,7 +59,7 @@ const Login = () => {
                                required
                                value={password}
                                onChange={handlePasswordChange}/>
-                    <Button fullWidth variant="contained" size="large" type="submit">Submit</Button>
+                    <Button fullWidth variant="contained" size="large" type="submit" data-testid="login-submit">Submit</Button>
                 </Stack>
             </form>
         </Box>
