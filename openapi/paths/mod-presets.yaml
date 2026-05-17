@@ -75,6 +75,29 @@
         $ref: '../components/responses.yaml#/ApiError'
       '404':
         $ref: '../components/responses.yaml#/ApiError'
+  patch:
+    tags: [ModPresets]
+    operationId: renamePreset
+    summary: Rename a mod preset
+    parameters:
+      - $ref: '../components/parameters.yaml#/presetId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mod-presets.yaml#/RenamePresetRequestDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetResponseDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
   delete:
     tags: [ModPresets]
     operationId: deletePreset

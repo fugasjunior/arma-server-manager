@@ -70,4 +70,19 @@ public class Api {
                         Files.readAllBytes(file.toPath())))
                 .header("Authorization", token.get()));
     }
+
+    public ResultActions multipartPostWithParam(String path, String paramName, File file, String contentType, String queryParamName, String queryParamValue) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.multipart(path)
+                .file(new MockMultipartFile(paramName, file.getName(), contentType,
+                        Files.readAllBytes(file.toPath())))
+                .param(queryParamName, queryParamValue)
+                .header("Authorization", token.get()));
+    }
+
+    public ResultActions patch(String path, String json) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.patch(path)
+                .header("Authorization", token.get())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
+    }
 }

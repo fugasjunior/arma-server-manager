@@ -58,7 +58,7 @@ class ArmaLauncherPresetController implements ArmaLauncherPresetApi {
     }
 
     @Override
-    public ResponseEntity<PresetResponseDto> importLauncherPreset(MultipartFile preset) {
+    public ResponseEntity<PresetResponseDto> importLauncherPreset(MultipartFile preset, String name) {
         if (preset == null) {
             return ResponseEntity.noContent().build();
         }
@@ -74,7 +74,7 @@ class ArmaLauncherPresetController implements ArmaLauncherPresetApi {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read preset file", e);
         }
-        Optional<ModPreset> modPreset = importService.importPreset(Jsoup.parse(fileContent));
+        Optional<ModPreset> modPreset = importService.importPreset(Jsoup.parse(fileContent), name);
 
         return modPreset.map(p -> ResponseEntity.ok(modPresetMapper.mapToModPresetDto(p)))
                 .orElseGet(() -> ResponseEntity.noContent().build());

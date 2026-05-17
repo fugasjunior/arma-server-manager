@@ -1,6 +1,18 @@
 // Import Jest DOM extensions
 require('@testing-library/jest-dom');
 
+// jsdom does not implement Blob/File.prototype.text — polyfill it
+if (!global.Blob.prototype.text) {
+    global.Blob.prototype.text = function() {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsText(this);
+        });
+    };
+}
+
 // Mock localStorage
 const localStorageMock = (function() {
   let store = {};

@@ -27,10 +27,14 @@
         multipart/form-data:
           schema:
             type: object
+            required: [preset, name]
             properties:
               preset:
                 type: string
                 format: binary
+              name:
+                type: string
+                minLength: 1
     responses:
       '200':
         description: OK

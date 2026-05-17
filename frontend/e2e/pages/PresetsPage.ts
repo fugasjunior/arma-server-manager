@@ -16,17 +16,31 @@ export class PresetsPage {
         return this.page.getByTestId(`preset-edit-${id}`);
     }
 
-    exportBtn(id: number): Locator {
-        return this.page.getByTestId(`preset-export-${id}`);
+    async openMenu(id: number) {
+        await this.page.getByTestId(`preset-menu-${id}`).click();
     }
 
-    deleteBtn(id: number): Locator {
-        return this.page.getByTestId(`preset-delete-${id}`);
+    async deleteAction(id: number) {
+        await this.openMenu(id);
+        await this.page.getByTestId(`preset-menu-delete-${id}`).click();
+    }
+
+    async renameAction(id: number) {
+        await this.openMenu(id);
+        await this.page.getByTestId(`preset-menu-rename-${id}`).click();
+    }
+
+    async exportAction(id: number) {
+        await this.openMenu(id);
+        await this.page.getByTestId(`preset-menu-download-${id}`).click();
     }
 
     async importPreset(filePath: string) {
         const fileInput = this.page.getByTestId('preset-import-input');
         await fileInput.setInputFiles(filePath);
+        // Dialog opens — wait for Import button and confirm
+        await this.page.getByRole('button', {name: /^import$/i}).waitFor({state: 'visible', timeout: 5_000});
+        await this.page.getByRole('button', {name: /^import$/i}).click();
     }
 
     async waitForPresetByName(name: string) {

@@ -6,6 +6,8 @@ import cz.forgottenempire.servermanager.api.model.ServerType;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -14,6 +16,16 @@ import org.mapstruct.MappingTarget;
 interface ModPresetMapper {
 
     PresetResponseDto mapToModPresetDto(ModPreset modPreset);
+
+    @AfterMapping
+    default void computeTotalModsSize(ModPreset source, @MappingTarget PresetResponseDto target) {
+        long total = source.getMods().stream()
+                .map(WorkshopMod::getFileSize)
+                .filter(Objects::nonNull)
+                .mapToLong(Long::longValue)
+                .sum();
+        target.setTotalModsSize(total > 0 ? total : null);
+    }
 
     List<PresetResponseDto> mapToModPresetDtos(Collection<ModPreset> modPresets);
 

@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.api.ModPresetsApi;
 import cz.forgottenempire.servermanager.api.model.CreatePresetRequestDto;
 import cz.forgottenempire.servermanager.api.model.PresetListResponseDto;
 import cz.forgottenempire.servermanager.api.model.PresetResponseDto;
+import cz.forgottenempire.servermanager.api.model.RenamePresetRequestDto;
 import cz.forgottenempire.servermanager.api.model.UpdatePresetRequestDto;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NonUniqueNameException;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,6 +76,18 @@ class ModPresetsController implements ModPresetsApi {
 
         modPreset.setName(requestDto.getName());
         modPreset.setMods(mods);
+        modPreset = modPresetsService.updatePreset(modPreset);
+        return ResponseEntity.ok(modPresetMapper.mapToModPresetDto(modPreset));
+    }
+
+    @Override
+    public ResponseEntity<PresetResponseDto> renamePreset(Long id, RenamePresetRequestDto requestDto) {
+        ModPreset modPreset = modPresetsService.getModPreset(id)
+                .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
+        if (!modPreset.getName().equals(requestDto.getName())) {
+            validatePresetName(requestDto.getName());
+        }
+        modPreset.setName(requestDto.getName());
         modPreset = modPresetsService.updatePreset(modPreset);
         return ResponseEntity.ok(modPresetMapper.mapToModPresetDto(modPreset));
     }

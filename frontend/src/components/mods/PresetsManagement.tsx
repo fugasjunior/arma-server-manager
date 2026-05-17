@@ -6,21 +6,28 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import {Backdrop, Box, CircularProgress, Divider, Modal, Stack, Toolbar} from "@mui/material";
+import {Backdrop, Box, CircularProgress, Divider, Menu, MenuItem, Modal, Stack, Toolbar} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import DownloadIcon from '@mui/icons-material/Download';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SERVER_NAMES from "../../util/serverNames";
+import {humanFileSize} from "../../util/util";
 import {toast} from "material-react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import TableGhosts from "../../UI/TableSkeletons";
 import Tooltip from "@mui/material/Tooltip";
 import UploadIcon from '@mui/icons-material/Upload';
-import DownloadIcon from '@mui/icons-material/Download';
 import {ModDto, PresetResponseDto, PresetResponseModDto, ServerType} from "../../api/generated";
 import {modPresetsApi, modsApi, armaLauncherPresetApi} from "../../api/client";
 import {downloadExportedPreset} from "../../api/downloads";
+import ImportPresetDialog from "./ImportPresetDialog";
+import RenamePresetDialog from "./RenamePresetDialog";
 
 export default function PresetsManagement() {
     const [initialLoading, setInitialLoading] = useState(true);
@@ -30,6 +37,11 @@ export default function PresetsManagement() {
     const [selectedMods, setSelectedMods] = useState<Array<PresetResponseModDto>>([]);
     const [availableMods, setAvailableMods] = useState<Array<PresetResponseModDto>>([]);
     const [isUploadInProgress, setIsUploadInProgress] = useState(false);
+    const [importDialogOpen, setImportDialogOpen] = useState(false);
+    const [importFile, setImportFile] = useState<File | null>(null);
+    const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+    const [renamePresetId, setRenamePresetId] = useState<number | null>(null);
+    const [menuAnchor, setMenuAnchor] = useState<{el: HTMLElement, presetId: number} | null>(null);
 
     useEffect(() => {
         async function fetchPresets() {
@@ -59,20 +71,6 @@ export default function PresetsManagement() {
         }
     }
 
-    function getSummarizedModsList(mods: Array<PresetResponseModDto>) {
-        const CUTOFF_LENGTH = 55;
-        const modNames = mods.map(mod => mod.shortName ?? "");
-        modNames.sort((a, b) => a.localeCompare(b));
-        let summarizedList = modNames[0];
-        let i = 1;
-        while (summarizedList.length < CUTOFF_LENGTH && i < modNames.length) {
-            summarizedList += ", " + modNames[i++];
-        }
-        if (summarizedList.length >= CUTOFF_LENGTH) {
-            summarizedList += " and " + (modNames.length - i) + " more...";
-        }
-        return summarizedList;
-    }
 
     function getSortedPresets() {
         return presets.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
@@ -141,14 +139,23 @@ export default function PresetsManagement() {
         });
     }
 
-    async function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
-        if (!e.target.files) {
+    function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files?.[0]) {
             return;
         }
+        setImportFile(e.target.files[0]);
+        setImportDialogOpen(true);
+        e.target.value = '';
+    }
 
+    async function handleImportConfirmed(name: string) {
+        if (!importFile) {
+            return;
+        }
         try {
             setIsUploadInProgress(true);
-            const {data: importedPreset} = await armaLauncherPresetApi.importLauncherPreset({preset: e.target.files[0]});
+            setImportDialogOpen(false);
+            const {data: importedPreset} = await armaLauncherPresetApi.importLauncherPreset({preset: importFile, name});
             setPresets(prevState => [...prevState, importedPreset]);
             setIsUploadInProgress(false);
             toast.success(`Preset '${importedPreset.name}' successfully imported`);
@@ -156,6 +163,36 @@ export default function PresetsManagement() {
             setIsUploadInProgress(false);
             console.error(e);
             toast.error(e.response.data || "Error during mod import");
+        } finally {
+            setImportFile(null);
+        }
+    }
+
+    function handleRenameClick(id: number) {
+        setRenamePresetId(id);
+        setRenameDialogOpen(true);
+    }
+
+    async function handleRenameConfirmed(name: string) {
+        if (renamePresetId === null) {
+            return;
+        }
+        try {
+            const {data: renamedPreset} = await modPresetsApi.renamePreset({
+                id: renamePresetId,
+                renamePresetRequestDto: {name}
+            });
+            setPresets(prevState => {
+                const updated = [...prevState];
+                const old = updated.find(p => p.id === renamedPreset.id);
+                return [...updated.filter(p => p !== old), renamedPreset];
+            });
+            setRenameDialogOpen(false);
+            setRenamePresetId(null);
+            toast.success(`Preset successfully renamed to '${renamedPreset.name}'`);
+        } catch (e: any) {
+            console.error(e);
+            toast.error(e.response.data || "Could not rename preset");
         }
     }
 
@@ -166,6 +203,14 @@ export default function PresetsManagement() {
             console.error(e);
             toast.error(e.response.data || "Error during mod export");
         }
+    }
+
+    function handleMenuOpen(event: React.MouseEvent<HTMLElement>, presetId: number) {
+        setMenuAnchor({el: event.currentTarget, presetId});
+    }
+
+    function handleMenuClose() {
+        setMenuAnchor(null);
     }
 
     return (
@@ -194,13 +239,11 @@ export default function PresetsManagement() {
                         <Table sx={{minWidth: 650}} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell>Mods</TableCell>
-                                    <TableCell align="right">Mods count</TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
+                                    <TableCell sx={{width: '20%'}}>Name</TableCell>
+                                    <TableCell sx={{width: '10%', whiteSpace: 'nowrap'}}>Type</TableCell>
+                                    <TableCell sx={{width: '20%'}}>Mods</TableCell>
+                                    <TableCell sx={{width: '8%', whiteSpace: 'nowrap'}}>Total size</TableCell>
+                                    <TableCell sx={{width: '2%'}}></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -217,27 +260,28 @@ export default function PresetsManagement() {
                                             {SERVER_NAMES.get(preset.type as ServerType)}
                                         </TableCell>
                                         <TableCell>
-                                            {getSummarizedModsList(preset.mods ?? [])}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {(preset.mods ?? []).length}
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton aria-label="edit" data-testid={`preset-edit-${preset.id}`}
-                                                        onClick={() => handleOpenEdit(preset)}>
-                                                <EditIcon color="primary"/>
-                                            </IconButton>
+                                            <Tooltip title={
+                                                <>{(preset.mods ?? []).map(m => <div key={m.id}>{m.name}</div>)}</>
+                                            } placement="bottom-start">
+                                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{width: 'fit-content', cursor: 'default'}}>
+                                                    <span>{(preset.mods ?? []).length} mods total</span>
+                                                    <InfoOutlinedIcon sx={{fontSize: 14, color: 'text.secondary'}}/>
+                                                </Stack>
+                                            </Tooltip>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton aria-label="export" data-testid={`preset-export-${preset.id}`}
-                                                        onClick={() => handleDownload(preset.id!)}>
-                                                <DownloadIcon color="primary"/>
-                                            </IconButton>
+                                            {preset.totalModsSize != null ? humanFileSize(preset.totalModsSize) : '—'}
                                         </TableCell>
-                                        <TableCell>
-                                            <IconButton aria-label="delete" data-testid={`preset-delete-${preset.id}`}
-                                                        onClick={() => handleDelete(preset.id!)}>
-                                                <DeleteIcon color="error"/>
+                                        <TableCell align="right" sx={{whiteSpace: 'nowrap', pr: 1}}>
+                                            <Tooltip title="Edit mods">
+                                                <IconButton size="small" aria-label="edit" data-testid={`preset-edit-${preset.id}`}
+                                                            onClick={() => handleOpenEdit(preset)}>
+                                                    <EditIcon fontSize="small" color="primary"/>
+                                                </IconButton>
+                                            </Tooltip>
+                                            <IconButton size="small" aria-label="more actions" data-testid={`preset-menu-${preset.id}`}
+                                                        onClick={(e) => handleMenuOpen(e, preset.id!)}>
+                                                <MoreVertIcon fontSize="small"/>
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
@@ -256,6 +300,64 @@ export default function PresetsManagement() {
                     />
                 </Box>
             </Modal>
+            <ImportPresetDialog
+                open={importDialogOpen}
+                file={importFile}
+                existingPresetNames={presets.map(p => p.name ?? '')}
+                onConfirmClicked={handleImportConfirmed}
+                onClose={() => {
+                    setImportDialogOpen(false);
+                    setImportFile(null);
+                }}
+            />
+            <RenamePresetDialog
+                open={renameDialogOpen}
+                currentName={presets.find(p => p.id === renamePresetId)?.name ?? ''}
+                existingPresetNames={presets.filter(p => p.id !== renamePresetId).map(p => p.name ?? '')}
+                onConfirmClicked={handleRenameConfirmed}
+                onClose={() => {
+                    setRenameDialogOpen(false);
+                    setRenamePresetId(null);
+                }}
+            />
+            <Menu
+                anchorEl={menuAnchor?.el}
+                open={menuAnchor !== null}
+                onClose={handleMenuClose}
+            >
+                <MenuItem data-testid={`preset-menu-edit-${menuAnchor?.presetId}`} onClick={() => {
+                    handleMenuClose();
+                    const preset = presets.find(p => p.id === menuAnchor?.presetId);
+                    if (preset) handleOpenEdit(preset);
+                }}>
+                    <ListItemIcon><EditIcon fontSize="small"/></ListItemIcon>
+                    Edit mods
+                </MenuItem>
+                <MenuItem data-testid={`preset-menu-rename-${menuAnchor?.presetId}`} onClick={() => {
+                    const id = menuAnchor?.presetId;
+                    handleMenuClose();
+                    if (id !== undefined) handleRenameClick(id);
+                }}>
+                    <ListItemIcon><DriveFileRenameOutlineIcon fontSize="small"/></ListItemIcon>
+                    Rename
+                </MenuItem>
+                <MenuItem data-testid={`preset-menu-download-${menuAnchor?.presetId}`} onClick={() => {
+                    const id = menuAnchor?.presetId;
+                    handleMenuClose();
+                    if (id !== undefined) handleDownload(id);
+                }}>
+                    <ListItemIcon><DownloadIcon fontSize="small"/></ListItemIcon>
+                    Download
+                </MenuItem>
+                <MenuItem data-testid={`preset-menu-delete-${menuAnchor?.presetId}`} onClick={() => {
+                    const id = menuAnchor?.presetId;
+                    handleMenuClose();
+                    if (id !== undefined) handleDelete(id);
+                }} sx={{color: 'error.main'}}>
+                    <ListItemIcon><DeleteIcon fontSize="small" color="error"/></ListItemIcon>
+                    Delete
+                </MenuItem>
+            </Menu>
         </>
     )
 }

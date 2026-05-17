@@ -99,9 +99,9 @@ class ArmaLauncherPresetControllerTest {
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
         ModPreset preset = new ModPreset(MOD_PRESET_NAME, Collections.emptyList(), ServerType.ARMA3);
         preset.setId(MOD_PRESET_ID);
-        when(importService.importPreset(any())).thenReturn(Optional.of(preset));
+        when(importService.importPreset(any(), eq(MOD_PRESET_NAME))).thenReturn(Optional.of(preset));
 
-        ResponseEntity<PresetResponseDto> response = controller.importLauncherPreset(file);
+        ResponseEntity<PresetResponseDto> response = controller.importLauncherPreset(file, MOD_PRESET_NAME);
 
         PresetResponseDto expectedResponseDto = new PresetResponseDto();
         expectedResponseDto.setId(MOD_PRESET_ID);
@@ -118,9 +118,9 @@ class ArmaLauncherPresetControllerTest {
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn(VALID_FILE_NAME);
         when(file.getBytes()).thenReturn(SAMPLE_HTML_CONTENT.getBytes());
-        when(importService.importPreset(any())).thenReturn(Optional.empty());
+        when(importService.importPreset(any(), eq(MOD_PRESET_NAME))).thenReturn(Optional.empty());
 
-        ResponseEntity<PresetResponseDto> response = controller.importLauncherPreset(file);
+        ResponseEntity<PresetResponseDto> response = controller.importLauncherPreset(file, MOD_PRESET_NAME);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -132,7 +132,7 @@ class ArmaLauncherPresetControllerTest {
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn(INVALID_FILE_NAME);
 
-        assertThatThrownBy(() -> controller.importLauncherPreset(file))
+        assertThatThrownBy(() -> controller.importLauncherPreset(file, MOD_PRESET_NAME))
                 .isInstanceOf(UnsupportedFileExtension.class)
                 .hasMessage("Only HTML files are allowed");
         verifyNoInteractions(importService);
@@ -143,7 +143,7 @@ class ArmaLauncherPresetControllerTest {
         MultipartFile file = mock(MultipartFile.class);
         when(file.getOriginalFilename()).thenReturn(null);
 
-        assertThatThrownBy(() -> controller.importLauncherPreset(file))
+        assertThatThrownBy(() -> controller.importLauncherPreset(file, MOD_PRESET_NAME))
                 .isInstanceOf(UnsupportedFileExtension.class)
                 .hasMessage("Only HTML files are allowed");
         verifyNoInteractions(importService);

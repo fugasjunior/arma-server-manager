@@ -42,6 +42,9 @@ PresetResponseDto:
         $ref: '#/PresetResponseModDto'
     type:
       $ref: './common.yaml#/ServerType'
+    totalModsSize:
+      type: integer
+      format: int64
 
 PresetResponseModDto:
   type: object
@@ -61,3 +64,11 @@ PresetListResponseDto:
       type: array
       items:
         $ref: '#/PresetResponseDto'
+
+RenamePresetRequestDto:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+      minLength: 1

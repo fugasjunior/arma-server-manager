@@ -1,12 +1,12 @@
 package cz.forgottenempire.servermanager.modpreset;
 
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.common.exceptions.NonUniqueNameException;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsFacade;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +21,6 @@ public class ArmaLauncherPresetImportServiceTest {
     private static final long ACE_MOD_ID = 463939057L;
     private static final long CBA3_MOD_ID = 450814997L;
     private static final String TEST_PRESET_NAME = "Test Preset";
-    private static final String PRESET_NAME_1 = "Imported preset 1";
-    private static final String PRESET_NAME_2 = "Imported preset 2";
     private static final long MOD_PRESET_ID = 1L;
 
     private Document htmlPresetDocument;
@@ -44,7 +42,7 @@ public class ArmaLauncherPresetImportServiceTest {
         aceWorkshopMod = new WorkshopMod(ACE_MOD_ID);
         cba3WorkshopMod = new WorkshopMod(CBA3_MOD_ID);
 
-        expectedModPreset = new ModPreset(PRESET_NAME_1, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
+        expectedModPreset = new ModPreset(TEST_PRESET_NAME, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
         expectedModPreset.setId(MOD_PRESET_ID);
 
         when(modsFacade.saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID))))
@@ -57,7 +55,7 @@ public class ArmaLauncherPresetImportServiceTest {
     void whenImportPresetCalled_thenListOfWorkshopModsReturned() {
         when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
 
-        Optional<ModPreset> modPreset = presetImportService.importPreset(htmlPresetDocument);
+        Optional<ModPreset> modPreset = presetImportService.importPreset(htmlPresetDocument, TEST_PRESET_NAME);
 
         verify(modsFacade).saveAndInstallMods(eq(List.of(ACE_MOD_ID, CBA3_MOD_ID)));
         assertThat(modPreset).isPresent();
@@ -67,28 +65,25 @@ public class ArmaLauncherPresetImportServiceTest {
     }
 
     @Test
-    void whenImportPresetCalled_thenModPresetCreated() {
+    void whenImportPresetCalled_thenModPresetCreatedWithGivenName() {
         when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
 
-        presetImportService.importPreset(htmlPresetDocument);
+        presetImportService.importPreset(htmlPresetDocument, TEST_PRESET_NAME);
 
-        ModPreset expectedPreset = new ModPreset(PRESET_NAME_1, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
+        ModPreset expectedPreset = new ModPreset(TEST_PRESET_NAME, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
         verify(modPresetsService).savePreset(eq(expectedPreset));
     }
 
     @Test
-    void whenImportPresetCalledAndPresetWithSameNameAlreadyExists_thenNewNameIsChosen() {
-        when(modPresetsService.presetWithNameExists(PRESET_NAME_1)).thenReturn(true);
-        expectedModPreset.setName(PRESET_NAME_2);
-        when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
+    void whenImportPresetCalledWithDuplicateName_thenNonUniqueNameExceptionThrown() {
+        when(modPresetsService.presetWithNameExists(TEST_PRESET_NAME)).thenReturn(true);
 
-        presetImportService.importPreset(htmlPresetDocument);
+        assertThatThrownBy(() -> presetImportService.importPreset(htmlPresetDocument, TEST_PRESET_NAME))
+                .isInstanceOf(NonUniqueNameException.class)
+                .hasMessage("Preset name '" + TEST_PRESET_NAME + "' is already used");
 
-        ModPreset expectedPreset = new ModPreset(PRESET_NAME_2, List.of(aceWorkshopMod, cba3WorkshopMod), ServerType.ARMA3);
-        InOrder inOrder = inOrder(modPresetsService);
-        inOrder.verify(modPresetsService).presetWithNameExists(PRESET_NAME_1);
-        inOrder.verify(modPresetsService).presetWithNameExists(PRESET_NAME_2);
-        inOrder.verify(modPresetsService).savePreset(eq(expectedPreset));
+        verifyNoInteractions(modsFacade);
+        verify(modPresetsService, never()).savePreset(any());
     }
 
     @Test
@@ -108,7 +103,7 @@ public class ArmaLauncherPresetImportServiceTest {
                         """
         );
 
-        assertThatThrownBy(() -> presetImportService.importPreset(documentWithInvalidModLink))
+        assertThatThrownBy(() -> presetImportService.importPreset(documentWithInvalidModLink, TEST_PRESET_NAME))
                 .isInstanceOf(MalformedLauncherModPresetFileException.class)
                 .hasMessage("Invalid workshop mod ID 'INVALID_ID' found in preset HTML file");
     }
@@ -129,39 +124,11 @@ public class ArmaLauncherPresetImportServiceTest {
                         """
         );
 
-        Optional<ModPreset> modPreset = presetImportService.importPreset(documentWithNoModLinks);
+        Optional<ModPreset> modPreset = presetImportService.importPreset(documentWithNoModLinks, TEST_PRESET_NAME);
 
         verifyNoInteractions(modsFacade);
         verifyNoInteractions(modPresetsService);
         assertThat(modPreset).isEmpty();
-    }
-
-    @Test
-    void whenPresetFileWithNameMetaTagGivenAndNoNameConflicts_thenPresetSavedWithSpecifiedName() {
-        when(modPresetsService.presetWithNameExists(TEST_PRESET_NAME)).thenReturn(false);
-        expectedModPreset.setName(TEST_PRESET_NAME);
-        when(modPresetsService.savePreset(expectedModPreset)).thenReturn(expectedModPreset);
-        Document documentWithSpecifiedName = new Document("/");
-        documentWithSpecifiedName.html(
-                """
-                        <html>
-                          <head>
-                            <meta name="arma:PresetName" content="Test Preset" />
-                          </head>
-                          <body>
-                            <div class="mod-list">
-                              <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=463939057"></a>
-                              <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=450814997"></a>
-                            </div>
-                          </body>
-                        </html>
-                        """
-        );
-
-        Optional<ModPreset> modPreset = presetImportService.importPreset(documentWithSpecifiedName);
-
-        assertThat(modPreset).isNotEmpty();
-        assertThat(modPreset.get().getName()).isEqualTo(TEST_PRESET_NAME);
     }
 
     private String getTestPresetHtml() {
