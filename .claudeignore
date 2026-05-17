@@ -48,3 +48,10 @@ Thumbs.db
 
 # Docker dev
 docker-compose-dev.yml
+
+# Large static files
+LICENSE
+
+# Tool caches
+.aider.tags.cache.v4/
+.playwright-mcp/

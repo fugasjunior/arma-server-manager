@@ -6,14 +6,14 @@ This guide will help you set up the Arma Server Manager project for development.
 
 The project consists of two main components:
 
-- **Backend**: Spring Boot application (Java 17)
+- **Backend**: Spring Boot application (Java 25)
 - **Frontend**: React application with TypeScript, Vite, and Jest
 
 ## Prerequisites
 
-- JDK 17 or higher
-- Node.js 18 or higher
-- npm 9 or higher
+- JDK 25 or higher
+- Node.js 24 or higher
+- npm 11 or higher
 - Docker and Docker Compose (for database and optional containerized development)
 - MySQL 8.x (if not using Docker)
 - Git
