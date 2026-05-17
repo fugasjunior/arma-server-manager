@@ -53,3 +53,14 @@
     responses:
       '200':
         description: OK
+  delete:
+    tags: [ServerInstallation]
+    operationId: uninstallServer
+    summary: Uninstall a server — wipes all files from disk and resets installation state
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverType'
+    responses:
+      '204':
+        description: No Content
+      '409':
+        description: Server is running or installation is in progress

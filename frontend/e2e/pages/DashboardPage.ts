@@ -30,4 +30,33 @@ export class DashboardPage {
     async waitForInstallFinished(type: string) {
         await this.installBtn(type).waitFor({ state: 'visible', timeout: 30_000 });
     }
+
+    uninstallMenuBtn(type: string): Locator {
+        return this.page.getByTestId(`install-menu-btn-${type}`);
+    }
+
+    uninstallMenuItem(type: string): Locator {
+        return this.page.getByTestId(`uninstall-btn-${type}`);
+    }
+
+    uninstallConfirmBtn(type: string): Locator {
+        return this.page.getByTestId(`uninstall-confirm-${type}`);
+    }
+
+    async openInstallationMenu(type: string) {
+        await this.uninstallMenuBtn(type).click();
+    }
+
+    async triggerUninstall(type: string) {
+        await this.openInstallationMenu(type);
+        await this.uninstallMenuItem(type).click();
+    }
+
+    async confirmUninstall(type: string) {
+        await this.uninstallConfirmBtn(type).click();
+    }
+
+    async waitForUninstalled(type: string) {
+        await this.uninstallMenuBtn(type).waitFor({ state: 'hidden', timeout: 10_000 });
+    }
 }

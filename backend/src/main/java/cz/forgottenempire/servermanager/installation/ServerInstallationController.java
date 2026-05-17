@@ -20,16 +20,19 @@ public class ServerInstallationController implements ServerInstallationApi {
 
     private final ServerInstallationService installationService;
     private final ServerInstallerService installerService;
+    private final ServerUninstallerService uninstallerService;
     private final ServerInstallationMapper mapper;
 
     @Autowired
     public ServerInstallationController(
             ServerInstallationService installationService,
             ServerInstallerService installerService,
+            ServerUninstallerService uninstallerService,
             ServerInstallationMapper mapper
     ) {
         this.installationService = installationService;
         this.installerService = installerService;
+        this.uninstallerService = uninstallerService;
         this.mapper = mapper;
     }
 
@@ -61,5 +64,12 @@ public class ServerInstallationController implements ServerInstallationApi {
         ServerInstallation.Branch branch = ServerInstallation.Branch.valueOf(activeBranchDto.getBranch().name());
         installationService.setServerBranch(installation, branch);
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> uninstallServer(ServerType type) {
+        ServerInstallation installation = installationService.getServerInstallation(type);
+        uninstallerService.uninstallServer(installation);
+        return ResponseEntity.noContent().build();
     }
 }

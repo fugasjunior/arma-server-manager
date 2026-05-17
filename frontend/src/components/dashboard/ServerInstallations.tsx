@@ -57,6 +57,11 @@ const ServerInstallations = () => {
         });
     };
 
+    const handleUninstallConfirmed = async (serverType: ServerType) => {
+        await serverInstallationApi.uninstallServer({type: serverType});
+        await fetchServerInstallations();
+    };
+
     const handleBranchChanged = async (e: SelectChangeEvent, serverType: ServerType) => {
         const selectedBranch = e.target.value;
 
@@ -98,6 +103,7 @@ const ServerInstallations = () => {
                                                 steamCmdItemInfo={steamCmdItemInfo[serverTypeToId(installation.type!)]}
                                                 onBranchChanged={handleBranchChanged}
                                                 onUpdateClicked={handleUpdateClicked}
+                                                onUninstallConfirmed={handleUninstallConfirmed}
                         />
                     </Grid>
                 ))}
