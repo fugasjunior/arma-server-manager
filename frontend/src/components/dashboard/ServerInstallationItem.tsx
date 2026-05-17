@@ -74,7 +74,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
         await onUninstallConfirmed(installation.type! as ServerType);
     };
 
-    const hasMultipleAvailableBranches = () => (installation.availableBranches?.size ?? 0) > 1;
+    const hasMultipleAvailableBranches = () => Array.from(installation.availableBranches ?? []).length > 1;
 
     const getProgressBar = () => {
         if (steamCmdItemInfo && steamCmdItemInfo.bytesTotal) {
