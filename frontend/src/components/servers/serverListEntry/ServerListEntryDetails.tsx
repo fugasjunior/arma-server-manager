@@ -14,8 +14,7 @@ export function ServerListEntryDetails(props: {
     onDuplicateServer: (server: ServerDto) => void
 }) {
     return <Stack direction="row">
-        <Stack direction="row" spacing={2} justifyItems="center" alignItems="center" sx={{flexGrow: 1}}
-               justifyContent="flex-start">
+        <Stack direction="row" spacing={2} sx={{flexGrow: 1, justifyItems: "center", alignItems: "center", justifyContent: "flex-start"}}>
             <ModEditButton server={props.server} serverStatus={props.serverStatus}/>
             {props.server.type === ServerType.Arma3 &&
                 <ListBuilderDLCsEdit status={props.serverStatus} server={props.server}/>}

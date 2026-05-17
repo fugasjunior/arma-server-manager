@@ -1,4 +1,4 @@
-import {useFormik} from "formik";
+import {useForm, FormProvider} from "react-hook-form";
 import {FormGroup, Grid} from "@mui/material";
 import Arma3DifficultySettingsForm from "./difficulty/Arma3DifficultySettingsForm.tsx";
 import {Arma3NetworkSettingsDto} from "../../api/generated";
@@ -7,7 +7,7 @@ import {SwitchField} from "../../UI/Form/SwitchField.tsx";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 import {ServerSettingsFormControls} from "./ServerSettingsFormControls.tsx";
 import Arma3NetworkSettingsForm from "./Arma3NetworkSettingsForm.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {CustomLaunchParametersInput} from "./CustomLaunchParametersInput.tsx";
 
 type EditArma3ServerSettingsFormProps = {
@@ -20,6 +20,13 @@ type EditArma3ServerSettingsFormProps = {
 const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) => {
 
     const [launchParameters, setLaunchParameters] = useState([...(props.server.customLaunchParameters ?? [])]);
+    const methods = useForm<Arma3ServerDto>({
+        defaultValues: props.server
+    });
+
+    useEffect(() => {
+        methods.reset(props.server);
+    }, [props.server, methods]);
 
     const handleSubmit = (values: Arma3ServerDto) => {
         if (areAllPropertiesNull(values.networkSettings)) {
@@ -30,12 +37,6 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
         props.onSubmit(values);
     }
 
-    const formik = useFormik<Arma3ServerDto>({
-        initialValues: props.server,
-        onSubmit: handleSubmit,
-        enableReinitialize: true
-    });
-
     const areAllPropertiesNull = (networkSettings: Arma3NetworkSettingsDto | null | undefined): boolean => {
         if (networkSettings == null) {
             return true;
@@ -45,48 +46,50 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
 
     return (
         <div>
-            <form onSubmit={formik.handleSubmit}>
-                <Grid container spacing={3}>
-                    <CustomTextField id='name' label='Server name' required formik={formik}/>
-                    <CustomTextField id='description' label='Description' formik={formik}/>
-                    <CustomTextField id='port' label='Port' required type='number' formik={formik}/>
-                    <CustomTextField id='maxPlayers' label='Max players' required type='number' formik={formik}/>
-                    <CustomTextField id='password' label='Server password' formik={formik}/>
-                    <CustomTextField id='adminPassword' label='Admin password' formik={formik}/>
-                    <Grid item xs={6}>
-                        <FormGroup>
-                            <SwitchField id='clientFilePatching' label='Client file patching' formik={formik}/>
-                            <SwitchField id='serverFilePatching' label='Server file patching' formik={formik}/>
-                            <SwitchField id='verifySignatures' label='Verify signatures' formik={formik}/>
-                        </FormGroup>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <FormGroup>
-                            <SwitchField id='vonEnabled' label='VON enabled' formik={formik}/>
-                            <SwitchField id='battlEye' label='BattlEye enabled' formik={formik}/>
-                            <SwitchField id='persistent' label='Persistent' formik={formik}/>
-                        </FormGroup>
-                    </Grid>
-                    <CustomTextField id='additionalOptions' label='Additional options' multiline
-                                     formik={formik} containerMd={12}/>
+            <FormProvider {...methods}>
+                <form onSubmit={methods.handleSubmit(handleSubmit)}>
+                    <Grid container spacing={3}>
+                        <CustomTextField name='name' label='Server name' required/>
+                        <CustomTextField name='description' label='Description'/>
+                        <CustomTextField name='port' label='Port' required type='number'/>
+                        <CustomTextField name='maxPlayers' label='Max players' required type='number'/>
+                        <CustomTextField name='password' label='Server password'/>
+                        <CustomTextField name='adminPassword' label='Admin password'/>
+                        <Grid size={6}>
+                            <FormGroup>
+                                <SwitchField name='clientFilePatching' label='Client file patching'/>
+                                <SwitchField name='serverFilePatching' label='Server file patching'/>
+                                <SwitchField name='verifySignatures' label='Verify signatures'/>
+                            </FormGroup>
+                        </Grid>
+                        <Grid size={6}>
+                            <FormGroup>
+                                <SwitchField name='vonEnabled' label='VON enabled'/>
+                                <SwitchField name='battlEye' label='BattlEye enabled'/>
+                                <SwitchField name='persistent' label='Persistent'/>
+                            </FormGroup>
+                        </Grid>
+                        <CustomTextField name='additionalOptions' label='Additional options' multiline
+                                         containerMd={12}/>
 
-                    <Grid item xs={12}>
-                        <CustomLaunchParametersInput
-                            valueDelimiter='='
-                            parameters={launchParameters}
-                            onParametersChange={setLaunchParameters}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Arma3DifficultySettingsForm formik={formik}/>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Arma3NetworkSettingsForm formik={formik}/>
-                    </Grid>
+                        <Grid size={12}>
+                            <CustomLaunchParametersInput
+                                valueDelimiter='='
+                                parameters={launchParameters}
+                                onParametersChange={setLaunchParameters}
+                            />
+                        </Grid>
+                        <Grid size={12}>
+                            <Arma3DifficultySettingsForm/>
+                        </Grid>
+                        <Grid size={12}>
+                            <Arma3NetworkSettingsForm/>
+                        </Grid>
 
-                    <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
-                </Grid>
-            </form>
+                        <ServerSettingsFormControls serverRunning={props.isServerRunning} onCancel={props.onCancel}/>
+                    </Grid>
+                </form>
+            </FormProvider>
         </div>
     );
 };

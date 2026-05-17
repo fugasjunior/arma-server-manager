@@ -139,12 +139,12 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                     </Alert>
                 }
 
-                <Stack direction="row" justifyContent="space-between">
+                <Stack direction="row" sx={{justifyContent: "space-between"}}>
                     <Typography gutterBottom variant="h5">
                         {SERVER_NAMES.get(installation.type!)}
                     </Typography>
 
-                    <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack direction="row" spacing={1} sx={{alignItems: "center"}}>
                         {hasMultipleAvailableBranches() &&
                             <ServerBranchSelect installation={installation}
                                                 onChange={(e) => onBranchChanged(e, installation.type!)}/>
@@ -195,7 +195,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                 data-testid={`uninstall-btn-${installation.type}`}
             >
                 <ListItemIcon><DeleteForeverIcon color="error"/></ListItemIcon>
-                <ListItemText primaryTypographyProps={{color: "error"}}>Uninstall</ListItemText>
+                <ListItemText slotProps={{primary: {color: "error"}}}>Uninstall</ListItemText>
             </MenuItem>
         </Menu>
 

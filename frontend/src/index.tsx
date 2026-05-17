@@ -5,8 +5,6 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextProvider} from "./store/auth-context";
-import {DevSupport} from "@react-buddy/ide-toolbox";
-import {ComponentPreviews, useInitial} from "./dev";
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 
@@ -18,11 +16,7 @@ if (rootElement) {
             <AuthContextProvider>
                 <BrowserRouter>
                     <React.StrictMode>
-                        <DevSupport ComponentPreviews={ComponentPreviews}
-                                    useInitialHook={useInitial}
-                        >
-                            <App/>
-                        </DevSupport>
+                        <App/>
                     </React.StrictMode>
                 </BrowserRouter>
             </AuthContextProvider>

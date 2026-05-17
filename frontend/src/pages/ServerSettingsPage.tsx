@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {serversApi} from "../api/client";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import {Typography} from "@mui/material";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
@@ -68,7 +68,7 @@ const ServerSettingsPage = () => {
             {isLoading && <h2>Loading server data...</h2>}
             {!isLoading && !!server &&
                 <>
-                    <Typography variant="h4" mb={2}>Server Settings
+                    <Typography variant="h4" sx={{mb: 2}}>Server Settings
                         ({SERVER_NAMES.get(server.type as ServerType)})</Typography>
                     {server.type === ServerType.Arma3 &&
                         <EditArma3ServerSettingsForm server={server as Arma3ServerDto} onSubmit={handleSubmit}

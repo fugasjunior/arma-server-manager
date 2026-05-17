@@ -21,11 +21,11 @@ export const EnhancedTableBottomControls = (
         customControls
     }: EnhancedTableControlsProps
 ) => {
-    return <Grid container padding={1} justifyContent="space-between">
-        <Grid item>
+    return <Grid container sx={{padding: 1, justifyContent: "space-between"}}>
+        <Grid>
             {customControls}
         </Grid>
-        <Grid item alignContent="flex-end" alignSelf="flex-end">
+        <Grid sx={{alignContent: "flex-end", alignSelf: "flex-end"}}>
             <TablePagination
                 rowsPerPageOptions={[10, 15, 25, 50]}
                 component="div"

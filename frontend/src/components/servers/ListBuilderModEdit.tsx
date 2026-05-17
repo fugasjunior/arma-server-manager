@@ -4,7 +4,7 @@ import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {serversApi, modsApi, modPresetsApi} from "../../api/client";
 import {PresetResponseDto, ServerDto, ServerInstanceInfoDto, ServerType, ServerWorkshopModDto} from "../../api/generated";
 import {Arma3ServerDto, DayZServerDto} from "../../api/serverModels";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import MemoryIcon from "@mui/icons-material/Memory";
 
 type ListBuilderModEditProps = {

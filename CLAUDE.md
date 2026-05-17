@@ -67,7 +67,7 @@ cd frontend && npm run generate
 arma-server-manager/
 ├── openapi/openapi.yaml          # Single source of truth for API contract
 ├── backend/                      # Spring Boot 4 / Java 25
-└── frontend/                     # React 18 / TypeScript / Vite
+└── frontend/                     # React 19 / TypeScript / Vite
 ```
 
 The OpenAPI spec drives both sides: the backend generates Spring controller interfaces + DTOs; the frontend generates a TypeScript-Axios client. **Never hand-write API interfaces or DTOs on either side** — edit `openapi/openapi.yaml` and regenerate.

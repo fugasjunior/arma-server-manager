@@ -173,7 +173,7 @@ const ModsTable = (props: ModsTableProps) => {
                                customBottomControls={
                                    <Stack direction="row" spacing={1}>
                                        <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
-                                                  size="small" inputProps={{"data-testid": "mod-install-input"}}
+                                                  size="small" slotProps={{htmlInput: {"data-testid": "mod-install-input"}}}
                                                   variant="filled" value={enteredModId}
                                                   onChange={handleEnteredModIdChange}/>
                                        <Button variant="outlined" size="small" disabled={enteredModId.length === 0}

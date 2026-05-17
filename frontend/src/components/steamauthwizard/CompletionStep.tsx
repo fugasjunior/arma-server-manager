@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { CheckCircleOutline } from '@mui/icons-material';
+import { CheckCircleOutlined } from '@mui/icons-material';
 
 interface CompletionStepProps {
     onComplete: () => void;
@@ -13,21 +13,21 @@ interface CompletionStepProps {
 const CompletionStep: React.FC<CompletionStepProps> = ({ onComplete }) => {
     return (
         <Box sx={{ textAlign: 'center' }}>
-            <CheckCircleOutline sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
+            <CheckCircleOutlined sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
             
             <Typography variant="h5" gutterBottom>
                 Setup Complete!
             </Typography>
             
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" component="p">
                 Your Steam credentials have been successfully configured.
             </Typography>
-            
-            <Typography variant="body1" paragraph>
+
+            <Typography variant="body1" component="p">
                 You can now download and update game servers and workshop mods using SteamCMD.
             </Typography>
-            
-            <Typography variant="body1" paragraph>
+
+            <Typography variant="body1" component="p">
                 If you ever need to change your Steam credentials, you can do so in the Settings page.
             </Typography>
             

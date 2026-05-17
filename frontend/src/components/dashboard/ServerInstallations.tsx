@@ -98,7 +98,7 @@ const ServerInstallations = () => {
         <>
             <Grid container spacing={2}>
                 {serverInstallations.map(installation => (
-                    <Grid item xs={12} md={6} key={installation.type}>
+                    <Grid size={{xs: 12, md: 6}} key={installation.type}>
                         <ServerInstallationItem installation={installation}
                                                 steamCmdItemInfo={steamCmdItemInfo[serverTypeToId(installation.type!)]}
                                                 onBranchChanged={handleBranchChanged}

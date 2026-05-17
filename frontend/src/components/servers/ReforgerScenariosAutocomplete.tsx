@@ -2,15 +2,14 @@ import {ReforgerScenarioDto} from "../../api/generated";
 import {scenariosApi} from "../../api/client";
 import {Autocomplete, AutocompleteValue, Box, TextField} from "@mui/material";
 import React, {SyntheticEvent, useEffect, useState} from "react";
-import {FormikState} from "formik";
-import {ReforgerServerDto} from "../../api/serverModels";
+import {useController} from "react-hook-form";
 
 type ReforgerScenariosAutocompleteProps = {
     onChange: (_: SyntheticEvent | null, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
-    formik: FormikState<ReforgerServerDto>
 };
 
-export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenariosAutocompleteProps) {
+export function ReforgerScenariosAutocomplete({onChange}: ReforgerScenariosAutocompleteProps) {
+    const {field, fieldState} = useController({name: 'scenarioId'});
     const [scenarios, setScenarios] = useState<Array<ReforgerScenarioDto>>([]);
 
     useEffect(() => {
@@ -46,7 +45,7 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
                 return option;
             return option.value ?? '';
         }}
-        value={formik.values.scenarioId}
+        value={field.value}
         onChange={onChange}
         renderOption={(props, option) => (
             <Box component="li"  {...props}>
@@ -60,12 +59,11 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
                 id="scenarioId"
                 name="scenarioId"
                 label="Scenario ID"
-                value={formik.values.scenarioId}
-                error={formik.touched.scenarioId && Boolean(
-                    formik.errors.scenarioId)}
-                inputProps={{
-                    ...params.inputProps,
-                    autoComplete: 'new-password'
+                value={field.value}
+                error={Boolean(fieldState.error)}
+                slotProps={{
+                    ...params.slotProps,
+                    htmlInput: {...(params.slotProps?.htmlInput as object), autoComplete: 'new-password'},
                 }}
             />
         )}

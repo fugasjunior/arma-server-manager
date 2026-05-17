@@ -3,7 +3,7 @@ import ModsTable from "./ModsTable";
 import CreatePresetDialog from "./CreatePresetDialog";
 import {ChangeEvent, useEffect, useState} from "react";
 import {useInterval} from "../../hooks/use-interval";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import {ModDto, ServerType, SteamCmdItemInfoDto} from "../../api/generated";
 import {modsApi, modPresetsApi, steamCmdApi} from "../../api/client";
 

@@ -72,7 +72,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
                 Enter Steam Guard Token
             </Typography>
 
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" component="p">
                 A Steam Guard code has been sent to the email address associated with your Steam account.
                 Please check your email and enter the code below.
             </Typography>
@@ -93,7 +93,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
                 disabled={loading}
                 required
                 autoFocus
-                inputProps={{ 'data-testid': 'token-input' }}
+                slotProps={{ htmlInput: { 'data-testid': 'token-input' } }}
             />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>

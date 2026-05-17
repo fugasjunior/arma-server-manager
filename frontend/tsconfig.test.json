@@ -3,7 +3,10 @@
   "compilerOptions": {
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src", "__tests__"]
 }

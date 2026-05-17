@@ -1,5 +1,5 @@
 import axios from "axios";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import {
     AdditionalServersApi,
     ArmaLauncherPresetApi,

@@ -41,8 +41,9 @@ const Login = () => {
             textAlign: "center",
             bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4
-        }} alignContent="center">
+            p: 4,
+            alignContent: "center"
+        }}>
 
             <form onSubmit={handleSubmit}>
                 <Stack spacing={2}>

@@ -1,6 +1,6 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import {Box, Typography} from "@mui/material";
-import {CircularProgressProps} from "@mui/material/CircularProgress/CircularProgress";
+import {CircularProgressProps} from "@mui/material/CircularProgress";
 
 type CircularProgressWithLabelProps = {
     value: number

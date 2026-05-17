@@ -4,7 +4,7 @@ import {ServerIcon} from "./ServerIcon.tsx";
 import SERVER_NAMES from "../../../util/serverNames.ts";
 
 export function ServerHeader(props: { server: ServerDto }) {
-    return <Stack direction="row" spacing={2} alignItems="center">
+    return <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
         <ServerIcon serverType={props.server.type}/>
         <Stack>
             <Typography variant="h6">{props.server.name}</Typography>

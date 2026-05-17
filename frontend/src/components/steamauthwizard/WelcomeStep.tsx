@@ -17,25 +17,25 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext, onSkip }) => {
                 Welcome to the Steam Authentication Setup
             </Typography>
             
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" component="p">
                 This wizard will help you configure your Steam credentials for the Arma Server Manager.
             </Typography>
-            
-            <Typography variant="body1" paragraph>
+
+            <Typography variant="body1" component="p">
                 <strong>Why do we need your Steam credentials?</strong>
             </Typography>
-            
-            <Typography variant="body1" paragraph>
+
+            <Typography variant="body1" component="p">
                 The Arma Server Manager uses SteamCMD to download and update servers and workshop mods.
                 SteamCMD requires valid Steam credentials to access these resources.
             </Typography>
-            
-            <Typography variant="body1" paragraph>
+
+            <Typography variant="body1" component="p">
                 Your credentials will be stored securely and will only be used for downloading and updating
                 game servers and workshop mods.
             </Typography>
-            
-            <Typography variant="body1" paragraph>
+
+            <Typography variant="body1" component="p">
                 <strong>Note:</strong> We recommend creating a separate Steam account for this purpose rather than using your main gaming account.
             </Typography>
             

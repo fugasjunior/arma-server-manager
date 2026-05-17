@@ -43,8 +43,8 @@ tasks.register('appNpmTest', NpmTask) {
     inputs.files(fileTree('src'))
     inputs.files(fileTree('__tests__'))
     inputs.file('package.json')
-    inputs.file('jest.config.js')
-    inputs.file('jest.setup.js')
+    inputs.file('jest.config.cjs')
+    inputs.file('jest.setup.cjs')
     inputs.file('tsconfig.test.json')
 
     args = ["run", "test"]

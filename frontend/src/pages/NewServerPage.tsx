@@ -1,6 +1,6 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {serversApi} from "../api/client";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
@@ -40,7 +40,7 @@ const NewServerPage = () => {
 
     return (
         <>
-            <Typography variant="h4" mb={2}>New {SERVER_NAMES.get(type as ServerType)} server</Typography>
+            <Typography variant="h4" sx={{mb: 2}}>New {SERVER_NAMES.get(type as ServerType)} server</Typography>
             {type === ServerType.Arma3 &&
                 <EditArma3ServerSettingsForm server={arma3ServerInitialState()}
                                              onCancel={handleCancel}

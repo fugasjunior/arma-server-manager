@@ -1,68 +1,63 @@
-import {Accordion, AccordionDetails, AccordionSummary, Grid, InputBaseComponentProps, Typography} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Grid, Typography} from "@mui/material";
+import {InputHTMLAttributes} from "react";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {FormikProps} from "formik";
-import {Arma3ServerDto} from "../../api/serverModels";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
-type Arma3NetworkSettingsFormProps = {
-    formik: FormikProps<Arma3ServerDto>
-}
-
 type NetworkSettingField = {
-    id: string,
+    name: string,
     label: string,
     description: string,
-    inputProps?: InputBaseComponentProps
+    inputProps?: InputHTMLAttributes<HTMLInputElement>
 }
 
 const networkSettingFields: Array<NetworkSettingField> = [
     {
-        id: 'maxMessagesSend',
+        name: 'networkSettings.maxMessagesSend',
         label: 'MaxMsgSend',
         description: 'Maximum number of packets that can be sent in one simulation cycle (default 128)'
     },
     {
-        id: 'maxSizeGuaranteed',
+        name: 'networkSettings.maxSizeGuaranteed',
         label: 'MaxSizeGuaranteed',
         description: 'Maximum size of guaranteed packet in bytes (default 512)'
     },
     {
-        id: 'maxSizeNonguaranteed',
+        name: 'networkSettings.maxSizeNonguaranteed',
         label: 'MaxSizeNonuaranteed',
         description: 'Maximum size of guaranteed packet in bytes (default 256)'
     },
     {
-        id: 'minBandwidth',
+        name: 'networkSettings.minBandwidth',
         label: 'MinBandwidth',
         description: 'Bandwidth the server is guaranteed to have in bps (default 131072)'
     },
-    {id: 'maxBandwidth', label: 'MaxBandwidth', description: 'Bandwidth the server is guaranteed to never have in bps'},
+    {name: 'networkSettings.maxBandwidth', label: 'MaxBandwidth', description: 'Bandwidth the server is guaranteed to never have in bps'},
     {
-        id: 'maxCustomFileSize',
+        name: 'networkSettings.maxCustomFileSize',
         label: 'MaxCustomFileSize',
         description: 'Users with custom face or custom sound larger than this size are kicked when trying to connect'
     },
     {
-        id: 'minErrorToSend',
+        name: 'networkSettings.minErrorToSend',
         label: 'MinErrorToSend',
         description: 'Minimal error to send updates across network (default: 0.001)',
         inputProps: {min: '0', step: '0.001'}
     },
     {
-        id: 'minErrorToSendNear',
+        name: 'networkSettings.minErrorToSendNear',
         label: 'MinErrorToSendNear',
         description: 'Minimal error to send updates across network for near units (default 0.01)',
         inputProps: {min: '0', step: '0.001'}
     },
     {
-        id: 'maxPacketSize',
+        name: 'networkSettings.maxPacketSize',
         label: 'MaxPacketSize',
         description: 'Maximal size of packet sent over network (default 1400)'
     }
 ];
 
-const Arma3DifficultySettingsForm = ({formik}: Arma3NetworkSettingsFormProps) => {
+const Arma3DifficultySettingsForm = () => {
     return <Accordion>
         <AccordionSummary
             expandIcon={<ExpandMoreIcon/>}
@@ -72,7 +67,7 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3NetworkSettingsFormProps) =>
             <Typography>Custom network settings (advanced)</Typography>
         </AccordionSummary>
         <AccordionDetails>
-            <Typography variant='body2' mb={2}>
+            <Typography variant='body2' sx={{mb: 2}}>
                 For further info, refer to&nbsp;
                 <a href='https://community.bistudio.com/wiki/Arma_3:_Basic_Server_Config_File' target="_blank">
                     Community Wiki: Basic Server Config File
@@ -80,11 +75,11 @@ const Arma3DifficultySettingsForm = ({formik}: Arma3NetworkSettingsFormProps) =>
             </Typography>
             <Grid container spacing={1}>
                 {networkSettingFields.map(field =>
-                    <CustomTextField id={'networkSettings.' + field.id}
+                    <CustomTextField key={field.name}
+                                     name={field.name}
                                      label={field.label}
                                      helperText={field.description}
                                      type='number'
-                                     formik={formik}
                                      inputProps={field.inputProps}
                     />
                 )}

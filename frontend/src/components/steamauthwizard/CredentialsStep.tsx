@@ -89,7 +89,7 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
                 Enter Your Steam Credentials
             </Typography>
             
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" component="p">
                 Please enter your Steam username and password. These credentials will be used to download and update
                 game servers and workshop mods.
             </Typography>
@@ -109,7 +109,7 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
                 onChange={handleChange}
                 disabled={loading}
                 required
-                inputProps={{ 'data-testid': 'credentials-username' }}
+                slotProps={{ htmlInput: { 'data-testid': 'credentials-username' } }}
             />
 
             <TextField
@@ -122,7 +122,7 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
                 onChange={handleChange}
                 disabled={loading}
                 required
-                inputProps={{ 'data-testid': 'credentials-password' }}
+                slotProps={{ htmlInput: { 'data-testid': 'credentials-password' } }}
             />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>

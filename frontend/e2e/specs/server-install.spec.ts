@@ -44,7 +44,7 @@ test('failed installation shows error state on the card', async ({ browser }) =>
     await dashboard.triggerInstall('ARMA3');
 
     // Wait for error button to appear (red "Retry Install" / "Retry Update")
-    await expect(dashboard.installBtn('ARMA3')).toHaveClass(/MuiButton-containedError/, { timeout: 30_000 });
+    await expect(dashboard.installBtn('ARMA3')).toHaveClass(/MuiButton-colorError/, { timeout: 30_000 });
 
     await page.close();
 });

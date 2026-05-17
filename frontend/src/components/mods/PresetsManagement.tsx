@@ -18,7 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SERVER_NAMES from "../../util/serverNames";
 import {humanFileSize} from "../../util/util";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import TableGhosts from "../../UI/TableSkeletons";
 import Tooltip from "@mui/material/Tooltip";
@@ -263,7 +263,7 @@ export default function PresetsManagement() {
                                             <Tooltip title={
                                                 <>{(preset.mods ?? []).map(m => <div key={m.id}>{m.name}</div>)}</>
                                             } placement="bottom-start">
-                                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{width: 'fit-content', cursor: 'default'}}>
+                                                <Stack direction="row" spacing={0.5} sx={{width: 'fit-content', cursor: 'default', alignItems: "center"}}>
                                                     <span>{(preset.mods ?? []).length} mods total</span>
                                                     <InfoOutlinedIcon sx={{fontSize: 14, color: 'text.secondary'}}/>
                                                 </Stack>

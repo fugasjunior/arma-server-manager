@@ -3,7 +3,7 @@ import {Backdrop, Box, Button, CircularProgress, Modal, Stack, TextField} from "
 import {serversApi} from "../../api/client";
 import {ServerDto, ServerInstanceInfoDto} from "../../api/generated";
 import {ReforgerServerDto} from "../../api/serverModels";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import AddIcon from "@mui/icons-material/Add";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
@@ -110,7 +110,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
             </Button>
             <Modal open={isOpen} onClose={handleClose}>
                 <Box sx={modalStyle}>
-                    <Stack direction="row" spacing={1} mb={2} justifyItems="center" justifyContent="space-between">
+                    <Stack direction="row" spacing={1} sx={{mb: 2, justifyItems: "center", justifyContent: "space-between"}}>
                         <TextField id="mod-id" label="Mod ID" placeholder="Mod ID" size="small" required
                                    variant="standard" value={newModId} onChange={handleNewModIdChange}/>
                         <TextField id="mod-name" label="Mod name" placeholder="Mod name" size="small" required
@@ -123,7 +123,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
                         </Button>
                     </Stack>
                     {mods.length > 0 &&
-                        <Box overflow="auto" maxHeight={400}>
+                        <Box sx={{overflow: "auto", maxHeight: 400}}>
                             <TableContainer>
                                 <Table size="small">
                                     <TableHead>

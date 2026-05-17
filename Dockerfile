@@ -1,7 +1,7 @@
 # --- Build ---
 FROM eclipse-temurin:25-jdk AS build
 
-ENV NODE_VERSION=20.15.0
+ENV NODE_VERSION=24.15.0
 ENV NVM_DIR=/root/.nvm
 
 # Install Node
@@ -12,7 +12,7 @@ RUN apt-get update \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}

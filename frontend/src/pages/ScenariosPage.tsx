@@ -2,7 +2,7 @@ import {ChangeEvent, useEffect, useState} from "react";
 import {scenariosApi} from "../api/client";
 import {downloadScenario} from "../api/downloads";
 import {Arma3ScenarioDto} from "../api/generated";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import {ScenariosTable} from "../components/scenarios/ScenariosTable";
 
 const ScenariosPage = () => {

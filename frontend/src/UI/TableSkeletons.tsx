@@ -19,7 +19,7 @@ export default function TableSkeletons(props: Props) {
     }
 
     return (
-            <Stack p={2} spacing={props.spacing ?? 1}>
+            <Stack spacing={props.spacing ?? 1} sx={{p: 2}}>
                 {skeletonsArray.map((item) => (item))}
             </Stack>
     );

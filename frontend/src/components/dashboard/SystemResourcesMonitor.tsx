@@ -5,7 +5,7 @@ import CircularProgressWithLabel from "../../UI/CircularProgressWithLabel";
 import {systemApi} from "../../api/client";
 import {useInterval} from "../../hooks/use-interval";
 import {humanFileSize} from "../../util/util";
-import {CircularProgressProps} from "@mui/material/CircularProgress/CircularProgress";
+import {CircularProgressProps} from "@mui/material/CircularProgress";
 
 const SystemResourcesMonitor = () => {
     const [infoLoaded, setInfoLoaded] = useState(false);
@@ -52,19 +52,19 @@ const SystemResourcesMonitor = () => {
             <Paper>
                 {!infoLoaded && <LinearProgress /> }
                 {infoLoaded &&
-                        <Stack direction="row" divider={<Divider orientation="vertical" flexItem/>} p={4} spacing={3}
-                               alignItems="center" justifyContent="center">
+                        <Stack direction="row" divider={<Divider orientation="vertical" flexItem/>} spacing={3}
+                               sx={{p: 4, alignItems: "center", justifyContent: "center"}}>
                             <Stack direction="row" divider={<Divider orientation="vertical" flexItem/>} spacing={3}
-                                   alignItems="center" justifyContent="center"
+                                   sx={{alignItems: "center", justifyContent: "center"}}
                             >
-                                <Stack spacing={2} alignItems="center" justifyContent="center">
+                                <Stack spacing={2} sx={{alignItems: "center", justifyContent: "center"}}>
                                     <p>CPU usage</p>
                                     <div>
                                         <CircularProgressWithLabel value={cpuUsage} color={evaluateColor(cpuUsage)}/>
                                     </div>
                                 </Stack>
 
-                                <Stack spacing={2} alignItems="center" justifyContent="center">
+                                <Stack spacing={2} sx={{alignItems: "center", justifyContent: "center"}}>
                                     <p>Memory</p>
                                     <div>
                                         <CircularProgressWithLabel
@@ -74,7 +74,7 @@ const SystemResourcesMonitor = () => {
                                     </div>
                                 </Stack>
 
-                                <Stack spacing={2} alignItems="center" justifyContent="center">
+                                <Stack spacing={2} sx={{alignItems: "center", justifyContent: "center"}}>
                                     <p>Storage</p>
                                     <div>
                                         <CircularProgressWithLabel

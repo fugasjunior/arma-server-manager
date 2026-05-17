@@ -33,12 +33,8 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
                         src={logo}
                         style={{height: 52}}
                     />
-                    <Stack marginLeft={4}
-                           direction="row"
-                           justifyContent="flex-start"
-                           alignItems="center"
-                           spacing={1}
-                           sx={{flexGrow: 1}}
+                    <Stack direction="row" spacing={1}
+                           sx={{marginLeft: 4, justifyContent: "flex-start", alignItems: "center", flexGrow: 1}}
                     >
                         <Button color="success" component={NavLink} to="/" sx={{color: '#fff'}}>
                             Dashboard

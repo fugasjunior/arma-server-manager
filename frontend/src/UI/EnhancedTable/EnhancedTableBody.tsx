@@ -30,8 +30,8 @@ export const EnhancedTableBody = (
                           aria-checked={selected} tabIndex={-1} selected={selected}>
                     <TableCell padding="checkbox">
                         <Checkbox checked={selected} color="primary"
-                                  inputProps={{
-                                      "aria-labelledby": String(row.id),
+                                  slotProps={{
+                                      input: {"aria-labelledby": String(row.id)},
                                   }}
                         />
                     </TableCell>

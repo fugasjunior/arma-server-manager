@@ -41,13 +41,14 @@ export default function ListBuilder<T extends ListBuilderElement>(props: ListBui
     const itemsLabel = props.itemsLabel ?? "options";
 
     return (
-        <Box className={styles.box} overflow="auto" sx={{
+        <Box className={styles.box} sx={{
+            overflow: "auto",
             bgcolor: 'background.paper',
             boxShadow: 24,
             p: 4,
         }}>
-            <Grid container spacing={4} p={4}>
-                <Grid item xs={12}>
+            <Grid container spacing={4} sx={{p: 4}}>
+                <Grid size={12}>
                     <ListBuilderHeader
                         presets={props.presets}
                         itemsLabel={props.itemsLabel}
@@ -59,7 +60,7 @@ export default function ListBuilder<T extends ListBuilderElement>(props: ListBui
                         confirmDisabled={props.confirmDisabled}
                     />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={6}>
                     <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="available"
                         selectedOptions={filterAvailableOptions()} onClickItem={props.onSelect}
@@ -67,7 +68,7 @@ export default function ListBuilder<T extends ListBuilderElement>(props: ListBui
                         showFilter onFilterChange={handleFilterChange}
                     />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={6}>
                     <ListBuilderList
                         itemLabel={itemsLabel} typeLabel="selected"
                         itemsLabel={props.itemsLabel}

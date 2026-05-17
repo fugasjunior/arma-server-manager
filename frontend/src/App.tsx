@@ -1,4 +1,4 @@
-import {ToastContainer} from "material-react-toastify";
+import {ToastContainer} from "react-toastify";
 import './App.css';
 import Navbar from "./components/Navbar";
 import {Route, Routes} from "react-router-dom";
@@ -9,7 +9,7 @@ import ServerSettingsPage from "./pages/ServerSettingsPage";
 import ModsPage from "./pages/ModsPage";
 import NewServerPage from "./pages/NewServerPage";
 import {Container, createTheme, CssBaseline, ThemeProvider, useMediaQuery} from "@mui/material";
-import 'material-react-toastify/dist/ReactToastify.css'
+import 'react-toastify/dist/ReactToastify.css'
 import ScenariosPage from "./pages/ScenariosPage";
 import AppConfigPage from "./pages/AppConfigPage";
 import AdditionalServersPage from "./pages/AdditionalServersPage";

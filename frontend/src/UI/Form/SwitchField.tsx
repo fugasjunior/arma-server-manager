@@ -1,22 +1,22 @@
-import {FormikState} from "formik";
-import {FormikHandlers} from "formik/dist/types";
-import {getValueByKeyPath} from "../../util/formUtils.ts";
+import {useController} from 'react-hook-form';
 import {FormControlLabel, Switch} from "@mui/material";
 
-type SwitchFieldProps<T> = {
-    id: string,
+type SwitchFieldProps = {
+    name: string,
     label: string,
-    formik: FormikState<T> & FormikHandlers
 }
-export const SwitchField = <T, >({id, label, formik}: SwitchFieldProps<T>) => {
-    const checked = !!getValueByKeyPath(formik.values, id);
+
+export const SwitchField = ({name, label}: SwitchFieldProps) => {
+    const {field} = useController({name});
 
     return <FormControlLabel
         control={
-            <Switch checked={checked}
-                    onChange={formik.handleChange}
-                    name={id}
-                    id={id}/>
+            <Switch
+                {...field}
+                checked={!!field.value}
+                name={name}
+                id={name}
+            />
         }
         label={label}
     />;

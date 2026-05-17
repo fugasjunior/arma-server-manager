@@ -4,7 +4,7 @@ import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import {serversApi, modsApi} from "../../api/client";
 import {CreatorDlcDto, ServerDto, ServerInstanceInfoDto, ServerType} from "../../api/generated";
 import {Arma3ServerDto} from "../../api/serverModels";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import ApartmentIcon from '@mui/icons-material/Apartment';
 
 type ListBuilderDLCsEditProps = {

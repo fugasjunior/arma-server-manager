@@ -62,9 +62,9 @@ const AdditionalServersPage = () => {
             }
             {!isLoading && additionalServers.length > 0 && <Paper>
                 <TableSkeletons count={8} spacing={6} display={isLoading}/>
-                {!isLoading && <Stack p={3} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
+                {!isLoading && <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem/>} sx={{p: 3}}>
                     {additionalServers.map(server => (
-                        <Stack key={server.id} direction="row" justifyContent="space-between" width="100%">
+                        <Stack key={server.id} direction="row" sx={{width: "100%", justifyContent: "space-between"}}>
                             <Stack direction="row" spacing={3}>
                                 <Avatar src={server.imageUrl} alt={`${server.name} icon`}/>
                                 <p>{server.name}</p>

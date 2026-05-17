@@ -51,7 +51,7 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
         <Modal open onClose={onClose}>
             <Box sx={modalStyle}>
                 {isLogEmpty() ?
-                    <Typography m={2}>No logs available for this server</Typography>
+                    <Typography sx={{m: 2}}>No logs available for this server</Typography>
                     :
                     <TextField multiline value={logs} disabled fullWidth rows={25}/>
                 }

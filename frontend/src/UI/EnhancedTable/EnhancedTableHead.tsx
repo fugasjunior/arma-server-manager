@@ -31,7 +31,7 @@ const EnhancedTableHead = (
         search
     }: EnhancedTableHeadProps
 ) => {
-    const createSortHandler = (property: string) => (_: any) => {
+    const createSortHandler = (property: string) => (_event: unknown) => {
         onRequestSort(property);
     };
 
@@ -44,8 +44,8 @@ const EnhancedTableHead = (
                         indeterminate={numSelected > 0 && numSelected < rowCount}
                         checked={rowCount > 0 && numSelected === rowCount}
                         onChange={onSelectAllClick}
-                        inputProps={{
-                            "aria-label": "select all",
+                        slotProps={{
+                            input: {"aria-label": "select all"},
                         }}
                     />
                 </TableCell>

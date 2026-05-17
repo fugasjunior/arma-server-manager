@@ -7,7 +7,7 @@ type ServerSettingsFormControlsProps = {
 export const ServerSettingsFormControls = ({serverRunning, onCancel}: ServerSettingsFormControlsProps) => {
     const mediaQuery = useMediaQuery('(min-width:600px)');
 
-    return <Grid item xs={12} md={6}>
+    return <Grid size={{xs: 12, md: 6}}>
         <Button id="submit-btn"
                 title={serverRunning ? "Stop the server to be able to update the settings." : ""}
                 fullWidth={!mediaQuery}

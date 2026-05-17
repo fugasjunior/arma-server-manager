@@ -22,7 +22,7 @@ export default function ListBuilderList<T extends ListBuilderElement>(props: Lis
 
     return (
         <Stack>
-            <Stack direction="row" spacing={4} mb={2} alignItems="flex-end" minHeight={40}>
+            <Stack direction="row" spacing={4} sx={{mb: 2, alignItems: "flex-end", minHeight: 40}}>
                 <Typography variant="h5">{getHeadingText()}</Typography>
                 {props.showFilter &&
                     <TextField label="Filter" type="search" variant="outlined" size="small" margin="none"
@@ -31,7 +31,7 @@ export default function ListBuilderList<T extends ListBuilderElement>(props: Lis
             </Stack>
             <List className={styles.list} sx={{p: 0}}>
                 {props.selectedOptions.length === 0 &&
-                    <Typography m={2}>No {props.itemsLabel} {props.typeLabel.toLowerCase()}</Typography>
+                    <Typography sx={{m: 2}}>No {props.itemsLabel} {props.typeLabel.toLowerCase()}</Typography>
                 }
                 {props.selectedOptions.length > 0 && props.selectedOptions.map(opt =>
                     <ListItemButton

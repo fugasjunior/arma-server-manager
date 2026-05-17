@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {headlessClientApi} from "../../../api/client";
 import {ServerInstanceInfoDto} from "../../../api/generated";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import {Avatar, Stack, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import RemoveIcon from "@mui/icons-material/Remove";

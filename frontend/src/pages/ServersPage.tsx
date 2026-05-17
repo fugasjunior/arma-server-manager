@@ -7,7 +7,7 @@ import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import TableBody from "@mui/material/TableBody";
-import {toast} from "material-react-toastify";
+import {toast} from "react-toastify";
 import ConfirmationDialog from "../UI/ConfirmationDialog";
 import ServerLogs from "../components/servers/serverListEntry/ServerLogs.tsx";
 import {ServerDto, ServerInstanceInfoDto} from "../api/generated";
