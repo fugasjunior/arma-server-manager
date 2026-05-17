@@ -35,15 +35,22 @@ RUN chmod 555 ./gradlew \
     && sed -i -e 's/\r$//' ./gradlew \
     && ./gradlew install -x :backend:test
 
-# --- JRE layer ---
-FROM eclipse-temurin:25-jre AS jre
+# --- Custom minimal JRE via jlink ---
+FROM eclipse-temurin:25-jdk AS jre-build
 
-# -- Create runtime image ---
+ENV APP_VERSION=2.0.0-SNAPSHOT
+COPY --from=build /app/backend/build/libs/backend-$APP_VERSION.jar /app.jar
+RUN jlink \
+      --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql,java.sql.rowset,java.xml,java.xml.crypto,jdk.attach,jdk.crypto.ec,jdk.httpserver,jdk.jfr,jdk.management,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.unsupported,jdk.unsupported.desktop \
+      --strip-debug --no-man-pages --no-header-files \
+      --compress=zip-9 --output /jre
+
+# --- Runtime image ---
 FROM cm2network/steamcmd AS runtime
 
 ENV APP_VERSION=2.0.0-SNAPSHOT
 
-COPY --from=jre /opt/java/openjdk /opt/java/openjdk
+COPY --from=jre-build /jre /opt/java/openjdk
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
@@ -51,14 +58,14 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 USER root
 RUN dpkg --add-architecture i386 \
     && apt-get update \
-    && apt-get install -y \
+    && apt-get install -y --no-install-recommends \
           lib32gcc-s1 \
-          lib32stdc++6  \
+          lib32stdc++6 \
           libcap2 \
           expect \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 WORKDIR /home/steam
 COPY ./config/application-docker.properties /home/steam/config/application.properties

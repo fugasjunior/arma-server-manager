@@ -33,6 +33,10 @@ repositories {
 tasks.register('copyWebApp', Copy) {
     dependsOn(':frontend:appNpmBuild')
 
+    doFirst {
+        delete "$rootDir/backend/build/resources/main/static"
+    }
+
     from "$rootDir/frontend/build"
     into "$rootDir/backend/build/resources/main/static/."
 }
@@ -68,18 +72,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-    implementation 'org.springframework.boot:spring-boot-starter-flyway'
     implementation "commons-io:commons-io:2.22.0"
     implementation "com.auth0:java-jwt:4.2.2"
     implementation "com.ibasco.agql:agql-source-query:1.2.2"
-    implementation "org.springframework:spring-context-support"
     implementation "com.google.guava:guava:33.6.0-jre"
     implementation "org.mapstruct:mapstruct:1.6.3"
     implementation "org.jsoup:jsoup:1.22.2"
-    implementation "org.flywaydb:flyway-mysql"
 
-    compileOnly "org.projectlombok:lombok:1.18.46"
-
+    runtimeOnly 'org.springframework.boot:spring-boot-starter-flyway'
+    runtimeOnly 'org.flywaydb:flyway-mysql'
     runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -97,8 +98,12 @@ dependencies {
     testImplementation 'io.rest-assured:spring-mock-mvc:5.5.0'
     testImplementation 'org.awaitility:awaitility:4.2.2'
     testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
     testCompileOnly "org.projectlombok:lombok:1.18.46"
     testAnnotationProcessor "org.projectlombok:lombok:1.18.46"
+
+    compileOnly 'io.swagger.core.v3:swagger-annotations:2.2.28'
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 openApiGenerate {
@@ -139,11 +144,6 @@ sourceSets {
 }
 
 compileJava.dependsOn tasks.openApiGenerate
-
-dependencies {
-    implementation 'io.swagger.core.v3:swagger-annotations:2.2.28'
-    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
-}
 
 test {
     useJUnitPlatform()
