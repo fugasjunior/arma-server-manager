@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.headlessclient;
 
 import cz.forgottenempire.servermanager.api.HeadlessClientApi;
+import cz.forgottenempire.servermanager.api.model.SetHeadlessClientsTargetRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +19,8 @@ public class HeadlessClientController implements HeadlessClientApi {
     }
 
     @Override
-    public ResponseEntity<Void> startHeadlessClient(Long id) {
-        headlessClientService.addHeadlessClient(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> stopHeadlessClient(Long id) {
-        headlessClientService.removeHeadlessClient(id);
+    public ResponseEntity<Void> setHeadlessClientsTarget(Long id, SetHeadlessClientsTargetRequest request) {
+        headlessClientService.setTargetCount(id, request.getTargetHeadlessClientsCount());
         return ResponseEntity.ok().build();
     }
 }

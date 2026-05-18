@@ -45,10 +45,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server~1{id}~1autorestart'
 
   # ── Headless Client ─────────────────────────────────────────────────────────
-  /server/{id}/hc/start:
-    $ref: './paths/headless-client.yaml#/~1server~1{id}~1hc~1start'
-  /server/{id}/hc/stop:
-    $ref: './paths/headless-client.yaml#/~1server~1{id}~1hc~1stop'
+  /server/{id}/hc/target:
+    $ref: './paths/headless-client.yaml#/~1server~1{id}~1hc~1target'
 
   # ── Additional Servers ─────────────────────────────────────────────────────
   /additionalServers:

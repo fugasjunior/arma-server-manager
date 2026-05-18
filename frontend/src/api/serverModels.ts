@@ -18,6 +18,7 @@ export interface Arma3ServerDto extends BaseServerDto {
     activeDLCs?: CreatorDlcDto[];
     difficultySettings?: Arma3DifficultySettingsDto;
     networkSettings?: Arma3NetworkSettingsDto;
+    targetHeadlessClientsCount?: number;
 }
 
 export interface DayZServerDto extends BaseServerDto {

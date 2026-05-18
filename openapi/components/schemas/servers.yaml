@@ -78,6 +78,10 @@ Arma3ServerDto:
           $ref: '#/Arma3DifficultySettingsDto'
         networkSettings:
           $ref: '#/Arma3NetworkSettingsDto'
+        targetHeadlessClientsCount:
+          type: integer
+          minimum: 0
+          default: 0
 
 DayZServerDto:
   allOf:
@@ -282,3 +286,11 @@ Arma3NetworkSettingsDto:
       type: integer
     maxCustomFileSize:
       type: integer
+
+SetHeadlessClientsTargetRequest:
+  type: object
+  required: [targetHeadlessClientsCount]
+  properties:
+    targetHeadlessClientsCount:
+      type: integer
+      minimum: 0

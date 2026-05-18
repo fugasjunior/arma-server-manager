@@ -1,4 +1,5 @@
 import {ServerDto, ServerInstanceInfoDto, ServerType} from "../../../api/generated";
+import {Arma3ServerDto} from "../../../api/serverModels.ts";
 import {Button, Stack} from "@mui/material";
 import ModEditButton from "../ModEditButton.tsx";
 import ListBuilderDLCsEdit from "../ListBuilderDLCsEdit.tsx";
@@ -11,7 +12,8 @@ export function ServerListEntryDetails(props: {
     server: ServerDto,
     serverStatus: ServerInstanceInfoDto | null,
     onClick: () => void,
-    onDuplicateServer: (server: ServerDto) => void
+    onDuplicateServer: (server: ServerDto) => void,
+    onTargetHcChanged?: () => void,
 }) {
     return <Stack direction="row">
         <Stack direction="row" spacing={2} sx={{flexGrow: 1, justifyItems: "center", alignItems: "center", justifyContent: "flex-start"}}>
@@ -27,8 +29,13 @@ export function ServerListEntryDetails(props: {
 
             {props.server.automaticRestart && <AutomaticRestartSettings serverId={props.server.id!} dto={props.server.automaticRestart}/>}
 
-            {props.serverStatus?.alive && props.server.type === ServerType.Arma3 &&
-                <HeadlessClientControls serverId={props.server.id!} serverStatus={props.serverStatus}/>}
+            {props.server.type === ServerType.Arma3 &&
+                <HeadlessClientControls
+                    serverId={props.server.id!}
+                    serverStatus={props.serverStatus}
+                    targetCount={(props.server as Arma3ServerDto).targetHeadlessClientsCount ?? 0}
+                    onTargetChanged={props.onTargetHcChanged}
+                />}
         </Stack>
         <Stack direction="row" sx={{flexGrow: 0}}>
             <Button

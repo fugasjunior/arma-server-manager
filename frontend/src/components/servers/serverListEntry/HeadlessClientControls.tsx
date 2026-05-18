@@ -8,39 +8,63 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import {blue, grey} from "@mui/material/colors";
 import AddIcon from "@mui/icons-material/Add";
 
-export function HeadlessClientControls(props: { serverStatus: ServerInstanceInfoDto, serverId: number }) {
-    const [headlessClientsCount, setHeadlessClientsCount] = useState(props.serverStatus.headlessClientsCount ?? 0);
+type HeadlessClientControlsProps = {
+    serverStatus: ServerInstanceInfoDto | null,
+    serverId: number,
+    targetCount: number,
+    onTargetChanged?: () => void,
+}
+
+export function HeadlessClientControls(props: HeadlessClientControlsProps) {
+    const [targetCount, setTargetCount] = useState(props.targetCount);
+    const [pending, setPending] = useState(false);
+    const runningCount = props.serverStatus?.headlessClientsCount ?? 0;
 
     useEffect(() => {
-        setHeadlessClientsCount(props.serverStatus.headlessClientsCount ?? 0)
-    }, [props.serverStatus.headlessClientsCount]);
+        setTargetCount(props.targetCount);
+    }, [props.targetCount]);
 
-    const handleAddHeadlessClient = async () => {
-        setHeadlessClientsCount(prevState => (prevState ?? 0) + 1);
-        await headlessClientApi.startHeadlessClient({id: props.serverId});
-        toast.success("Headless client started");
-    }
+    const setTarget = async (newTarget: number) => {
+        const previousCount = targetCount;
+        setTargetCount(newTarget);
+        setPending(true);
+        try {
+            await headlessClientApi.setHeadlessClientsTarget({
+                id: props.serverId,
+                setHeadlessClientsTargetRequest: {targetHeadlessClientsCount: newTarget}
+            });
+            props.onTargetChanged?.();
+        } catch {
+            setTargetCount(previousCount);
+            toast.error("Failed to update headless client target");
+        } finally {
+            setPending(false);
+        }
+    };
 
-    const handleRemoveHeadlessClient = async () => {
-        setHeadlessClientsCount(prevState => (prevState ?? 0) - 1);
-        await headlessClientApi.stopHeadlessClient({id: props.serverId});
-        toast.success("Headless client stopped");
-    }
+    const handleAdd = () => setTarget(targetCount + 1);
+    const handleRemove = () => setTarget(targetCount - 1);
+
+    const isRunning = props.serverStatus?.alive ?? false;
+    const displayCount = isRunning ? `${runningCount} / ${targetCount}` : `${targetCount}`;
 
     return <Stack spacing={1}>
         <Typography>Headless clients</Typography>
         <Stack direction="row">
             <IconButton color="primary" aria-label="remove headless client"
-                        disabled={headlessClientsCount < 1}
-                        onClick={handleRemoveHeadlessClient}
+                        disabled={pending || targetCount < 1}
+                        onClick={handleRemove}
             >
                 <RemoveIcon/>
             </IconButton>
-            <Avatar sx={headlessClientsCount > 0 ? {bgcolor: blue[500]} : {bgcolor: grey[400]}}>
-                {headlessClientsCount}
+            <Avatar sx={targetCount > 0 ? {bgcolor: blue[500]} : {bgcolor: grey[400]}}>
+                <Typography variant="caption" sx={{fontSize: isRunning ? '0.7rem' : '0.85rem', lineHeight: 1}}>
+                    {displayCount}
+                </Typography>
             </Avatar>
             <IconButton color="primary" aria-label="add headless client"
-                        onClick={handleAddHeadlessClient}
+                        disabled={pending}
+                        onClick={handleAdd}
             >
                 <AddIcon/>
             </IconButton>

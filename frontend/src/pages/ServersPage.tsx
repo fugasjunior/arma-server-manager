@@ -144,6 +144,13 @@ const ServersPage = () => {
         setIsLogOpen(false);
     }
 
+    const handleTargetHcChanged = async (serverId: number) => {
+        const {data: updatedServer} = await serversApi.getServer({id: serverId});
+        setServerInstances(prev => prev.map(inst =>
+            inst.server.id === serverId ? {...inst, server: updatedServer} : inst
+        ));
+    };
+
     const handleDuplicateServer = async (server: ServerDto) => {
         const duplicatedServer = {...server, name: server.name + " (copy)"};
         const {data: createdServer} = await serversApi.createServer({serverDto: duplicatedServer});
@@ -169,6 +176,7 @@ const ServersPage = () => {
                                              onOpenLogs={handleOpenLogs}
                                              onDeleteServer={() => handleDeleteServerClicked(instance.server)}
                                              serverWithSamePortRunning={isServerWithSamePortRunning(instance.server)}
+                                             onTargetHcChanged={() => handleTargetHcChanged(instance.server.id!)}
                             />
                         )}
                     </TableBody>

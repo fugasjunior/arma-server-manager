@@ -69,6 +69,8 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                                 <SwitchField name='persistent' label='Persistent'/>
                             </FormGroup>
                         </Grid>
+                        <CustomTextField name='targetHeadlessClientsCount' label='Target headless clients' type='number'
+                                         containerMd={6}/>
                         <CustomTextField name='additionalOptions' label='Additional options' multiline
                                          containerMd={12}/>
 

@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance;
 import com.ibasco.agql.protocols.valve.source.query.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.info.SourceQueryInfoResponse;
 import com.ibasco.agql.protocols.valve.source.query.info.SourceServer;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
@@ -50,8 +51,9 @@ class CheckServerInstancesStatusCronJob {
             handleCrashedServer(process);
             return;
         }
-        updateHeadlessClients(process);
-        updateServerInstanceInfo(process);
+        Server server = getServer(process.getServerId());
+        updateHeadlessClients(process, server);
+        updateServerInstanceInfo(process, server);
     }
 
     private void handleCrashedServer(ServerProcess serverProcess) {
@@ -59,8 +61,7 @@ class CheckServerInstancesStatusCronJob {
         serverProcessService.shutDownServer(serverProcess.getServerId());
     }
 
-    private void updateServerInstanceInfo(ServerProcess process) {
-        Server server = getServer(process.getServerId());
+    private void updateServerInstanceInfo(ServerProcess process, Server server) {
         ServerInstanceInfo instanceInfo = process.getInstanceInfo();
         try (SourceQueryClient sourceQueryClient = new SourceQueryClient()) {
             InetSocketAddress serverAddress = new InetSocketAddress(LOCALHOST, server.getQueryPort());
@@ -98,9 +99,9 @@ class CheckServerInstancesStatusCronJob {
         return process.getInstanceInfo() != null && process.getInstanceInfo().isAlive();
     }
 
-    private static void updateHeadlessClients(ServerProcess process) {
-        if (process instanceof Arma3ServerProcess arma3ServerProcess) {
-            arma3ServerProcess.checkHeadlessClients();
+    private static void updateHeadlessClients(ServerProcess process, Server server) {
+        if (process instanceof Arma3ServerProcess arma3ServerProcess && server instanceof Arma3Server arma3Server) {
+            arma3ServerProcess.reconcileHeadlessClients(arma3Server);
         }
     }
 }

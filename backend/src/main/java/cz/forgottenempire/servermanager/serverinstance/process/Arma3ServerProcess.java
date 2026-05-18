@@ -7,7 +7,6 @@ import cz.forgottenempire.servermanager.serverinstance.headlessclient.HeadlessCl
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Arma3ServerProcess extends ServerProcess {
 
@@ -31,12 +30,8 @@ public class Arma3ServerProcess extends ServerProcess {
 
     @Override
     public void restart(Server server) {
-        int countOfHeadlessClients = headlessClients.size();
         super.restart(server);
-        Arma3Server arma3Server = (Arma3Server) server;
-        for (int i = 0; i < countOfHeadlessClients; i++) {
-            addHeadlessClient(arma3Server);
-        }
+        reconcileHeadlessClients((Arma3Server) server);
     }
 
     public void addHeadlessClient(Arma3Server server) {
@@ -54,9 +49,20 @@ public class Arma3ServerProcess extends ServerProcess {
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 
-    public void checkHeadlessClients() {
-        List<HeadlessClient> crashedHeadlessClients = headlessClients.stream().filter(hc -> !hc.isAlive()).toList();
-        crashedHeadlessClients.forEach(headlessClients::remove);
+    public void reconcileHeadlessClients(Arma3Server server) {
+        headlessClients.removeIf(hc -> !hc.isAlive());
+        // If server process is dead, caller (crash handler) is responsible for stopping remaining HCs via stop()
+        if (!isAlive()) {
+            instanceInfo.setHeadlessClientsCount(headlessClients.size());
+            return;
+        }
+        int target = server.getTargetHeadlessClientsCount();
+        while (headlessClients.size() < target) {
+            addHeadlessClient(server);
+        }
+        while (headlessClients.size() > target) {
+            removeHeadlessClient();
+        }
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 }

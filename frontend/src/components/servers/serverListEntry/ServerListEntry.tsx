@@ -23,7 +23,8 @@ type ServerListEntryProps = {
     onRestartServer: (id: number) => void,
     onDeleteServer: (id: number) => void,
     onOpenLogs: (id: number) => void,
-    onDuplicateServer: (server: ServerDto) => void
+    onDuplicateServer: (server: ServerDto) => void,
+    onTargetHcChanged?: () => void,
 }
 
 const ServerListEntry = (props: ServerListEntryProps) => {
@@ -35,7 +36,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
         onRestartServer,
         onDeleteServer,
         onDuplicateServer,
-        serverWithSamePortRunning
+        serverWithSamePortRunning,
     } = props;
 
     const [isExpanded, setExpanded] = useState(false);
@@ -95,7 +96,8 @@ const ServerListEntry = (props: ServerListEntryProps) => {
             {isExpanded && <TableRow>
                 <TableCell colSpan={5}>
                     <ServerListEntryDetails server={server} serverStatus={status} onDuplicateServer={onDuplicateServer}
-                                            onClick={() => props.onOpenLogs(server.id as number)}/>
+                                            onClick={() => props.onOpenLogs(server.id as number)}
+                    />
                 </TableCell>
             </TableRow>}
         </>

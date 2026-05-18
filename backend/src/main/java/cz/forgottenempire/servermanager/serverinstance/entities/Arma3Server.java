@@ -33,6 +33,8 @@ public class Arma3Server extends Server {
     private boolean clientFilePatching;
     private boolean serverFilePatching;
 
+    private int targetHeadlessClientsCount;
+
     private boolean persistent;
 
     private boolean battlEye;

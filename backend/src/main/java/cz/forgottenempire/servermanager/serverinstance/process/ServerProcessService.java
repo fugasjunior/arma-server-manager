@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.AutomaticRestartScheduler;
 import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
 import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.PortAlreadyTakenException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,10 @@ public class ServerProcessService {
 
         validatePortsNotTaken(server);
         serverProcess.start(server);
+
+        if (serverProcess.isAlive() && server instanceof Arma3Server arma3Server && serverProcess instanceof Arma3ServerProcess arma3Process) {
+            arma3Process.reconcileHeadlessClients(arma3Server);
+        }
 
         if (server.isRestartAutomatically()) {
             restartScheduler.schedule(id, server.getAutomaticRestartTime(), () -> restartServer(id));

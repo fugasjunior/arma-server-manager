@@ -1,21 +1,16 @@
-/server/{id}/hc/start:
-  post:
+/server/{id}/hc/target:
+  put:
     tags: [HeadlessClient]
-    operationId: startHeadlessClient
-    summary: Start a headless client for a server
+    operationId: setHeadlessClientsTarget
+    summary: Set the target headless client count for a server
     parameters:
       - $ref: '../components/parameters.yaml#/serverId'
-    responses:
-      '200':
-        description: OK
-
-/server/{id}/hc/stop:
-  delete:
-    tags: [HeadlessClient]
-    operationId: stopHeadlessClient
-    summary: Stop the headless client for a server
-    parameters:
-      - $ref: '../components/parameters.yaml#/serverId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/servers.yaml#/SetHeadlessClientsTargetRequest'
     responses:
       '200':
         description: OK
