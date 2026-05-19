@@ -141,6 +141,74 @@ class ModPresetCrudJourneyTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void whenCreatePresetWithSpecificModOrder_thenModOrderIsPreserved() throws Exception {
+        WorkshopMod mod2 = new WorkshopMod();
+        mod2.setId(200000002L);
+        mod2.setName("ModB");
+        mod2.setServerType(ServerType.ARMA3);
+        mod2.setInstallationStatus(InstallationStatus.FINISHED);
+        workshopModsService.saveMod(mod2);
+
+        WorkshopMod mod3 = new WorkshopMod();
+        mod3.setId(300000003L);
+        mod3.setName("ModC");
+        mod3.setServerType(ServerType.ARMA3);
+        mod3.setInstallationStatus(InstallationStatus.FINISHED);
+        workshopModsService.saveMod(mod3);
+
+        // Create preset with mods in non-sorted order: mod3, modId, mod2
+        String presetBody = "{\"name\":\"OrderedPreset\",\"mods\":[%d,%d,%d],\"type\":\"ARMA3\"}"
+                .formatted(mod3.getId(), modId, mod2.getId());
+        MvcResult createResult = api().postJson("/api/mod/preset", presetBody)
+                .andExpect(status().isOk())
+                .andReturn();
+        int presetId = (int) JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
+
+        api().get("/api/mod/preset/" + presetId)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mods[0].id", equalTo(mod3.getId().intValue())))
+                .andExpect(jsonPath("$.mods[1].id", equalTo(modId.intValue())))
+                .andExpect(jsonPath("$.mods[2].id", equalTo(mod2.getId().intValue())));
+    }
+
+    @Test
+    void whenUpdatePresetWithSpecificModOrder_thenModOrderIsPreserved() throws Exception {
+        WorkshopMod mod2 = new WorkshopMod();
+        mod2.setId(400000002L);
+        mod2.setName("UpdateModB");
+        mod2.setServerType(ServerType.ARMA3);
+        mod2.setInstallationStatus(InstallationStatus.FINISHED);
+        workshopModsService.saveMod(mod2);
+
+        WorkshopMod mod3 = new WorkshopMod();
+        mod3.setId(500000003L);
+        mod3.setName("UpdateModC");
+        mod3.setServerType(ServerType.ARMA3);
+        mod3.setInstallationStatus(InstallationStatus.FINISHED);
+        workshopModsService.saveMod(mod3);
+
+        // Create with mods in sorted order
+        String createBody = "{\"name\":\"ReorderPreset\",\"mods\":[%d,%d,%d],\"type\":\"ARMA3\"}"
+                .formatted(modId, mod2.getId(), mod3.getId());
+        MvcResult createResult = api().postJson("/api/mod/preset", createBody)
+                .andExpect(status().isOk())
+                .andReturn();
+        int presetId = (int) JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
+
+        // Update with reversed order
+        String updateBody = "{\"name\":\"ReorderPreset\",\"mods\":[%d,%d,%d]}"
+                .formatted(mod3.getId(), mod2.getId(), modId);
+        api().put("/api/mod/preset/" + presetId, updateBody)
+                .andExpect(status().isOk());
+
+        api().get("/api/mod/preset/" + presetId)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mods[0].id", equalTo(mod3.getId().intValue())))
+                .andExpect(jsonPath("$.mods[1].id", equalTo(mod2.getId().intValue())))
+                .andExpect(jsonPath("$.mods[2].id", equalTo(modId.intValue())));
+    }
+
+    @Test
     void whenRenamePresetToDuplicateName_thenBadRequest() throws Exception {
         String body1 = "{\"name\":\"Preset One\",\"mods\":[%d],\"type\":\"ARMA3\"}".formatted(modId);
         String body2 = "{\"name\":\"Preset Two\",\"mods\":[%d],\"type\":\"ARMA3\"}".formatted(modId);

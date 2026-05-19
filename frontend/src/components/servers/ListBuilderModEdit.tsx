@@ -47,45 +47,54 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     const serverRunning = props.status != null && props.status.alive;
 
     function handleManageModsButtonClick() {
-        if (props.server.id === undefined) {
-            return;
-        }
+        if (props.server.id === undefined) return;
         setIsOpen(true);
     }
 
     function handleModSelect(option: ServerWorkshopModDto) {
         setSelectedPreset("");
-        setAvailableMods((prevState) => prevState.filter(item => item !== option));
-        setSelectedMods((prevState) =>
-            [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+        setAvailableMods(prev => prev.filter(item => item !== option));
+        setSelectedMods(prev =>
+            [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
         );
     }
 
     function handleModDeselect(option: ServerWorkshopModDto) {
         setSelectedPreset("");
-        setSelectedMods((prevState) => prevState.filter(item => item !== option));
-        setAvailableMods((prevState) =>
-            [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+        setSelectedMods(prev => prev.filter(item => item !== option));
+        setAvailableMods(prev =>
+            [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
         );
+    }
+
+    function handleModReorder(items: ServerWorkshopModDto[]) {
+        setSelectedMods(items);
+    }
+
+    function handleSelectAll() {
+        setSelectedPreset("");
+        setSelectedMods(prev => [...prev, ...availableMods].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setAvailableMods([]);
+    }
+
+    function handleClearAll() {
+        setSelectedPreset("");
+        setAvailableMods(prev => [...prev, ...selectedMods].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setSelectedMods([]);
     }
 
     function handlePresetChange(e: SelectChangeEvent) {
         const presetId = Number(e.target.value);
         const preset = presetsData.find((preset: PresetResponseDto) => preset.id === presetId);
-        if (!preset) {
-            return;
-        }
+        if (!preset) return;
 
         const newAvailableMods = [...availableMods, ...selectedMods];
         const newSelectedMods = [];
         for (const mod of preset.mods ?? []) {
             const selectedMod = newAvailableMods.find(m => m.id === mod.id);
-            if (!selectedMod) {
-                continue;
-            }
-            const index = newAvailableMods.indexOf(selectedMod);
+            if (!selectedMod) continue;
+            newAvailableMods.splice(newAvailableMods.indexOf(selectedMod), 1);
             newSelectedMods.push(selectedMod);
-            newAvailableMods.splice(index, 1);
         }
 
         setAvailableMods(newAvailableMods);
@@ -94,9 +103,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     }
 
     async function handleConfirm() {
-        if (props.server.id === undefined) {
-            return;
-        }
+        if (props.server.id === undefined) return;
 
         setIsOpen(false);
         try {
@@ -128,6 +135,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
                 <Box>
                     <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
                                  onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                 onReorder={handleModReorder} onSelectAll={handleSelectAll} onClearAll={handleClearAll}
                                  itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presetsData}
                                  onPresetChange={handlePresetChange} withControls
                                  onConfirm={handleConfirm} onCancel={handleClose}

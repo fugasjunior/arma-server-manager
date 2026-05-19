@@ -7,6 +7,9 @@ CreatePresetRequestDto:
       minLength: 1
     mods:
       type: array
+      description: >
+        Mods in this preset. Array order is significant: when the preset is applied
+        to a server, mods are loaded in this order.
       minItems: 1
       items:
         type: integer
@@ -23,6 +26,9 @@ UpdatePresetRequestDto:
       minLength: 1
     mods:
       type: array
+      description: >
+        Mods in this preset. Array order is significant: when the preset is applied
+        to a server, mods are loaded in this order.
       minItems: 1
       items:
         type: integer
@@ -38,6 +44,9 @@ PresetResponseDto:
       type: string
     mods:
       type: array
+      description: >
+        Mods in this preset. Array order is significant: when the preset is applied
+        to a server, mods are loaded in this order.
       items:
         $ref: '#/PresetResponseModDto'
     type:

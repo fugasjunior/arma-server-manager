@@ -68,10 +68,16 @@ Arma3ServerDto:
           type: boolean
         activeMods:
           type: array
+          description: >
+            Active mods for this server. Array order is significant: index 0 is loaded first.
+            The order is persisted and reflected in launch parameters (-mod=, -serverMod=).
           items:
             $ref: '#/ServerWorkshopModDto'
         activeDLCs:
           type: array
+          description: >
+            Active Creator DLCs for this server. Array order is significant: index 0 is loaded first.
+            The order is persisted and reflected in launch parameters.
           items:
             $ref: './mods.yaml#/CreatorDlcDto'
         difficultySettings:
@@ -117,6 +123,9 @@ DayZServerDto:
           maximum: 64
         activeMods:
           type: array
+          description: >
+            Active mods for this server. Array order is significant: index 0 is loaded first.
+            The order is persisted and reflected in launch parameters (-mod=, -serverMod=).
           items:
             $ref: '#/ServerWorkshopModDto'
 
@@ -134,6 +143,9 @@ ReforgerServerDto:
           type: boolean
         activeMods:
           type: array
+          description: >
+            Active mods for this server. Array order is significant: index 0 is loaded first.
+            The order is persisted and reflected in the server configuration.
           items:
             $ref: '#/ReforgerModDto'
 

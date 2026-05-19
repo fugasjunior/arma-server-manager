@@ -12,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -57,6 +58,7 @@ public class DayZServer extends Server {
     @JoinTable(name = "dayzserver_active_mods",
             joinColumns = @JoinColumn(name = "dayzserver_id"),
             inverseJoinColumns = @JoinColumn(name = "active_mods_id"))
+    @OrderColumn(name = "mod_order")
     private List<WorkshopMod> activeMods;
 
     @Override

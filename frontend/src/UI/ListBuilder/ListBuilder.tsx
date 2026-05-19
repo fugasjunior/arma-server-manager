@@ -1,7 +1,5 @@
-import {ChangeEvent, useState} from "react";
 import ListBuilderList from "./ListBuilderList";
 import ListBuilderHeader from "./ListBuilderHeader";
-import Fuse from "fuse.js";
 import {Box, Grid, SelectChangeEvent} from "@mui/material";
 import styles from "./ListBuilder.module.css";
 import {PresetResponseDto} from "../../api/generated";
@@ -20,30 +18,20 @@ type ListBuilderProps<T> = {
     onPresetChange?: (event: SelectChangeEvent) => void,
     onSelect: (element: T) => void,
     onDeselect: (element: T) => void,
+    onReorder?: (items: T[]) => void,
+    onSelectAll?: () => void,
+    onClearAll?: () => void,
     onConfirm?: () => void,
     onCancel?: () => void
 }
 
 export default function ListBuilder<T extends ListBuilderElement>(props: ListBuilderProps<T>) {
-    const [filter, setFilter] = useState("");
-
-    function handleFilterChange(e: ChangeEvent<HTMLInputElement>) {
-        setFilter(e.target.value);
-    }
-
-    const filterAvailableOptions = (): Array<T> => {
-        if (!filter) {
-            return props.availableOptions;
-        }
-        return new Fuse<T>(props.availableOptions, {keys: ['name']}).search(filter).map(o => o.item);
-    }
-
     const itemsLabel = props.itemsLabel ?? "options";
 
     return (
         <Box className={styles.box} sx={{
             overflow: "auto",
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
         }}>
@@ -62,17 +50,25 @@ export default function ListBuilder<T extends ListBuilderElement>(props: ListBui
                 </Grid>
                 <Grid size={6}>
                     <ListBuilderList
-                        itemLabel={itemsLabel} typeLabel="available"
-                        selectedOptions={filterAvailableOptions()} onClickItem={props.onSelect}
+                        itemLabel={itemsLabel}
+                        typeLabel="available"
+                        selectedOptions={props.availableOptions}
+                        onClickItem={props.onSelect}
                         itemsLabel={props.itemsLabel}
-                        showFilter onFilterChange={handleFilterChange}
+                        showFilter={props.showFilter}
+                        onSelectAll={props.onSelectAll}
                     />
                 </Grid>
                 <Grid size={6}>
                     <ListBuilderList
-                        itemLabel={itemsLabel} typeLabel="selected"
+                        itemLabel={itemsLabel}
+                        typeLabel="selected"
                         itemsLabel={props.itemsLabel}
-                        selectedOptions={props.selectedOptions} onClickItem={props.onDeselect}
+                        selectedOptions={props.selectedOptions}
+                        onClickItem={props.onDeselect}
+                        showFilter={props.showFilter}
+                        onReorder={props.onReorder}
+                        onClearAll={props.onClearAll}
                     />
                 </Grid>
             </Grid>

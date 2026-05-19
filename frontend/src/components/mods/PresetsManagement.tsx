@@ -86,10 +86,8 @@ export default function PresetsManagement() {
         setEditedPreset(preset);
     }
 
-    async function handlePresetModalClosed() {
-        if (!editedPreset || editedPreset.id === undefined) {
-            return;
-        }
+    async function handlePresetConfirm() {
+        if (!editedPreset || editedPreset.id === undefined) return;
 
         const request = {
             name: editedPreset.name!,
@@ -115,23 +113,35 @@ export default function PresetsManagement() {
         setPresetModalOpen(false);
     }
 
+    function handlePresetModalCancelled() {
+        setEditedPreset(null);
+        setSelectedMods([]);
+        setAvailableMods([]);
+        setPresetModalOpen(false);
+    }
+
     function handleModSelect(option: PresetResponseModDto) {
-        setAvailableMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-        setSelectedMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
-        });
+        setAvailableMods(prev => prev.filter(item => item !== option));
+        setSelectedMods(prev => [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
     }
 
     function handleModDeselect(option: PresetResponseModDto) {
-        setSelectedMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
+        setSelectedMods(prev => prev.filter(item => item !== option));
+        setAvailableMods(prev => [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+    }
 
-        setAvailableMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
-        });
+    function handleModReorder(items: PresetResponseModDto[]) {
+        setSelectedMods(items);
+    }
+
+    function handleSelectAll() {
+        setSelectedMods(prev => [...prev, ...availableMods].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setAvailableMods([]);
+    }
+
+    function handleClearAll() {
+        setAvailableMods(prev => [...prev, ...selectedMods].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setSelectedMods([]);
     }
 
     function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
@@ -283,11 +293,13 @@ export default function PresetsManagement() {
                     </TableContainer>
                 </Paper>
             </Box>
-            <Modal open={presetModalOpen} onClose={handlePresetModalClosed}>
+            <Modal open={presetModalOpen} onClose={handlePresetModalCancelled}>
                 <Box>
-                    <ListBuilder selectedOptions={selectedMods as any} availableOptions={availableMods as any}
-                                 onSelect={handleModSelect as any} onDeselect={handleModDeselect as any}
-                                 itemsLabel="mods" showFilter
+                    <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
+                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
+                                 onReorder={handleModReorder} onSelectAll={handleSelectAll} onClearAll={handleClearAll}
+                                 itemsLabel="mods" showFilter withControls
+                                 onConfirm={handlePresetConfirm} onCancel={handlePresetModalCancelled}
                     />
                 </Box>
             </Modal>

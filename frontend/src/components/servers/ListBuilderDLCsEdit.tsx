@@ -32,9 +32,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
         if (!isOpen || !serverData || dlcsLoading) return;
         const activeDLCs: CreatorDlcDto[] = (serverData as Arma3ServerDto).activeDLCs ?? [];
         setSelectedDLCs(activeDLCs);
-        setAvailableDLCs(
-            dlcsData.filter(dlc => !activeDLCs.find(d => d.id === dlc.id))
-        );
+        setAvailableDLCs(dlcsData.filter(dlc => !activeDLCs.find(d => d.id === dlc.id)));
     }, [isOpen, serverData, dlcsLoading]);
 
     function handleManageDLCsButtonClick() {
@@ -50,6 +48,20 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
     function handleDLCDeselect(option: CreatorDlcDto) {
         setSelectedDLCs(prev => prev.filter(item => item !== option));
         setAvailableDLCs(prev => [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+    }
+
+    function handleDLCReorder(items: CreatorDlcDto[]) {
+        setSelectedDLCs(items);
+    }
+
+    function handleSelectAll() {
+        setSelectedDLCs(prev => [...prev, ...availableDLCs].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setAvailableDLCs([]);
+    }
+
+    function handleClearAll() {
+        setAvailableDLCs(prev => [...prev, ...selectedDLCs].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setSelectedDLCs([]);
     }
 
     async function handleConfirm() {
@@ -85,7 +97,8 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
                 <Box>
                     <ListBuilder selectedOptions={selectedDLCs} availableOptions={availableDLCs}
                                  onSelect={handleDLCSelect} onDeselect={handleDLCDeselect}
-                                 itemsLabel="DLCs" withControls
+                                 onReorder={handleDLCReorder} onSelectAll={handleSelectAll} onClearAll={handleClearAll}
+                                 itemsLabel="DLCs" withControls showFilter
                                  onConfirm={handleConfirm} onCancel={handleClose}
                                  confirmDisabled={serverRunning}
                     />
