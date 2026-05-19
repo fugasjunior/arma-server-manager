@@ -1,25 +1,18 @@
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useState} from "react";
 import {scenariosApi} from "../api/client";
 import {downloadScenario} from "../api/downloads";
-import {Arma3ScenarioDto} from "../api/generated";
 import {toast} from "react-toastify";
 import {ScenariosTable} from "../components/scenarios/ScenariosTable";
+import {useArma3Scenarios} from "../hooks/queries/useArma3Scenarios";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../api/queryKeys";
 
 const ScenariosPage = () => {
-    const [scenarios, setScenarios] = useState<Array<Arma3ScenarioDto>>([]);
+    const queryClient = useQueryClient();
+    const {data: scenarios = []} = useArma3Scenarios();
     const [selected, setSelected] = useState<Array<string>>([]);
     const [uploadInProgress, setUploadInProgress] = useState(false);
     const [percentUploaded, setPercentUploaded] = useState(0);
-
-    useEffect(() => {
-        refreshScenarios();
-    }, []);
-
-    const refreshScenarios = async () => {
-        const {data: scenariosDto} = await scenariosApi.getArma3Scenarios();
-        const scenarios = scenariosDto.scenarios ?? [];
-        setScenarios(scenarios);
-    };
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -29,10 +22,9 @@ const ScenariosPage = () => {
 
         try {
             setUploadInProgress(true);
-
             await scenariosApi.uploadScenarios({file: Array.from(e.target.files)});
-            await refreshScenarios();
             toast.success("Scenarios successfully uploaded");
+            await queryClient.invalidateQueries({queryKey: queryKeys.arma3Scenarios});
         } catch (ex: any) {
             console.error(ex);
             toast.error(ex.response.data);
@@ -53,21 +45,17 @@ const ScenariosPage = () => {
 
     const handleDelete = async () => {
         try {
-            setScenarios(prevState => {
-                    return prevState.filter(scenario => selected.indexOf(scenario.name ?? "") === -1)
-                }
-            );
-
             for (const scenario of selected) {
                 await scenariosApi.deleteScenario({name: scenario});
             }
             toast.success("Scenario(s) deleted successfully");
             setSelected([]);
+            await queryClient.invalidateQueries({queryKey: queryKeys.arma3Scenarios});
         } catch (e) {
             console.error(e);
             toast.error("Error deleting scenarios");
         }
-    }
+    };
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
@@ -108,7 +96,7 @@ const ScenariosPage = () => {
                         percentUploaded={percentUploaded} uploadInProgress={uploadInProgress}
                         onDownloadClicked={handleDownload}
         />
-    )
-}
+    );
+};
 
 export default ScenariosPage;

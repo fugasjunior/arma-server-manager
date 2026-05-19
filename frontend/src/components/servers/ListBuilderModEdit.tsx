@@ -1,11 +1,16 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal, SelectChangeEvent} from "@mui/material";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
-import {serversApi, modsApi, modPresetsApi} from "../../api/client";
+import {serversApi} from "../../api/client";
 import {PresetResponseDto, ServerDto, ServerInstanceInfoDto, ServerType, ServerWorkshopModDto} from "../../api/generated";
 import {Arma3ServerDto, DayZServerDto} from "../../api/serverModels";
 import {toast} from "react-toastify";
 import MemoryIcon from "@mui/icons-material/Memory";
+import {useServer} from "../../hooks/queries/useServer";
+import {useMods} from "../../hooks/queries/useMods";
+import {usePresets} from "../../hooks/queries/usePresets";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
 
 type ListBuilderModEditProps = {
     server: ServerDto
@@ -13,69 +18,60 @@ type ListBuilderModEditProps = {
 }
 
 const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
-    const [server, setServer] = useState<ServerDto>();
+    const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
     const [availableMods, setAvailableMods] = useState<Array<ServerWorkshopModDto>>([]);
     const [selectedMods, setSelectedMods] = useState<Array<ServerWorkshopModDto>>([]);
-    const [presets, setPresets] = useState<Array<PresetResponseDto>>([]);
     const [selectedPreset, setSelectedPreset] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+
+    const serverType = props.server.type as ServerType;
+
+    const {data: serverData, isLoading: serverLoading} = useServer(props.server.id, {enabled: isOpen});
+    const {data: modsData = [], isLoading: modsLoading} = useMods(serverType, {enabled: isOpen});
+    const {data: presetsData = [], isLoading: presetsLoading} = usePresets(serverType, {enabled: isOpen});
+
+    const isLoading = isOpen && (serverLoading || modsLoading || presetsLoading);
+
+    useEffect(() => {
+        if (!isOpen || !serverData || modsLoading || presetsLoading) return;
+        const activeMods: ServerWorkshopModDto[] = (serverData as Arma3ServerDto | DayZServerDto).activeMods ?? [];
+        setSelectedMods(activeMods);
+        setAvailableMods(
+            (modsData as unknown as ServerWorkshopModDto[])
+                .filter(mod => !activeMods.find(m => m.id === mod.id))
+                .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+        );
+        setSelectedPreset("");
+    }, [isOpen, serverData, modsLoading, presetsLoading]);
 
     const serverRunning = props.status != null && props.status.alive;
 
-    async function handleManageModsButtonClick() {
+    function handleManageModsButtonClick() {
         if (props.server.id === undefined) {
             return;
         }
-
-        setIsLoading(true);
-        setIsOpen(false);
-        try {
-            const {data: presetsDto} = await modPresetsApi.getPresets({filter: props.server.type as ServerType});
-            const {data: serverDto} = await serversApi.getServer({id: props.server.id});
-            const {data: modsDto} = await modsApi.getMods({filter: props.server.type as ServerType});
-            setPresets(presetsDto.presets ?? []);
-            setServer(serverDto);
-            setSelectedMods((serverDto as Arma3ServerDto | DayZServerDto).activeMods ?? []);
-            setAvailableMods((modsDto.workshopMods ?? []).filter((mod: ServerWorkshopModDto) => !((serverDto as Arma3ServerDto | DayZServerDto).activeMods ?? [])
-                .find((searchedMod: ServerWorkshopModDto) => searchedMod.id === mod.id))
-                .sort((a: ServerWorkshopModDto, b: ServerWorkshopModDto) => (a.name ?? "").localeCompare(b.name ?? "")));
-            setSelectedPreset("");
-            setIsOpen(true);
-        } catch (e: any) {
-            console.error(e);
-            toast.error(e.response.data || "Could not load server data");
-        }
-        setIsLoading(false);
+        setIsOpen(true);
     }
 
     function handleModSelect(option: ServerWorkshopModDto) {
         setSelectedPreset("");
-
-        setAvailableMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setSelectedMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
-        });
+        setAvailableMods((prevState) => prevState.filter(item => item !== option));
+        setSelectedMods((prevState) =>
+            [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+        );
     }
 
     function handleModDeselect(option: ServerWorkshopModDto) {
         setSelectedPreset("");
-
-        setSelectedMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setAvailableMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
-        });
+        setSelectedMods((prevState) => prevState.filter(item => item !== option));
+        setAvailableMods((prevState) =>
+            [option, ...prevState].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+        );
     }
 
     function handlePresetChange(e: SelectChangeEvent) {
         const presetId = Number(e.target.value);
-        const preset = presets.find(preset => preset.id === presetId);
+        const preset = presetsData.find((preset: PresetResponseDto) => preset.id === presetId);
         if (!preset) {
             return;
         }
@@ -88,7 +84,6 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
                 continue;
             }
             const index = newAvailableMods.indexOf(selectedMod);
-            console.log(mod, selectedMod);
             newSelectedMods.push(selectedMod);
             newAvailableMods.splice(index, 1);
         }
@@ -105,11 +100,15 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
 
         setIsOpen(false);
         try {
-            await serversApi.updateServer({id: props.server.id, serverDto: {...server, activeMods: selectedMods} as unknown as ServerDto});
+            await serversApi.updateServer({
+                id: props.server.id,
+                serverDto: {...serverData, activeMods: selectedMods} as unknown as ServerDto
+            });
             toast.success("Mods successfully set");
+            await queryClient.invalidateQueries({queryKey: queryKeys.servers});
         } catch (e: any) {
             console.error(e);
-            toast.error(e.data.response || "Failed to update the server");
+            toast.error(e.data?.response || "Failed to update the server");
         }
     }
 
@@ -125,11 +124,11 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
             <Button id="manage-mods-btn" onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="contained">
                 Mods
             </Button>
-            <Modal open={isOpen} onClose={handleClose}>
+            <Modal open={isOpen && !isLoading} onClose={handleClose}>
                 <Box>
                     <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
                                  onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                 itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presets}
+                                 itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presetsData}
                                  onPresetChange={handlePresetChange} withControls
                                  onConfirm={handleConfirm} onCancel={handleClose}
                                  confirmDisabled={serverRunning}
@@ -137,7 +136,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
                 </Box>
             </Modal>
         </>
-    )
-}
+    );
+};
 
 export default ListBuilderModEdit;

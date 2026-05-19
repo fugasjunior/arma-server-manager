@@ -1,5 +1,6 @@
 import {createContext, useState} from "react";
 import {setJwt} from "../api/client";
+import {useQueryClient} from "@tanstack/react-query";
 
 interface AuthContextType {
     token: string | null,
@@ -22,6 +23,7 @@ export const AuthContextProvider = (props: any) => {
         initialToken = tokenData.storedToken;
     }
     const [token, setToken] = useState<string | null>(initialToken);
+    const queryClient = useQueryClient();
     if (token) {
         setJwt(token);
     }
@@ -39,6 +41,7 @@ export const AuthContextProvider = (props: any) => {
         setToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('expirationTime');
+        queryClient.clear();
     };
 
     const contextValue: AuthContextType = {

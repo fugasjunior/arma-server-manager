@@ -23,16 +23,21 @@ import ListBuilder from "../../UI/ListBuilder/ListBuilder";
 import TableGhosts from "../../UI/TableSkeletons";
 import Tooltip from "@mui/material/Tooltip";
 import UploadIcon from '@mui/icons-material/Upload';
-import {ModDto, PresetResponseDto, PresetResponseModDto, ServerType} from "../../api/generated";
-import {modPresetsApi, modsApi, armaLauncherPresetApi} from "../../api/client";
+import {PresetResponseDto, PresetResponseModDto, ServerType} from "../../api/generated";
+import {modPresetsApi, armaLauncherPresetApi} from "../../api/client";
 import {downloadExportedPreset} from "../../api/downloads";
 import ImportPresetDialog from "./ImportPresetDialog";
 import RenamePresetDialog from "./RenamePresetDialog";
+import {usePresets} from "../../hooks/queries/usePresets";
+import {useMods} from "../../hooks/queries/useMods";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
 
 export default function PresetsManagement() {
-    const [initialLoading, setInitialLoading] = useState(true);
-    const [presets, setPresets] = useState<Array<PresetResponseDto>>([]);
-    const [editedPreset, setEditedPreset] = useState<PresetResponseDto | null>();
+    const queryClient = useQueryClient();
+    const {data: presets = [], isLoading: initialLoading} = usePresets();
+
+    const [editedPreset, setEditedPreset] = useState<PresetResponseDto | null>(null);
     const [presetModalOpen, setPresetModalOpen] = useState(false);
     const [selectedMods, setSelectedMods] = useState<Array<PresetResponseModDto>>([]);
     const [availableMods, setAvailableMods] = useState<Array<PresetResponseModDto>>([]);
@@ -43,15 +48,19 @@ export default function PresetsManagement() {
     const [renamePresetId, setRenamePresetId] = useState<number | null>(null);
     const [menuAnchor, setMenuAnchor] = useState<{el: HTMLElement, presetId: number} | null>(null);
 
-    useEffect(() => {
-        async function fetchPresets() {
-            const {data: presetsDto} = await modPresetsApi.getPresets();
-            setPresets(presetsDto.presets ?? []);
-            setInitialLoading(false);
-        }
+    const {data: modsForEdit = [], isSuccess: modsForEditLoaded} = useMods(
+        editedPreset?.type as ServerType | undefined,
+        {enabled: !!editedPreset}
+    );
 
-        fetchPresets();
-    }, []);
+    useEffect(() => {
+        if (!editedPreset || !modsForEditLoaded) return;
+        const available = (modsForEdit as unknown as PresetResponseModDto[])
+            .filter(mod => !(editedPreset.mods ?? []).find(m => m.id === mod.id));
+        setSelectedMods(editedPreset.mods ?? []);
+        setAvailableMods(available);
+        setPresetModalOpen(true);
+    }, [editedPreset?.id, modsForEditLoaded]);
 
     async function handleDelete(id: number) {
         const deletedPreset = presets.find(preset => preset.id === id);
@@ -59,32 +68,22 @@ export default function PresetsManagement() {
             return;
         }
 
-        setPresets(prevState => [...prevState].filter(preset => preset !== deletedPreset));
-
         try {
             await modPresetsApi.deletePreset({id});
             toast.success(`Preset '${deletedPreset.name}' successfully deleted`);
+            await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
         } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not delete preset");
-            setPresets(prevState => [...prevState, deletedPreset]);
         }
     }
 
-
     function getSortedPresets() {
-        return presets.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+        return [...presets].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
     }
 
-    async function handleOpenEdit(preset: PresetResponseDto) {
-        const {data: modsDto} = await modsApi.getMods({filter: preset.type as ServerType});
-        let available = modsDto.workshopMods ?? [];
-        available = available.filter((mod: ModDto) => !(preset.mods ?? []).find(searchedMod => searchedMod.id === mod.id))
-
+    function handleOpenEdit(preset: PresetResponseDto) {
         setEditedPreset(preset);
-        setSelectedMods(preset.mods ?? []);
-        setAvailableMods(available);
-        setPresetModalOpen(true);
     }
 
     async function handlePresetModalClosed() {
@@ -95,19 +94,15 @@ export default function PresetsManagement() {
         const request = {
             name: editedPreset.name!,
             mods: selectedMods.map(mod => mod.id!)
-        }
+        };
 
         if (selectedMods.length === 0) {
             await handleDelete(editedPreset.id);
         } else {
             try {
-                const {data: savedPreset} = await modPresetsApi.updatePreset({id: editedPreset.id, updatePresetRequestDto: request});
-                setPresets(prevState => {
-                    const newState = [...prevState];
-                    const oldPreset = newState.find(preset => preset.id === savedPreset.id);
-                    return [...newState.filter(preset => preset !== oldPreset), savedPreset];
-                });
-                toast.success(`Preset '${savedPreset.name}' successfully updated`);
+                await modPresetsApi.updatePreset({id: editedPreset.id, updatePresetRequestDto: request});
+                toast.success(`Preset '${editedPreset.name}' successfully updated`);
+                await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
             } catch (e: any) {
                 console.error(e);
                 toast.error(e.response.data || "Could not update preset");
@@ -156,9 +151,9 @@ export default function PresetsManagement() {
             setIsUploadInProgress(true);
             setImportDialogOpen(false);
             const {data: importedPreset} = await armaLauncherPresetApi.importLauncherPreset({preset: importFile, name});
-            setPresets(prevState => [...prevState, importedPreset]);
             setIsUploadInProgress(false);
             toast.success(`Preset '${importedPreset.name}' successfully imported`);
+            await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
         } catch (e: any) {
             setIsUploadInProgress(false);
             console.error(e);
@@ -182,14 +177,10 @@ export default function PresetsManagement() {
                 id: renamePresetId,
                 renamePresetRequestDto: {name}
             });
-            setPresets(prevState => {
-                const updated = [...prevState];
-                const old = updated.find(p => p.id === renamedPreset.id);
-                return [...updated.filter(p => p !== old), renamedPreset];
-            });
             setRenameDialogOpen(false);
             setRenamePresetId(null);
             toast.success(`Preset successfully renamed to '${renamedPreset.name}'`);
+            await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
         } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not rename preset");
@@ -359,5 +350,5 @@ export default function PresetsManagement() {
                 </MenuItem>
             </Menu>
         </>
-    )
+    );
 }

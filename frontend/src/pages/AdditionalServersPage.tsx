@@ -1,5 +1,3 @@
-import {useEffect, useState} from "react";
-import {useInterval} from "../hooks/use-interval";
 import {Avatar, Button, Divider, Stack, Typography} from "@mui/material";
 import {additionalServersApi} from "../api/client";
 import {AdditionalServerDto} from "../api/generated";
@@ -7,48 +5,28 @@ import Paper from "@mui/material/Paper";
 import config from "../config";
 import TableSkeletons from "../UI/TableSkeletons";
 import CircularProgress from "@mui/material/CircularProgress";
+import {useAdditionalServers} from "../hooks/queries/useAdditionalServers";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../api/queryKeys";
 
 const AdditionalServersPage = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [additionalServers, setAdditionalServers] = useState<Array<AdditionalServerDto>>([]);
-
-    useEffect(() => {
-        fetchAdditionalServers();
-    }, [])
-
-    useInterval(async () => {
-        fetchAdditionalServers();
-    }, 2000);
-
-    const fetchAdditionalServers = async () => {
-        const {data: servers} = await additionalServersApi.getAdditionalServers();
-        setAdditionalServers(servers.servers ?? []);
-        setIsLoading(false);
-    }
+    const queryClient = useQueryClient();
+    const {data: additionalServers = [], isLoading} = useAdditionalServers();
 
     const handleStart = async (id: number) => {
-        await additionalServersApi.startAdditionalServer({serverId: id as number});
-        setAdditionalServers(prevState => {
-            const newServers = [...prevState];
-            const server = newServers.find(server => server.id === id);
-            if (server) {
-                server.alive = true;
-            }
-            return newServers;
-        })
+        queryClient.setQueryData(queryKeys.additionalServers, (old: AdditionalServerDto[] = []) =>
+            old.map(s => s.id === id ? {...s, alive: true} : s)
+        );
+        await additionalServersApi.startAdditionalServer({serverId: id});
+        await queryClient.invalidateQueries({queryKey: queryKeys.additionalServers});
     };
 
     const handleStop = async (id: number) => {
-        await additionalServersApi.stopAdditionalServer({serverId: id as number});
-        setAdditionalServers(prevState => {
-            const newServers = [...prevState];
-            const server = newServers.find(server => server.id === id);
-            if (server) {
-                server.alive = false;
-                server.startedAt = undefined;
-            }
-            return newServers;
-        })
+        queryClient.setQueryData(queryKeys.additionalServers, (old: AdditionalServerDto[] = []) =>
+            old.map(s => s.id === id ? {...s, alive: false, startedAt: undefined} : s)
+        );
+        await additionalServersApi.stopAdditionalServer({serverId: id});
+        await queryClient.invalidateQueries({queryKey: queryKeys.additionalServers});
     };
 
     return (
@@ -94,7 +72,7 @@ const AdditionalServersPage = () => {
             </Paper>
             }
         </>
-    )
-}
+    );
+};
 
 export default AdditionalServersPage;

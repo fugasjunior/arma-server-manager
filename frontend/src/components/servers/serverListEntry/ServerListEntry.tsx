@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import {ServerDto, ServerInstanceInfoDto} from "../../../api/generated";
+import {ServerDto} from "../../../api/generated";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import {useState} from "react";
@@ -13,10 +13,10 @@ import {ServerListEntryDetails} from "./ServerListEntryDetails.tsx";
 import {ServerStatusDetails} from "./ServerStatusDetails.tsx";
 import {ServerHeader} from "./ServerHeader.tsx";
 import {SeverControls} from "./SeverControls.tsx";
+import {useServerStatus} from "../../../hooks/queries/useServerStatus.ts";
 
 type ServerListEntryProps = {
     server: ServerDto,
-    status: ServerInstanceInfoDto | null,
     serverWithSamePortRunning: boolean,
     onStartServer: (id: number) => void,
     onStopServer: (id: number) => void,
@@ -30,7 +30,6 @@ type ServerListEntryProps = {
 const ServerListEntry = (props: ServerListEntryProps) => {
     const {
         server,
-        status,
         onStartServer,
         onStopServer,
         onRestartServer,
@@ -39,6 +38,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
         serverWithSamePortRunning,
     } = props;
 
+    const {data: status = null} = useServerStatus(server.id);
     const [isExpanded, setExpanded] = useState(false);
 
     if (server.id === undefined) {
@@ -97,6 +97,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                 <TableCell colSpan={5}>
                     <ServerListEntryDetails server={server} serverStatus={status} onDuplicateServer={onDuplicateServer}
                                             onClick={() => props.onOpenLogs(server.id as number)}
+                                            onTargetHcChanged={props.onTargetHcChanged}
                     />
                 </TableCell>
             </TableRow>}

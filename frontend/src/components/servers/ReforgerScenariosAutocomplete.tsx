@@ -1,8 +1,8 @@
 import {ReforgerScenarioDto} from "../../api/generated";
-import {scenariosApi} from "../../api/client";
 import {Autocomplete, AutocompleteValue, Box, TextField} from "@mui/material";
-import React, {SyntheticEvent, useEffect, useState} from "react";
+import React, {SyntheticEvent} from "react";
 import {useController} from "react-hook-form";
+import {useReforgerScenarios} from "../../hooks/queries/useReforgerScenarios";
 
 type ReforgerScenariosAutocompleteProps = {
     onChange: (_: SyntheticEvent | null, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
@@ -10,16 +10,8 @@ type ReforgerScenariosAutocompleteProps = {
 
 export function ReforgerScenariosAutocomplete({onChange}: ReforgerScenariosAutocompleteProps) {
     const {field, fieldState} = useController({name: 'scenarioId'});
-    const [scenarios, setScenarios] = useState<Array<ReforgerScenarioDto>>([]);
+    const {data: scenarios = []} = useReforgerScenarios();
 
-    useEffect(() => {
-        const fetchScenarios = async () => {
-            const {data: scenariosDto} = await scenariosApi.getReforgerScenarios();
-            setScenarios(scenariosDto.scenarios ?? []);
-        };
-
-        fetchScenarios();
-    }, []);
     const getScenarioDisplayName = (scenario: ReforgerScenarioDto) => {
         if (scenario.name) {
             return `${scenario.name} (${scenario.value})`;

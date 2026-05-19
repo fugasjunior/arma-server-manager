@@ -1,98 +1,55 @@
-import {useEffect, useState} from "react";
 import {Grid, SelectChangeEvent} from "@mui/material";
-import {useInterval} from "../../hooks/use-interval";
-import {serverInstallationApi, steamCmdApi} from "../../api/client";
-import {InstallationBranch, InstallationStatus, ServerInstallationDto, ServerType, SteamCmdItemInfoDto} from "../../api/generated";
+import {serverInstallationApi} from "../../api/client";
+import {InstallationBranch, InstallationStatus, ServerInstallationDto, ServerType} from "../../api/generated";
 import ServerInstallationItem from "./ServerInstallationItem";
-
-type WorkshopItemInfoResponse = {
-    [id: number]: SteamCmdItemInfoDto
-}
+import {useServerInstallations} from "../../hooks/queries/useServerInstallations";
+import {useSteamCmdItemInfos} from "../../hooks/queries/useSteamCmdItemInfos";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
 
 const ServerInstallations = () => {
-    const [serverInstallations, setServerInstallations] = useState<Array<ServerInstallationDto>>([]);
-    const [steamCmdItemInfo, setSteamCmdItemInfo] = useState<WorkshopItemInfoResponse>({});
-
-    useEffect(() => {
-        void fetchServerInstallations();
-        void fetchSteamCmdItemInfo();
-    }, []);
-
-    useInterval(() => {
-        void fetchServerInstallations();
-        void fetchSteamCmdItemInfo();
-    }, 5000);
-
-    const fetchServerInstallations = async () => {
-        const {data: serverInstallationsDto} = await serverInstallationApi.getServerInstallations();
-        const installations = (serverInstallationsDto.serverInstallations ?? [])
-            .sort((a: ServerInstallationDto, b: ServerInstallationDto) => (a.type ?? "").localeCompare(b.type ?? ""));
-        setServerInstallations(installations);
-    };
-
-    const fetchSteamCmdItemInfo = async () => {
-        const {data} = await steamCmdApi.getSteamCmdItemInfos();
-        setSteamCmdItemInfo(data);
-    };
+    const queryClient = useQueryClient();
+    const {data: serverInstallations = []} = useServerInstallations({refetchInterval: 5000});
+    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000});
 
     const handleUpdateClicked = async (serverType: ServerType) => {
-        await serverInstallationApi.installServer({type: serverType});
-
-        setSteamCmdItemInfo(prevState => {
-            const newState = {...prevState};
-            delete newState[serverTypeToId(serverType)];
-            return newState;
-        })
-
-        setServerInstallations(prevState => {
-            const newState = [...prevState];
-            const installation = newState.find(i => i.type === serverType);
-            if (!installation) {
-                return prevState;
-            }
-
-            installation.installationStatus = InstallationStatus.InstallationInProgress;
-            installation.errorStatus = undefined;
-            return newState;
+        queryClient.setQueryData(queryKeys.serverInstallations, (old: ServerInstallationDto[] = []) =>
+            old.map(i => i.type === serverType
+                ? {...i, installationStatus: InstallationStatus.InstallationInProgress, errorStatus: undefined}
+                : i
+            )
+        );
+        queryClient.setQueryData(queryKeys.steamCmdItemInfos, (old: Record<string, unknown> = {}) => {
+            const updated = {...old};
+            delete updated[serverTypeToId(serverType)];
+            return updated;
         });
+        await serverInstallationApi.installServer({type: serverType});
+        await queryClient.invalidateQueries({queryKey: queryKeys.serverInstallations});
     };
 
     const handleUninstallConfirmed = async (serverType: ServerType) => {
         await serverInstallationApi.uninstallServer({type: serverType});
-        await fetchServerInstallations();
+        await queryClient.invalidateQueries({queryKey: queryKeys.serverInstallations});
     };
 
     const handleBranchChanged = async (e: SelectChangeEvent, serverType: ServerType) => {
-        const selectedBranch = e.target.value;
-
-        setServerInstallations(prevState => {
-            const newState = [...prevState];
-            const installation = newState.find(i => i.type === serverType);
-            if (!installation) {
-                return prevState;
-            }
-
-            installation.branch = selectedBranch as InstallationBranch;
-            return newState;
-        });
-
-        await serverInstallationApi.setActiveBranch({type: serverType, activeBranchDto: {branch: selectedBranch as InstallationBranch}});
+        const selectedBranch = e.target.value as InstallationBranch;
+        queryClient.setQueryData(queryKeys.serverInstallations, (old: ServerInstallationDto[] = []) =>
+            old.map(i => i.type === serverType ? {...i, branch: selectedBranch} : i)
+        );
+        await serverInstallationApi.setActiveBranch({type: serverType, activeBranchDto: {branch: selectedBranch}});
     };
 
     const serverTypeToId = (type: ServerType): number => {
         switch (type) {
-            case ServerType.Arma3:
-                return 233780;
-            case ServerType.Reforger:
-                return 1874900;
-            case ServerType.Dayz:
-                return 223350;
-            case ServerType.DayzExp:
-                return 1042420;
-            default:
-                return 0;
+            case ServerType.Arma3: return 233780;
+            case ServerType.Reforger: return 1874900;
+            case ServerType.Dayz: return 223350;
+            case ServerType.DayzExp: return 1042420;
+            default: return 0;
         }
-    }
+    };
 
     return (
         <>

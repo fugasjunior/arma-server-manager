@@ -1,6 +1,8 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {serversApi} from "../api/client";
 import {toast} from "react-toastify";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../api/queryKeys";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
@@ -13,6 +15,7 @@ import {ServerType} from "../api/generated";
 const NewServerPage = () => {
     const {type} = useParams<{ type: string }>();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     type FixMeLater = any;
 
@@ -27,6 +30,7 @@ const NewServerPage = () => {
         try {
             await serversApi.createServer({serverDto: server});
             toast.success("Server successfully created");
+            await queryClient.invalidateQueries({queryKey: queryKeys.servers});
             navigate("/servers");
         } catch (e) {
             console.error(e);
