@@ -3,17 +3,20 @@ package cz.forgottenempire.servermanager.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static cz.forgottenempire.servermanager.security.SecurityConstants.*;
 
@@ -46,19 +49,25 @@ class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return null;
         }
 
-        String user;
+        DecodedJWT decoded;
         try {
-            user = JWT.require(Algorithm.HMAC512(secret.getBytes()))
+            decoded = JWT.require(Algorithm.HMAC512(secret.getBytes()))
                     .build()
-                    .verify(token.replace(TOKEN_PREFIX, ""))
-                    .getSubject();
+                    .verify(token.replace(TOKEN_PREFIX, ""));
         } catch (JWTVerificationException e) {
             return null;
         }
 
-        if (user != null) {
-            return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+        String username = decoded.getSubject();
+        if (username == null) {
+            return null;
         }
-        return null;
+
+        List<SimpleGrantedAuthority> authorities = decoded.getClaim("perms").asList(String.class)
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+        return new UsernamePasswordAuthenticationToken(username, null, authorities);
     }
 }

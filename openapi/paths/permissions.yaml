@@ -1,0 +1,14 @@
+/permissions:
+  get:
+    tags: [Permissions]
+    operationId: getPermissions
+    summary: List all available permission codes
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../components/schemas/user-management.yaml#/PermissionDto'

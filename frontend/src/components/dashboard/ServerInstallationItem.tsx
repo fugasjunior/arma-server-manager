@@ -34,6 +34,8 @@ import {ErrorStatus, ServerInstallationDto, ServerType, SteamCmdItemInfoDto, Ste
 import {ServerBranchSelect} from "./ServerBranchSelect.tsx";
 import {humanFileSize} from "../../util/util.ts";
 import React, {useState} from "react";
+import PermissionGuard from "../auth/PermissionGuard";
+import {usePermission} from "../../hooks/usePermission";
 
 const SERVER_IMAGE_URLS = new Map<ServerType, string>([
     [ServerType.Arma3, arma3Logo],
@@ -56,6 +58,8 @@ type ServerInstallationItemProps = {
 
 const ServerInstallationItem = (props: ServerInstallationItemProps) => {
     const {installation, steamCmdItemInfo, onUpdateClicked, onBranchChanged, onUninstallConfirmed} = props;
+
+    const canInstallManage = usePermission("INSTALL_MANAGE");
 
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -110,6 +114,8 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
             </Button>
         }
 
+        if (!canInstallManage) return null;
+
         return <Button fullWidth variant="contained"
                        data-testid={`install-update-btn-${installation.type}`}
                        onClick={() => onUpdateClicked(installation.type! as ServerType)}
@@ -149,16 +155,18 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                             <ServerBranchSelect installation={installation}
                                                 onChange={(e) => onBranchChanged(e, installation.type!)}/>
                         }
-                        {isInstalled && (
-                            <IconButton
-                                size="small"
-                                onClick={handleMenuOpen}
-                                data-testid={`install-menu-btn-${installation.type}`}
-                                aria-label="More options"
-                            >
-                                <MoreVertIcon/>
-                            </IconButton>
-                        )}
+                        <PermissionGuard permission="INSTALL_MANAGE">
+                            {isInstalled && (
+                                <IconButton
+                                    size="small"
+                                    onClick={handleMenuOpen}
+                                    data-testid={`install-menu-btn-${installation.type}`}
+                                    aria-label="More options"
+                                >
+                                    <MoreVertIcon/>
+                                </IconButton>
+                            )}
+                        </PermissionGuard>
                     </Stack>
                 </Stack>
 
@@ -183,42 +191,46 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                     getProgressBar()
                 }
             </CardContent>
-            <CardActions data-testid={`install-status-${installation.type}`}>
-                {getActionButton()}
-            </CardActions>
+            {(isInstalling(installation) || canInstallManage) && (
+                <CardActions data-testid={`install-status-${installation.type}`}>
+                    {getActionButton()}
+                </CardActions>
+            )}
         </Card>
 
-        <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
-            <MenuItem
-                onClick={handleUninstallClick}
-                disabled={isInstalling(installation)}
-                data-testid={`uninstall-btn-${installation.type}`}
-            >
-                <ListItemIcon><DeleteForeverIcon color="error"/></ListItemIcon>
-                <ListItemText slotProps={{primary: {color: "error"}}}>Uninstall</ListItemText>
-            </MenuItem>
-        </Menu>
-
-        <Dialog open={confirmOpen} onClose={handleConfirmClose}>
-            <DialogTitle>Uninstall {SERVER_NAMES.get(installation.type!)}?</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    This will permanently delete all server files including scenarios, custom profiles, and
-                    save files. This cannot be undone.
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleConfirmClose}>Cancel</Button>
-                <Button
-                    onClick={handleConfirmUninstall}
-                    color="error"
-                    variant="contained"
-                    data-testid={`uninstall-confirm-${installation.type}`}
+        <PermissionGuard permission="INSTALL_MANAGE">
+            <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
+                <MenuItem
+                    onClick={handleUninstallClick}
+                    disabled={isInstalling(installation)}
+                    data-testid={`uninstall-btn-${installation.type}`}
                 >
-                    Uninstall
-                </Button>
-            </DialogActions>
-        </Dialog>
+                    <ListItemIcon><DeleteForeverIcon color="error"/></ListItemIcon>
+                    <ListItemText slotProps={{primary: {color: "error"}}}>Uninstall</ListItemText>
+                </MenuItem>
+            </Menu>
+
+            <Dialog open={confirmOpen} onClose={handleConfirmClose}>
+                <DialogTitle>Uninstall {SERVER_NAMES.get(installation.type!)}?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        This will permanently delete all server files including scenarios, custom profiles, and
+                        save files. This cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmClose}>Cancel</Button>
+                    <Button
+                        onClick={handleConfirmUninstall}
+                        color="error"
+                        variant="contained"
+                        data-testid={`uninstall-confirm-${installation.type}`}
+                    >
+                        Uninstall
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </PermissionGuard>
         </>
     );
 };

@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.modpreset;
 import cz.forgottenempire.servermanager.api.ArmaLauncherPresetApi;
 import cz.forgottenempire.servermanager.api.model.PresetResponseDto;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +42,7 @@ class ArmaLauncherPresetController implements ArmaLauncherPresetApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_VIEW + "')")
     public ResponseEntity<Resource> downloadLauncherPreset(Long id) {
         ModPreset modPreset = modPresetsService.getModPreset(id)
                 .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
@@ -58,6 +61,7 @@ class ArmaLauncherPresetController implements ArmaLauncherPresetApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<PresetResponseDto> importLauncherPreset(MultipartFile preset, String name) {
         if (preset == null) {
             return ResponseEntity.noContent().build();

@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import {HeadlessClientControls} from '../../../src/components/servers/serverListEntry/HeadlessClientControls.tsx';
 import {headlessClientApi} from '../../../src/api/client';
 import {ServerInstanceInfoDto} from '../../../src/api/generated';
+import renderWithPermissions from '../../helpers/renderWithPermissions';
 
 jest.mock('../../../src/api/client', () => ({
     headlessClientApi: {
@@ -52,45 +53,49 @@ test('renders only target count when server is not alive', () => {
 });
 
 test('minus button is disabled when target is zero', () => {
-    render(
+    renderWithPermissions(
         <HeadlessClientControls
             serverId={1}
             serverStatus={null}
             targetCount={0}
-        />
+        />,
+        ['SERVER_MODIFY']
     );
     expect(screen.getByRole('button', {name: /remove headless client/i})).toBeDisabled();
 });
 
 test('minus button is enabled when target is greater than zero', () => {
-    render(
+    renderWithPermissions(
         <HeadlessClientControls
             serverId={1}
             serverStatus={null}
             targetCount={1}
-        />
+        />,
+        ['SERVER_MODIFY']
     );
     expect(screen.getByRole('button', {name: /remove headless client/i})).toBeEnabled();
 });
 
 test('plus button is enabled when server is stopped', () => {
-    render(
+    renderWithPermissions(
         <HeadlessClientControls
             serverId={1}
             serverStatus={null}
             targetCount={0}
-        />
+        />,
+        ['SERVER_MODIFY']
     );
     expect(screen.getByRole('button', {name: /add headless client/i})).toBeEnabled();
 });
 
 test('plus button calls setHeadlessClientsTarget with target+1', async () => {
-    render(
+    renderWithPermissions(
         <HeadlessClientControls
             serverId={42}
             serverStatus={null}
             targetCount={2}
-        />
+        />,
+        ['SERVER_MODIFY']
     );
     fireEvent.click(screen.getByRole('button', {name: /add headless client/i}));
 
@@ -103,12 +108,13 @@ test('plus button calls setHeadlessClientsTarget with target+1', async () => {
 });
 
 test('minus button calls setHeadlessClientsTarget with target-1', async () => {
-    render(
+    renderWithPermissions(
         <HeadlessClientControls
             serverId={42}
             serverStatus={aliveStatus(2)}
             targetCount={2}
-        />
+        />,
+        ['SERVER_MODIFY']
     );
     fireEvent.click(screen.getByRole('button', {name: /remove headless client/i}));
 
@@ -123,12 +129,13 @@ test('minus button calls setHeadlessClientsTarget with target-1', async () => {
 test('reverts optimistic update on API failure', async () => {
     mockedApi.setHeadlessClientsTarget.mockRejectedValue(new Error('Network error'));
 
-    render(
+    renderWithPermissions(
         <HeadlessClientControls
             serverId={1}
             serverStatus={null}
             targetCount={2}
-        />
+        />,
+        ['SERVER_MODIFY']
     );
     fireEvent.click(screen.getByRole('button', {name: /add headless client/i}));
 

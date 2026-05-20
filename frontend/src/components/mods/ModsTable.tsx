@@ -1,4 +1,5 @@
 import {ChangeEvent, ReactNode, useState} from 'react';
+import PermissionGuard from "../auth/PermissionGuard";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
@@ -13,6 +14,7 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
 import SERVER_NAMES from "../../util/serverNames.ts";
 import {humanFileSize} from "../../util/util.ts";
+import {usePermission} from "../../hooks/usePermission.ts";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
@@ -70,6 +72,7 @@ type ModsTableProps = {
 
 const ModsTable = (props: ModsTableProps) => {
     const [enteredModId, setEnteredModId] = useState("");
+    const canModify = usePermission("MOD_MODIFY");
 
     const handleEnteredModIdChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -129,10 +132,13 @@ const ModsTable = (props: ModsTableProps) => {
                     {
                         id: "serverOnly",
                         value: "serverOnly",
-                        displayValue: <Switch
-                            checked={modDto.serverOnly}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => props.onServerOnlyChanged(e, modDto.id!)}/>
+                        displayValue: <span data-testid={`mod-server-only-switch-${modDto.id}`}>
+                            <Switch
+                                checked={modDto.serverOnly}
+                                disabled={!canModify}
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => props.onServerOnlyChanged(e, modDto.id!)}/>
+                        </span>
                     },
                     {
                         id: "lastUpdated",
@@ -171,15 +177,17 @@ const ModsTable = (props: ModsTableProps) => {
                                />}
 
                                customBottomControls={
-                                   <Stack direction="row" spacing={1}>
-                                       <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
-                                                  size="small" slotProps={{htmlInput: {"data-testid": "mod-install-input"}}}
-                                                  variant="filled" value={enteredModId}
-                                                  onChange={handleEnteredModIdChange}/>
-                                       <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
-                                               data-testid="mod-install-submit"
-                                               onClick={() => props.onModInstallClicked(Number(enteredModId))}>Install</Button>
-                                   </Stack>
+                                   <PermissionGuard permission="MOD_MODIFY">
+                                       <Stack direction="row" spacing={1}>
+                                           <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
+                                                      size="small" slotProps={{htmlInput: {"data-testid": "mod-install-input"}}}
+                                                      variant="filled" value={enteredModId}
+                                                      onChange={handleEnteredModIdChange}/>
+                                           <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
+                                                   data-testid="mod-install-submit"
+                                                   onClick={() => props.onModInstallClicked(Number(enteredModId))}>Install</Button>
+                                       </Stack>
+                                   </PermissionGuard>
                                }
                 />
             </Paper>

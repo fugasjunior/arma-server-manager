@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.api.SteamCmdApi;
 import cz.forgottenempire.servermanager.api.model.SteamCmdItemInfoDto;
 import cz.forgottenempire.servermanager.api.model.SteamCmdStatus;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
@@ -15,9 +16,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PreAuthorize("hasAuthority('" + PermissionCode.STEAM_AUTH_ADMIN + "')")
 public class SteamCmdController implements SteamCmdApi {
 
     private final SteamCmdItemInfoRepository itemInfoRepository;

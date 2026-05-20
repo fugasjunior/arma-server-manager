@@ -1,5 +1,5 @@
 import {ChangeEvent, useState} from "react";
-import {Button, IconButton, List, ListItem, ListItemButton, Stack, TextField, Typography} from "@mui/material";
+import {Button, IconButton, List, ListItem, ListItemButton, ListItemText, Stack, TextField, Typography} from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import styles from "./ListBuilder.module.css";
 import {ListBuilderElement} from "./ListBuilder.tsx";
@@ -57,7 +57,10 @@ function SortableItem<T extends ListBuilderElement>({item, typeLabel, itemsLabel
             <span className={styles.dragHandle} {...attributes} {...listeners}>
                 <DragIndicatorIcon fontSize="small" color="action"/>
             </span>
-            <Typography sx={{py: 1, px: 1, flexGrow: 1, userSelect: "none", fontSize: "inherit"}}>{item.name}</Typography>
+            <Stack sx={{py: 1, px: 1, flexGrow: 1, userSelect: "none"}}>
+                <Typography sx={{fontSize: "inherit"}}>{item.name}</Typography>
+                {item.subtitle && <Typography variant="caption" color="text.secondary">{item.subtitle}</Typography>}
+            </Stack>
         </ListItem>
     );
 }
@@ -86,8 +89,11 @@ export default function ListBuilderList<T extends ListBuilderElement>(props: Lis
 
     const filteredOptions: Array<T> = filter
         ? isSortable
-            ? props.selectedOptions.filter(o => o.name?.toLowerCase().includes(filter.toLowerCase()))
-            : new Fuse<T>(props.selectedOptions, {keys: ["name"]}).search(filter).map(o => o.item)
+            ? props.selectedOptions.filter(o =>
+                o.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                o.subtitle?.toLowerCase().includes(filter.toLowerCase())
+            )
+            : new Fuse<T>(props.selectedOptions, {keys: ["name", "subtitle"]}).search(filter).map(o => o.item)
         : props.selectedOptions;
 
     return (
@@ -138,7 +144,14 @@ export default function ListBuilderList<T extends ListBuilderElement>(props: Lis
                             key={opt.id}
                             onClick={() => props.onClickItem(opt)}
                             divider>
-                            {opt.name}
+                            {opt.subtitle ? (
+                                <ListItemText
+                                    primary={opt.name}
+                                    secondary={opt.subtitle}
+                                />
+                            ) : (
+                                opt.name
+                            )}
                         </ListItemButton>
                     ))
                 )}

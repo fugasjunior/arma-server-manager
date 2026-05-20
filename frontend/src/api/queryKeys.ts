@@ -13,4 +13,8 @@ export const queryKeys = {
     creatorDlcs: (filter?: ServerType) => ["creatorDlcs", filter ?? "all"] as const,
     arma3Scenarios: ["arma3Scenarios"] as const,
     reforgerScenarios: ["reforgerScenarios"] as const,
+    users: ["users"] as const,
+    user: (id: number) => ["users", id] as const,
+    roles: ["roles"] as const,
+    permissions: ["permissions"] as const,
 } as const;

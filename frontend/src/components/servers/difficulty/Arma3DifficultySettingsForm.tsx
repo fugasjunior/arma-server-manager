@@ -7,7 +7,11 @@ import {SwitchField} from "../../../UI/Form/SwitchField.tsx";
 import {BOOLEAN_FIELDS, FOUR_STATE_FLAG_FIELDS, THREE_STATE_FLAG_FIELDS} from "./fieldDefinitions.ts";
 import {FourStateFlagField} from "../../../UI/Form/FourStateFlagField.tsx";
 
-const Arma3DifficultySettingsForm = () => {
+interface Arma3DifficultySettingsFormProps {
+    canModify?: boolean
+}
+
+const Arma3DifficultySettingsForm = ({canModify}: Arma3DifficultySettingsFormProps) => {
     return <Accordion>
         <AccordionSummary
             expandIcon={<ExpandMoreIcon/>}
@@ -17,29 +21,32 @@ const Arma3DifficultySettingsForm = () => {
             <Typography>Custom difficulty settings</Typography>
         </AccordionSummary>
         <AccordionDetails>
-            <Grid container>
-                <Grid size={{xs: 12, md: 4}}>
-                    <FormGroup>
-                        {BOOLEAN_FIELDS.map(field =>
-                            <SwitchField key={field.name} name={field.name} label={field.label}/>
+            <fieldset disabled={!canModify}
+                      style={{border: "none", padding: 0, margin: 0, minInlineSize: "auto"}}>
+                <Grid container>
+                    <Grid size={{xs: 12, md: 4}}>
+                        <FormGroup>
+                            {BOOLEAN_FIELDS.map(field =>
+                                <SwitchField key={field.name} name={field.name} label={field.label}/>
+                            )}
+                        </FormGroup>
+                    </Grid>
+                    <Grid size={{xs: 12, md: 4}}>
+                        {THREE_STATE_FLAG_FIELDS.map((field, index) =>
+                            index < 4 && <ThreeStateFlagField key={field.name} {...field}/>
                         )}
-                    </FormGroup>
+                        <Arma3AiSkillSettings disabled={!canModify}/>
+                    </Grid>
+                    <Grid size={{xs: 12, md: 4}}>
+                        {THREE_STATE_FLAG_FIELDS.map((field, index) =>
+                            index >= 4 && <ThreeStateFlagField key={field.name} {...field}/>
+                        )}
+                        {FOUR_STATE_FLAG_FIELDS.map((field) =>
+                            <FourStateFlagField key={field.name} {...field}/>
+                        )}
+                    </Grid>
                 </Grid>
-                <Grid size={{xs: 12, md: 4}}>
-                    {THREE_STATE_FLAG_FIELDS.map((field, index) =>
-                        index < 4 && <ThreeStateFlagField key={field.name} {...field}/>
-                    )}
-                    <Arma3AiSkillSettings/>
-                </Grid>
-                <Grid size={{xs: 12, md: 4}}>
-                    {THREE_STATE_FLAG_FIELDS.map((field, index) =>
-                        index >= 4 && <ThreeStateFlagField key={field.name} {...field}/>
-                    )}
-                    {FOUR_STATE_FLAG_FIELDS.map((field) =>
-                        <FourStateFlagField key={field.name} {...field}/>
-                    )}
-                </Grid>
-            </Grid>
+            </fieldset>
         </AccordionDetails>
     </Accordion>
 }

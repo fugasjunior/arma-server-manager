@@ -7,12 +7,14 @@ import cz.forgottenempire.servermanager.api.model.ModsDto;
 import cz.forgottenempire.servermanager.api.model.ServerOnlyDto;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,6 +32,7 @@ public class WorkshopModsController implements ModsApi {
 
     @Override
     @Cacheable("workshopModsResponse")
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_VIEW + "')")
     public ResponseEntity<ModsDto> getMods(ServerType filter) {
         log.debug("Getting all mods");
         List<CreatorDlcDto> creatorDlcDtos = Collections.emptyList();
@@ -41,12 +44,14 @@ public class WorkshopModsController implements ModsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_VIEW + "')")
     public ResponseEntity<ModDto> getMod(Long id) {
         WorkshopMod mod = findMod(id);
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<ModsDto> addMods(List<Long> modIds) {
         log.info("Installing or updating mods: {}", modIds);
         List<WorkshopMod> workshopMods = modsFacade.saveAndInstallMods(modIds);
@@ -55,6 +60,7 @@ public class WorkshopModsController implements ModsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<ModDto> updateMod(Long id) {
         log.info("Installing mod id {}", id);
         WorkshopMod mod = modsFacade.saveAndInstallMods(List.of(id)).get(0);
@@ -62,6 +68,7 @@ public class WorkshopModsController implements ModsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_DELETE + "')")
     public ResponseEntity<Void> deleteMods(List<Long> modIds) {
         log.info("Uninstalling mods: {}", modIds);
         modIds.forEach(modsFacade::uninstallMod);
@@ -69,6 +76,7 @@ public class WorkshopModsController implements ModsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_DELETE + "')")
     public ResponseEntity<Void> deleteMod(Long id) {
         log.info("Uninstalling mod {}", id);
         modsFacade.uninstallMod(id);
@@ -76,6 +84,7 @@ public class WorkshopModsController implements ModsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<Void> setModServerOnly(Long id, ServerOnlyDto serverOnlyDto) {
         WorkshopMod mod = findMod(id);
         modsFacade.setModServerOnly(mod, serverOnlyDto.getServerOnly());

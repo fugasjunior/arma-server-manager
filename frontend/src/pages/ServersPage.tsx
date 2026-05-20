@@ -1,5 +1,6 @@
 import {serversApi} from "../api/client"
 import {useState} from "react";
+import PermissionGuard from "../components/auth/PermissionGuard";
 import ServerListEntry from "../components/servers/serverListEntry/ServerListEntry.tsx";
 import NewServerButton from "../components/servers/NewServerButton";
 import Table from "@mui/material/Table";
@@ -13,10 +14,12 @@ import {ServerDto} from "../api/generated";
 import {useServers} from "../hooks/queries/useServers";
 import {useQueryClient, useQueries} from "@tanstack/react-query";
 import {queryKeys} from "../api/queryKeys";
+import {usePermission} from "../hooks/usePermission";
 
 const ServersPage = () => {
     const queryClient = useQueryClient();
-    const {data: servers = []} = useServers();
+    const hasServerView = usePermission('SERVER_VIEW');
+    const {data: servers = []} = useServers({enabled: hasServerView});
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [serverToDelete, setServerToDelete] = useState<ServerDto | null>();
@@ -100,7 +103,9 @@ const ServersPage = () => {
 
     return (
         <>
-            <NewServerButton/>
+            <PermissionGuard permission="SERVER_MODIFY">
+                <NewServerButton/>
+            </PermissionGuard>
             {isLogOpen && logServerId !== undefined && <ServerLogs onClose={handleCloseLogs} serverId={logServerId}/>}
             <TableContainer component={Paper}>
                 <Table>

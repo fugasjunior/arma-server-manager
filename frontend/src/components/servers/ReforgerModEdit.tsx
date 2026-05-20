@@ -17,6 +17,7 @@ import MemoryIcon from '@mui/icons-material/Memory';
 import {useServer} from "../../hooks/queries/useServer";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
 
 const modalStyle = {
     position: 'absolute',
@@ -37,6 +38,7 @@ type ReforgerModEditProps = {
 
 const ReforgerModEdit = (props: ReforgerModEditProps) => {
     const queryClient = useQueryClient();
+    const canModify = usePermission('MOD_MODIFY');
     const [isOpen, setIsOpen] = useState(false);
     const [mods, setMods] = useState<Array<{id: string, name: string}>>(props.server.activeMods ?? []);
     const [newModName, setNewModName] = useState("");
@@ -109,12 +111,14 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
                 <Box sx={modalStyle}>
                     <Stack direction="row" spacing={1} sx={{mb: 2, justifyItems: "center", justifyContent: "space-between"}}>
                         <TextField id="mod-id" label="Mod ID" placeholder="Mod ID" size="small" required
-                                   variant="standard" value={newModId} onChange={handleNewModIdChange}/>
+                                   variant="standard" value={newModId} onChange={handleNewModIdChange}
+                                   disabled={!canModify}/>
                         <TextField id="mod-name" label="Mod name" placeholder="Mod name" size="small" required
-                                   variant="standard" value={newModName} onChange={handleNewModNameChange}/>
+                                   variant="standard" value={newModName} onChange={handleNewModNameChange}
+                                   disabled={!canModify}/>
                         <Button variant="contained" startIcon={<AddIcon/>} color="success"
                                 onClick={handleAddNewMod}
-                                disabled={newModId.length === 0 || newModName.length === 0}
+                                disabled={!canModify || newModId.length === 0 || newModName.length === 0}
                         >
                             Add
                         </Button>
@@ -136,11 +140,11 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
                                                 <TableCell>{mod.id}</TableCell>
                                                 <TableCell>{mod.name}</TableCell>
                                                 <TableCell align="right">
-                                                    <IconButton
+                                                    {canModify && <IconButton
                                                         aria-label="delete"
                                                         onClick={() => handleDeleteMod(mod.id)}>
                                                         <DeleteIcon color="error"/>
-                                                    </IconButton>
+                                                    </IconButton>}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -152,7 +156,7 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
                     <Stack>
                         <Button onClick={handleConfirm} variant="contained" color="primary"
                                 sx={{mt: 1, mb: 1}}
-                                disabled={serverRunning}>Confirm</Button>
+                                disabled={serverRunning || !canModify}>Confirm</Button>
                         <Button onClick={handleClose} variant="outlined" color="error">Cancel</Button>
                     </Stack>
                 </Box>

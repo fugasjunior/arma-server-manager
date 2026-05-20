@@ -3,7 +3,7 @@ import {serverInstallationApi} from "../../api/client";
 import {queryKeys} from "../../api/queryKeys";
 import {ServerInstallationDto} from "../../api/generated";
 
-export function useServerInstallations(opts?: {refetchInterval?: number | false}) {
+export function useServerInstallations(opts?: {refetchInterval?: number | false, enabled?: boolean}) {
     return useQuery({
         queryKey: queryKeys.serverInstallations,
         queryFn: async () => {
@@ -13,5 +13,6 @@ export function useServerInstallations(opts?: {refetchInterval?: number | false}
             );
         },
         refetchInterval: opts?.refetchInterval,
+        enabled: opts?.enabled,
     });
 }

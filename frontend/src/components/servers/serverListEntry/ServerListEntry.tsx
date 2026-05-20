@@ -1,5 +1,6 @@
 import {Link} from "react-router-dom";
 import {Button} from "@mui/material";
+import PermissionGuard from "../../auth/PermissionGuard";
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TableRow from "@mui/material/TableRow";
@@ -59,33 +60,39 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                     <ServerHeader server={server}/>
                 </TableCell>
                 <TableCell>
-                    <SeverControls
-                        serverRunning={status?.alive ?? null} server={server}
-                        onStartServer={() => onStartServer(server.id as number)}
-                        onStopServer={() => onStopServer(server.id as number)}
-                        onRestartServer={() => onRestartServer(server.id as number)}
-                        disabled={serverWithSamePortRunning}
-                    />
+                    <PermissionGuard permission="SERVER_OPERATE">
+                        <SeverControls
+                            serverRunning={status?.alive ?? null} server={server}
+                            onStartServer={() => onStartServer(server.id as number)}
+                            onStopServer={() => onStopServer(server.id as number)}
+                            onRestartServer={() => onRestartServer(server.id as number)}
+                            disabled={serverWithSamePortRunning}
+                        />
+                    </PermissionGuard>
                 </TableCell>
                 <TableCell>
-                    <Button id={`server-${server.id}-settings-btn`}
-                            className="server-settings-btn"
-                            component={Link} to={"/servers/" + server.id}
-                            variant="outlined" startIcon={<SettingsIcon/>}
-                    >
-                        Settings
-                    </Button>
+                    <PermissionGuard permission="SERVER_VIEW">
+                        <Button id={`server-${server.id}-settings-btn`}
+                                className="server-settings-btn"
+                                component={Link} to={"/servers/" + server.id}
+                                variant="outlined" startIcon={<SettingsIcon/>}
+                        >
+                            Settings
+                        </Button>
+                    </PermissionGuard>
                 </TableCell>
                 <TableCell>
                     {serverRunning && status &&
                         <ServerStatusDetails status={status}/>
                     }
                     {!serverRunning &&
-                        <Button id={`server-${server.id}-delete-btn`}
-                                className="server-delete-btn"
-                                variant="outlined" startIcon={<DeleteIcon/>} color="error"
-                                onClick={() => onDeleteServer(server.id as number)}>Delete
-                        </Button>}
+                        <PermissionGuard permission="SERVER_DELETE">
+                            <Button id={`server-${server.id}-delete-btn`}
+                                    className="server-delete-btn"
+                                    variant="outlined" startIcon={<DeleteIcon/>} color="error"
+                                    onClick={() => onDeleteServer(server.id as number)}>Delete
+                            </Button>
+                        </PermissionGuard>}
                 </TableCell>
                 <TableCell>
                     <IconButton onClick={handleExpandClick}>

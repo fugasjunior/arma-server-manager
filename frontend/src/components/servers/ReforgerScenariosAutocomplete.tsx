@@ -3,6 +3,7 @@ import {Autocomplete, AutocompleteValue, Box, TextField} from "@mui/material";
 import React, {SyntheticEvent} from "react";
 import {useController} from "react-hook-form";
 import {useReforgerScenarios} from "../../hooks/queries/useReforgerScenarios";
+import {usePermission} from "../../hooks/usePermission";
 
 type ReforgerScenariosAutocompleteProps = {
     onChange: (_: SyntheticEvent | null, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
@@ -10,7 +11,8 @@ type ReforgerScenariosAutocompleteProps = {
 
 export function ReforgerScenariosAutocomplete({onChange}: ReforgerScenariosAutocompleteProps) {
     const {field, fieldState} = useController({name: 'scenarioId'});
-    const {data: scenarios = []} = useReforgerScenarios();
+    const canViewScenarios = usePermission('SCENARIO_VIEW');
+    const {data: scenarios = []} = useReforgerScenarios({enabled: canViewScenarios});
 
     const getScenarioDisplayName = (scenario: ReforgerScenarioDto) => {
         if (scenario.name) {

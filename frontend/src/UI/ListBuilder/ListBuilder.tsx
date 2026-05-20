@@ -4,12 +4,13 @@ import {Box, Grid, SelectChangeEvent} from "@mui/material";
 import styles from "./ListBuilder.module.css";
 import {PresetResponseDto} from "../../api/generated";
 
-export type ListBuilderElement = { id?: number | string, name?: string };
+export type ListBuilderElement = { id?: number | string; name?: string; subtitle?: string };
 
 type ListBuilderProps<T> = {
     availableOptions: Array<T>,
     selectedOptions: Array<T>,
     itemsLabel: string,
+    embedded?: boolean,
     withControls?: boolean,
     confirmDisabled?: boolean,
     showFilter?: boolean,
@@ -27,28 +28,29 @@ type ListBuilderProps<T> = {
 
 export default function ListBuilder<T extends ListBuilderElement>(props: ListBuilderProps<T>) {
     const itemsLabel = props.itemsLabel ?? "options";
+    const embedded = props.embedded ?? false;
 
     return (
-        <Box className={styles.box} sx={{
-            overflow: "auto",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-        }}>
-            <Grid container spacing={4} sx={{p: 4}}>
-                <Grid size={12}>
-                    <ListBuilderHeader
-                        presets={props.presets}
-                        itemsLabel={props.itemsLabel}
-                        selectedPreset={props.selectedPreset}
-                        onPresetChange={props.onPresetChange}
-                        onConfirm={props.onConfirm}
-                        onCancel={props.onCancel}
-                        withControls={props.withControls}
-                        confirmDisabled={props.confirmDisabled}
-                    />
-                </Grid>
-                <Grid size={6}>
+        <Box
+            className={embedded ? undefined : styles.box}
+            sx={embedded ? {overflow: "auto"} : {overflow: "auto", bgcolor: "background.paper", boxShadow: 24, p: 4}}
+        >
+            <Grid container spacing={4} sx={embedded ? {} : {p: 4}}>
+                {!embedded && (
+                    <Grid size={12}>
+                        <ListBuilderHeader
+                            presets={props.presets}
+                            itemsLabel={props.itemsLabel}
+                            selectedPreset={props.selectedPreset}
+                            onPresetChange={props.onPresetChange}
+                            onConfirm={props.onConfirm}
+                            onCancel={props.onCancel}
+                            withControls={props.withControls}
+                            confirmDisabled={props.confirmDisabled}
+                        />
+                    </Grid>
+                )}
+                <Grid size={6} sx={{pr: 2}}>
                     <ListBuilderList
                         itemLabel={itemsLabel}
                         typeLabel="available"
@@ -59,7 +61,7 @@ export default function ListBuilder<T extends ListBuilderElement>(props: ListBui
                         onSelectAll={props.onSelectAll}
                     />
                 </Grid>
-                <Grid size={6}>
+                <Grid size={6} sx={{borderLeft: '1px solid #e0e0e0', pl: 2}}>
                     <ListBuilderList
                         itemLabel={itemsLabel}
                         typeLabel="selected"

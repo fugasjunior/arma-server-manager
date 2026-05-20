@@ -1,5 +1,4 @@
 import { Page, Locator } from '@playwright/test';
-import path from 'path';
 
 export class ScenariosPage {
     constructor(private readonly page: Page) {}

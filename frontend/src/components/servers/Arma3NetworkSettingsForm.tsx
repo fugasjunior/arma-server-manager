@@ -32,7 +32,11 @@ const networkSettingFields: Array<NetworkSettingField> = [
         label: 'MinBandwidth',
         description: 'Bandwidth the server is guaranteed to have in bps (default 131072)'
     },
-    {name: 'networkSettings.maxBandwidth', label: 'MaxBandwidth', description: 'Bandwidth the server is guaranteed to never have in bps'},
+    {
+        name: 'networkSettings.maxBandwidth',
+        label: 'MaxBandwidth',
+        description: 'Bandwidth the server is guaranteed to never have in bps'
+    },
     {
         name: 'networkSettings.maxCustomFileSize',
         label: 'MaxCustomFileSize',
@@ -57,7 +61,11 @@ const networkSettingFields: Array<NetworkSettingField> = [
     }
 ];
 
-const Arma3DifficultySettingsForm = () => {
+interface Arma3NetworkSettingsFormProps {
+    canModify?: boolean
+}
+
+const Arma3DifficultySettingsForm = ({canModify}: Arma3NetworkSettingsFormProps) => {
     return <Accordion>
         <AccordionSummary
             expandIcon={<ExpandMoreIcon/>}
@@ -81,6 +89,7 @@ const Arma3DifficultySettingsForm = () => {
                                      helperText={field.description}
                                      type='number'
                                      inputProps={field.inputProps}
+                                     disabled={!canModify}
                     />
                 )}
             </Grid>

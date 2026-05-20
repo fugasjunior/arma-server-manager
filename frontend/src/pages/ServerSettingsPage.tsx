@@ -12,15 +12,17 @@ import {useServer} from "../hooks/queries/useServer";
 import {useServerStatus} from "../hooks/queries/useServerStatus";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../api/queryKeys";
+import {usePermission} from "../hooks/usePermission";
 
 const ServerSettingsPage = () => {
     const {id} = useParams();
     const numericId = Number(id);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const canViewServer = usePermission('SERVER_VIEW');
 
-    const {data: server, isLoading} = useServer(numericId);
-    const {data: status} = useServerStatus(numericId, {refetchInterval: false});
+    const {data: server, isLoading} = useServer(numericId, {enabled: canViewServer});
+    const {data: status} = useServerStatus(numericId, {refetchInterval: false, enabled: canViewServer});
 
     const handleSubmit = async (values: Arma3ServerDto | DayZServerDto | ReforgerServerDto) => {
         if (!server) {

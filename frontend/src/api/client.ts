@@ -7,12 +7,15 @@ import {
     HeadlessClientApi,
     ModPresetsApi,
     ModsApi,
+    PermissionsApi,
+    RolesApi,
     ScenariosApi,
     ServerInstallationApi,
     ServersApi,
     SteamAuthApi,
     SteamCmdApi,
     SystemApi,
+    UsersApi,
 } from "./generated";
 import config from "../config";
 
@@ -51,3 +54,6 @@ export const scenariosApi = new ScenariosApi(apiConfig, "", apiAxiosInstance);
 export const steamAuthApi = new SteamAuthApi(apiConfig, "", apiAxiosInstance);
 export const steamCmdApi = new SteamCmdApi(apiConfig, "", apiAxiosInstance);
 export const systemApi = new SystemApi(apiConfig, "", apiAxiosInstance);
+export const usersApi = new UsersApi(apiConfig, "", apiAxiosInstance);
+export const rolesApi = new RolesApi(apiConfig, "", apiAxiosInstance);
+export const permissionsApi = new PermissionsApi(apiConfig, "", apiAxiosInstance);

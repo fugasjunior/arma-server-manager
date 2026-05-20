@@ -4,9 +4,10 @@ import {FormControlLabel, Switch} from "@mui/material";
 type SwitchFieldProps = {
     name: string,
     label: string,
+    disabled?: boolean
 }
 
-export const SwitchField = ({name, label}: SwitchFieldProps) => {
+export const SwitchField = ({name, label, disabled}: SwitchFieldProps) => {
     const {field} = useController({name});
 
     return <FormControlLabel
@@ -16,6 +17,7 @@ export const SwitchField = ({name, label}: SwitchFieldProps) => {
                 checked={!!field.value}
                 name={name}
                 id={name}
+                disabled={disabled ?? false}
             />
         }
         label={label}

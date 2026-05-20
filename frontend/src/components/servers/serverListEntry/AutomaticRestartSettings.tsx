@@ -5,6 +5,7 @@ import {TimeField} from "@mui/x-date-pickers";
 import {FormControlLabel, Stack, Switch} from "@mui/material";
 import {parseInt} from "lodash";
 import dayjs from "dayjs";
+import {usePermission} from "../../../hooks/usePermission.ts";
 
 const convertTimeStringToDate = (timeString: string | null): dayjs.Dayjs | null => {
     if (timeString === null) {
@@ -22,6 +23,7 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
 
     const [enabled, setEnabled] = useState<boolean>(props.dto.enabled ?? false);
     const [time, setTime] = useState<dayjs.Dayjs | null>(convertTimeStringToDate(props.dto.time ?? null));
+    const canModify = usePermission("SERVER_MODIFY");
 
     useEffect(() => {
         const updateTimeout = setTimeout(async () => {
@@ -35,11 +37,12 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
             <FormControlLabel control={
                 <Switch
                     checked={enabled}
+                    disabled={!canModify}
                     onChange={(_, checked) => setEnabled(checked)}/>
             } label="Automatic restart"/>
             {enabled &&
                 <TimeField
-                    disabled={!enabled}
+                    disabled={!enabled || !canModify}
                     value={dayjs(time)}
                     label="Time"
                     format="HH:mm"

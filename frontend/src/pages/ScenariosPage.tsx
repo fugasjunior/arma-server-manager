@@ -6,10 +6,12 @@ import {ScenariosTable} from "../components/scenarios/ScenariosTable";
 import {useArma3Scenarios} from "../hooks/queries/useArma3Scenarios";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../api/queryKeys";
+import {usePermission} from "../hooks/usePermission";
 
 const ScenariosPage = () => {
     const queryClient = useQueryClient();
-    const {data: scenarios = []} = useArma3Scenarios();
+    const canViewScenarios = usePermission("SCENARIO_VIEW");
+    const {data: scenarios = []} = useArma3Scenarios({enabled: canViewScenarios});
     const [selected, setSelected] = useState<Array<string>>([]);
     const [uploadInProgress, setUploadInProgress] = useState(false);
     const [percentUploaded, setPercentUploaded] = useState(0);

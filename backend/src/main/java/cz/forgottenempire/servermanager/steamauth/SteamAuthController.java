@@ -6,11 +6,14 @@ import cz.forgottenempire.servermanager.api.model.AuthType;
 import cz.forgottenempire.servermanager.api.model.AuthVerificationResultDto;
 import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import cz.forgottenempire.servermanager.api.model.SteamAuthStatusDto;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PreAuthorize("hasAuthority('" + PermissionCode.STEAM_AUTH_ADMIN + "')")
 public class SteamAuthController implements SteamAuthApi {
 
     private final SteamAuthService authService;

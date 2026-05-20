@@ -8,10 +8,11 @@ type SliderFieldProps = {
     min: number,
     max: number,
     step: number
-    icon?: ReactNode
+    icon?: ReactNode,
+    disabled: boolean,
 }
 
-export const SliderField = ({name, label, min, max, step, icon}: SliderFieldProps) => {
+export const SliderField = ({name, label, min, max, step, icon, disabled}: SliderFieldProps) => {
     const {field} = useController({name});
 
     return <>
@@ -33,6 +34,7 @@ export const SliderField = ({name, label, min, max, step, icon}: SliderFieldProp
                     step={step}
                     min={min}
                     max={max}
+                    disabled={disabled}
                 />
             </Grid>
         </Grid>

@@ -5,6 +5,7 @@ type CustomLaunchParametersInputProps = {
     valueDelimiter: string,
     parameters: Array<{ name: string, value?: string }>,
     onParametersChange: (values: Array<{ name: string, value?: string }>) => void,
+    canModify?: boolean
 }
 
 export const CustomLaunchParametersInput = (props: CustomLaunchParametersInputProps) => {
@@ -35,7 +36,8 @@ export const CustomLaunchParametersInput = (props: CustomLaunchParametersInputPr
     return (
         <>
             <Typography>Custom launch parameters</Typography>
-            <MuiChipsInput value={convertLaunchParameters()} onChange={handleParameterInput} addOnBlur/>
+            <MuiChipsInput value={convertLaunchParameters()} onChange={handleParameterInput} addOnBlur
+                           disabled={!props.canModify}/>
         </>
     );
 };

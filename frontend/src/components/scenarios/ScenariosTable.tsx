@@ -70,7 +70,7 @@ export const ScenariosTable = (
                     },
                     {
                         id: "createdOn",
-                        value: scenarioDto.createdOn ?? ""
+                        value: scenarioDto.createdOn ? new Date(scenarioDto.createdOn) : new Date()
                     },
                 ]
             };

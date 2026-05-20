@@ -4,9 +4,13 @@ import CircularProgressWithLabel from "../../UI/CircularProgressWithLabel";
 import {humanFileSize} from "../../util/util";
 import {CircularProgressProps} from "@mui/material/CircularProgress";
 import {useSystemDetails} from "../../hooks/queries/useSystemDetails";
+import {usePermission} from "../../hooks/usePermission";
 
 const SystemResourcesMonitor = () => {
-    const {data: systemInfo, isSuccess: infoLoaded} = useSystemDetails({refetchInterval: 3000});
+    const canViewSystem = usePermission("SYSTEM_VIEW");
+    const {data: systemInfo, isSuccess: infoLoaded} = useSystemDetails({refetchInterval: 3000, enabled: canViewSystem});
+
+    if (!canViewSystem) return null;
 
     const cpuUsage = Math.round((systemInfo?.cpuUsage ?? 0) * 100);
     const memoryLeft = systemInfo?.memoryLeft ?? 0;

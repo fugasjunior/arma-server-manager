@@ -28,6 +28,8 @@ import {modPresetsApi, armaLauncherPresetApi} from "../../api/client";
 import {downloadExportedPreset} from "../../api/downloads";
 import ImportPresetDialog from "./ImportPresetDialog";
 import RenamePresetDialog from "./RenamePresetDialog";
+import PermissionGuard from "../auth/PermissionGuard";
+import {usePermission} from "../../hooks/usePermission";
 import {usePresets} from "../../hooks/queries/usePresets";
 import {useMods} from "../../hooks/queries/useMods";
 import {useQueryClient} from "@tanstack/react-query";
@@ -35,7 +37,8 @@ import {queryKeys} from "../../api/queryKeys";
 
 export default function PresetsManagement() {
     const queryClient = useQueryClient();
-    const {data: presets = [], isLoading: initialLoading} = usePresets();
+    const canViewMods = usePermission("MOD_VIEW");
+    const {data: presets = [], isLoading: initialLoading} = usePresets(undefined, {enabled: canViewMods});
 
     const [editedPreset, setEditedPreset] = useState<PresetResponseDto | null>(null);
     const [presetModalOpen, setPresetModalOpen] = useState(false);
@@ -50,7 +53,7 @@ export default function PresetsManagement() {
 
     const {data: modsForEdit = [], isSuccess: modsForEditLoaded} = useMods(
         editedPreset?.type as ServerType | undefined,
-        {enabled: !!editedPreset}
+        {enabled: !!editedPreset && canViewMods}
     );
 
     useEffect(() => {
@@ -227,13 +230,15 @@ export default function PresetsManagement() {
                             Presets
                         </Typography>
                         <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
-                            <Tooltip title="Import preset">
-                                <label htmlFor="fileInput">
-                                    <IconButton component="span">
-                                        <UploadIcon/>
-                                    </IconButton>
-                                </label>
-                            </Tooltip>
+                            <PermissionGuard permission="MOD_MODIFY">
+                                <Tooltip title="Import preset">
+                                    <label htmlFor="fileInput">
+                                        <IconButton component="span" data-testid="preset-import-btn">
+                                            <UploadIcon/>
+                                        </IconButton>
+                                    </label>
+                                </Tooltip>
+                            </PermissionGuard>
                         </Stack>
                     </Toolbar>
                     <TableContainer component={Paper}>
@@ -274,12 +279,14 @@ export default function PresetsManagement() {
                                             {preset.totalModsSize != null ? humanFileSize(preset.totalModsSize) : '—'}
                                         </TableCell>
                                         <TableCell align="right" sx={{whiteSpace: 'nowrap', pr: 1}}>
-                                            <Tooltip title="Edit mods">
-                                                <IconButton size="small" aria-label="edit" data-testid={`preset-edit-${preset.id}`}
-                                                            onClick={() => handleOpenEdit(preset)}>
-                                                    <EditIcon fontSize="small" color="primary"/>
-                                                </IconButton>
-                                            </Tooltip>
+                                            <PermissionGuard permission="MOD_MODIFY">
+                                                <Tooltip title="Edit mods">
+                                                    <IconButton size="small" aria-label="edit" data-testid={`preset-edit-${preset.id}`}
+                                                                onClick={() => handleOpenEdit(preset)}>
+                                                        <EditIcon fontSize="small" color="primary"/>
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </PermissionGuard>
                                             <IconButton size="small" aria-label="more actions" data-testid={`preset-menu-${preset.id}`}
                                                         onClick={(e) => handleMenuOpen(e, preset.id!)}>
                                                 <MoreVertIcon fontSize="small"/>
@@ -328,22 +335,24 @@ export default function PresetsManagement() {
                 open={menuAnchor !== null}
                 onClose={handleMenuClose}
             >
-                <MenuItem data-testid={`preset-menu-edit-${menuAnchor?.presetId}`} onClick={() => {
-                    handleMenuClose();
-                    const preset = presets.find(p => p.id === menuAnchor?.presetId);
-                    if (preset) handleOpenEdit(preset);
-                }}>
-                    <ListItemIcon><EditIcon fontSize="small"/></ListItemIcon>
-                    Edit mods
-                </MenuItem>
-                <MenuItem data-testid={`preset-menu-rename-${menuAnchor?.presetId}`} onClick={() => {
-                    const id = menuAnchor?.presetId;
-                    handleMenuClose();
-                    if (id !== undefined) handleRenameClick(id);
-                }}>
-                    <ListItemIcon><DriveFileRenameOutlineIcon fontSize="small"/></ListItemIcon>
-                    Rename
-                </MenuItem>
+                <PermissionGuard permission="MOD_MODIFY">
+                    <MenuItem data-testid={`preset-menu-edit-${menuAnchor?.presetId}`} onClick={() => {
+                        handleMenuClose();
+                        const preset = presets.find(p => p.id === menuAnchor?.presetId);
+                        if (preset) handleOpenEdit(preset);
+                    }}>
+                        <ListItemIcon><EditIcon fontSize="small"/></ListItemIcon>
+                        Edit mods
+                    </MenuItem>
+                    <MenuItem data-testid={`preset-menu-rename-${menuAnchor?.presetId}`} onClick={() => {
+                        const id = menuAnchor?.presetId;
+                        handleMenuClose();
+                        if (id !== undefined) handleRenameClick(id);
+                    }}>
+                        <ListItemIcon><DriveFileRenameOutlineIcon fontSize="small"/></ListItemIcon>
+                        Rename
+                    </MenuItem>
+                </PermissionGuard>
                 <MenuItem data-testid={`preset-menu-download-${menuAnchor?.presetId}`} onClick={() => {
                     const id = menuAnchor?.presetId;
                     handleMenuClose();
@@ -352,14 +361,16 @@ export default function PresetsManagement() {
                     <ListItemIcon><DownloadIcon fontSize="small"/></ListItemIcon>
                     Download
                 </MenuItem>
-                <MenuItem data-testid={`preset-menu-delete-${menuAnchor?.presetId}`} onClick={() => {
-                    const id = menuAnchor?.presetId;
-                    handleMenuClose();
-                    if (id !== undefined) handleDelete(id);
-                }} sx={{color: 'error.main'}}>
-                    <ListItemIcon><DeleteIcon fontSize="small" color="error"/></ListItemIcon>
-                    Delete
-                </MenuItem>
+                <PermissionGuard permission="MOD_DELETE">
+                    <MenuItem data-testid={`preset-menu-delete-${menuAnchor?.presetId}`} onClick={() => {
+                        const id = menuAnchor?.presetId;
+                        handleMenuClose();
+                        if (id !== undefined) handleDelete(id);
+                    }} sx={{color: 'error.main'}}>
+                        <ListItemIcon><DeleteIcon fontSize="small" color="error"/></ListItemIcon>
+                        Delete
+                    </MenuItem>
+                </PermissionGuard>
             </Menu>
         </>
     );

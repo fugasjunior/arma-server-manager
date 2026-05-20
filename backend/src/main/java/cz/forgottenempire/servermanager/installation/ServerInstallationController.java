@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.api.model.ActiveBranchDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstallationDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstallationsDto;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,6 +13,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,6 +40,7 @@ public class ServerInstallationController implements ServerInstallationApi {
 
     @Override
     @Cacheable("serverInstallationsResponse")
+    @PreAuthorize("hasAuthority('" + PermissionCode.INSTALL_VIEW + "')")
     public ResponseEntity<ServerInstallationsDto> getServerInstallations() {
         log.debug("Getting server installations");
         List<ServerInstallation> installations = installationService.getAvailableServerInstallations();
@@ -46,12 +49,14 @@ public class ServerInstallationController implements ServerInstallationApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.INSTALL_VIEW + "')")
     public ResponseEntity<ServerInstallationDto> getServerInstallation(ServerType type) {
         ServerInstallation installation = installationService.getServerInstallation(type);
         return ResponseEntity.ok(mapper.map(installation));
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.INSTALL_MANAGE + "')")
     public ResponseEntity<ServerInstallationDto> installServer(ServerType type) {
         ServerInstallation serverInstallation = installationService.getServerInstallation(type);
         installerService.installServer(serverInstallation);
@@ -59,6 +64,7 @@ public class ServerInstallationController implements ServerInstallationApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.INSTALL_MANAGE + "')")
     public ResponseEntity<Void> setActiveBranch(ServerType type, ActiveBranchDto activeBranchDto) {
         ServerInstallation installation = installationService.getServerInstallation(type);
         ServerInstallation.Branch branch = ServerInstallation.Branch.valueOf(activeBranchDto.getBranch().name());
@@ -67,6 +73,7 @@ public class ServerInstallationController implements ServerInstallationApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.INSTALL_MANAGE + "')")
     public ResponseEntity<Void> uninstallServer(ServerType type) {
         ServerInstallation installation = installationService.getServerInstallation(type);
         uninstallerService.uninstallServer(installation);

@@ -9,11 +9,14 @@ import {useMods} from "../../hooks/queries/useMods";
 import {useSteamCmdItemInfos} from "../../hooks/queries/useSteamCmdItemInfos";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
 
 export default function ModsManagement() {
     const queryClient = useQueryClient();
-    const {data: mods = [], isLoading: initialLoading} = useMods(undefined, {refetchInterval: 5000});
-    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000});
+    const canViewMods = usePermission("MOD_VIEW");
+    const canPollSteamCmd = usePermission("STEAM_AUTH_ADMIN");
+    const {data: mods = [], isLoading: initialLoading} = useMods(undefined, {refetchInterval: 5000, enabled: canViewMods});
+    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000, enabled: canPollSteamCmd});
 
     const [selectedModsIds, setSelectedModsIds] = useState<Array<number>>([]);
     const [filter, setFilter] = useState("");

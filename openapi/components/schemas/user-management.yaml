@@ -1,0 +1,116 @@
+UserDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    username:
+      type: string
+    enabled:
+      type: boolean
+    roles:
+      type: array
+      items:
+        $ref: '#/RoleDto'
+    createdAt:
+      type: string
+      format: date-time
+    passwordChangedAt:
+      type: string
+      format: date-time
+
+CreateUserRequest:
+  type: object
+  required: [username, password]
+  properties:
+    username:
+      type: string
+      minLength: 3
+      maxLength: 64
+    password:
+      type: string
+      minLength: 6
+
+UpdateUserRequest:
+  type: object
+  properties:
+    enabled:
+      type: boolean
+
+ChangePasswordRequest:
+  type: object
+  required: [newPassword]
+  properties:
+    currentPassword:
+      type: string
+      description: Required when user changes their own password; omitted for admin reset
+    newPassword:
+      type: string
+      minLength: 6
+
+RoleDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    description:
+      type: string
+    builtIn:
+      type: boolean
+    permissions:
+      type: array
+      items:
+        type: string
+
+CreateRoleRequest:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 64
+    description:
+      type: string
+    permissions:
+      type: array
+      items:
+        type: string
+
+UpdateRoleRequest:
+  type: object
+  properties:
+    description:
+      type: string
+    permissions:
+      type: array
+      items:
+        type: string
+
+PermissionDto:
+  type: object
+  properties:
+    code:
+      type: string
+    description:
+      type: string
+
+CurrentUserDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    username:
+      type: string
+    permissions:
+      type: array
+      items:
+        type: string
+    roles:
+      type: array
+      items:
+        type: string

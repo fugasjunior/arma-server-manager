@@ -1,11 +1,12 @@
 import {useContext} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
-import {AppBar, Button, CssBaseline, Stack, Toolbar} from "@mui/material";
+import {AppBar, Button, Stack, Toolbar} from "@mui/material";
 import {AuthContext} from "../store/auth-context";
 import logo from "../img/asm_logo.png"
 import IconButton from "@mui/material/IconButton";
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import PermissionGuard from "./auth/PermissionGuard";
 
 type NavbarProps = {
     onModeChange: () => void,
@@ -25,7 +26,6 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
     return (
         <>
             {isLoggedIn && <AppBar position="static" sx={{mb: 4}}>
-                <CssBaseline/>
                 <Toolbar>
                     <img
                         alt="Arma Server Manager Logo"
@@ -39,24 +39,41 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
                         <Button color="success" component={NavLink} to="/" sx={{color: '#fff'}}>
                             Dashboard
                         </Button>
-                        <Button component={NavLink} to="/servers" sx={{color: '#fff'}}>
-                            Servers
-                        </Button>
-                        <Button component={NavLink} to="/mods" sx={{color: '#fff'}}>
-                            Mods
-                        </Button>
-                        <Button component={NavLink} to="/scenarios" sx={{color: '#fff'}}>
-                            Scenarios
-                        </Button>
-                        <Button component={NavLink} to="/tools" sx={{color: '#fff'}}>
-                            Tools
-                        </Button>
-                        <Button component={NavLink} to="/settings" sx={{color: '#fff'}}>
-                            Settings
-                        </Button>
-                        <Button component={NavLink} to="/additionalServers" sx={{color: '#fff'}}>
-                            Additional servers
-                        </Button>
+                        <PermissionGuard permission="SERVER_VIEW">
+                            <Button component={NavLink} to="/servers" sx={{color: '#fff'}}>
+                                Servers
+                            </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="MOD_VIEW">
+                            <Button component={NavLink} to="/mods" sx={{color: '#fff'}}>
+                                Mods
+                            </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="SCENARIO_VIEW">
+                            <Button component={NavLink} to="/scenarios" sx={{color: '#fff'}}>
+                                Scenarios
+                            </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="STEAM_AUTH_ADMIN">
+                            <Button component={NavLink} to="/tools" sx={{color: '#fff'}}>
+                                Tools
+                            </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="STEAM_AUTH_ADMIN">
+                            <Button component={NavLink} to="/settings" sx={{color: '#fff'}}>
+                                Settings
+                            </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="ADDITIONAL_SERVER_VIEW">
+                            <Button component={NavLink} to="/additionalServers" sx={{color: '#fff'}}>
+                                Additional servers
+                            </Button>
+                        </PermissionGuard>
+                        <PermissionGuard permission="USER_ADMIN">
+                            <Button component={NavLink} to="/users" sx={{color: '#fff'}}>
+                                Users
+                            </Button>
+                        </PermissionGuard>
                     </Stack>
                     <Stack direction="row" sx={{flexGrow: 0}}>
                         <IconButton onClick={onModeChange}>
@@ -64,6 +81,9 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
                         </IconButton>
                         <Button component={NavLink} to="/about" sx={{color: '#fff'}}>
                             About
+                        </Button>
+                        <Button component={NavLink} to="/profile" sx={{color: '#fff'}}>
+                            {authCtx.currentUser?.username ?? "Profile"}
                         </Button>
                         <Button onClick={handleLogout}
                                 sx={{color: '#fff'}}

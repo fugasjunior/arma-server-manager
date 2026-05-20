@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import RemoveIcon from "@mui/icons-material/Remove";
 import {blue, grey} from "@mui/material/colors";
 import AddIcon from "@mui/icons-material/Add";
+import PermissionGuard from "../../auth/PermissionGuard";
 
 type HeadlessClientControlsProps = {
     serverStatus: ServerInstanceInfoDto | null,
@@ -51,23 +52,28 @@ export function HeadlessClientControls(props: HeadlessClientControlsProps) {
     return <Stack spacing={1}>
         <Typography>Headless clients</Typography>
         <Stack direction="row">
-            <IconButton color="primary" aria-label="remove headless client"
-                        disabled={pending || targetCount < 1}
-                        onClick={handleRemove}
-            >
-                <RemoveIcon/>
-            </IconButton>
+            <PermissionGuard permission="SERVER_MODIFY">
+
+                <IconButton color="primary" aria-label="remove headless client"
+                            disabled={pending || targetCount < 1}
+                            onClick={handleRemove}
+                >
+                    <RemoveIcon/>
+                </IconButton>
+            </PermissionGuard>
             <Avatar sx={targetCount > 0 ? {bgcolor: blue[500]} : {bgcolor: grey[400]}}>
                 <Typography variant="caption" sx={{fontSize: isRunning ? '0.7rem' : '0.85rem', lineHeight: 1}}>
                     {displayCount}
                 </Typography>
             </Avatar>
-            <IconButton color="primary" aria-label="add headless client"
-                        disabled={pending}
-                        onClick={handleAdd}
-            >
-                <AddIcon/>
-            </IconButton>
+            <PermissionGuard permission="SERVER_MODIFY">
+                <IconButton color="primary" aria-label="add headless client"
+                            disabled={pending}
+                            onClick={handleAdd}
+                >
+                    <AddIcon/>
+                </IconButton>
+            </PermissionGuard>
         </Stack>
     </Stack>;
 }

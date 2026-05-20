@@ -11,6 +11,7 @@ import {useMods} from "../../hooks/queries/useMods";
 import {usePresets} from "../../hooks/queries/usePresets";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
 
 type ListBuilderModEditProps = {
     server: ServerDto
@@ -19,6 +20,7 @@ type ListBuilderModEditProps = {
 
 const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
     const queryClient = useQueryClient();
+    const canModify = usePermission('MOD_MODIFY');
     const [isOpen, setIsOpen] = useState(false);
     const [availableMods, setAvailableMods] = useState<Array<ServerWorkshopModDto>>([]);
     const [selectedMods, setSelectedMods] = useState<Array<ServerWorkshopModDto>>([]);
@@ -134,12 +136,16 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
             <Modal open={isOpen && !isLoading} onClose={handleClose}>
                 <Box>
                     <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
-                                 onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                 onReorder={handleModReorder} onSelectAll={handleSelectAll} onClearAll={handleClearAll}
+                                 onSelect={canModify ? handleModSelect : () => {}}
+                                 onDeselect={canModify ? handleModDeselect : () => {}}
+                                 onReorder={canModify ? handleModReorder : undefined}
+                                 onSelectAll={canModify ? handleSelectAll : undefined}
+                                 onClearAll={canModify ? handleClearAll : undefined}
                                  itemsLabel="mods" showFilter selectedPreset={selectedPreset} presets={presetsData}
-                                 onPresetChange={handlePresetChange} withControls
+                                 onPresetChange={canModify ? handlePresetChange : () => {}}
+                                 withControls
                                  onConfirm={handleConfirm} onCancel={handleClose}
-                                 confirmDisabled={serverRunning}
+                                 confirmDisabled={serverRunning || !canModify}
                     />
                 </Box>
             </Modal>

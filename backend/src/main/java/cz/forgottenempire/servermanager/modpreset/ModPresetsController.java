@@ -9,6 +9,7 @@ import cz.forgottenempire.servermanager.api.model.UpdatePresetRequestDto;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NonUniqueNameException;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import cz.forgottenempire.servermanager.workshop.WorkshopModsService;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,6 +43,7 @@ class ModPresetsController implements ModPresetsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_VIEW + "')")
     public ResponseEntity<PresetListResponseDto> getPresets(ServerType filter) {
         Collection<ModPreset> presets = filter == null
                 ? modPresetsService.getAllPresets()
@@ -49,6 +52,7 @@ class ModPresetsController implements ModPresetsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_VIEW + "')")
     public ResponseEntity<PresetResponseDto> getPreset(Long id) {
         ModPreset modPreset = modPresetsService.getModPreset(id)
                 .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
@@ -56,6 +60,7 @@ class ModPresetsController implements ModPresetsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<PresetResponseDto> createPreset(CreatePresetRequestDto requestDto) {
         validatePresetName(requestDto.getName());
         List<WorkshopMod> mods = validateAndGetMods(requestDto.getMods(), requestDto.getType());
@@ -65,6 +70,7 @@ class ModPresetsController implements ModPresetsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<PresetResponseDto> updatePreset(Long id, UpdatePresetRequestDto requestDto) {
         ModPreset modPreset = modPresetsService.getModPreset(id)
                 .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
@@ -81,6 +87,7 @@ class ModPresetsController implements ModPresetsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<PresetResponseDto> renamePreset(Long id, RenamePresetRequestDto requestDto) {
         ModPreset modPreset = modPresetsService.getModPreset(id)
                 .orElseThrow(() -> new NotFoundException("Mod preset " + id + " not found"));
@@ -93,6 +100,7 @@ class ModPresetsController implements ModPresetsApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_DELETE + "')")
     public ResponseEntity<Void> deletePreset(Long id) {
         modPresetsService.deletePreset(id);
         return ResponseEntity.noContent().build();

@@ -3,7 +3,11 @@ import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} 
 import {LocationSearching, School} from "@mui/icons-material";
 import {SliderField} from "../../../UI/Form/SliderField.tsx";
 
-export const Arma3AiSkillSettings = () => {
+interface Arma3AiSkillSettingsProps {
+    disabled?: boolean
+}
+
+export const Arma3AiSkillSettings = ({disabled}: Arma3AiSkillSettingsProps) => {
     const {field} = useController({name: 'difficultySettings.aiLevelPreset'});
 
     return <>
@@ -25,8 +29,8 @@ export const Arma3AiSkillSettings = () => {
             </FormControl>
         </FormGroup>
         <SliderField name='difficultySettings.skillAI' label='AI skill' min={0} max={1} step={0.05}
-                     icon={<School/>}/>
+                     icon={<School/>} disabled={disabled ?? false}/>
         <SliderField name='difficultySettings.precisionAI' label='AI precision' min={0} max={1} step={0.05}
-                     icon={<LocationSearching/>}/>
+                     icon={<LocationSearching/>} disabled={disabled ?? false}/>
     </>;
 }

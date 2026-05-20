@@ -4,11 +4,13 @@ import cz.forgottenempire.servermanager.api.AdditionalServersApi;
 import cz.forgottenempire.servermanager.api.model.AdditionalServerDto;
 import cz.forgottenempire.servermanager.api.model.AdditionalServersDto;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,6 +26,7 @@ public class AdditionalServersController implements AdditionalServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.ADDITIONAL_SERVER_VIEW + "')")
     public ResponseEntity<AdditionalServersDto> getAdditionalServers() {
         List<AdditionalServerDto> servers = serversService.getAllServers().stream()
                 .map(model -> serverMapper.from(model, serversService.getServerInstanceInfo(model.getId())))
@@ -34,6 +37,7 @@ public class AdditionalServersController implements AdditionalServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.ADDITIONAL_SERVER_VIEW + "')")
     public ResponseEntity<AdditionalServerDto> getAdditionalServer(Long serverId) {
         AdditionalServer server = serversService.getServer(serverId)
                 .orElseThrow(() -> new NotFoundException("Additional server ID " + serverId + " not found"));
@@ -42,12 +46,14 @@ public class AdditionalServersController implements AdditionalServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.ADDITIONAL_SERVER_OPERATE + "')")
     public ResponseEntity<Void> startAdditionalServer(Long serverId) {
         serversService.startServer(serverId);
         return ResponseEntity.ok().build();
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.ADDITIONAL_SERVER_OPERATE + "')")
     public ResponseEntity<Void> stopAdditionalServer(Long serverId) {
         serversService.stopServer(serverId);
         return ResponseEntity.ok().build();

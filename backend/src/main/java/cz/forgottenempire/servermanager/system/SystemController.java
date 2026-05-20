@@ -4,14 +4,17 @@ import cz.forgottenempire.servermanager.api.SystemApi;
 import cz.forgottenempire.servermanager.api.model.OSType;
 import cz.forgottenempire.servermanager.api.model.ServerDetailsDto;
 import cz.forgottenempire.servermanager.api.model.ServerOSDto;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@PreAuthorize("hasAuthority('" + PermissionCode.SYSTEM_VIEW + "')")
 public class SystemController implements SystemApi {
 
     private final SystemService systemService;

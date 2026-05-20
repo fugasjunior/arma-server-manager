@@ -15,12 +15,14 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,56 +33,89 @@ class ServerController implements ServersApi {
     private final ServerProcessService serverProcessService;
     private final ServerMapper serverMapper;
     private final PathsFactory pathsFactory;
+    private final ServerSecretsMasker secretsMasker;
 
     @Autowired
     public ServerController(
             ServerInstanceService serverInstanceService,
             ServerProcessService serverProcessService,
             ServerMapper serverMapper,
-            PathsFactory pathsFactory) {
+            PathsFactory pathsFactory,
+            ServerSecretsMasker secretsMasker) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
         this.serverMapper = serverMapper;
         this.pathsFactory = pathsFactory;
+        this.secretsMasker = secretsMasker;
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_VIEW + "')")
     public ResponseEntity<ServersDto> getServers() {
         List<ServerDto> serverDtos = serverInstanceService.getAllServers()
                 .stream()
-                .map(serverMapper::mapServerToDto).toList();
+                .map(serverMapper::mapServerToDto)
+                .peek(secretsMasker::maskIfUnauthorized)
+                .toList();
         return ResponseEntity.ok(new ServersDto().servers(serverDtos));
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_VIEW + "')")
     public ResponseEntity<ServerDto> getServer(Long id) {
         Server server = getServerEntity(id);
-        return ResponseEntity.ok(serverMapper.mapServerToDto(server));
+        ServerDto dto = serverMapper.mapServerToDto(server);
+        secretsMasker.maskIfUnauthorized(dto);
+        return ResponseEntity.ok(dto);
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
     public ResponseEntity<ServerDto> createServer(ServerDto serverDto) {
         Server server = serverMapper.mapServerDtoToEntity(serverDto);
         server.setId(null);
         server = serverInstanceService.createServer(server);
-        return ResponseEntity.status(HttpStatus.CREATED).body(serverMapper.mapServerToDto(server));
+        ServerDto dto = serverMapper.mapServerToDto(server);
+        secretsMasker.maskIfUnauthorized(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
     public ResponseEntity<ServerDto> updateServer(Long id, ServerDto serverDto) {
-        Server server = getServerEntity(id);
-        serverMapper.updateServerFromDto(serverDto, server);
-        server = serverInstanceService.updateServer(server);
-        return ResponseEntity.ok(serverMapper.mapServerToDto(server));
+        Server existing = getServerEntity(id);
+        if (!secretsMasker.canViewSecrets()) {
+            preserveExistingPasswords(serverDto, existing);
+        }
+        serverMapper.updateServerFromDto(serverDto, existing);
+        Server server = serverInstanceService.updateServer(existing);
+        ServerDto dto = serverMapper.mapServerToDto(server);
+        secretsMasker.maskIfUnauthorized(dto);
+        return ResponseEntity.ok(dto);
+    }
+
+    private void preserveExistingPasswords(ServerDto serverDto, Server existing) {
+        if (serverDto instanceof cz.forgottenempire.servermanager.api.model.Arma3ServerDto a3) {
+            a3.setPassword(existing.getPassword());
+            a3.setAdminPassword(existing.getAdminPassword());
+        } else if (serverDto instanceof cz.forgottenempire.servermanager.api.model.DayZServerDto dz) {
+            dz.setPassword(existing.getPassword());
+            dz.setAdminPassword(existing.getAdminPassword());
+        } else if (serverDto instanceof cz.forgottenempire.servermanager.api.model.ReforgerServerDto rf) {
+            rf.setPassword(existing.getPassword());
+            rf.setAdminPassword(existing.getAdminPassword());
+        }
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_DELETE + "')")
     public ResponseEntity<Void> deleteServer(Long id) {
         serverInstanceService.getServer(id).ifPresent(serverInstanceService::deleteServer);
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_OPERATE + "')")
     public ResponseEntity<Void> startServer(Long id) {
         log.info("Received request to start server ID {}", id);
         serverProcessService.startServer(id);
@@ -88,6 +123,7 @@ class ServerController implements ServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_OPERATE + "')")
     public ResponseEntity<Void> stopServer(Long id) {
         log.info("Received request to stop server ID {}", id);
         serverProcessService.shutDownServer(id);
@@ -95,6 +131,7 @@ class ServerController implements ServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_OPERATE + "')")
     public ResponseEntity<Void> restartServer(Long id) {
         log.info("Received request to restart server ID {}", id);
         serverProcessService.restartServer(id);
@@ -102,6 +139,7 @@ class ServerController implements ServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_VIEW + "')")
     public ResponseEntity<ServerInstanceInfoDto> getServerStatus(Long id) {
         ServerInstanceInfo instanceInfo = Optional.ofNullable(serverProcessService.getServerInstanceInfo(id))
                 .orElse(ServerInstanceInfo.builder().build());
@@ -109,6 +147,7 @@ class ServerController implements ServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_LOGS_VIEW + "')")
     public ResponseEntity<Resource> downloadServerLog(Long id) {
         Server server = getServerEntity(id);
         try {
@@ -128,12 +167,14 @@ class ServerController implements ServersApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_LOGS_VIEW + "')")
     public ResponseEntity<String> getServerLog(Long id, Integer count) {
         Server server = getServerEntity(id);
         return ResponseEntity.ok(server.getLog(pathsFactory).getLastLines(count));
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_OPERATE + "')")
     public ResponseEntity<Void> setAutoRestart(Long id, AutomaticRestartDto automaticRestartDto) {
         Server server = getServerEntity(id);
         boolean enabled = Boolean.TRUE.equals(automaticRestartDto.getEnabled());

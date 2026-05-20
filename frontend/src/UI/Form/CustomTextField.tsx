@@ -12,11 +12,12 @@ type CustomTextFieldProps = {
     multiline?: boolean
     containerXs?: number
     containerMd?: number
+    disabled?: boolean
 }
 
 export const CustomTextField = (
     {
-        name, label, required, type, helperText, inputProps, multiline, containerXs, containerMd
+        name, label, required, type, helperText, inputProps, multiline, containerXs, containerMd, disabled,
     }: CustomTextFieldProps
 ) => {
     const {field} = useController({name});
@@ -33,6 +34,7 @@ export const CustomTextField = (
             helperText={helperText}
             slotProps={{htmlInput: {autoComplete: 'new-password', ...inputProps}}}
             multiline={multiline}
+            disabled={disabled ?? false}
         />
     </Grid>
 };

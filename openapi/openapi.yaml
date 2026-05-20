@@ -21,6 +21,9 @@ tags:
   - name: SteamAuth
   - name: SteamCmd
   - name: System
+  - name: Users
+  - name: Roles
+  - name: Permissions
 
 paths:
 
@@ -113,6 +116,30 @@ paths:
     $ref: './paths/system.yaml#/~1system'
   /system/os:
     $ref: './paths/system.yaml#/~1system~1os'
+
+  # ── Users ──────────────────────────────────────────────────────────────────
+  /users:
+    $ref: './paths/users.yaml#/~1users'
+  /users/{id}:
+    $ref: './paths/users.yaml#/~1users~1{id}'
+  /users/{id}/roles:
+    $ref: './paths/users.yaml#/~1users~1{id}~1roles'
+  /users/{id}/password:
+    $ref: './paths/users.yaml#/~1users~1{id}~1password'
+  /users/me:
+    $ref: './paths/users.yaml#/~1users~1me'
+  /users/me/password:
+    $ref: './paths/users.yaml#/~1users~1me~1password'
+
+  # ── Roles ──────────────────────────────────────────────────────────────────
+  /roles:
+    $ref: './paths/roles.yaml#/~1roles'
+  /roles/{id}:
+    $ref: './paths/roles.yaml#/~1roles~1{id}'
+
+  # ── Permissions ────────────────────────────────────────────────────────────
+  /permissions:
+    $ref: './paths/permissions.yaml#/~1permissions'
 
 components:
 
@@ -247,3 +274,23 @@ components:
       $ref: './components/schemas/system.yaml#/ServerDetailsDto'
     ServerOSDto:
       $ref: './components/schemas/system.yaml#/ServerOSDto'
+
+    # ── User Management ───────────────────────────────────────────────────────
+    UserDto:
+      $ref: './components/schemas/user-management.yaml#/UserDto'
+    CreateUserRequest:
+      $ref: './components/schemas/user-management.yaml#/CreateUserRequest'
+    UpdateUserRequest:
+      $ref: './components/schemas/user-management.yaml#/UpdateUserRequest'
+    ChangePasswordRequest:
+      $ref: './components/schemas/user-management.yaml#/ChangePasswordRequest'
+    RoleDto:
+      $ref: './components/schemas/user-management.yaml#/RoleDto'
+    CreateRoleRequest:
+      $ref: './components/schemas/user-management.yaml#/CreateRoleRequest'
+    UpdateRoleRequest:
+      $ref: './components/schemas/user-management.yaml#/UpdateRoleRequest'
+    PermissionDto:
+      $ref: './components/schemas/user-management.yaml#/PermissionDto'
+    CurrentUserDto:
+      $ref: './components/schemas/user-management.yaml#/CurrentUserDto'

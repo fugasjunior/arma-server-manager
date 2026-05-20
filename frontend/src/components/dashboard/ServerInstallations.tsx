@@ -6,11 +6,15 @@ import {useServerInstallations} from "../../hooks/queries/useServerInstallations
 import {useSteamCmdItemInfos} from "../../hooks/queries/useSteamCmdItemInfos";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
+import PermissionGuard from "../auth/PermissionGuard";
 
 const ServerInstallations = () => {
     const queryClient = useQueryClient();
-    const {data: serverInstallations = []} = useServerInstallations({refetchInterval: 5000});
-    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000});
+    const canViewInstall = usePermission("INSTALL_VIEW");
+    const canPollSteamCmd = usePermission("STEAM_AUTH_ADMIN");
+    const {data: serverInstallations = []} = useServerInstallations({refetchInterval: 5000, enabled: canViewInstall});
+    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000, enabled: canPollSteamCmd});
 
     const handleUpdateClicked = async (serverType: ServerType) => {
         queryClient.setQueryData(queryKeys.serverInstallations, (old: ServerInstallationDto[] = []) =>
@@ -52,7 +56,7 @@ const ServerInstallations = () => {
     };
 
     return (
-        <>
+        <PermissionGuard permission="INSTALL_VIEW">
             <Grid container spacing={2}>
                 {serverInstallations.map(installation => (
                     <Grid size={{xs: 12, md: 6}} key={installation.type}>
@@ -65,7 +69,7 @@ const ServerInstallations = () => {
                     </Grid>
                 ))}
             </Grid>
-        </>
+        </PermissionGuard>
     );
 };
 
