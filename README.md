@@ -100,106 +100,21 @@ There are two ways to run the project.
 - [Docker](https://docs.docker.com/engine/install/) installed
 
 #### Installation
-To run the manager, you can use the following files:
+Download `docker-compose.yml` and `.env` from the root of this repository and place them in the same directory. Follow the comments inside `.env` to configure the required values (database credentials, storage path, Steam API key). The remaining settings are optional and have sensible defaults.
 
-`docker-compose.yml`
-```yml
-services:
-  db:
-    image: mysql:8.3.0
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_DATABASE: "${MYSQL_DB_NAME}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-    ports:
-      - "3306:3306"
-    volumes:
-      - armaservermanager-db:/var/lib/mysql
+After you've set up the values, run `docker compose up` to start the database and the server manager. The app will be accessible at http://localhost:8080 by default.
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8090:8080"
+#### First login
 
-  armaservermanager:
-    image: "fugasjunior/armaservermanager:${VERSION}"
-    restart: always
-    # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
-    network_mode: host
-    # uncomment when running on Windows and add additional ports according to your needs
-    #    ports:
-    #      - "8080:8080"
-    #      - "2302-2305:2302-2305/udp"
-    #      - "27016:27016/udp"
-    depends_on:
-      - db
-    volumes:
-      - "${STORAGE_PATH}:/home/steam/armaservermanager/"
-    environment:
-      AUTH_USERNAME: "${AUTH_USERNAME}"
-      AUTH_PASSWORD: "${AUTH_PASSWORD}"
-      SPRING_DATASOURCE_URL: "${MYSQL_DB_URL}"
-      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER}"
-      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD}"
-      STEAM_API_KEY: "${STEAM_API_KEY}"
-      JWT_SECRET: "${JWT_SECRET}"
-      DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
-      TZ: "${TIMEZONE}"
+If you did not set `AUTH_USERNAME` / `AUTH_PASSWORD` in `.env`, the app creates an `admin` account with a randomly generated password on first startup. The credentials are printed **once** to the container log:
 
-volumes:
-  armaservermanager-db:
+```
+INFO c.f.s.s.SecurityBootstrap: Initial admin credentials (shown only once):
+INFO c.f.s.s.SecurityBootstrap: Username: admin
+INFO c.f.s.s.SecurityBootstrap: Password: <generated-password>
 ```
 
-`.env`
-```properties
-# App version
-VERSION=latest
-
-# Change the path where the servers files and mods will be stored on your server
-STORAGE_PATH=/home/armaservermanager/storage
-
-# Username and password for accessing the web interface
-AUTH_USERNAME=test
-AUTH_PASSWORD=password
-
-# Database settings. Make sure to change the password and root password
-MYSQL_DB_NAME=armaservermanager_db
-MYSQL_DB_URL=jdbc:mysql://localhost:3306/armaservermanager_db
-# For Windows, use the following URL instead:
-# MYSQL_DB_URL=jdbc:mysql://db:3306/armaservermanager_db
-MYSQL_USER=armaservermanager
-MYSQL_PASSWORD=example
-MYSQL_ROOT_PASSWORD=change_me
-
-# Steam API key, needed for Steam Workshop interaction.
-# Generated with https://steamcommunity.com/dev/apikey.
-STEAM_API_KEY=
-
-# JWT secret
-# Used for creating JSON web tokens for app authentication.
-# Any string can be used as a secret. The secret should be at least 32 characters long.
-JWT_SECRET=
-
-# (OPTIONAL) Database encryption secret used for encrypting the Steam account password inside the database.
-# Must be a valid AES 256-bit key (https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx).
-# This setting is optional. In case the secret is not provided, the password will be stored in plain text form.
-# Also make sure there are no '$' symbols in the secret which cause issues when being passed through the .env file
-DATABASE_ENCRYPTION_SECRET=
-
-# Set the right Timezone from https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, example Europe/London , US/Pacific , etc
-TIMEZONE=
-```
-
-You can also find these files for download in the root of the repository.
-
-Place these two files in the same directory and follow the comments which tell you how to set them up. It's especially
-important to set up the `.env` file, as it contains passwords, database connection settings and API keys to generate.
-
-After you've set up the values, you can run `docker compose up`, which will automatically bring
-the database and the server manager up. It should then be accessible on http://localhost:8080 by default.
+Retrieve them with `docker compose logs armaservermanager | grep -A2 "Initial admin credentials"`. Change the password after first login.
 
 ### Custom installation without Docker
 While the Docker approach is recommended because of the ease of setup, there might be reasons why you'd wish to run
@@ -231,7 +146,7 @@ service and then start the container with `docker-compose up -d`.
 You can also use your own MySQL database server instead if you prefer do to so.
 
 #### Running the Admin UI app
-Launch the application by running: `java -jar arma3-server-gui.jar`. You should be able to access the GUI through
+Launch the application by running: `java -jar arma-server-manager.jar`. You should be able to access the GUI through
 `http://localhost:8080` by default.
 
 

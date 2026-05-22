@@ -12,7 +12,7 @@ services:
     volumes:
       - armaservermanager-db:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=tcp"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,16 +41,18 @@ services:
         condition: service_healthy
     volumes:
       - "${STORAGE_PATH}:/home/steam/armaservermanager/"
+      - armaservermanager-config:/home/steam/config
     environment:
-      AUTH_USERNAME: "${AUTH_USERNAME}"
-      AUTH_PASSWORD: "${AUTH_PASSWORD}"
-      SPRING_DATASOURCE_URL: "${MYSQL_DB_URL}"
-      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER}"
-      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD}"
-      STEAM_API_KEY: "${STEAM_API_KEY}"
-      JWT_SECRET: "${JWT_SECRET}"
-      DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
-      TZ: "${TIMEZONE}"
+      - AUTH_USERNAME
+      - AUTH_PASSWORD
+      - SPRING_DATASOURCE_URL=${MYSQL_DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - STEAM_API_KEY=${STEAM_API_KEY}
+      - JWT_SECRET
+      - DATABASE_ENCRYPTION_SECRET
+      - TZ=${TIMEZONE}
 
 volumes:
   armaservermanager-db:
+  armaservermanager-config:

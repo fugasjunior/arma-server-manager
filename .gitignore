@@ -5,6 +5,7 @@ config/*
 logs/
 .env
 docker-compose-dev.yml
+backend/config/secrets.properties
 
 HELP.md
 .gradle
