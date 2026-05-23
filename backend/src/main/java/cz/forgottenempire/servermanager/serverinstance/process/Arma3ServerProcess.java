@@ -11,12 +11,14 @@ import java.util.LinkedList;
 public class Arma3ServerProcess extends ServerProcess {
 
     private final String[] additionalMods;
+    private final int logMaxFiles;
     private final Deque<HeadlessClient> headlessClients;
 
     public Arma3ServerProcess(long serverId, ServerProcessCreator serverProcessCreator,
-                              ServerLaunchContext launchContext, String[] additionalMods) {
-        super(serverId, serverProcessCreator, launchContext);
+                              ServerLaunchContext launchContext, String[] additionalMods, int logMaxFiles) {
+        super(serverId, serverProcessCreator, launchContext, logMaxFiles);
         this.additionalMods = additionalMods;
+        this.logMaxFiles = logMaxFiles;
         headlessClients = new LinkedList<>();
     }
 
@@ -37,7 +39,7 @@ public class Arma3ServerProcess extends ServerProcess {
     public void addHeadlessClient(Arma3Server server) {
         headlessClients.push(
                 new HeadlessClient(headlessClients.size() + 1, server, launchContext.pathsFactory(),
-                        serverProcessCreator, additionalMods).start());
+                        serverProcessCreator, additionalMods, logMaxFiles).start());
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 

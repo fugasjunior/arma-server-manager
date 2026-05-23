@@ -46,6 +46,16 @@ directory.servers=/home/armaservermanager/servers/
 directory.logs=/home/armaservermanager/logs/server
 
 
+### Log rotation
+# Maximum number of rotated log files to keep per server (older files are deleted).
+# Default: 5
+log.rotation.max-files=5
+
+# Log file size threshold in MB for mid-session rotation (copytruncate approach).
+# When a running log file exceeds this size, it's copied to archive and truncated.
+# Default: 10
+log.rotation.max-size-mb=10
+
 ### Server config
 # Additional mods to be activated when running the server that are not managed through the UI.
 # Comma separated list, such as: mod1,mod2,mod3. Can be left blank in most cases.

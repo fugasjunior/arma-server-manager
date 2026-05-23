@@ -17,13 +17,15 @@ public class ServerProcess {
     private final long serverId;
     protected final ServerProcessCreator serverProcessCreator;
     protected final ServerLaunchContext launchContext;
+    private final int logMaxFiles;
     private Process process;
     protected ServerInstanceInfo instanceInfo;
 
-    public ServerProcess(long serverId, ServerProcessCreator serverProcessCreator, ServerLaunchContext launchContext) {
+    public ServerProcess(long serverId, ServerProcessCreator serverProcessCreator, ServerLaunchContext launchContext, int logMaxFiles) {
         this.serverId = serverId;
         this.serverProcessCreator = serverProcessCreator;
         this.launchContext = launchContext;
+        this.logMaxFiles = logMaxFiles;
     }
 
     public ServerInstanceInfo getInstanceInfo() {
@@ -43,12 +45,13 @@ public class ServerProcess {
         List<String> parameters = server.getLaunchParameters(launchContext);
 
         server.getConfigFiles(launchContext).forEach(ServerConfig::generateIfNecessary);
-        server.getLog(launchContext.pathsFactory()).prepare();
+        var logFile = server.getLog(launchContext.pathsFactory());
+        logFile.prepare(logMaxFiles);
 
         try {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
             process = serverProcessCreator.startProcessWithRedirectedOutput(
-                    executable, parameters, server.getLog(launchContext.pathsFactory()).getFile());
+                    executable, parameters, logFile.getFile());
             log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);

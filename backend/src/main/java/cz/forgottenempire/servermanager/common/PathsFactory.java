@@ -20,6 +20,7 @@ public class PathsFactory {
     private final Path modsBasePath;
     @Getter
     private final Path serversBasePath;
+    @Getter
     private final Path logsBasePath;
     private final String steamCmdPathString;
     private final String steamCmdCacheFilePath;

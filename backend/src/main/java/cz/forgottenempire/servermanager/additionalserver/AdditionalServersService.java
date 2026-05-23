@@ -2,6 +2,8 @@ package cz.forgottenempire.servermanager.additionalserver;
 
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
+import cz.forgottenempire.servermanager.serverinstance.LogRotationProperties;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,18 +27,21 @@ class AdditionalServersService {
     private final AdditionalServerInstanceInfoRepository instanceInfoRepository;
     private final ProcessFactory processFactory;
     private final String logDirectory;
+    private final int logMaxFiles;
 
     @Autowired
     public AdditionalServersService(
             AdditionalServerRepository serverRepository,
             AdditionalServerInstanceInfoRepository instanceInfoRepository,
             ProcessFactory processFactory,
-            @Value("${directory.logs}") String logDirectory
+            @Value("${directory.logs}") String logDirectory,
+            LogRotationProperties logRotationProperties
     ) {
         this.serverRepository = serverRepository;
         this.instanceInfoRepository = instanceInfoRepository;
         this.processFactory = processFactory;
         this.logDirectory = logDirectory;
+        this.logMaxFiles = logRotationProperties.getMaxFiles();
     }
 
     @PreDestroy
@@ -72,8 +77,12 @@ class AdditionalServersService {
 
         try {
             File executable = new File(settings.getCommand());
+            File logFileOnDisk = getLogFile(settings.getName());
+            LogFile logFile = new LogFile(logFileOnDisk);
+            logFile.prepare(logMaxFiles);
+
             Process process = processFactory.startProcessWithRedirectedOutput(executable, Collections.emptyList(),
-                    getLogFile(settings.getName()));
+                    logFile.getFile());
 
             instanceInfoRepository.storeServerInstanceInfo(serverId,
                     new AdditionalServerInstanceInfo(serverId, true, LocalDateTime.now(), process));
@@ -105,7 +114,6 @@ class AdditionalServersService {
         return instanceInfo.alive();
     }
 
-    // TODO split log files automatically
     private File getLogFile(String serverName) {
         File logFile = new File(Path.of(logDirectory, sanitizeServerName(serverName), "log.txt").toUri());
         File parent = logFile.getParentFile();

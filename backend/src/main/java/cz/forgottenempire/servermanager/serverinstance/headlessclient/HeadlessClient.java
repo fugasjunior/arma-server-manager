@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance.headlessclient;
 import com.google.common.base.Joiner;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessCreator;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import jakarta.annotation.Nullable;
@@ -24,26 +25,36 @@ public class HeadlessClient {
     private final PathsFactory pathsFactory;
     private final ServerProcessCreator serverProcessCreator;
     private final String[] additionalMods;
+    private final int logMaxFiles;
 
     private Process process;
 
-    public HeadlessClient(int id, Arma3Server server, PathsFactory pathsFactory,
-                          ServerProcessCreator serverProcessCreator, @Nullable String[] additionalMods) {
+    public HeadlessClient(
+            int id,
+            Arma3Server server,
+            PathsFactory pathsFactory,
+            ServerProcessCreator serverProcessCreator,
+            @Nullable String[] additionalMods,
+            int logMaxFiles
+    ) {
         this.id = id;
         this.server = server;
         this.pathsFactory = pathsFactory;
         this.serverProcessCreator = serverProcessCreator;
         this.additionalMods = additionalMods;
+        this.logMaxFiles = logMaxFiles;
     }
 
     public HeadlessClient start() {
         File executable = pathsFactory.getServerExecutableWithFallback(ServerType.ARMA3);
-        File logFile = pathsFactory.getHeadlessClientLogFile(server.getId(), id);
+        LogFile logFile = new LogFile(pathsFactory.getHeadlessClientLogFile(server.getId(), id));
+
+        logFile.prepare(logMaxFiles);
 
         try {
             List<String> parameters = prepareParameters();
             log.info("Starting headless client with options: {}", Joiner.on(" ").join(parameters));
-            process = serverProcessCreator.startProcessWithRedirectedOutput(executable, parameters, logFile);
+            process = serverProcessCreator.startProcessWithRedirectedOutput(executable, parameters, logFile.getFile());
         } catch (IOException e) {
             log.error("Failed to start headless client", e);
         }

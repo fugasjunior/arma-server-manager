@@ -7,16 +7,23 @@ import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class Arma3ServerProcessTest {
+
+    @TempDir
+    private File tempDir;
 
     private static final long SERVER_ID = 1L;
 
@@ -30,6 +37,14 @@ class Arma3ServerProcessTest {
         PathsFactory pathsFactory = mock(PathsFactory.class, withSettings().stubOnly());
         File executable = mock(File.class, withSettings().stubOnly());
         when(pathsFactory.getServerExecutableWithFallback(ServerType.ARMA3)).thenReturn(executable);
+
+        when(pathsFactory.getHeadlessClientLogFile(anyLong(), anyInt())).thenAnswer(invocation -> {
+            long serverId = invocation.getArgument(0);
+            int hcId = invocation.getArgument(1);
+            File hcLogFile = new File(tempDir, "ARMA3_" + serverId + "_HC " + hcId + ".log");
+            hcLogFile.getParentFile().mkdirs();
+            return hcLogFile;
+        });
 
         LogFile logFile = mock(LogFile.class);
         when(logFile.getFile()).thenReturn(mock(File.class, withSettings().stubOnly()));
@@ -46,7 +61,7 @@ class Arma3ServerProcessTest {
         ServerLaunchContext launchContext = new ServerLaunchContext(
                 pathsFactory, mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
-        arma3ServerProcess = new Arma3ServerProcess(SERVER_ID, processCreator, launchContext, new String[0]);
+        arma3ServerProcess = new Arma3ServerProcess(SERVER_ID, processCreator, launchContext, new String[0], 5);
     }
 
     @Test

@@ -55,7 +55,7 @@ class ServerProcessTest {
         ServerLaunchContext launchContext = new ServerLaunchContext(
                 pathsFactory, mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
-        serverProcess = new ServerProcess(SERVER_ID, processCreator, launchContext);
+        serverProcess = new ServerProcess(SERVER_ID, processCreator, launchContext, 5);
     }
 
     @Test
@@ -90,7 +90,7 @@ class ServerProcessTest {
     void start_whenServerIsStarted_thenServerLogIsPrepared() {
         serverProcess.start(server);
 
-        verify(logFile).prepare();
+        verify(logFile).prepare(5);
     }
 
     @Test
