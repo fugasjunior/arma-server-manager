@@ -27,6 +27,12 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
         error.response.status >= 400 &&
         error.response.status < 500;
 
+    // Skip toast for login endpoint errors (handled by component)
+    const isLoginEndpoint = error.config?.url?.includes('/login');
+    if (isLoginEndpoint) {
+        return Promise.reject(error);
+    }
+
     if (!expectedError) {
         console.error(error.response?.data?.message);
         toast.error("An unexpected error occurred.");

@@ -1,5 +1,6 @@
 import {ChangeEvent, FormEvent, useContext, useState} from 'react';
 import {login} from "../../services/authService";
+import {toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
 import {Box, Button, Stack, TextField, Typography} from "@mui/material";
 import {AuthContext} from "../../store/auth-context";
@@ -15,9 +16,13 @@ const Login = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const data = await login(username, password);
-        authCtx.login(data.token, data.expiresIn * 1000);
-        navigate("/");
+        try {
+            const data = await login(username, password);
+            authCtx.login(data.token, data.expiresIn * 1000);
+            navigate("/");
+        } catch (error: any) {
+            toast.error("Invalid username or password.");
+        }
     };
 
     const handleUsernameChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
