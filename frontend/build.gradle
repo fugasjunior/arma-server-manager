@@ -33,6 +33,7 @@ tasks.register('appNpmBuild', NpmTask) {
 
     outputs.dir('build')
 
+    environment = ["VITE_APP_VERSION": rootProject.version]
     args = ["run", "build"]
 }
 

@@ -8,7 +8,6 @@ plugins {
 }
 
 group = 'cz.forgottenempire'
-version = '2.0.0-SNAPSHOT'
 
 java {
     toolchain {
@@ -144,6 +143,10 @@ sourceSets {
 }
 
 compileJava.dependsOn tasks.openApiGenerate
+
+bootJar {
+    archiveFileName = 'app.jar'
+}
 
 test {
     useJUnitPlatform()

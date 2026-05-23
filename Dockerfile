@@ -22,9 +22,10 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 WORKDIR /app
 
 COPY ./build.gradle /app
+COPY ./gradle.properties /app
+COPY ./settings.gradle /app
 COPY ./gradle /app/gradle
 COPY ./gradlew /app
-COPY ./settings.gradle /app
 COPY ./frontend /app/frontend
 COPY ./backend /app/backend
 COPY ./openapi /app/openapi
@@ -38,8 +39,7 @@ RUN chmod 555 ./gradlew \
 # --- Custom minimal JRE via jlink ---
 FROM eclipse-temurin:25-jdk AS jre-build
 
-ENV APP_VERSION=2.0.0-SNAPSHOT
-COPY --from=build /app/backend/build/libs/backend-$APP_VERSION.jar /app.jar
+COPY --from=build /app/backend/build/libs/app.jar /app.jar
 RUN jlink \
       --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql,java.sql.rowset,java.xml,java.xml.crypto,jdk.attach,jdk.crypto.ec,jdk.httpserver,jdk.jfr,jdk.management,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.unsupported,jdk.unsupported.desktop \
       --strip-debug --no-man-pages --no-header-files \
@@ -47,8 +47,6 @@ RUN jlink \
 
 # --- Runtime image ---
 FROM cm2network/steamcmd AS runtime
-
-ENV APP_VERSION=2.0.0-SNAPSHOT
 
 COPY --from=jre-build /jre /opt/java/openjdk
 ENV JAVA_HOME=/opt/java/openjdk
@@ -69,7 +67,7 @@ RUN dpkg --add-architecture i386 \
 
 WORKDIR /home/steam
 COPY ./config/application-docker.properties /home/steam/config/application.properties
-COPY --from=build /app/backend/build/libs/backend-$APP_VERSION.jar /home/steam/app.jar
+COPY --from=build /app/backend/build/libs/app.jar /home/steam/app.jar
 
 RUN chown -R root:root /home/steam \
     && chmod -R 755 /home/steam
