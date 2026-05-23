@@ -62,6 +62,15 @@ tasks.register('appNpmGenerate', NpmTask) {
     args = ["run", "generate"]
 }
 
+tasks.register('syncPackageJsonVersion') {
+    doLast {
+        def pkgFile = file('package.json')
+        pkgFile.text = pkgFile.text.replaceAll(/"version"\s*:\s*"[^"]+"/, "\"version\": \"${rootProject.version}\"")
+    }
+}
+
 appNpmBuild.dependsOn(appNpmGenerate)
+appNpmBuild.dependsOn(syncPackageJsonVersion)
 appNpmTest.dependsOn(appNpmGenerate)
+appNpmTest.dependsOn(syncPackageJsonVersion)
 assemble.dependsOn(appNpmBuild)

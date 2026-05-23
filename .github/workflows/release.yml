@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: Release type
+        required: true
+        type: choice
+        options: [patch, minor, major, rc]
+        default: patch
+      rc_number:
+        description: RC number (only for rc type)
+        required: false
+        default: '1'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute and apply release version
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          RC_NUMBER: ${{ inputs.rc_number }}
+        run: bash .github/scripts/bump-version.sh
+
+      - name: Compute Docker tags
+        id: docker-tags
+        run: |
+          TAGS="fugasjunior/armaservermanager:${{ env.RELEASE_VERSION }}"
+          if [ "${{ inputs.release_type }}" != "rc" ]; then
+            TAGS="${TAGS},fugasjunior/armaservermanager:latest"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.docker-tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Commit release version and tag
+        run: |
+          git add gradle.properties frontend/package.json
+          git commit -m "chore: release v${{ env.RELEASE_VERSION }} [skip ci]"
+          git tag "v${{ env.RELEASE_VERSION }}"
+          git push origin HEAD
+          git push origin "v${{ env.RELEASE_VERSION }}"
+
+      - name: Bump to next snapshot
+        if: inputs.release_type != 'rc'
+        run: |
+          sed -i "s/^appVersion=.*/appVersion=${{ env.NEXT_SNAPSHOT }}/" gradle.properties
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"${{ env.NEXT_SNAPSHOT }}\"/" frontend/package.json
+          git add gradle.properties frontend/package.json
+          git commit -m "chore: bump version to ${{ env.NEXT_SNAPSHOT }} [skip ci]"
+          git push origin HEAD
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          gh release create "v${{ env.RELEASE_VERSION }}" \
+            --generate-notes \
+            ${{ inputs.release_type == 'rc' && '--prerelease' || '--latest' }}
