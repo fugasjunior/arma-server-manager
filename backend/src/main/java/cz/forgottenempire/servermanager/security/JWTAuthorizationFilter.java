@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,11 @@ class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return null;
         }
 
-        List<SimpleGrantedAuthority> authorities = decoded.getClaim("perms").asList(String.class)
+        List<String> perms = decoded.getClaim("perms").asList(String.class);
+        if (perms == null) {
+            perms = new ArrayList<>();
+        }
+        List<SimpleGrantedAuthority> authorities = perms
                 .stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
