@@ -5,6 +5,7 @@ export const queryKeys = {
     server: (id: number) => ["servers", id] as const,
     serverStatus: (id: number) => ["servers", id, "status"] as const,
     mods: (filter?: ServerType) => ["mods", filter ?? "all"] as const,
+    localMods: (filter?: ServerType) => ["localMods", filter ?? "all"] as const,
     presets: (filter?: ServerType) => ["presets", filter ?? "all"] as const,
     steamCmdItemInfos: ["steamCmdItemInfos"] as const,
     additionalServers: ["additionalServers"] as const,

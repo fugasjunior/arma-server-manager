@@ -73,6 +73,13 @@ Arma3ServerDto:
             The order is persisted and reflected in launch parameters (-mod=, -serverMod=).
           items:
             $ref: '#/ServerWorkshopModDto'
+        activeLocalMods:
+          type: array
+          description: >
+            Active local mods for this server. Array order is significant: index 0 is loaded first.
+            The order is persisted and reflected in launch parameters (-mod=, -serverMod=).
+          items:
+            $ref: './local-mods.yaml#/ServerLocalModDto'
         activeDLCs:
           type: array
           description: >
@@ -128,6 +135,13 @@ DayZServerDto:
             The order is persisted and reflected in launch parameters (-mod=, -serverMod=).
           items:
             $ref: '#/ServerWorkshopModDto'
+        activeLocalMods:
+          type: array
+          description: >
+            Active local mods for this server. Array order is significant: index 0 is loaded first.
+            The order is persisted and reflected in launch parameters (-mod=, -serverMod=).
+          items:
+            $ref: './local-mods.yaml#/ServerLocalModDto'
 
 ReforgerServerDto:
   allOf:
@@ -179,12 +193,15 @@ ServerInstanceInfoDto:
 
 ServerWorkshopModDto:
   type: object
+  required: [id, name, position]
   properties:
     id:
       type: integer
       format: int64
     name:
       type: string
+    position:
+      type: integer
 
 ReforgerModDto:
   type: object

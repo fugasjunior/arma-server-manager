@@ -65,6 +65,18 @@ public class PathsFactory {
         return Path.of(getServerKeysPath(type).toString(), keyName);
     }
 
+    public Path getLocalModsBasePath(ServerType type) {
+        return Path.of(getModsBasePath().toString(), "local", type.name());
+    }
+
+    public Path getLocalModPath(String dirName, ServerType type) {
+        return Path.of(getLocalModsBasePath(type).toString(), dirName);
+    }
+
+    public Path getLocalModLinkPath(String dirName, ServerType type) {
+        return Path.of(getServerPath(type).toString(), dirName);
+    }
+
     public Path getScenariosBasePath() {
         return Path.of(getServerPath(ServerType.ARMA3).toString(), "mpmissions");
     }

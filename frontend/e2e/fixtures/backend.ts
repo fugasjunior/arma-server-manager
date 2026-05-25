@@ -47,8 +47,35 @@ export class BackendHelper {
         }
     }
 
+    async seedLocalMod(name: string, serverType: string = 'ARMA3'): Promise<void> {
+        const token = await this.getToken();
+        const res = await this.ctx.post(`${BACKEND}/api/test/seed/local-mod?name=${encodeURIComponent(name)}&serverType=${serverType}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok()) {
+            throw new Error(`seedLocalMod failed: ${res.status()} ${await res.text()}`);
+        }
+    }
+
+    async removeLocalMod(name: string, serverType: string = 'ARMA3'): Promise<void> {
+        const token = await this.getToken();
+        const res = await this.ctx.delete(`${BACKEND}/api/test/seed/local-mod?name=${encodeURIComponent(name)}&serverType=${serverType}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok()) {
+            throw new Error(`removeLocalMod failed: ${res.status()} ${await res.text()}`);
+        }
+    }
+
     async scriptSteamCmdSuccess(): Promise<void> {
         await this.scriptSteamCmd({ alive: false, exitCode: 0, output: '' });
+    }
+
+    async terminateSteamCmd(): Promise<void> {
+        const token = await this.getToken();
+        await this.ctx.post(`${BACKEND}/api/test/fakes/steamcmd/terminate`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
     }
 
     async scriptSteamCmdFailure(exitCode = 1): Promise<void> {

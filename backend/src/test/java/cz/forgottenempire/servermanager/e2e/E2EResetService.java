@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Service
@@ -27,7 +29,9 @@ class E2EResetService {
     private static final List<String> TABLES_TO_DELETE_IN_ORDER = List.of(
             "arma3server_active_mods",
             "arma3server_activedlcs",
+            "arma3server_active_local_mods",
             "dayzserver_active_mods",
+            "dayzserver_active_local_mods",
             "reforger_server_active_mods",
             "arma3_network_settings",
             "arma3difficulty_settings",
@@ -40,6 +44,7 @@ class E2EResetService {
             "preset_mod",
             "workshop_mod",
             "mod_preset",
+            "local_mod",
             "steam_auth",
             "additional_server"
     );
@@ -109,6 +114,17 @@ class E2EResetService {
                 "('DAYZ','PUBLIC'),('DAYZ_EXP','PUBLIC'),('REFORGER','PUBLIC')"
         ).executeUpdate();
         entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
+    }
+
+    public void seedLocalMod(String name, String serverType) throws IOException {
+        Path modDir = Path.of(modsDir, "local", serverType, name);
+        Files.createDirectories(modDir);
+        Files.writeString(modDir.resolve("placeholder.pbo"), "placeholder");
+    }
+
+    public void removeLocalMod(String name, String serverType) throws IOException {
+        Path modDir = Path.of(modsDir, "local", serverType, name);
+        FileUtils.deleteDirectory(modDir.toFile());
     }
 
     private void wipeDirs(String... paths) {

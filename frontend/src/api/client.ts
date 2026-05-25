@@ -5,6 +5,7 @@ import {
     ArmaLauncherPresetApi,
     Configuration,
     HeadlessClientApi,
+    LocalModsApi,
     ModPresetsApi,
     ModsApi,
     PermissionsApi,
@@ -29,7 +30,9 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
 
     // Skip toast for login endpoint errors (handled by component)
     const isLoginEndpoint = error.config?.url?.includes('/login');
-    if (isLoginEndpoint) {
+    // Skip toast for local-mod 409 — component shows overwrite dialog instead
+    const isLocalModConflict = error.config?.url?.includes('/local-mod') && error.response?.status === 409;
+    if (isLoginEndpoint || isLocalModConflict) {
         return Promise.reject(error);
     }
 
@@ -54,6 +57,7 @@ export const additionalServersApi = new AdditionalServersApi(apiConfig, "", apiA
 export const headlessClientApi = new HeadlessClientApi(apiConfig, "", apiAxiosInstance);
 export const serverInstallationApi = new ServerInstallationApi(apiConfig, "", apiAxiosInstance);
 export const modsApi = new ModsApi(apiConfig, "", apiAxiosInstance);
+export const localModsApi = new LocalModsApi(apiConfig, "", apiAxiosInstance);
 export const modPresetsApi = new ModPresetsApi(apiConfig, "", apiAxiosInstance);
 export const armaLauncherPresetApi = new ArmaLauncherPresetApi(apiConfig, "", apiAxiosInstance);
 export const scenariosApi = new ScenariosApi(apiConfig, "", apiAxiosInstance);

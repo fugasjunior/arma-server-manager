@@ -7,6 +7,8 @@ import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.api.model.ServersDto;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
+import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -81,17 +84,30 @@ class ServerController implements ServersApi {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
     public ResponseEntity<ServerDto> updateServer(Long id, ServerDto serverDto) {
         Server existing = getServerEntity(id);
         if (!secretsMasker.canViewSecrets()) {
             preserveExistingPasswords(serverDto, existing);
         }
+        clearModCollections(existing);
+        serverInstanceService.flush();
         serverMapper.updateServerFromDto(serverDto, existing);
         Server server = serverInstanceService.updateServer(existing);
         ServerDto dto = serverMapper.mapServerToDto(server);
         secretsMasker.maskIfUnauthorized(dto);
         return ResponseEntity.ok(dto);
+    }
+
+    private void clearModCollections(Server server) {
+        if (server instanceof Arma3Server a3) {
+            a3.getActiveMods().clear();
+            a3.getActiveLocalMods().clear();
+        } else if (server instanceof DayZServer dz) {
+            dz.getActiveMods().clear();
+            dz.getActiveLocalMods().clear();
+        }
     }
 
     private void preserveExistingPasswords(ServerDto serverDto, Server existing) {

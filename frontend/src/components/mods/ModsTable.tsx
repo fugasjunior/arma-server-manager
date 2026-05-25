@@ -137,7 +137,9 @@ const ModsTable = (props: ModsTableProps) => {
                                 checked={modDto.serverOnly}
                                 disabled={!canModify}
                                 onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => props.onServerOnlyChanged(e, modDto.id!)}/>
+                                onChange={(e) => props.onServerOnlyChanged(e, modDto.id!)}
+                                size="small"
+                            />
                         </span>
                     },
                     {

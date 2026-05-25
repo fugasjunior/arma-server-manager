@@ -12,9 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import cz.forgottenempire.servermanager.common.exceptions.CustomUserErrorException;
+import org.springframework.http.HttpStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +25,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -120,7 +120,7 @@ class WorkshopInstallerService {
 
     private void deleteBiKeys(WorkshopMod mod) {
         mod.getBiKeys().forEach(biKey -> {
-            for (ServerType serverType : getRelevantServerTypes(mod)) {
+            for (ServerType serverType : installationService.getInstalledRelatedServerTypes(mod.getServerType())) {
                 File keyFile = pathsFactory.getServerKeyPath(biKey, serverType).toFile();
                 FileUtils.deleteQuietly(keyFile);
             }
@@ -134,7 +134,7 @@ class WorkshopInstallerService {
         for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
             File key = it.next();
             mod.addBiKey(key.getName());
-            for (ServerType serverType : getRelevantServerTypes(mod)) {
+            for (ServerType serverType : installationService.getInstalledRelatedServerTypes(mod.getServerType())) {
                 log.debug("Copying BiKey {} to server {}", key.getName(), serverType);
                 FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), serverType).toFile());
             }
@@ -142,27 +142,27 @@ class WorkshopInstallerService {
     }
 
     private void createSymlink(WorkshopMod mod) throws IOException {
-        // create symlink to server directory
         Path targetPath = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType());
 
-        for (ServerType serverType : getRelevantServerTypes(mod)) {
+        for (ServerType serverType : installationService.getInstalledRelatedServerTypes(mod.getServerType())) {
             Path linkPath = pathsFactory.getModLinkPath(mod.getNormalizedName(), serverType);
-            if (!Files.isSymbolicLink(linkPath)) {
+            if (Files.isSymbolicLink(linkPath)) {
+                Path existingTarget = Files.readSymbolicLink(linkPath);
+                if (!existingTarget.isAbsolute()) {
+                    existingTarget = linkPath.getParent().resolve(existingTarget);
+                }
+                if (existingTarget.startsWith(pathsFactory.getLocalModsBasePath(serverType))) {
+                    throw new CustomUserErrorException(
+                            "Cannot install workshop mod '" + mod.getName() + "': a local mod symlink already exists at " +
+                            linkPath + ". Delete the conflicting local mod first.",
+                            HttpStatus.CONFLICT);
+                }
+                // existing workshop symlink — already linked, skip
+            } else {
                 log.debug("Creating symlink - link {}, target {}", linkPath, targetPath);
                 Files.createSymbolicLink(linkPath, targetPath);
             }
         }
-    }
-
-    private Collection<ServerType> getRelevantServerTypes(WorkshopMod mod) {
-        Set<ServerType> serverTypes = new HashSet<>();
-        if (installationService.isServerInstalled(mod.getServerType())) {
-            serverTypes.add(mod.getServerType());
-        }
-        if (mod.getServerType() == ServerType.DAYZ && installationService.isServerInstalled(ServerType.DAYZ_EXP)) {
-            serverTypes.add(ServerType.DAYZ_EXP);
-        }
-        return serverTypes;
     }
 
     private void updateModInfo(WorkshopMod mod) {

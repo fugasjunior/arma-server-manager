@@ -7,7 +7,6 @@ import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.util.SystemUtils;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
-import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -44,12 +44,15 @@ public class Arma3Server extends Server {
     @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "arma3server_active_mods",
-            joinColumns = @JoinColumn(name = "arma3server_id"),
-            inverseJoinColumns = @JoinColumn(name = "active_mods_id"))
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "arma3server_id", nullable = false)
     @OrderColumn(name = "mod_order")
-    private List<WorkshopMod> activeMods;
+    private List<Arma3ServerActiveMod> activeMods = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "arma3server_id", nullable = false)
+    @OrderColumn(name = "mod_order")
+    private List<Arma3ServerActiveLocalMod> activeLocalMods = new ArrayList<>();
 
     @ElementCollection(targetClass = Arma3CDLC.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
@@ -119,11 +122,22 @@ public class Arma3Server extends Server {
     }
 
     public Stream<String> getServerModsAsParameters() {
-        return getActiveServerMods().stream().map(mod -> "-serverMod=" + mod.getNormalizedName());
+        return orderedActiveMods()
+                .filter(ActiveModEntry::isServerOnly)
+                .map(e -> "-serverMod=" + e.getLaunchName());
     }
 
     public Stream<String> getClientModsAsParameters() {
-        return getActiveClientMods().stream().map(mod -> "-mod=" + mod.getNormalizedName());
+        return orderedActiveMods()
+                .filter(e -> !e.isServerOnly())
+                .map(e -> "-mod=" + e.getLaunchName());
+    }
+
+    private Stream<ActiveModEntry> orderedActiveMods() {
+        return Stream.concat(
+                activeMods.stream().map(e -> (ActiveModEntry) e),
+                activeLocalMods.stream().map(e -> (ActiveModEntry) e)
+        ).sorted(Comparator.comparingInt(ActiveModEntry::getPosition));
     }
 
     public Stream<String> getCreatorDlcsAsParameters() {
@@ -132,18 +146,6 @@ public class Arma3Server extends Server {
 
     public Stream<String> getAdditionalModsAsParameters(String[] additionalMods) {
         return Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod);
-    }
-
-    private List<WorkshopMod> getActiveClientMods() {
-        return getActiveMods().stream()
-                .filter(mod -> !mod.isServerOnly())
-                .toList();
-    }
-
-    private List<WorkshopMod> getActiveServerMods() {
-        return getActiveMods().stream()
-                .filter(WorkshopMod::isServerOnly)
-                .toList();
     }
 
     private File getConfigFile(PathsFactory pathsFactory) {

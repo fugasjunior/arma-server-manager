@@ -15,6 +15,7 @@ tags:
   - name: HeadlessClient
   - name: ServerInstallation
   - name: Mods
+  - name: LocalMods
   - name: ModPresets
   - name: ArmaLauncherPreset
   - name: Scenarios
@@ -74,6 +75,16 @@ paths:
     $ref: './paths/mods.yaml#/~1mod~1{id}'
   /mod/{id}/serverOnly:
     $ref: './paths/mods.yaml#/~1mod~1{id}~1serverOnly'
+
+  # ── Local Mods ────────────────────────────────────────────────────────────
+  /local-mod:
+    $ref: './paths/local-mods.yaml#/~1local-mod'
+  /local-mod/{id}/serverOnly:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1serverOnly'
+  /local-mod/sync:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1sync'
+  /local-mod/sync/status:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1sync~1status'
 
   # ── Mod Presets ────────────────────────────────────────────────────────────
   /mod/preset:
@@ -224,6 +235,14 @@ components:
       $ref: './components/schemas/installation.yaml#/ServerInstallationsDto'
     ActiveBranchDto:
       $ref: './components/schemas/installation.yaml#/ActiveBranchDto'
+
+    # ── Local Mods ───────────────────────────────────────────────────────────
+    LocalModDto:
+      $ref: './components/schemas/local-mods.yaml#/LocalModDto'
+    LocalModsDto:
+      $ref: './components/schemas/local-mods.yaml#/LocalModsDto'
+    ServerLocalModDto:
+      $ref: './components/schemas/local-mods.yaml#/ServerLocalModDto'
 
     # ── Workshop Mods ─────────────────────────────────────────────────────────
     ModDto:

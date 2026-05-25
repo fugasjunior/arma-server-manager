@@ -68,7 +68,7 @@ class ServerModOrderJourneyTest extends AbstractIntegrationTest {
                   "port": 2502,
                   "queryPort": 2503,
                   "maxPlayers": 20,
-                  "activeMods": [{"id": %d}, {"id": %d}, {"id": %d}],
+                  "activeMods": [{"id": %d, "name": "ModC", "position": 0}, {"id": %d, "name": "ModA", "position": 1}, {"id": %d, "name": "ModB", "position": 2}],
                   "activeDLCs": [],
                   "customLaunchParameters": [],
                   "difficultySettings": {}

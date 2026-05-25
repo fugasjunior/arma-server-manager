@@ -4,6 +4,8 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class ServerInstanceService {
     private final ServerProcessService processService;
     private final PathsFactory pathsFactory;
     private final FreeMarkerConfigurer freeMarkerConfigurer;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public ServerInstanceService(
@@ -70,5 +75,9 @@ public class ServerInstanceService {
         server.setRestartAutomatically(enabled);
         server.setAutomaticRestartTime(time);
         serverRepository.save(server);
+    }
+
+    public void flush() {
+        entityManager.flush();
     }
 }

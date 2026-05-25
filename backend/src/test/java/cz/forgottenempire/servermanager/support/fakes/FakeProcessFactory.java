@@ -19,9 +19,17 @@ public class FakeProcessFactory extends ProcessFactory {
 
     private final Map<String, Deque<FakeProcess>> scripts = new ConcurrentHashMap<>();
     private final Deque<FakeProcess> serverProcesses = new ArrayDeque<>();
+    private volatile FakeProcess lastSteamCmdProcess;
 
     public void scriptSteamCmd(FakeProcess process) {
         scripts.computeIfAbsent("steamcmd", k -> new ArrayDeque<>()).addLast(process);
+    }
+
+    public void terminateCurrentSteamCmd() {
+        FakeProcess p = lastSteamCmdProcess;
+        if (p != null) {
+            p.terminate();
+        }
     }
 
     public void scriptSteamCmdWithFixture(String fixtureName) {
@@ -99,10 +107,13 @@ public class FakeProcessFactory extends ProcessFactory {
             if (queue != null) {
                 FakeProcess p = queue.pollFirst();
                 if (p != null) {
+                    lastSteamCmdProcess = p;
                     return p;
                 }
             }
-            return FakeProcess.exiting(0);
+            FakeProcess p = FakeProcess.exiting(0);
+            lastSteamCmdProcess = p;
+            return p;
         }
         return resolveForServerProcess();
     }

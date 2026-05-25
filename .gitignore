@@ -6,6 +6,7 @@ logs/
 .env
 docker-compose-dev.yml
 backend/config/
+backend/bin/
 
 HELP.md
 .gradle
@@ -50,3 +51,6 @@ out/
 
 # MCP
 .playwright-mcp/
+
+# Local test server artifact
+backend/Test_server/

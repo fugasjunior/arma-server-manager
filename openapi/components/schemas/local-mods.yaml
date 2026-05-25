@@ -1,0 +1,44 @@
+LocalModDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    serverType:
+      $ref: './common.yaml#/ServerType'
+    fileSize:
+      type: integer
+      format: int64
+    serverOnly:
+      type: boolean
+    uploadedAt:
+      type: string
+
+LocalModsDto:
+  type: object
+  properties:
+    localMods:
+      type: array
+      items:
+        $ref: '#/LocalModDto'
+
+ServerLocalModDto:
+  type: object
+  required: [id, name, position]
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    position:
+      type: integer
+
+LocalModSyncStatusDto:
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [IDLE, IN_PROGRESS, FINISHED, ERROR]

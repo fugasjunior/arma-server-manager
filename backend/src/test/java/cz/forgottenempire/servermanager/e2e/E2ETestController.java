@@ -8,11 +8,14 @@ import cz.forgottenempire.servermanager.support.fakes.FakeProcessFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 
 /**
  * Test-only endpoints for resetting application state between E2E tests.
@@ -58,6 +61,18 @@ public class E2ETestController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/seed/local-mod")
+    public ResponseEntity<Void> seedLocalMod(@RequestParam String name, @RequestParam String serverType) throws IOException {
+        resetService.seedLocalMod(name, serverType);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/seed/local-mod")
+    public ResponseEntity<Void> removeLocalMod(@RequestParam String name, @RequestParam String serverType) throws IOException {
+        resetService.removeLocalMod(name, serverType);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/fakes/steamcmd")
     public ResponseEntity<Void> scriptSteamCmd(@RequestBody FakeProcessRequest request) {
         fakeProcessFactory.scriptSteamCmd(buildFakeProcess(request));
@@ -67,6 +82,12 @@ public class E2ETestController {
     @PostMapping("/fakes/server-process")
     public ResponseEntity<Void> scriptServerProcess(@RequestBody FakeProcessRequest request) {
         fakeProcessFactory.scriptServerProcess(buildFakeProcess(request));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/fakes/steamcmd/terminate")
+    public ResponseEntity<Void> terminateSteamCmd() {
+        fakeProcessFactory.terminateCurrentSteamCmd();
         return ResponseEntity.ok().build();
     }
 

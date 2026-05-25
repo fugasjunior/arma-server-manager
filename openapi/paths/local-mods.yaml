@@ -1,0 +1,66 @@
+/local-mod:
+  get:
+    tags: [LocalMods]
+    operationId: getLocalMods
+    summary: List all local mods (optionally filtered by server type)
+    parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          $ref: '../components/schemas/common.yaml#/ServerType'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/local-mods.yaml#/LocalModsDto'
+
+/local-mod/{id}/serverOnly:
+  patch:
+    tags: [LocalMods]
+    operationId: setLocalModServerOnly
+    summary: Toggle server-only flag for a local mod
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mods.yaml#/ServerOnlyDto'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/local-mod/sync:
+  post:
+    tags: [LocalMods]
+    operationId: syncLocalMods
+    summary: Start async sync of all local mods (ARMA3 + DAYZ)
+    responses:
+      '202':
+        description: Sync started
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/local-mod/sync/status:
+  get:
+    tags: [LocalMods]
+    operationId: getLocalModSyncStatus
+    summary: Get global sync status
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/local-mods.yaml#/LocalModSyncStatusDto'

@@ -11,7 +11,8 @@ test.beforeEach(async () => {
 
 test('install Arma3 server transitions from idle to in-progress then finishes', async ({ browser }) => {
     const backend = await createBackendHelper();
-    await backend.scriptSteamCmdSuccess();
+    // Script steamcmd to stay alive so the frontend can observe the in-progress state
+    await backend.scriptSteamCmd({ alive: true, exitCode: 0, output: '' });
     await backend.dispose();
 
     const page = await getAuthenticatedPage(browser);
@@ -25,6 +26,11 @@ test('install Arma3 server transitions from idle to in-progress then finishes', 
 
     // Status transitions to in-progress (button disabled)
     await dashboard.waitForInstallInProgress('ARMA3');
+
+    // Terminate the alive fake process so the installation can complete
+    const backend2 = await createBackendHelper();
+    await backend2.terminateSteamCmd();
+    await backend2.dispose();
 
     // Polling eventually shows completion (up to 30s with 5s poll interval)
     await dashboard.waitForInstallFinished('ARMA3');

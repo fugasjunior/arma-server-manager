@@ -4,6 +4,7 @@ import {
     BaseServerDto,
     CreatorDlcDto,
     ReforgerModDto,
+    ServerLocalModDto,
     ServerWorkshopModDto
 } from './generated';
 
@@ -15,6 +16,7 @@ export interface Arma3ServerDto extends BaseServerDto {
     vonEnabled?: boolean;
     verifySignatures?: boolean;
     activeMods?: ServerWorkshopModDto[];
+    activeLocalMods?: ServerLocalModDto[];
     activeDLCs?: CreatorDlcDto[];
     difficultySettings?: Arma3DifficultySettingsDto;
     networkSettings?: Arma3NetworkSettingsDto;
@@ -33,6 +35,7 @@ export interface DayZServerDto extends BaseServerDto {
     timeAcceleration?: number;
     nightTimeAcceleration?: number;
     activeMods?: ServerWorkshopModDto[];
+    activeLocalMods?: ServerLocalModDto[];
 }
 
 export interface ReforgerServerDto extends BaseServerDto {

@@ -84,6 +84,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, new HttpHeaders(), error.getStatus());
     }
 
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception ex) {
         ApiError error = ApiError.builder()
