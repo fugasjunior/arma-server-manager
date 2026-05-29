@@ -1,10 +1,14 @@
 package cz.forgottenempire.servermanager.e2e;
 
+import cz.forgottenempire.servermanager.common.InstallationStatus;
+import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
 import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
 import cz.forgottenempire.servermanager.support.fakes.FakeProcess;
 import cz.forgottenempire.servermanager.support.fakes.FakeProcessFactory;
+import cz.forgottenempire.servermanager.workshop.WorkshopMod;
+import cz.forgottenempire.servermanager.workshop.WorkshopModsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +39,9 @@ public class E2ETestController {
     @Autowired
     private FakeSteamAuthVerifier fakeSteamAuthVerifier;
 
+    @Autowired
+    private WorkshopModsService workshopModsService;
+
     @PostMapping("/reset")
     public ResponseEntity<Void> reset(
             @RequestParam(defaultValue = "true") boolean seedSteamAuth) {
@@ -52,6 +59,19 @@ public class E2ETestController {
                 .authType(authType)
                 .message(request.message())
                 .build());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/seed/workshop-mod")
+    public ResponseEntity<Void> seedWorkshopMod(
+            @RequestParam long id,
+            @RequestParam(defaultValue = "CBA_A3") String name,
+            @RequestParam(defaultValue = "ARMA3") String serverType) {
+        WorkshopMod mod = new WorkshopMod(id);
+        mod.setName(name);
+        mod.setServerType(ServerType.valueOf(serverType));
+        mod.setInstallationStatus(InstallationStatus.FINISHED);
+        workshopModsService.saveMod(mod);
         return ResponseEntity.ok().build();
     }
 

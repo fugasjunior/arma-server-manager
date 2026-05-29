@@ -18,6 +18,10 @@ class JsonPropertyProvider {
         return getValueFromJson("consumer_appid", modInfoJson);
     }
 
+    public String findPublishedFileId() {
+        return getValueFromJson("publishedfileid", modInfoJson);
+    }
+
     private String getValueFromJson(String key, JsonNode modInfoJson) {
         JsonNode value = modInfoJson.findValue(key);
         return value != null ? value.asString() : null;

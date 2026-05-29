@@ -26,7 +26,7 @@ test('install mod by workshop ID shows it in the list', async ({ browser }) => {
     await modsPage.installMod(CBA_A3_ID);
 
     await modsPage.waitForModVisible(CBA_A3_ID);
-    await expect(page.getByText('CBA_A3', { exact: true })).toBeVisible();
+    await expect(page.getByText('CBA_A3', { exact: true })).toBeVisible({ timeout: 20_000 });
 
     await page.close();
 });

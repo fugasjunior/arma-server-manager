@@ -26,11 +26,7 @@ test.beforeEach(async () => {
 });
 
 async function seedMod(backend: Awaited<ReturnType<typeof createBackendHelper>>) {
-    const token = await backend.getToken();
-    await fetch(`${BACKEND_URL}/api/mod?modIds=${CBA_A3_ID}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-    });
+    await backend.seedWorkshopMod(CBA_A3_ID, 'CBA_A3');
 }
 
 test('create preset from selected mods', async ({ browser }) => {

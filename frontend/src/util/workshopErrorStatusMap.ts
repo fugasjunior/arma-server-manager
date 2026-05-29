@@ -8,7 +8,9 @@ const workshopErrorStatusMap = new Map<ErrorStatus, String>([
     [ErrorStatus.Timeout, "The request timed out, please retry.",],
     [ErrorStatus.WrongAuth, "Incorrect Steam authorization. Please check username, password and Steam Guard token.",],
     [ErrorStatus.RateLimit, "Too many incorrect login attempts. Please try again later (no sooner than 30 minutes after last attempt)."],
-    [ErrorStatus.Interrupted, "The installation was interrupted. Please try again."]
+    [ErrorStatus.Interrupted, "The installation was interrupted. Please try again."],
+    [ErrorStatus.NotConsumedByGame, "This mod is not compatible with any supported game (Arma 3 / DayZ)."],
+    [ErrorStatus.ServerNotInstalled, "The target game server is not installed. Install the server first, then retry."]
 ]);
 
 export default workshopErrorStatusMap;

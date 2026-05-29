@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.workshop;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.installation.ServerInstallationService;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,15 @@ class E2EWorkshopInstallerService extends WorkshopInstallerService {
     private final PathsFactory pathsFactory;
 
     E2EWorkshopInstallerService(PathsFactory pathsFactory, WorkshopModsService modsService,
-                                 SteamCmdService steamCmdService, ServerInstallationService installationService) {
-        super(pathsFactory, modsService, steamCmdService, installationService);
+                                 SteamCmdService steamCmdService, ServerInstallationService installationService,
+                                 ModMetadataService metadataService) {
+        super(pathsFactory, modsService, steamCmdService, installationService, metadataService);
         this.pathsFactory = pathsFactory;
     }
 
     @Override
-    public void installOrUpdateMods(Collection<WorkshopMod> mods) {
+    protected void beforeDownload(Collection<WorkshopMod> mods) {
         mods.forEach(mod ->
                 pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile().mkdirs());
-        super.installOrUpdateMods(mods);
     }
 }

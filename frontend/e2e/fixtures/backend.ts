@@ -67,6 +67,17 @@ export class BackendHelper {
         }
     }
 
+    async seedWorkshopMod(id: number, name: string = 'CBA_A3', serverType: string = 'ARMA3'): Promise<void> {
+        const token = await this.getToken();
+        const res = await this.ctx.post(
+            `${BACKEND}/api/test/seed/workshop-mod?id=${id}&name=${encodeURIComponent(name)}&serverType=${serverType}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        if (!res.ok()) {
+            throw new Error(`seedWorkshopMod failed: ${res.status()} ${await res.text()}`);
+        }
+    }
+
     async scriptSteamCmdSuccess(): Promise<void> {
         await this.scriptSteamCmd({ alive: false, exitCode: 0, output: '' });
     }
