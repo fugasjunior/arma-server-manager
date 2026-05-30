@@ -4,22 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.5.0]
 
 ### Added
-- Local mods: sync and enable locally stored mod folders directly from the filesystem
-- Role-based access control: multiple user accounts with configurable roles and permissions
-- Server uninstallation from the dashboard
-- Mod drag-to-reorder (load order is reflected in server launch parameters)
-- Persistent headless clients (configuration survives manager restarts)
+- Local mods: sync and enable locally stored mod folders directly from the filesystem (#135)
+- Role-based access control: multiple user accounts with configurable roles and permissions (#140)
+- Server uninstallation from the dashboard (#125)
+- Mod drag-to-reorder (load order is reflected in server launch parameters) (#155)
+- Persistent headless clients (configuration survives manager restarts) (#118)
 - Automatic daily server restart scheduling (per-server, configurable time)
 - Auto-generated admin credentials on first startup when `AUTH_USERNAME`/`AUTH_PASSWORD` are not set in `.env`
 - GitHub Actions CI/CD workflows
-- Log file rotation
+- Log file rotation (#119, #128)
+- @extDB3 support (#137)
 
 ### Fixed
 - Workshop mod installation is now async — the UI no longer blocks during downloads
 - Server installation status no longer returns a stale cached response
+- Deleting scenarios with '#' in the name now works correctly (#160)
 
 ## [1.4.1]
 
