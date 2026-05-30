@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.ConfigFileKey;
 import cz.forgottenempire.servermanager.serverinstance.ConfigOverrideService;
@@ -19,6 +20,7 @@ public class ServerProcessFactory {
 
     private final ServerProcessCreator serverProcessCreator;
     private final PathsFactory pathsFactory;
+    private final Arma3InstancePaths arma3InstancePaths;
     private final FreeMarkerConfigurer freeMarkerConfigurer;
     private final String[] additionalMods;
     private final int logMaxFiles;
@@ -27,12 +29,14 @@ public class ServerProcessFactory {
     @Autowired
     public ServerProcessFactory(ServerProcessCreator serverProcessCreator,
                                 PathsFactory pathsFactory,
+                                Arma3InstancePaths arma3InstancePaths,
                                 FreeMarkerConfigurer freeMarkerConfigurer,
                                 @Value("${additionalMods:#{null}}") String[] additionalMods,
                                 LogRotationProperties logRotationProperties,
                                 ConfigOverrideService configOverrideService) {
         this.serverProcessCreator = serverProcessCreator;
         this.pathsFactory = pathsFactory;
+        this.arma3InstancePaths = arma3InstancePaths;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
         this.additionalMods = additionalMods;
         this.logMaxFiles = logRotationProperties.getMaxFiles();
@@ -42,7 +46,7 @@ public class ServerProcessFactory {
     public ServerProcess create(Server server) {
         Map<ConfigFileKey, String> overrides = configOverrideService.loadOverridesMap(server.getId());
         ServerLaunchContext ctx = new ServerLaunchContext(
-                pathsFactory, freeMarkerConfigurer, additionalMods,
+                pathsFactory, arma3InstancePaths, freeMarkerConfigurer, additionalMods,
                 overrides.isEmpty() ? null : overrides);
         if (server instanceof Arma3Server) {
             return new Arma3ServerProcess(server.getId(), serverProcessCreator, ctx, additionalMods, logMaxFiles);

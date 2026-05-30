@@ -25,7 +25,7 @@ services:
       - "8090:8080"
 
   armaservermanager:
-    image: "fugasjunior/armaservermanager:${VERSION}"
+    build: .
     restart: always
     # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host

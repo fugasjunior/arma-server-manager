@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.api.model.ConfigOverrideDto;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
@@ -25,6 +26,7 @@ public class ServerInstanceService {
     private final ServerRepository serverRepository;
     private final ServerProcessService processService;
     private final PathsFactory pathsFactory;
+    private final Arma3InstancePaths arma3InstancePaths;
     private final FreeMarkerConfigurer freeMarkerConfigurer;
     private final ConfigOverrideService configOverrideService;
 
@@ -36,12 +38,14 @@ public class ServerInstanceService {
             ServerRepository serverRepository,
             ServerProcessService processService,
             PathsFactory pathsFactory,
+            Arma3InstancePaths arma3InstancePaths,
             FreeMarkerConfigurer freeMarkerConfigurer,
             ConfigOverrideService configOverrideService
     ) {
         this.serverRepository = serverRepository;
         this.processService = processService;
         this.pathsFactory = pathsFactory;
+        this.arma3InstancePaths = arma3InstancePaths;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
         this.configOverrideService = configOverrideService;
     }
@@ -59,7 +63,7 @@ public class ServerInstanceService {
         Server persistedServer = serverRepository.save(server);
         Map<ConfigFileKey, String> overrideMap = configOverrideService.syncOverrides(persistedServer, overrides);
         ServerLaunchContext ctx = new ServerLaunchContext(
-                pathsFactory, freeMarkerConfigurer, null,
+                pathsFactory, arma3InstancePaths, freeMarkerConfigurer, null,
                 overrideMap.isEmpty() ? null : overrideMap);
         persistedServer.getConfigFiles(ctx).forEach(ServerConfig::generate);
         return persistedServer;

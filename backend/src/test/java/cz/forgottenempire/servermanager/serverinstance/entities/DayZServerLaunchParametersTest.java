@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.localmod.LocalMod;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
@@ -42,7 +43,10 @@ class DayZServerLaunchParametersTest {
     private ServerLaunchContext mockLaunchContext() {
         PathsFactory pathsFactory = mock(PathsFactory.class, withSettings().stubOnly());
         when(pathsFactory.getConfigFilePath(any(), any())).thenReturn(Path.of("/tmp/dayz.cfg"));
-        return new ServerLaunchContext(pathsFactory, mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
+        return new ServerLaunchContext(
+                pathsFactory,
+                mock(Arma3InstancePaths.class, withSettings().stubOnly()),
+                mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
     }
 
     @Test

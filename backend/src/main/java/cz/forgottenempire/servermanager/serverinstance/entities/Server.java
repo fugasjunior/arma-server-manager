@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
+import java.io.IOException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -58,6 +59,12 @@ public abstract class Server {
     public abstract List<String> getLaunchParameters(ServerLaunchContext ctx);
 
     public abstract Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx);
+
+    /**
+     * Hook called before config generation and process start.
+     * Subclasses override to create instance-specific directories or perform other setup.
+     */
+    public abstract void prepareLaunchEnvironment(ServerLaunchContext ctx) throws IOException;
 
     public LogFile getLog(PathsFactory pathsFactory) {
         return new LogFile(pathsFactory.getServerLogFile(type, id));
