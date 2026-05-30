@@ -1,6 +1,6 @@
 {
     "name": "arma-server-manager",
-    "version": "1.6.0",
+    "version": "1.6.1-SNAPSHOT",
     "private": true,
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",
