@@ -56,15 +56,22 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
 
     @Override
     public String convertToEntityAttribute(String dbData) {
-        if (!encryptionEnabled) {
+        if (!encryptionEnabled || StringUtils.isBlank(dbData)) {
             return dbData;
         }
 
         try {
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));
-        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new IllegalStateException(e);
+        } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException
+                 | IllegalArgumentException e) {
+            // Value could not be decrypted with the current key. This happens for legacy values
+            // stored as plain text before encryption was enabled (e.g. when the encryption secret
+            // is now auto-generated). Treat the value as plain text and return it unchanged; it
+            // will be re-encrypted transparently on the next save.
+            log.warn("Could not decrypt stored value, treating it as legacy plain text. "
+                    + "It will be re-encrypted on next save. (Cause: {})", e.getMessage());
+            return dbData;
         }
     }
 }
