@@ -61,6 +61,7 @@ RUN dpkg --add-architecture i386 \
           lib32stdc++6 \
           libcap2 \
           expect \
+          libtbbmalloc2 \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
