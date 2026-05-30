@@ -78,7 +78,7 @@ user uploading a scenario would see it silently ignored by the server. Therefore
   (F3 backend + F4 frontend), and existing data migrated (F6) — is complete.
 - **F5** — follows later as a separate, independently shippable increment on top.
 
-### F0 — Instance path methods (foundation, no behavior change)
+### F0 — Instance path methods (foundation, no behavior change) ✅
 
 Pure groundwork: introduce the per-instance path vocabulary in one place so F1–F3
 have a stable API to build on. **No existing callers change**, nothing reads the
