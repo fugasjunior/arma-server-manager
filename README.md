@@ -43,6 +43,7 @@ For more comprehensive list of features, see [Features](#features).
     - [Setting up SteamAuth](#setting-up-steamauth)
     - [Installing server files](#installing-server-files)
     - [Configuring your first server](#configuring-your-first-server)
+    - [Using local mods](#using-local-mods)
     - [Additional servers](#additional-servers)
 - [Discord](#discord)
 - [Support](#support)
@@ -207,6 +208,26 @@ Head to "Servers" tab and click the "Create new server" button. From the dropdow
 After that, finish the configuration and press "Submit" to create the server.
 
 Now, you should already see the server appear in the servers list. Now you're pretty much done - try running the server!
+
+### Using local mods
+
+> Supported for **Arma 3** and **DayZ** only.
+
+Local mods are mod folders you manage yourself — they are not downloaded from Steam Workshop.
+
+1. **Place the mod folder** in the correct subdirectory of your mods storage path:
+   - Arma 3: `<mods dir>/local/ARMA3/<ModName>`
+   - DayZ: `<mods dir>/local/DAYZ/<ModName>`
+
+   With Docker the mods dir lives inside your `STORAGE_PATH` volume (e.g. `$STORAGE_PATH/mods/local/ARMA3/<ModName>`).
+   Without Docker it is the value of `directory.mods` in `application.properties` (default `/home/armaservermanager/mods`).
+
+2. **Sync** — in the UI, open the **Mods** page and switch to the **Local Mods** tab, then click **Sync local mods**.
+   Sync scans the directories, registers new mod folders, refreshes existing ones, removes entries for deleted
+   folders, lowercases all file names (required by the game), copies `.bikey` files into each installed server's
+   `keys` directory, and creates the necessary symlinks.
+
+3. **Enable on a server** — edit your server and add the local mod to the active mod list, just like a workshop mod.
 
 ### Additional servers
 If you need to manage other servers than the ones natively supported, you can use the Additional servers feature.
