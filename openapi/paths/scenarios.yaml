@@ -29,6 +29,21 @@
     responses:
       '200':
         description: OK
+  delete:
+    tags: [Scenarios]
+    operationId: deleteScenario
+    summary: Delete a scenario
+    parameters:
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+    responses:
+      '204':
+        description: No Content
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
 
 /scenarios/REFORGER:
   get:
@@ -43,14 +58,14 @@
             schema:
               $ref: '../components/schemas/scenarios.yaml#/ReforgerScenariosDto'
 
-/scenarios/{name}:
+/scenarios/download:
   get:
     tags: [Scenarios]
     operationId: downloadScenario
     summary: Download a scenario file
     parameters:
       - name: name
-        in: path
+        in: query
         required: true
         schema:
           type: string
@@ -63,19 +78,4 @@
               type: string
               format: binary
       '404':
-        $ref: '../components/responses.yaml#/ApiError'
-  delete:
-    tags: [Scenarios]
-    operationId: deleteScenario
-    summary: Delete a scenario
-    parameters:
-      - name: name
-        in: path
-        required: true
-        schema:
-          type: string
-    responses:
-      '204':
-        description: No Content
-      '400':
         $ref: '../components/responses.yaml#/ApiError'

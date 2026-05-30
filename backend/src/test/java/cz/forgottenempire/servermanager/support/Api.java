@@ -64,6 +64,12 @@ public class Api {
                 .header("Authorization", token.get()));
     }
 
+    public ResultActions deleteWithQueryParam(String path, String paramName, String value) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.delete(path)
+                .queryParam(paramName, value)
+                .header("Authorization", token.get()));
+    }
+
     public ResultActions multipartPost(String path, String paramName, File file, String contentType) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.multipart(path)
                 .file(new MockMultipartFile(paramName, file.getName(), contentType,
