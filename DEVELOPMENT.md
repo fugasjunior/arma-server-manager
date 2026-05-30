@@ -89,11 +89,17 @@ cd frontend
 # Install dependencies
 npm install
 
+# Generate TypeScript API client from openapi/openapi.yaml (required before first run)
+npm run generate
+
 # Start the development server
 npm run dev
 ```
 
 The frontend development server will start on http://localhost:5173 and will proxy API requests to the backend.
+
+> **Note:** The generated client in `src/api/generated/` is gitignored. Run `npm run generate` again whenever
+> `openapi/openapi.yaml` changes.
 
 ## Development Workflow
 
@@ -107,8 +113,8 @@ The frontend development server will start on http://localhost:5173 and will pro
 
 - The frontend is built with React and TypeScript
 - State management is handled with React Context and hooks
-- Run tests with `npm test`
-- Cypress is set up for end-to-end testing (you may need to install Cypress with `npm install cypress --save-dev` and add a script to package.json)
+- Run unit tests with `npm test`
+- Playwright is set up for end-to-end testing. Install the browser once with `npm run e2e:install`, then run tests with `npm run e2e`
 
 ### Full-Stack Development
 

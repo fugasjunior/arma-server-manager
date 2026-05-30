@@ -91,10 +91,13 @@ Standard Spring layered architecture per domain feature. Key packages under `cz.
 | `additionalserver/` | Non-native servers (Minecraft, etc.) |
 | `scenario/` | Scenario (.pbo) upload/management |
 | `system/` | System resource monitoring |
-| `security/` | JWT auth, in-memory user config |
+| `security/` | JWT auth, user config |
+| `security/user/` | User CRUD, password management |
+| `security/role/` | Role and permission management (RBAC) |
+| `localmod/` | Local filesystem mod sync and management |
 | `common/` | Cross-cutting enums (`ServerType`, `InstallationStatus`), exceptions, `RestExceptionHandler` |
 
-Server entity hierarchy: `Server` (base JPA entity) → `Arma3Server`, `DayZServer`, `ReforgerServer`, `ReforgerExpServer`. Use `@Configurable` + AspectJ post-compile weaving for Spring injection into JPA entities — known coupling issue.
+Server entity hierarchy: `Server` (base JPA entity) → `Arma3Server`, `DayZServer`, `ReforgerServer`, `ReforgerExpServer`.
 
 Schema migrations in `backend/src/main/resources/db/migration/`. Server config files rendered via FreeMarker templates in `backend/src/main/resources/templates/`.
 
