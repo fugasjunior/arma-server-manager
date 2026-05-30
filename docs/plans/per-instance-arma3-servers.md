@@ -136,7 +136,7 @@ the last caller is gone.
 
 ---
 
-### F1 — Method 5 launch flags + per-instance config location
+### F1 — Method 5 launch flags + per-instance config location ✅
 
 **Touch points:** `entities/Arma3Server.java`, `process/ServerProcess.java` (dir prep).
 

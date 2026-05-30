@@ -89,10 +89,6 @@ public class PathsFactory {
         return Path.of(getServerPath(type).toString(), configName).toAbsolutePath();
     }
 
-    public Path getProfilesDirectoryPath() {
-        return Path.of(getServerPath(ServerType.ARMA3).toString(), "custom_profiles");
-    }
-
     public File getServerExecutableWithFallback(ServerType type) {
         File executable;
         if (SystemUtils.getOsType() == OSType.WINDOWS) {

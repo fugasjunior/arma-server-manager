@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
@@ -12,7 +13,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,7 +59,9 @@ class Arma3ServerProcessTest {
         when(processCreator.startProcessWithRedirectedOutput(any(), any(), any())).thenReturn(process);
 
         ServerLaunchContext launchContext = new ServerLaunchContext(
-                pathsFactory, mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
+                pathsFactory,
+                mock(Arma3InstancePaths.class, withSettings().stubOnly()),
+                mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
         arma3ServerProcess = new Arma3ServerProcess(SERVER_ID, processCreator, launchContext, new String[0], 5);
     }
