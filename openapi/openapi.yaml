@@ -1,0 +1,315 @@
+openapi: 3.0.3
+info:
+  title: Arma Server Manager API
+  version: 1.0.0
+
+servers:
+  - url: /api
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Servers
+  - name: AdditionalServers
+  - name: HeadlessClient
+  - name: ServerInstallation
+  - name: Mods
+  - name: LocalMods
+  - name: ModPresets
+  - name: ArmaLauncherPreset
+  - name: Scenarios
+  - name: SteamAuth
+  - name: SteamCmd
+  - name: System
+  - name: Users
+  - name: Roles
+  - name: Permissions
+
+paths:
+
+  # ── Servers ────────────────────────────────────────────────────────────────
+  /server:
+    $ref: './paths/servers.yaml#/~1server'
+  /server/{id}:
+    $ref: './paths/servers.yaml#/~1server~1{id}'
+  /server/{id}/start:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1start'
+  /server/{id}/stop:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1stop'
+  /server/{id}/restart:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1restart'
+  /server/{id}/status:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1status'
+  /server/{id}/log:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1log'
+  /server/{id}/log/download:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1log~1download'
+  /server/{id}/autorestart:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1autorestart'
+
+  # ── Headless Client ─────────────────────────────────────────────────────────
+  /server/{id}/hc/target:
+    $ref: './paths/headless-client.yaml#/~1server~1{id}~1hc~1target'
+
+  # ── Additional Servers ─────────────────────────────────────────────────────
+  /additionalServers:
+    $ref: './paths/additional-servers.yaml#/~1additionalServers'
+  /additionalServers/{serverId}:
+    $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}'
+  /additionalServers/{serverId}/start:
+    $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1start'
+  /additionalServers/{serverId}/stop:
+    $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1stop'
+
+  # ── Server Installation ────────────────────────────────────────────────────
+  /server/installation:
+    $ref: './paths/server-installation.yaml#/~1server~1installation'
+  /server/installation/{type}:
+    $ref: './paths/server-installation.yaml#/~1server~1installation~1{type}'
+
+  # ── Workshop Mods ──────────────────────────────────────────────────────────
+  /mod:
+    $ref: './paths/mods.yaml#/~1mod'
+  /mod/{id}:
+    $ref: './paths/mods.yaml#/~1mod~1{id}'
+  /mod/{id}/serverOnly:
+    $ref: './paths/mods.yaml#/~1mod~1{id}~1serverOnly'
+
+  # ── Local Mods ────────────────────────────────────────────────────────────
+  /local-mod:
+    $ref: './paths/local-mods.yaml#/~1local-mod'
+  /local-mod/{id}/serverOnly:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1serverOnly'
+  /local-mod/sync:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1sync'
+  /local-mod/sync/status:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1sync~1status'
+
+  # ── Mod Presets ────────────────────────────────────────────────────────────
+  /mod/preset:
+    $ref: './paths/mod-presets.yaml#/~1mod~1preset'
+  /mod/preset/{id}:
+    $ref: './paths/mod-presets.yaml#/~1mod~1preset~1{id}'
+
+  # ── Arma Launcher Preset ───────────────────────────────────────────────────
+  /mod/launcher_preset/{id}:
+    $ref: './paths/arma-launcher-preset.yaml#/~1mod~1launcher_preset~1{id}'
+  /mod/launcher_preset:
+    $ref: './paths/arma-launcher-preset.yaml#/~1mod~1launcher_preset'
+
+  # ── Scenarios ──────────────────────────────────────────────────────────────
+  /scenarios:
+    $ref: './paths/scenarios.yaml#/~1scenarios'
+  /scenarios/REFORGER:
+    $ref: './paths/scenarios.yaml#/~1scenarios~1REFORGER'
+  /scenarios/download:
+    $ref: './paths/scenarios.yaml#/~1scenarios~1download'
+
+  # ── Steam Auth ─────────────────────────────────────────────────────────────
+  /config/auth:
+    $ref: './paths/steam-auth.yaml#/~1config~1auth'
+  /config/auth/status:
+    $ref: './paths/steam-auth.yaml#/~1config~1auth~1status'
+  /config/auth/verify:
+    $ref: './paths/steam-auth.yaml#/~1config~1auth~1verify'
+
+  # ── SteamCmd ───────────────────────────────────────────────────────────────
+  /steamcmd:
+    $ref: './paths/steamcmd.yaml#/~1steamcmd'
+  /steamcmd/log:
+    $ref: './paths/steamcmd.yaml#/~1steamcmd~1log'
+  /steamcmd/log/download:
+    $ref: './paths/steamcmd.yaml#/~1steamcmd~1log~1download'
+
+  # ── System ─────────────────────────────────────────────────────────────────
+  /system:
+    $ref: './paths/system.yaml#/~1system'
+  /system/os:
+    $ref: './paths/system.yaml#/~1system~1os'
+
+  # ── Users ──────────────────────────────────────────────────────────────────
+  /users:
+    $ref: './paths/users.yaml#/~1users'
+  /users/{id}:
+    $ref: './paths/users.yaml#/~1users~1{id}'
+  /users/{id}/roles:
+    $ref: './paths/users.yaml#/~1users~1{id}~1roles'
+  /users/{id}/password:
+    $ref: './paths/users.yaml#/~1users~1{id}~1password'
+  /users/me:
+    $ref: './paths/users.yaml#/~1users~1me'
+  /users/me/password:
+    $ref: './paths/users.yaml#/~1users~1me~1password'
+
+  # ── Roles ──────────────────────────────────────────────────────────────────
+  /roles:
+    $ref: './paths/roles.yaml#/~1roles'
+  /roles/{id}:
+    $ref: './paths/roles.yaml#/~1roles~1{id}'
+
+  # ── Permissions ────────────────────────────────────────────────────────────
+  /permissions:
+    $ref: './paths/permissions.yaml#/~1permissions'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      $ref: './components/security-schemes.yaml#/bearerAuth'
+
+  parameters:
+    serverId:
+      $ref: './components/parameters.yaml#/serverId'
+    serverType:
+      $ref: './components/parameters.yaml#/serverType'
+    modId:
+      $ref: './components/parameters.yaml#/modId'
+    presetId:
+      $ref: './components/parameters.yaml#/presetId'
+
+  responses:
+    ApiError:
+      $ref: './components/responses.yaml#/ApiError'
+
+  schemas:
+
+    # ── Common ────────────────────────────────────────────────────────────────
+    ServerType:
+      $ref: './components/schemas/common.yaml#/ServerType'
+    InstallationStatus:
+      $ref: './components/schemas/common.yaml#/InstallationStatus'
+    ErrorStatus:
+      $ref: './components/schemas/common.yaml#/ErrorStatus'
+    InstallationBranch:
+      $ref: './components/schemas/common.yaml#/InstallationBranch'
+    OSType:
+      $ref: './components/schemas/common.yaml#/OSType'
+    SteamCmdStatus:
+      $ref: './components/schemas/common.yaml#/SteamCmdStatus'
+    AuthStatus:
+      $ref: './components/schemas/common.yaml#/AuthStatus'
+    AuthType:
+      $ref: './components/schemas/common.yaml#/AuthType'
+    ApiErrorDto:
+      $ref: './components/schemas/common.yaml#/ApiErrorDto'
+    LaunchParameterDto:
+      $ref: './components/schemas/common.yaml#/LaunchParameterDto'
+    AutomaticRestartDto:
+      $ref: './components/schemas/common.yaml#/AutomaticRestartDto'
+
+    # ── Servers ───────────────────────────────────────────────────────────────
+    ServerDto:
+      $ref: './components/schemas/servers.yaml#/ServerDto'
+    BaseServerDto:
+      $ref: './components/schemas/servers.yaml#/BaseServerDto'
+    Arma3ServerDto:
+      $ref: './components/schemas/servers.yaml#/Arma3ServerDto'
+    DayZServerDto:
+      $ref: './components/schemas/servers.yaml#/DayZServerDto'
+    ReforgerServerDto:
+      $ref: './components/schemas/servers.yaml#/ReforgerServerDto'
+    ServersDto:
+      $ref: './components/schemas/servers.yaml#/ServersDto'
+    ServerInstanceInfoDto:
+      $ref: './components/schemas/servers.yaml#/ServerInstanceInfoDto'
+    ServerWorkshopModDto:
+      $ref: './components/schemas/servers.yaml#/ServerWorkshopModDto'
+    ReforgerModDto:
+      $ref: './components/schemas/servers.yaml#/ReforgerModDto'
+    Arma3DifficultySettingsDto:
+      $ref: './components/schemas/servers.yaml#/Arma3DifficultySettingsDto'
+    Arma3NetworkSettingsDto:
+      $ref: './components/schemas/servers.yaml#/Arma3NetworkSettingsDto'
+
+    # ── Additional Servers ────────────────────────────────────────────────────
+    AdditionalServerDto:
+      $ref: './components/schemas/additional-servers.yaml#/AdditionalServerDto'
+    AdditionalServersDto:
+      $ref: './components/schemas/additional-servers.yaml#/AdditionalServersDto'
+
+    # ── Server Installation ───────────────────────────────────────────────────
+    ServerInstallationDto:
+      $ref: './components/schemas/installation.yaml#/ServerInstallationDto'
+    ServerInstallationsDto:
+      $ref: './components/schemas/installation.yaml#/ServerInstallationsDto'
+    ActiveBranchDto:
+      $ref: './components/schemas/installation.yaml#/ActiveBranchDto'
+
+    # ── Local Mods ───────────────────────────────────────────────────────────
+    LocalModDto:
+      $ref: './components/schemas/local-mods.yaml#/LocalModDto'
+    LocalModsDto:
+      $ref: './components/schemas/local-mods.yaml#/LocalModsDto'
+    ServerLocalModDto:
+      $ref: './components/schemas/local-mods.yaml#/ServerLocalModDto'
+
+    # ── Workshop Mods ─────────────────────────────────────────────────────────
+    ModDto:
+      $ref: './components/schemas/mods.yaml#/ModDto'
+    ModsDto:
+      $ref: './components/schemas/mods.yaml#/ModsDto'
+    CreatorDlcDto:
+      $ref: './components/schemas/mods.yaml#/CreatorDlcDto'
+    ServerOnlyDto:
+      $ref: './components/schemas/mods.yaml#/ServerOnlyDto'
+
+    # ── Mod Presets ───────────────────────────────────────────────────────────
+    CreatePresetRequestDto:
+      $ref: './components/schemas/mod-presets.yaml#/CreatePresetRequestDto'
+    UpdatePresetRequestDto:
+      $ref: './components/schemas/mod-presets.yaml#/UpdatePresetRequestDto'
+    PresetResponseDto:
+      $ref: './components/schemas/mod-presets.yaml#/PresetResponseDto'
+    PresetResponseModDto:
+      $ref: './components/schemas/mod-presets.yaml#/PresetResponseModDto'
+    PresetListResponseDto:
+      $ref: './components/schemas/mod-presets.yaml#/PresetListResponseDto'
+
+    # ── Scenarios ─────────────────────────────────────────────────────────────
+    Arma3ScenarioDto:
+      $ref: './components/schemas/scenarios.yaml#/Arma3ScenarioDto'
+    Arma3ScenariosDto:
+      $ref: './components/schemas/scenarios.yaml#/Arma3ScenariosDto'
+    ReforgerScenarioDto:
+      $ref: './components/schemas/scenarios.yaml#/ReforgerScenarioDto'
+    ReforgerScenariosDto:
+      $ref: './components/schemas/scenarios.yaml#/ReforgerScenariosDto'
+
+    # ── Steam Auth ────────────────────────────────────────────────────────────
+    SteamAuthDto:
+      $ref: './components/schemas/steam-auth.yaml#/SteamAuthDto'
+    SteamAuthStatusDto:
+      $ref: './components/schemas/steam-auth.yaml#/SteamAuthStatusDto'
+    AuthVerificationResultDto:
+      $ref: './components/schemas/steam-auth.yaml#/AuthVerificationResultDto'
+
+    # ── SteamCmd ──────────────────────────────────────────────────────────────
+    SteamCmdItemInfoDto:
+      $ref: './components/schemas/steamcmd.yaml#/SteamCmdItemInfoDto'
+
+    # ── System ────────────────────────────────────────────────────────────────
+    ServerDetailsDto:
+      $ref: './components/schemas/system.yaml#/ServerDetailsDto'
+    ServerOSDto:
+      $ref: './components/schemas/system.yaml#/ServerOSDto'
+
+    # ── User Management ───────────────────────────────────────────────────────
+    UserDto:
+      $ref: './components/schemas/user-management.yaml#/UserDto'
+    CreateUserRequest:
+      $ref: './components/schemas/user-management.yaml#/CreateUserRequest'
+    UpdateUserRequest:
+      $ref: './components/schemas/user-management.yaml#/UpdateUserRequest'
+    ChangePasswordRequest:
+      $ref: './components/schemas/user-management.yaml#/ChangePasswordRequest'
+    RoleDto:
+      $ref: './components/schemas/user-management.yaml#/RoleDto'
+    CreateRoleRequest:
+      $ref: './components/schemas/user-management.yaml#/CreateRoleRequest'
+    UpdateRoleRequest:
+      $ref: './components/schemas/user-management.yaml#/UpdateRoleRequest'
+    PermissionDto:
+      $ref: './components/schemas/user-management.yaml#/PermissionDto'
+    CurrentUserDto:
+      $ref: './components/schemas/user-management.yaml#/CurrentUserDto'

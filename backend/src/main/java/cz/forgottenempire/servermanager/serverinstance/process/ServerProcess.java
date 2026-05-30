@@ -1,36 +1,31 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
 import com.google.common.base.Joiner;
-import cz.forgottenempire.servermanager.common.PathsFactory;
-import cz.forgottenempire.servermanager.serverinstance.AutomaticRestartTask;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
-import cz.forgottenempire.servermanager.serverinstance.ServerRepository;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
-@Configurable
 public class ServerProcess {
 
     private final long serverId;
-    private ServerProcessCreator serverProcessCreator;
-    private PathsFactory pathsFactory;
-    private ServerRepository serverRepository;
+    protected final ServerProcessCreator serverProcessCreator;
+    protected final ServerLaunchContext launchContext;
+    private final int logMaxFiles;
     private Process process;
-    private AutomaticRestartTask automaticRestartTask;
     protected ServerInstanceInfo instanceInfo;
 
-    public ServerProcess(long serverId) {
+    public ServerProcess(long serverId, ServerProcessCreator serverProcessCreator, ServerLaunchContext launchContext, int logMaxFiles) {
         this.serverId = serverId;
+        this.serverProcessCreator = serverProcessCreator;
+        this.launchContext = launchContext;
+        this.logMaxFiles = logMaxFiles;
     }
 
     public ServerInstanceInfo getInstanceInfo() {
@@ -41,22 +36,22 @@ public class ServerProcess {
         return serverId;
     }
 
-    public Process start() {
+    public Process start(Server server) {
         if (isAlive()) {
             return process;
         }
 
-        Server server = serverRepository.findById(serverId).orElseThrow();
+        var executable = launchContext.pathsFactory().getServerExecutableWithFallback(server.getType());
+        List<String> parameters = server.getLaunchParameters(launchContext);
 
-        File executable = pathsFactory.getServerExecutableWithFallback(server.getType());
-        List<String> parameters = server.getLaunchParameters();
-
-        server.getConfigFiles().forEach(ServerConfig::generateIfNecessary);
-        server.getLog().prepare();
+        server.getConfigFiles(launchContext).forEach(ServerConfig::generateIfNecessary);
+        var logFile = server.getLog(launchContext.pathsFactory());
+        logFile.prepare(logMaxFiles);
 
         try {
             log.info("Starting server with options: {}", Joiner.on(" ").join(parameters));
-            process = serverProcessCreator.startProcessWithRedirectedOutput(executable, parameters, server.getLog().getFile());
+            process = serverProcessCreator.startProcessWithRedirectedOutput(
+                    executable, parameters, logFile.getFile());
             log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
@@ -68,56 +63,27 @@ public class ServerProcess {
                 .maxPlayers(server.getMaxPlayers())
                 .build();
 
-        if (server.isRestartAutomatically()) {
-            scheduleRestartJobAt(server.getAutomaticRestartTime());
-        }
-
         return process;
     }
 
     public void stop() {
+        log.info("Stopping server ID {}", serverId);
+
         if (isAlive()) {
             process.destroy();
+            process = null;
         }
 
-        cancelRestartJob();
         instanceInfo = ServerInstanceInfo.builder().build();
     }
 
-    public void restart() {
+    public void restart(Server server) {
+        log.info("Restarting server ID {}", serverId);
         stop();
-        start();
+        start(server);
     }
 
     public boolean isAlive() {
         return process != null && process.isAlive();
-    }
-
-    public void scheduleRestartJobAt(LocalTime time) {
-        if (automaticRestartTask != null) {
-            automaticRestartTask.cancel();
-        }
-        automaticRestartTask = new AutomaticRestartTask(this, time).schedule();
-    }
-
-    public void cancelRestartJob() {
-        if (automaticRestartTask != null) {
-            automaticRestartTask.cancel();
-        }
-    }
-
-    @Autowired
-    void setPathsFactory(PathsFactory pathsFactory) {
-        this.pathsFactory = pathsFactory;
-    }
-
-    @Autowired
-    void setServerRepository(ServerRepository serverRepository) {
-        this.serverRepository = serverRepository;
-    }
-
-    @Autowired
-    void setServerProcessCreator(ServerProcessCreator serverProcessCreator) {
-        this.serverProcessCreator = serverProcessCreator;
     }
 }

@@ -1,21 +1,20 @@
 import {ChangeEvent, ReactNode, useState} from 'react';
+import PermissionGuard from "../auth/PermissionGuard";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
-import {ModDto} from "../../dtos/ModDto.ts";
+import {ErrorStatus, ModDto, ServerType, SteamCmdItemInfoDto, SteamCmdStatus} from "../../api/generated";
 import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
 import {Button, CircularProgress, Stack, Switch, TextField} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
-import {ErrorStatus} from "../../dtos/Status.ts";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
-import {ServerType} from "../../dtos/ServerDto.ts";
 import SERVER_NAMES from "../../util/serverNames.ts";
 import {humanFileSize} from "../../util/util.ts";
-import {SteamCmdItemInfoDto, SteamCmdStatus} from "../../dtos/SteamCmdItemInfoDto.ts";
+import {usePermission} from "../../hooks/usePermission.ts";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
@@ -73,6 +72,7 @@ type ModsTableProps = {
 
 const ModsTable = (props: ModsTableProps) => {
     const [enteredModId, setEnteredModId] = useState("");
+    const canModify = usePermission("MOD_MODIFY");
 
     const handleEnteredModIdChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -85,13 +85,13 @@ const ModsTable = (props: ModsTableProps) => {
         const status = mod.installationStatus;
         const error = mod.errorStatus;
 
-        const modItemInfo = props.steamCmdItemInfo[mod.id];
+        const modItemInfo = props.steamCmdItemInfo[mod.id!];
 
         if (status === "INSTALLATION_IN_PROGRESS") {
-            if (modItemInfo?.status === SteamCmdStatus.IN_QUEUE) {
+            if (modItemInfo?.status === SteamCmdStatus.InQueue) {
                 return <Tooltip title="In queue"><HourglassBottomIcon/></Tooltip>;
             }
-            if (modItemInfo?.status === SteamCmdStatus.FINISHED) {
+            if (modItemInfo?.status === SteamCmdStatus.Finished) {
                 return <Tooltip title="Waiting for installation"><DownloadDoneIcon/></Tooltip>;
             }
 
@@ -99,7 +99,7 @@ const ModsTable = (props: ModsTableProps) => {
         }
         if (status === "ERROR") {
             return <Tooltip
-                title={workshopErrorStatusMap.get(ErrorStatus[error as keyof typeof ErrorStatus])}><ReportProblemIcon/></Tooltip>
+                title={workshopErrorStatusMap.get(error as ErrorStatus)}><ReportProblemIcon/></Tooltip>
         }
 
         if (status === "FINISHED") {
@@ -110,40 +110,45 @@ const ModsTable = (props: ModsTableProps) => {
     const mapModDtosToRows = (): Array<EnhancedTableRow> => {
         return props.rows.map(modDto => {
             return {
-                id: modDto.id,
+                id: modDto.id!,
                 cells: [
                     {
                         id: "id",
-                        value: modDto.id
+                        value: modDto.id ?? 0
                     },
                     {
                         id: "name",
-                        value: modDto.name
+                        value: modDto.name ?? ""
                     },
                     {
                         id: "serverType",
-                        value: SERVER_NAMES.get(ServerType[modDto.serverType as keyof typeof ServerType])!
+                        value: SERVER_NAMES.get(modDto.serverType as ServerType) ?? ""
                     },
                     {
                         id: "fileSize",
-                        value: modDto.fileSize,
-                        displayValue: humanFileSize(modDto.fileSize)
+                        value: modDto.fileSize ?? 0,
+                        displayValue: humanFileSize(modDto.fileSize ?? 0)
                     },
                     {
                         id: "serverOnly",
                         value: "serverOnly",
-                        displayValue: <Switch
-                            checked={modDto.serverOnly}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => props.onServerOnlyChanged(e, modDto.id)}/>
+                        displayValue: <span data-testid={`mod-server-only-switch-${modDto.id}`}>
+                            <Switch
+                                checked={modDto.serverOnly}
+                                disabled={!canModify}
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => props.onServerOnlyChanged(e, modDto.id!)}
+                                size="small"
+                            />
+                        </span>
                     },
                     {
                         id: "lastUpdated",
-                        value: modDto.lastUpdated
+                        value: modDto.lastUpdated ?? ""
                     },
                     {
                         id: "installationStatus",
-                        value: modDto.installationStatus,
+                        value: modDto.installationStatus ?? "",
                         displayValue: getInstalledIcon(modDto)
                     }
                 ]
@@ -174,14 +179,17 @@ const ModsTable = (props: ModsTableProps) => {
                                />}
 
                                customBottomControls={
-                                   <Stack direction="row" spacing={1}>
-                                       <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
-                                                  size="small"
-                                                  variant="filled" value={enteredModId}
-                                                  onChange={handleEnteredModIdChange}/>
-                                       <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
-                                               onClick={() => props.onModInstallClicked(Number(enteredModId))}>Install</Button>
-                                   </Stack>
+                                   <PermissionGuard permission="MOD_MODIFY">
+                                       <Stack direction="row" spacing={1}>
+                                           <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
+                                                      size="small" slotProps={{htmlInput: {"data-testid": "mod-install-input"}}}
+                                                      variant="filled" value={enteredModId}
+                                                      onChange={handleEnteredModIdChange}/>
+                                           <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
+                                                   data-testid="mod-install-submit"
+                                                   onClick={() => props.onModInstallClicked(Number(enteredModId))}>Install</Button>
+                                       </Stack>
+                                   </PermissionGuard>
                                }
                 />
             </Paper>

@@ -1,0 +1,38 @@
+auth:
+  username: testuser
+  password: testpassword
+
+jwt:
+  secret: integration-test-secret-key-long-enough-for-hmac512-algorithm
+
+directory:
+  servers: ${java.io.tmpdir}/arma-server-manager-test/servers
+  mods: ${java.io.tmpdir}/arma-server-manager-test/mods
+  logs: ${java.io.tmpdir}/arma-server-manager-test/logs
+
+steamcmd:
+  path: ${java.io.tmpdir}/arma-server-manager-test/steamcmd
+  cache.path: ${java.io.tmpdir}/arma-server-manager-test/steamcmd-cache
+
+steam:
+  api:
+    key: test-api-key
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  sql:
+    init:
+      mode: never
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        globally_quoted_identifiers: false
+
+logging:
+  level:
+    cz.forgottenempire: DEBUG
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN

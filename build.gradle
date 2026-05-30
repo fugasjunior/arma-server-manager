@@ -1,7 +1,13 @@
 allprojects {
-    version = '1.4.1'
+    version = appVersion
 
     repositories {
         mavenCentral()
     }
+}
+
+tasks.register('install') {
+    dependsOn([':backend:build', ':frontend:appNpmTest'])
+    description = 'Builds the project and runs all tests'
+    group = 'build'
 }

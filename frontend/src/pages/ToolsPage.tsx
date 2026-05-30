@@ -22,7 +22,7 @@ const ToolsPage = () => {
 
     return (
         <>
-            <Typography variant="h4" component="h2" mb={2}>Tools</Typography>
+            <Typography variant="h4" component="h2" sx={{mb: 2}}>Tools</Typography>
             <Tabs value={renderSelectedTool} onChange={handleChange}>
                 <Tab value={Tool.STEAMCMD_LOGS} label={Tool.STEAMCMD_LOGS} />
             </Tabs>

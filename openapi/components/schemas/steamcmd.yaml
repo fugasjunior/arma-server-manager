@@ -1,0 +1,17 @@
+SteamCmdItemInfoDto:
+  type: object
+  properties:
+    itemId:
+      type: integer
+      format: int64
+    status:
+      $ref: './common.yaml#/SteamCmdStatus'
+    progressPercent:
+      type: number
+      format: double
+    bytesFinished:
+      type: integer
+      format: int64
+    bytesTotal:
+      type: integer
+      format: int64

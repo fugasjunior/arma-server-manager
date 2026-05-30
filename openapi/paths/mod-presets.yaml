@@ -1,0 +1,109 @@
+/mod/preset:
+  get:
+    tags: [ModPresets]
+    operationId: getPresets
+    summary: List all mod presets (optionally filtered by server type)
+    parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          $ref: '../components/schemas/common.yaml#/ServerType'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetListResponseDto'
+  post:
+    tags: [ModPresets]
+    operationId: createPreset
+    summary: Create a mod preset
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mod-presets.yaml#/CreatePresetRequestDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetResponseDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/mod/preset/{id}:
+  get:
+    tags: [ModPresets]
+    operationId: getPreset
+    summary: Get a mod preset by ID
+    parameters:
+      - $ref: '../components/parameters.yaml#/presetId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetResponseDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  put:
+    tags: [ModPresets]
+    operationId: updatePreset
+    summary: Update a mod preset
+    parameters:
+      - $ref: '../components/parameters.yaml#/presetId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mod-presets.yaml#/UpdatePresetRequestDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetResponseDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  patch:
+    tags: [ModPresets]
+    operationId: renamePreset
+    summary: Rename a mod preset
+    parameters:
+      - $ref: '../components/parameters.yaml#/presetId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mod-presets.yaml#/RenamePresetRequestDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetResponseDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  delete:
+    tags: [ModPresets]
+    operationId: deletePreset
+    summary: Delete a mod preset
+    parameters:
+      - $ref: '../components/parameters.yaml#/presetId'
+    responses:
+      '204':
+        description: No Content

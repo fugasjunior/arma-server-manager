@@ -1,13 +1,13 @@
 import {Button, FormControl, InputLabel, Select, SelectChangeEvent, Stack, Typography} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-import {ModPresetDto} from "../../dtos/ModPresetDto.ts";
+import {PresetResponseDto} from "../../api/generated";
 
 type ListBuilderHeaderProps = {
     itemsLabel: string,
     withControls?: boolean,
     confirmDisabled?: boolean,
     selectedPreset?: string,
-    presets?: Array<ModPresetDto>,
+    presets?: Array<PresetResponseDto>,
     onPresetChange?: (event: SelectChangeEvent) => void
     onConfirm?: () => void,
     onCancel?: () => void,
@@ -16,7 +16,7 @@ type ListBuilderHeaderProps = {
 export default function ListBuilderHeader(props: ListBuilderHeaderProps) {
 
     return (
-        <Stack direction="row" justifyContent="space-between">
+        <Stack direction="row" sx={{justifyContent: "space-between"}}>
             <Stack>
                 <Typography id="transition-modal-title" variant="h4">
                     Select {props.itemsLabel}
@@ -25,7 +25,7 @@ export default function ListBuilderHeader(props: ListBuilderHeaderProps) {
                     Click an item to move it into the second column
                 </Typography>
             </Stack>
-            <Stack direction="row" alignItems="center">
+            <Stack direction="row" sx={{alignItems: "center"}}>
                 {props.withControls &&
                     <>
                         <Button color="primary" variant="contained" sx={{mr: 1}}

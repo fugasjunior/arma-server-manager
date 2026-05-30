@@ -1,0 +1,46 @@
+/mod/launcher_preset/{id}:
+  get:
+    tags: [ArmaLauncherPreset]
+    operationId: downloadLauncherPreset
+    summary: Download an Arma launcher preset as HTML
+    parameters:
+      - $ref: '../components/parameters.yaml#/presetId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/mod/launcher_preset:
+  post:
+    tags: [ArmaLauncherPreset]
+    operationId: importLauncherPreset
+    summary: Import mods from an Arma launcher preset HTML file
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [preset, name]
+            properties:
+              preset:
+                type: string
+                format: binary
+              name:
+                type: string
+                minLength: 1
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mod-presets.yaml#/PresetResponseDto'
+      '204':
+        description: No mods found in preset

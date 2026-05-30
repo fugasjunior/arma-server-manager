@@ -5,6 +5,8 @@ config/*
 logs/
 .env
 docker-compose-dev.yml
+backend/config/
+backend/bin/
 
 HELP.md
 .gradle
@@ -46,3 +48,9 @@ out/
 
 # Transpiled Jest tests
 /src/main/webapp/__tests__/**.test.js
+
+# MCP
+.playwright-mcp/
+
+# Local test server artifact
+backend/Test_server/

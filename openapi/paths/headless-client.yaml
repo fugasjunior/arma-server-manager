@@ -1,0 +1,16 @@
+/server/{id}/hc/target:
+  put:
+    tags: [HeadlessClient]
+    operationId: setHeadlessClientsTarget
+    summary: Set the target headless client count for a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/servers.yaml#/SetHeadlessClientsTargetRequest'
+    responses:
+      '200':
+        description: OK

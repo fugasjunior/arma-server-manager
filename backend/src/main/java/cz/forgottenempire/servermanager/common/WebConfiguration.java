@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.ResourceResolver;
@@ -16,6 +18,12 @@ import java.util.Set;
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.addPathPrefix("/api",
+                c -> c.isAnnotationPresent(RestController.class));
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

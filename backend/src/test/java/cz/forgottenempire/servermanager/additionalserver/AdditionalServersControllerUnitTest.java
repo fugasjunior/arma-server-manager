@@ -5,12 +5,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import cz.forgottenempire.servermanager.api.model.AdditionalServerDto;
+import cz.forgottenempire.servermanager.api.model.AdditionalServersDto;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +27,7 @@ class AdditionalServersControllerUnitTest {
     void setUp() {
         serversService = Mockito.mock(AdditionalServersService.class);
 
-        controller = new AdditionalServersController(serversService);
+        controller = new AdditionalServersController(serversService, Mappers.getMapper(AdditionalServerMapper.class));
     }
 
     @Test
@@ -79,7 +82,7 @@ class AdditionalServersControllerUnitTest {
 
     @Test
     void whenStartServer_thenServiceStartServerMethodIsCalledAndOkResponseIsReturned() {
-        ResponseEntity<?> response = controller.startServer(1L);
+        ResponseEntity<?> response = controller.startAdditionalServer(1L);
 
         verify(serversService).startServer(1L);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -88,7 +91,7 @@ class AdditionalServersControllerUnitTest {
 
     @Test
     void whenStopServer_thenServiceStopServerMethodIsCalledAndOkResponseIsReturned() {
-        ResponseEntity<?> response = controller.stopServer(1L);
+        ResponseEntity<?> response = controller.stopAdditionalServer(1L);
 
         verify(serversService).stopServer(1L);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

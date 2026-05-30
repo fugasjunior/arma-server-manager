@@ -5,19 +5,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import cz.forgottenempire.servermanager.workshop.SteamAuthDto;
+import cz.forgottenempire.servermanager.steamcmd.SteamCmdAuthService;
+import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
+
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 class SteamAuthServiceUnitTest {
 
-    private final SteamAuthRepository steamAuthRepository;
-    private final SteamAuthService service;
+    @Mock
+    private SteamAuthRepository steamAuthRepository;
 
-    public SteamAuthServiceUnitTest() {
-        steamAuthRepository = mock(SteamAuthRepository.class);
+    private SteamAuthService service;
 
+    @BeforeEach
+    void setUp() {
         service = new SteamAuthService(steamAuthRepository);
     }
 
@@ -78,5 +87,35 @@ class SteamAuthServiceUnitTest {
         service.clearAuthAccount();
 
         verify(steamAuthRepository).deleteAll();
+    }
+
+    @Test
+    void whenIsAuthConfiguredAndUsernameAndPasswordAreSet_thenReturnTrue() {
+        SteamAuth steamAuth = new SteamAuth(1L, "username", "password", "ABCDE");
+        when(steamAuthRepository.findAll()).thenReturn(List.of(steamAuth));
+
+        boolean result = service.isAuthConfigured();
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void whenIsAuthConfiguredAndUsernameIsNull_thenReturnFalse() {
+        SteamAuth steamAuth = new SteamAuth(1L, null, "password", "ABCDE");
+        when(steamAuthRepository.findAll()).thenReturn(List.of(steamAuth));
+
+        boolean result = service.isAuthConfigured();
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void whenIsAuthConfiguredAndPasswordIsNull_thenReturnFalse() {
+        SteamAuth steamAuth = new SteamAuth(1L, "username", null, "ABCDE");
+        when(steamAuthRepository.findAll()).thenReturn(List.of(steamAuth));
+
+        boolean result = service.isAuthConfigured();
+
+        assertThat(result).isFalse();
     }
 }

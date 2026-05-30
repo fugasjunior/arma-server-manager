@@ -8,5 +8,7 @@ public enum ErrorStatus {
     NO_SUBSCRIPTION,
     RATE_LIMIT,
     GENERIC,
-    INTERRUPTED
+    INTERRUPTED,
+    NOT_CONSUMED_BY_GAME,
+    SERVER_NOT_INSTALLED
 }

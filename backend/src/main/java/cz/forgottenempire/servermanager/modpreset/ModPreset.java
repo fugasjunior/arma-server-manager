@@ -31,6 +31,7 @@ public class ModPreset {
             name = "preset_mod",
             joinColumns = @JoinColumn(name = "preset_id"),
             inverseJoinColumns = @JoinColumn(name = "mod_id"))
+    @OrderColumn(name = "mod_order")
     private List<WorkshopMod> mods;
 
     @NotNull

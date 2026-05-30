@@ -15,14 +15,16 @@ For more comprehensive list of features, see [Features](#features).
 - [About](#about)
 - [List of contents](#list-of-contents)
 - [Features](#features)
-    - [Host multiple game servers](#host-multiple-game-servers-from-bohemia-interactive)
+    - [Host multiple game servers](#host-multiple-game-servers)
     - [Server configuration](#server-configuration)
     - [Steam Workshop mods](#steam-workshop-mods)
+    - [Local mods](#local-mods)
     - [Community DLCs (cDLCs)](#community-dlcs-cdlcs)
     - [Launcher HTML mod presets](#launcher-html-mod-presets)
     - [System dashboard](#system-dashboard)
     - [Headless clients](#headless-clients)
     - [Scenarios](#scenarios)
+    - [User management](#user-management)
     - [Additional game servers](#additional-game-servers)
 - [Installation](#installation)
     - [Docker setup](#docker-setup-recommended) _(recommended)_
@@ -41,6 +43,7 @@ For more comprehensive list of features, see [Features](#features).
     - [Setting up SteamAuth](#setting-up-steamauth)
     - [Installing server files](#installing-server-files)
     - [Configuring your first server](#configuring-your-first-server)
+    - [Using local mods](#using-local-mods)
     - [Additional servers](#additional-servers)
 - [Discord](#discord)
 - [Support](#support)
@@ -52,7 +55,7 @@ For more comprehensive list of features, see [Features](#features).
 [More screenshots](https://imgur.com/a/74pWsoO)
 
 ### Host multiple game servers
-Manage multiple **Arma 3**, **DayZ***, **DayZ Experimental** and **Arma Reforger** servers. With SteamCMD running in 
+Manage multiple **Arma 3**, **DayZ**, **DayZ Experimental** and **Arma Reforger** servers. With SteamCMD running in 
 the background, server installation is fully automated and installing and updating the server takes just a single click.
 
 ### Server configuration
@@ -67,6 +70,11 @@ All of the following can be configured with a simple form:
 The manager allows you to download and automatically install mods from Steam workshop. Just copy the ID of the mod
 into the form field and click "Install", everything will be done for you. Then, you can easily enable the downloaded
 mods for your existing server instances.
+
+### Local mods
+Besides Steam Workshop mods, you can also use locally stored mod files. Place mod folders in the manager's storage
+directory and use the Local Mods tab to sync and enable them on your servers. Local mods can also be marked as
+server-only to exclude them from client mod lists.
 
 ### Community DLCs (cDLCs)
 Besides workshop mods, you can also select which community DLCs you want to run any of your Arma 3 servers. 
@@ -85,6 +93,10 @@ When running Arma 3 servers, you can launch or stop preconfigured headless clien
 ### Scenarios
 You can upload and manage `.pbo` scenarios which will be available to play on your Arma 3 servers.
 
+### User management
+Create and manage multiple user accounts with granular role-based permissions. Admins can define roles with specific
+permissions (e.g. read-only server view, mod management) and assign them to users.
+
 ### Additional game servers
 Besides the main supported games, you can also use the manager for very basic control of any other server you wish. That's
 very useful in case you want to run other servers like Minecraft besides your primary Arma/DayZ servers. For setup,
@@ -100,106 +112,23 @@ There are two ways to run the project.
 - [Docker](https://docs.docker.com/engine/install/) installed
 
 #### Installation
-To run the manager, you can use the following files:
+Download `docker-compose.yml` and `.env` from the root of this repository and place them in the same directory. Follow the comments inside `.env` to configure the required values (database credentials, storage path, Steam API key). The remaining settings are optional and have sensible defaults.
 
-`docker-compose.yml`
-```yml
-services:
-  db:
-    image: mysql:8.3.0
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_DATABASE: "${MYSQL_DB_NAME}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-    ports:
-      - "3306:3306"
-    volumes:
-      - armaservermanager-db:/var/lib/mysql
+`JWT_SECRET` and `DATABASE_ENCRYPTION_SECRET` in `.env` are optional — if omitted, the app auto-generates secure values on first startup and persists them to `config/secrets.properties` inside the container volume so they survive restarts.
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8090:8080"
+After you've set up the values, run `docker compose up` to start the database and the server manager. The app will be accessible at http://localhost:8080 by default.
 
-  armaservermanager:
-    image: "fugasjunior/armaservermanager:${VERSION}"
-    restart: always
-    # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
-    network_mode: host
-    # uncomment when running on Windows and add additional ports according to your needs
-    #    ports:
-    #      - "8080:8080"
-    #      - "2302-2305:2302-2305/udp"
-    #      - "27016:27016/udp"
-    depends_on:
-      - db
-    volumes:
-      - "${STORAGE_PATH}:/home/steam/armaservermanager/"
-    environment:
-      AUTH_USERNAME: "${AUTH_USERNAME}"
-      AUTH_PASSWORD: "${AUTH_PASSWORD}"
-      SPRING_DATASOURCE_URL: "${MYSQL_DB_URL}"
-      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER}"
-      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD}"
-      STEAM_API_KEY: "${STEAM_API_KEY}"
-      JWT_SECRET: "${JWT_SECRET}"
-      DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
-      TZ: "${TIMEZONE}"
+#### First login
 
-volumes:
-  armaservermanager-db:
+If you did not set `AUTH_USERNAME` / `AUTH_PASSWORD` in `.env`, the app creates an `admin` account with a randomly generated password on first startup. The credentials are printed **once** to the container log:
+
+```
+INFO c.f.s.s.SecurityBootstrap: Initial admin credentials (shown only once):
+INFO c.f.s.s.SecurityBootstrap: Username: admin
+INFO c.f.s.s.SecurityBootstrap: Password: <generated-password>
 ```
 
-`.env`
-```properties
-# App version
-VERSION=latest
-
-# Change the path where the servers files and mods will be stored on your server
-STORAGE_PATH=/home/armaservermanager/storage
-
-# Username and password for accessing the web interface
-AUTH_USERNAME=test
-AUTH_PASSWORD=password
-
-# Database settings. Make sure to change the password and root password
-MYSQL_DB_NAME=armaservermanager_db
-MYSQL_DB_URL=jdbc:mysql://localhost:3306/armaservermanager_db
-# For Windows, use the following URL instead:
-# MYSQL_DB_URL=jdbc:mysql://db:3306/armaservermanager_db
-MYSQL_USER=armaservermanager
-MYSQL_PASSWORD=example
-MYSQL_ROOT_PASSWORD=change_me
-
-# Steam API key, needed for Steam Workshop interaction.
-# Generated with https://steamcommunity.com/dev/apikey.
-STEAM_API_KEY=
-
-# JWT secret
-# Used for creating JSON web tokens for app authentication.
-# Any string can be used as a secret. The secret should be at least 32 characters long.
-JWT_SECRET=
-
-# (OPTIONAL) Database encryption secret used for encrypting the Steam account password inside the database.
-# Must be a valid AES 256-bit key (https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx).
-# This setting is optional. In case the secret is not provided, the password will be stored in plain text form.
-# Also make sure there are no '$' symbols in the secret which cause issues when being passed through the .env file
-DATABASE_ENCRYPTION_SECRET=
-
-# Set the right Timezone from https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, example Europe/London , US/Pacific , etc
-TIMEZONE=
-```
-
-You can also find these files for download in the root of the repository.
-
-Place these two files in the same directory and follow the comments which tell you how to set them up. It's especially
-important to set up the `.env` file, as it contains passwords, database connection settings and API keys to generate.
-
-After you've set up the values, you can run `docker compose up`, which will automatically bring
-the database and the server manager up. It should then be accessible on http://localhost:8080 by default.
+Retrieve them with `docker compose logs armaservermanager | grep -A2 "Initial admin credentials"`. Change the password after first login.
 
 ### Custom installation without Docker
 While the Docker approach is recommended because of the ease of setup, there might be reasons why you'd wish to run
@@ -208,7 +137,7 @@ the manager natively.
 You can find the `.jar` file in releases section of this repository. Follow the next steps to set it up manually.
 
 #### Prerequisites
-[JDK 17](https://www.oracle.com/java/technologies/downloads/#java17) + MySQL database
+[JDK 25](https://www.oracle.com/java/technologies/downloads/) + MySQL database
 
 #### Installing SteamCMD
 Follow [this guide](https://developer.valvesoftware.com/wiki/SteamCMD#Downloading_SteamCMD) to install SteamCMD on your
@@ -223,6 +152,8 @@ file which contains sample configuration. Copy this file and name it `applicatio
 
 Open the new file and set all the required properties as described.
 
+`auth.jwt.secret` and `database.encryption.secret` in `application.properties` are optional — if omitted, the app auto-generates secure random values on first startup and persists them to `config/secrets.properties` so they survive restarts. Do not commit this file.
+
 #### Setting up MySQL database with Docker
 In the project you can find `docker-compose.yml` file for the MySQL database Docker container. Edit the environment
 variables to match `application.properties`, **especially the database properties**, comment out the `armaservermanager`
@@ -231,7 +162,7 @@ service and then start the container with `docker-compose up -d`.
 You can also use your own MySQL database server instead if you prefer do to so.
 
 #### Running the Admin UI app
-Launch the application by running: `java -jar arma3-server-gui.jar`. You should be able to access the GUI through
+Launch the application by running: `java -jar arma-server-manager.jar`. You should be able to access the GUI through
 `http://localhost:8080` by default.
 
 
@@ -277,6 +208,26 @@ Head to "Servers" tab and click the "Create new server" button. From the dropdow
 After that, finish the configuration and press "Submit" to create the server.
 
 Now, you should already see the server appear in the servers list. Now you're pretty much done - try running the server!
+
+### Using local mods
+
+> Supported for **Arma 3** and **DayZ** only.
+
+Local mods are mod folders you manage yourself — they are not downloaded from Steam Workshop.
+
+1. **Place the mod folder** in the correct subdirectory of your mods storage path:
+   - Arma 3: `<mods dir>/local/ARMA3/<ModName>`
+   - DayZ: `<mods dir>/local/DAYZ/<ModName>`
+
+   With Docker the mods dir lives inside your `STORAGE_PATH` volume (e.g. `$STORAGE_PATH/mods/local/ARMA3/<ModName>`).
+   Without Docker it is the value of `directory.mods` in `application.properties` (default `/home/armaservermanager/mods`).
+
+2. **Sync** — in the UI, open the **Mods** page and switch to the **Local Mods** tab, then click **Sync local mods**.
+   Sync scans the directories, registers new mod folders, refreshes existing ones, removes entries for deleted
+   folders, lowercases all file names (required by the game), copies `.bikey` files into each installed server's
+   `keys` directory, and creates the necessary symlinks.
+
+3. **Enable on a server** — edit your server and add the local mod to the active mod list, just like a workshop mod.
 
 ### Additional servers
 If you need to manage other servers than the ones natively supported, you can use the Additional servers feature.

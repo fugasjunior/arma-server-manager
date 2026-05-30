@@ -24,4 +24,8 @@ class ServerProcessRepository {
     public void store(long serverId, ServerProcess process) {
         serverIdToProcessMap.put(serverId, process);
     }
+
+    public void clear() {
+        serverIdToProcessMap.clear();
+    }
 }

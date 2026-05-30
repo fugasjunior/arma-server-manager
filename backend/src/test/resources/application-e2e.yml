@@ -1,0 +1,41 @@
+auth:
+  username: testuser
+  password: testpassword
+
+jwt:
+  secret: e2e-test-secret-key-long-enough-for-hmac512-algorithm-padding
+
+directory:
+  servers: ${java.io.tmpdir}/arma-server-manager-e2e/servers
+  mods: ${java.io.tmpdir}/arma-server-manager-e2e/mods
+  logs: ${java.io.tmpdir}/arma-server-manager-e2e/logs
+
+steamcmd:
+  path: ${java.io.tmpdir}/arma-server-manager-e2e/steamcmd
+  cache.path: ${java.io.tmpdir}/arma-server-manager-e2e/steamcmd-cache
+
+steam:
+  api:
+    key: e2e-test-api-key
+
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  sql:
+    init:
+      mode: never
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        globally_quoted_identifiers: false
+
+logging:
+  level:
+    cz.forgottenempire: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN

@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {Box, Modal, TextField, Typography} from "@mui/material";
-import {downloadLogFile, getServerLogs} from "../../../services/serverLogService.ts";
+import {serversApi} from "../../../api/client";
+import {downloadServerLog} from "../../../api/downloads";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -31,7 +32,7 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
     }, []);
 
     async function fetchLogs() {
-        const {data: downloadedLogs} = await getServerLogs(serverId);
+        const {data: downloadedLogs} = await serversApi.getServerLog({id: serverId});
         setLogs(downloadedLogs);
         if (logTextArea.current) {
             logTextArea.current.scrollTop = logTextArea.current.scrollHeight;
@@ -39,7 +40,7 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
     }
 
     async function handleDownloadLogFile() {
-        downloadLogFile(serverId);
+        downloadServerLog(serverId);
     }
 
     function isLogEmpty() {
@@ -50,7 +51,7 @@ const ServerLogs = ({serverId, onClose}: ServerLogsProps) => {
         <Modal open onClose={onClose}>
             <Box sx={modalStyle}>
                 {isLogEmpty() ?
-                    <Typography m={2}>No logs available for this server</Typography>
+                    <Typography sx={{m: 2}}>No logs available for this server</Typography>
                     :
                     <TextField multiline value={logs} disabled fullWidth rows={25}/>
                 }

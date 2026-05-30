@@ -1,98 +1,60 @@
 import ModsErrorAlertMessage from "./ModsErrorAlertMessage";
 import ModsTable from "./ModsTable";
 import CreatePresetDialog from "./CreatePresetDialog";
-import {ChangeEvent, useEffect, useState} from "react";
-import {getMods, installMod, setModServerOnly, uninstallMods, updateMods} from "../../services/modsService";
-import {useInterval} from "../../hooks/use-interval";
-import {toast} from "material-react-toastify";
-import {createModPreset} from "../../services/modPresetsService";
-import {ModDto} from "../../dtos/ModDto.ts";
-import {SteamCmdItemInfoDto} from "../../dtos/SteamCmdItemInfoDto.ts";
-import {getItemInfo} from "../../services/steamCmdService.ts";
-
-type WorkshopItemInfoResponse = {
-    [id: number]: SteamCmdItemInfoDto
-}
+import {ChangeEvent, useMemo, useState} from "react";
+import {toast} from "react-toastify";
+import {ModDto, ServerType} from "../../api/generated";
+import {modsApi, modPresetsApi} from "../../api/client";
+import {useMods} from "../../hooks/queries/useMods";
+import {useSteamCmdItemInfos} from "../../hooks/queries/useSteamCmdItemInfos";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
 
 export default function ModsManagement() {
-    const [initialLoading, setInitialLoading] = useState(true);
-    const [mods, setMods] = useState<Array<ModDto>>([]);
+    const queryClient = useQueryClient();
+    const canViewMods = usePermission("MOD_VIEW");
+    const canPollSteamCmd = usePermission("STEAM_AUTH_ADMIN");
+    const {data: mods = [], isLoading: initialLoading} = useMods(undefined, {refetchInterval: 5000, enabled: canViewMods});
+    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000, enabled: canPollSteamCmd});
+
     const [selectedModsIds, setSelectedModsIds] = useState<Array<number>>([]);
     const [filter, setFilter] = useState("");
     const [newPresetDialogOpen, setNewPresetDialogOpen] = useState(false);
-    const [steamCmdItemInfo, setSteamCmdItemInfo] = useState<WorkshopItemInfoResponse>({});
-
-    useEffect(() => {
-        void fetchMods();
-        void fetchSteamCmdItemInfo();
-    }, []);
-
-    useInterval(() => {
-        void fetchMods();
-        void fetchSteamCmdItemInfo();
-    }, 5000);
-
-    const fetchMods = async () => {
-        const {data: modsDto} = await getMods();
-        const mods = modsDto.workshopMods.map((mod: ModDto) => {
-            const lastUpdated = mod.lastUpdated ? new Date(mod.lastUpdated) : "";
-            return {...mod, lastUpdated}
-        });
-        mods.sort((a: ModDto, b: ModDto) => a.name.localeCompare(b.name));
-
-        setMods(mods);
-        setInitialLoading(false);
-    };
-
-    const fetchSteamCmdItemInfo = async () => {
-        const {data} = await getItemInfo();
-        setSteamCmdItemInfo(data);
-    };
 
     const handleInstall = async (modId: number) => {
-        const {data: mod} = await installMod(modId);
-        setMods(prevState => {
-            return [mod, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        })
+        await modsApi.updateMod({id: modId});
+        await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
     };
 
     const handleModUpdate = async () => {
-        setSteamCmdItemInfo(prevState => {
-            const newState = {...prevState};
-            for (const selectedModId of selectedModsIds) {
-                delete newState[selectedModId];
-            }
-            return newState;
-        })
-
-        setMods(prevState => {
-            const newMods = [...prevState];
-            for (const selectedModId of selectedModsIds) {
-                const selectedMod = newMods.find((mod: ModDto) => mod.id === selectedModId);
-                if (!selectedMod) {
-                    continue;
-                }
-
-                selectedMod.installationStatus = "INSTALLATION_IN_PROGRESS";
-                selectedMod.errorStatus = null;
-            }
-            return newMods;
-        })
-        await updateMods(selectedModsIds.join(","));
+        queryClient.setQueryData(queryKeys.mods(), (old: ModDto[] = []) =>
+            old.map(mod =>
+                selectedModsIds.includes(mod.id!)
+                    ? {...mod, installationStatus: "INSTALLATION_IN_PROGRESS", errorStatus: undefined}
+                    : mod
+            )
+        );
+        queryClient.setQueryData(queryKeys.steamCmdItemInfos, (old: Record<string, unknown> = {}) => {
+            const updated = {...old};
+            for (const id of selectedModsIds) delete updated[id];
+            return updated;
+        });
+        await modsApi.addMods({modIds: selectedModsIds});
+        await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
     };
 
     const handleUninstall = async () => {
-        setMods(prevState => {
-            return prevState.filter(mod => selectedModsIds.indexOf(mod.id) === -1);
-        })
+        const ids = selectedModsIds;
         setSelectedModsIds([]);
-        await uninstallMods(selectedModsIds.join(","));
+        await modsApi.deleteMods({modIds: ids});
         toast.success("Mod(s) successfully uninstalled");
+        await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
     };
 
     const handleSelectAllRowsClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = filteredMods.map((n) => n.id);
+            const newSelected = filteredMods.map((n) => n.id!);
             setSelectedModsIds(newSelected);
             return;
         }
@@ -122,25 +84,24 @@ export default function ModsManagement() {
     const handleFilterChange = (_: any, newValue: string) => {
         setSelectedModsIds([]);
         setFilter(newValue);
-    }
+    };
 
-    const filterMods = () => {
-        if (!filter) {
-            return mods;
-        }
+    const filteredMods = useMemo(() => {
+        if (!filter) return mods;
         return mods.filter(mod => mod.serverType === filter);
-    }
+    }, [mods, filter]);
 
     const getSelectedMods = (): Array<ModDto> => {
-        return mods.filter(mod => selectedModsIds.indexOf(mod.id) !== -1);
-    }
+        return mods.filter(mod => selectedModsIds.indexOf(mod.id!) !== -1);
+    };
+
     const handlePresedDialogOpen = () => {
         setNewPresetDialogOpen(true);
-    }
+    };
 
     const handlePresedDialogClose = () => {
         setNewPresetDialogOpen(false);
-    }
+    };
 
     const handleCreateNewPreset = async (presetName: string) => {
         setNewPresetDialogOpen(false);
@@ -152,32 +113,22 @@ export default function ModsManagement() {
         const request = {
             name: presetName,
             mods: selectedModsIds,
-            type: mod.serverType
+            type: mod.serverType as ServerType
         };
-        await createModPreset(request);
+        await modPresetsApi.createPreset({createPresetRequestDto: request});
         toast.success(`Preset '${presetName}' successfully created`);
-    }
+        await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
+    };
 
     const handleServerOnlyChanged = async (e: ChangeEvent<HTMLInputElement>, modId: number) => {
         const isServerOnly = e.target.checked;
-        setMods(prevState => {
-            const newMods = [...prevState];
-            const foundMod = newMods.find(mod => mod.id === modId);
-            if (!foundMod) {
-                return prevState;
-            }
-
-            foundMod.serverOnly = isServerOnly;
-            return newMods;
-        });
-
-        await setModServerOnly(modId, isServerOnly);
+        await modsApi.setModServerOnly({id: modId, serverOnlyDto: {serverOnly: isServerOnly}});
+        await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
     };
 
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
-    const filteredMods = filterMods();
-    const arma3ModsCount = mods.filter(mod => mod.serverType === "ARMA3").length;
-    const dayZModsCount = mods.filter(mod => mod.serverType === "DAYZ").length;
+    const arma3ModsCount = mods.filter(mod => mod.serverType === ServerType.Arma3).length;
+    const dayZModsCount = mods.filter(mod => mod.serverType === ServerType.Dayz).length;
     const mixedModsSelected = getSelectedMods().map(mod => mod.serverType).filter(
         (v, i, a) => a.indexOf(v) === i).length > 1;
 

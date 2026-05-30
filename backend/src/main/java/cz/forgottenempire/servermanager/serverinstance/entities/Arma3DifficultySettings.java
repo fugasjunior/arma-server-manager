@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Min;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "arma3difficulty_settings")
 public class Arma3DifficultySettings {
 
     @Id

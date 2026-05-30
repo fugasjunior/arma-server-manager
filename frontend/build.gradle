@@ -33,8 +33,44 @@ tasks.register('appNpmBuild', NpmTask) {
 
     outputs.dir('build')
 
+    environment = ["VITE_APP_VERSION": rootProject.version]
     args = ["run", "build"]
 }
 
-appNpmBuild.dependsOn(appNpmInstall)
+tasks.register('appNpmTest', NpmTask) {
+    description = "Runs frontend tests"
+
+    inputs.files(fileTree('node_modules'))
+    inputs.files(fileTree('src'))
+    inputs.files(fileTree('__tests__'))
+    inputs.file('package.json')
+    inputs.file('jest.config.cjs')
+    inputs.file('jest.setup.cjs')
+    inputs.file('tsconfig.test.json')
+
+    args = ["run", "test"]
+}
+
+tasks.register('appNpmGenerate', NpmTask) {
+    description = "Generates TypeScript API client from OpenAPI spec"
+
+    inputs.file('../openapi/openapi.yaml')
+    inputs.file('openapitools.json')
+    outputs.dir('src/api/generated')
+
+    dependsOn(appNpmInstall)
+    args = ["run", "generate"]
+}
+
+tasks.register('syncPackageJsonVersion') {
+    doLast {
+        def pkgFile = file('package.json')
+        pkgFile.text = pkgFile.text.replaceAll(/"version"\s*:\s*"[^"]+"/, "\"version\": \"${rootProject.version}\"")
+    }
+}
+
+appNpmBuild.dependsOn(appNpmGenerate)
+appNpmBuild.dependsOn(syncPackageJsonVersion)
+appNpmTest.dependsOn(appNpmGenerate)
+appNpmTest.dependsOn(syncPackageJsonVersion)
 assemble.dependsOn(appNpmBuild)

@@ -1,11 +1,4 @@
 import {ChangeEvent, useEffect, useState} from "react";
-import {
-    deleteModPreset,
-    downloadExportedPreset,
-    getModPresets,
-    updateModPreset,
-    uploadImportedPreset
-} from "../../services/modPresetsService";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -13,111 +6,104 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
-import {Backdrop, Box, CircularProgress, Divider, Modal, Stack, Toolbar} from "@mui/material";
+import {Backdrop, Box, CircularProgress, Divider, Menu, MenuItem, Modal, Stack, Toolbar} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import DownloadIcon from '@mui/icons-material/Download';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SERVER_NAMES from "../../util/serverNames";
-import {toast} from "material-react-toastify";
+import {humanFileSize} from "../../util/util";
+import {toast} from "react-toastify";
 import ListBuilder from "../../UI/ListBuilder/ListBuilder";
-import {getMods} from "../../services/modsService";
 import TableGhosts from "../../UI/TableSkeletons";
 import Tooltip from "@mui/material/Tooltip";
 import UploadIcon from '@mui/icons-material/Upload';
-import DownloadIcon from '@mui/icons-material/Download';
-import {ModPresetDto, ModPresetModDto} from "../../dtos/ModPresetDto";
-import {ModDto} from "../../dtos/ModDto.ts";
-import {ServerType} from "../../dtos/ServerDto.ts";
+import {PresetResponseDto, PresetResponseModDto, ServerType} from "../../api/generated";
+import {modPresetsApi, armaLauncherPresetApi} from "../../api/client";
+import {downloadExportedPreset} from "../../api/downloads";
+import ImportPresetDialog from "./ImportPresetDialog";
+import RenamePresetDialog from "./RenamePresetDialog";
+import PermissionGuard from "../auth/PermissionGuard";
+import {usePermission} from "../../hooks/usePermission";
+import {usePresets} from "../../hooks/queries/usePresets";
+import {useMods} from "../../hooks/queries/useMods";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
 
 export default function PresetsManagement() {
-    const [initialLoading, setInitialLoading] = useState(true);
-    const [presets, setPresets] = useState<Array<ModPresetDto>>([]);
-    const [editedPreset, setEditedPreset] = useState<ModPresetDto | null>();
+    const queryClient = useQueryClient();
+    const canViewMods = usePermission("MOD_VIEW");
+    const {data: presets = [], isLoading: initialLoading} = usePresets(undefined, {enabled: canViewMods});
+
+    const [editedPreset, setEditedPreset] = useState<PresetResponseDto | null>(null);
     const [presetModalOpen, setPresetModalOpen] = useState(false);
-    const [selectedMods, setSelectedMods] = useState<Array<ModPresetModDto>>([]);
-    const [availableMods, setAvailableMods] = useState<Array<ModPresetModDto>>([]);
+    const [selectedMods, setSelectedMods] = useState<Array<PresetResponseModDto>>([]);
+    const [availableMods, setAvailableMods] = useState<Array<PresetResponseModDto>>([]);
     const [isUploadInProgress, setIsUploadInProgress] = useState(false);
+    const [importDialogOpen, setImportDialogOpen] = useState(false);
+    const [importFile, setImportFile] = useState<File | null>(null);
+    const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+    const [renamePresetId, setRenamePresetId] = useState<number | null>(null);
+    const [menuAnchor, setMenuAnchor] = useState<{el: HTMLElement, presetId: number} | null>(null);
+
+    const {data: modsForEdit = [], isSuccess: modsForEditLoaded} = useMods(
+        editedPreset?.type as ServerType | undefined,
+        {enabled: !!editedPreset && canViewMods}
+    );
 
     useEffect(() => {
-        async function fetchPresets() {
-            const {data: presetsDto} = await getModPresets();
-            setPresets(presetsDto.presets);
-            setInitialLoading(false);
-        }
+        if (!editedPreset || !modsForEditLoaded) return;
+        const available = (modsForEdit as unknown as PresetResponseModDto[])
+            .filter(mod => !(editedPreset.mods ?? []).find(m => m.id === mod.id));
+        setSelectedMods(editedPreset.mods ?? []);
+        setAvailableMods(available);
+        setPresetModalOpen(true);
+    }, [editedPreset?.id, modsForEditLoaded]);
 
-        fetchPresets();
-    }, []);
-
-    async function handleDelete(id: string) {
+    async function handleDelete(id: number) {
         const deletedPreset = presets.find(preset => preset.id === id);
         if (!deletedPreset) {
             return;
         }
 
-        setPresets(prevState => [...prevState].filter(preset => preset !== deletedPreset));
-
         try {
-            await deleteModPreset(id);
+            await modPresetsApi.deletePreset({id});
             toast.success(`Preset '${deletedPreset.name}' successfully deleted`);
+            await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
         } catch (e: any) {
             console.error(e);
             toast.error(e.response.data || "Could not delete preset");
-            setPresets(prevState => [...prevState, deletedPreset]);
         }
-    }
-
-    function getSummarizedModsList(mods: Array<ModPresetModDto>) {
-        const CUTOFF_LENGTH = 55;
-        const modNames = mods.map(mod => mod.shortName);
-        modNames.sort((a, b) => a.localeCompare(b));
-        let summarizedList = modNames[0];
-        let i = 1;
-        while (summarizedList.length < CUTOFF_LENGTH && i < modNames.length) {
-            summarizedList += ", " + modNames[i++];
-        }
-        if (summarizedList.length >= CUTOFF_LENGTH) {
-            summarizedList += " and " + (modNames.length - i) + " more...";
-        }
-        return summarizedList;
     }
 
     function getSortedPresets() {
-        return presets.sort((a, b) => a.name.localeCompare(b.name));
+        return [...presets].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
     }
 
-    async function handleOpenEdit(preset: ModPresetDto) {
-        const {data: modsDto} = await getMods(preset.type);
-        let availableMods = modsDto.workshopMods;
-        availableMods = availableMods.filter((mod: ModDto) => !preset.mods.find(searchedMod => searchedMod.id === mod.id))
-
+    function handleOpenEdit(preset: PresetResponseDto) {
         setEditedPreset(preset);
-        setSelectedMods(preset.mods);
-        setAvailableMods(availableMods);
-        setPresetModalOpen(true);
     }
 
-    async function handlePresetModalClosed() {
-        if (!editedPreset || editedPreset.id === undefined) {
-            return;
-        }
+    async function handlePresetConfirm() {
+        if (!editedPreset || editedPreset.id === undefined) return;
 
         const request = {
-            name: editedPreset.name,
-            mods: selectedMods.map(mod => mod.id)
-        }
+            name: editedPreset.name!,
+            mods: selectedMods.map(mod => mod.id!)
+        };
 
         if (selectedMods.length === 0) {
             await handleDelete(editedPreset.id);
         } else {
             try {
-                const {data: savedPreset} = await updateModPreset(editedPreset.id, request);
-                setPresets(prevState => {
-                    const newState = [...prevState];
-                    const oldPreset = newState.find(preset => preset.id === savedPreset.id);
-                    return [...newState.filter(preset => preset !== oldPreset), savedPreset];
-                });
-                toast.success(`Preset '${savedPreset.name}' successfully updated`);
+                await modPresetsApi.updatePreset({id: editedPreset.id, updatePresetRequestDto: request});
+                toast.success(`Preset '${editedPreset.name}' successfully updated`);
+                await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
             } catch (e: any) {
                 console.error(e);
                 toast.error(e.response.data || "Could not update preset");
@@ -130,45 +116,91 @@ export default function PresetsManagement() {
         setPresetModalOpen(false);
     }
 
-    function handleModSelect(option: ModPresetModDto) {
-
-        setAvailableMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-        setSelectedMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        });
+    function handlePresetModalCancelled() {
+        setEditedPreset(null);
+        setSelectedMods([]);
+        setAvailableMods([]);
+        setPresetModalOpen(false);
     }
 
-    function handleModDeselect(option: ModPresetModDto) {
-        setSelectedMods((prevState) => {
-            return prevState.filter(item => item !== option);
-        });
-
-        setAvailableMods((prevState) => {
-            return [option, ...prevState].sort((a, b) => a.name.localeCompare(b.name));
-        });
+    function handleModSelect(option: PresetResponseModDto) {
+        setAvailableMods(prev => prev.filter(item => item !== option));
+        setSelectedMods(prev => [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
     }
 
-    async function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
-        if (!e.target.files) {
+    function handleModDeselect(option: PresetResponseModDto) {
+        setSelectedMods(prev => prev.filter(item => item !== option));
+        setAvailableMods(prev => [option, ...prev].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+    }
+
+    function handleModReorder(items: PresetResponseModDto[]) {
+        setSelectedMods(items);
+    }
+
+    function handleSelectAll() {
+        setSelectedMods(prev => [...prev, ...availableMods].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setAvailableMods([]);
+    }
+
+    function handleClearAll() {
+        setAvailableMods(prev => [...prev, ...selectedMods].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")));
+        setSelectedMods([]);
+    }
+
+    function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files?.[0]) {
             return;
         }
+        setImportFile(e.target.files[0]);
+        setImportDialogOpen(true);
+        e.target.value = '';
+    }
 
+    async function handleImportConfirmed(name: string) {
+        if (!importFile) {
+            return;
+        }
         try {
             setIsUploadInProgress(true);
-            const {data: importedPreset} = await uploadImportedPreset(e.target.files[0]);
-            setPresets(prevState => [...prevState, importedPreset]);
+            setImportDialogOpen(false);
+            const {data: importedPreset} = await armaLauncherPresetApi.importLauncherPreset({preset: importFile, name});
             setIsUploadInProgress(false);
             toast.success(`Preset '${importedPreset.name}' successfully imported`);
+            await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
         } catch (e: any) {
             setIsUploadInProgress(false);
             console.error(e);
             toast.error(e.response.data || "Error during mod import");
+        } finally {
+            setImportFile(null);
         }
     }
 
-    function handleDownload(presetId: string) {
+    function handleRenameClick(id: number) {
+        setRenamePresetId(id);
+        setRenameDialogOpen(true);
+    }
+
+    async function handleRenameConfirmed(name: string) {
+        if (renamePresetId === null) {
+            return;
+        }
+        try {
+            const {data: renamedPreset} = await modPresetsApi.renamePreset({
+                id: renamePresetId,
+                renamePresetRequestDto: {name}
+            });
+            setRenameDialogOpen(false);
+            setRenamePresetId(null);
+            toast.success(`Preset successfully renamed to '${renamedPreset.name}'`);
+            await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
+        } catch (e: any) {
+            console.error(e);
+            toast.error(e.response.data || "Could not rename preset");
+        }
+    }
+
+    function handleDownload(presetId: number) {
         try {
             downloadExportedPreset(presetId);
         } catch (e: any) {
@@ -177,12 +209,20 @@ export default function PresetsManagement() {
         }
     }
 
+    function handleMenuOpen(event: React.MouseEvent<HTMLElement>, presetId: number) {
+        setMenuAnchor({el: event.currentTarget, presetId});
+    }
+
+    function handleMenuClose() {
+        setMenuAnchor(null);
+    }
+
     return (
         <>
             <Backdrop open={isUploadInProgress}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <input type="file" id="fileInput" onChange={handleFileInput} style={{display: 'none'}}/>
+            <input type="file" id="fileInput" data-testid="preset-import-input" onChange={handleFileInput} style={{display: 'none'}}/>
             <Box sx={{width: '100%'}}>
                 <Paper sx={{width: '100%'}}>
                     <Toolbar sx={{pl: {sm: 2}, pr: {xs: 1, sm: 1}}}>
@@ -190,62 +230,66 @@ export default function PresetsManagement() {
                             Presets
                         </Typography>
                         <Stack direction="row" spacing={2} divider={<Divider orientation={"vertical"} flexItem/>}>
-                            <Tooltip title="Import preset">
-                                <label htmlFor="fileInput">
-                                    <IconButton component="span">
-                                        <UploadIcon/>
-                                    </IconButton>
-                                </label>
-                            </Tooltip>
+                            <PermissionGuard permission="MOD_MODIFY">
+                                <Tooltip title="Import preset">
+                                    <label htmlFor="fileInput">
+                                        <IconButton component="span" data-testid="preset-import-btn">
+                                            <UploadIcon/>
+                                        </IconButton>
+                                    </label>
+                                </Tooltip>
+                            </PermissionGuard>
                         </Stack>
                     </Toolbar>
                     <TableContainer component={Paper}>
                         <Table sx={{minWidth: 650}} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell>Mods</TableCell>
-                                    <TableCell align="right">Mods count</TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
+                                    <TableCell sx={{width: '20%'}}>Name</TableCell>
+                                    <TableCell sx={{width: '10%', whiteSpace: 'nowrap'}}>Type</TableCell>
+                                    <TableCell sx={{width: '20%'}}>Mods</TableCell>
+                                    <TableCell sx={{width: '8%', whiteSpace: 'nowrap'}}>Total size</TableCell>
+                                    <TableCell sx={{width: '2%'}}></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {getSortedPresets().map((preset) => (
                                     <TableRow
                                         key={preset.id}
+                                        data-testid={`preset-row-${preset.id}`}
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
                                         <TableCell component="th" scope="row">
                                             {preset.name}
                                         </TableCell>
                                         <TableCell>
-                                            {SERVER_NAMES.get(ServerType[preset.type as keyof typeof ServerType])}
+                                            {SERVER_NAMES.get(preset.type as ServerType)}
                                         </TableCell>
                                         <TableCell>
-                                            {getSummarizedModsList(preset.mods)}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {preset.mods.length}
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton aria-label="edit"
-                                                        onClick={() => handleOpenEdit(preset)}>
-                                                <EditIcon color="primary"/>
-                                            </IconButton>
+                                            <Tooltip title={
+                                                <>{(preset.mods ?? []).map(m => <div key={m.id}>{m.name}</div>)}</>
+                                            } placement="bottom-start">
+                                                <Stack direction="row" spacing={0.5} sx={{width: 'fit-content', cursor: 'default', alignItems: "center"}}>
+                                                    <span>{(preset.mods ?? []).length} mods total</span>
+                                                    <InfoOutlinedIcon sx={{fontSize: 14, color: 'text.secondary'}}/>
+                                                </Stack>
+                                            </Tooltip>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton aria-label="export"
-                                                        onClick={() => handleDownload(preset.id as string)}>
-                                                <DownloadIcon color="primary"/>
-                                            </IconButton>
+                                            {preset.totalModsSize != null ? humanFileSize(preset.totalModsSize) : '—'}
                                         </TableCell>
-                                        <TableCell>
-                                            <IconButton aria-label="delete"
-                                                        onClick={() => handleDelete(preset.id as string)}>
-                                                <DeleteIcon color="error"/>
+                                        <TableCell align="right" sx={{whiteSpace: 'nowrap', pr: 1}}>
+                                            <PermissionGuard permission="MOD_MODIFY">
+                                                <Tooltip title="Edit mods">
+                                                    <IconButton size="small" aria-label="edit" data-testid={`preset-edit-${preset.id}`}
+                                                                onClick={() => handleOpenEdit(preset)}>
+                                                        <EditIcon fontSize="small" color="primary"/>
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </PermissionGuard>
+                                            <IconButton size="small" aria-label="more actions" data-testid={`preset-menu-${preset.id}`}
+                                                        onClick={(e) => handleMenuOpen(e, preset.id!)}>
+                                                <MoreVertIcon fontSize="small"/>
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
@@ -256,14 +300,78 @@ export default function PresetsManagement() {
                     </TableContainer>
                 </Paper>
             </Box>
-            <Modal open={presetModalOpen} onClose={handlePresetModalClosed}>
+            <Modal open={presetModalOpen} onClose={handlePresetModalCancelled}>
                 <Box>
                     <ListBuilder selectedOptions={selectedMods} availableOptions={availableMods}
                                  onSelect={handleModSelect} onDeselect={handleModDeselect}
-                                 itemsLabel="mods" showFilter
+                                 onReorder={handleModReorder} onSelectAll={handleSelectAll} onClearAll={handleClearAll}
+                                 itemsLabel="mods" showFilter withControls
+                                 onConfirm={handlePresetConfirm} onCancel={handlePresetModalCancelled}
                     />
                 </Box>
             </Modal>
+            <ImportPresetDialog
+                open={importDialogOpen}
+                file={importFile}
+                existingPresetNames={presets.map(p => p.name ?? '')}
+                onConfirmClicked={handleImportConfirmed}
+                onClose={() => {
+                    setImportDialogOpen(false);
+                    setImportFile(null);
+                }}
+            />
+            <RenamePresetDialog
+                open={renameDialogOpen}
+                currentName={presets.find(p => p.id === renamePresetId)?.name ?? ''}
+                existingPresetNames={presets.filter(p => p.id !== renamePresetId).map(p => p.name ?? '')}
+                onConfirmClicked={handleRenameConfirmed}
+                onClose={() => {
+                    setRenameDialogOpen(false);
+                    setRenamePresetId(null);
+                }}
+            />
+            <Menu
+                anchorEl={menuAnchor?.el}
+                open={menuAnchor !== null}
+                onClose={handleMenuClose}
+            >
+                <PermissionGuard permission="MOD_MODIFY">
+                    <MenuItem data-testid={`preset-menu-edit-${menuAnchor?.presetId}`} onClick={() => {
+                        handleMenuClose();
+                        const preset = presets.find(p => p.id === menuAnchor?.presetId);
+                        if (preset) handleOpenEdit(preset);
+                    }}>
+                        <ListItemIcon><EditIcon fontSize="small"/></ListItemIcon>
+                        Edit mods
+                    </MenuItem>
+                    <MenuItem data-testid={`preset-menu-rename-${menuAnchor?.presetId}`} onClick={() => {
+                        const id = menuAnchor?.presetId;
+                        handleMenuClose();
+                        if (id !== undefined) handleRenameClick(id);
+                    }}>
+                        <ListItemIcon><DriveFileRenameOutlineIcon fontSize="small"/></ListItemIcon>
+                        Rename
+                    </MenuItem>
+                </PermissionGuard>
+                <MenuItem data-testid={`preset-menu-download-${menuAnchor?.presetId}`} onClick={() => {
+                    const id = menuAnchor?.presetId;
+                    handleMenuClose();
+                    if (id !== undefined) handleDownload(id);
+                }}>
+                    <ListItemIcon><DownloadIcon fontSize="small"/></ListItemIcon>
+                    Download
+                </MenuItem>
+                <PermissionGuard permission="MOD_DELETE">
+                    <MenuItem data-testid={`preset-menu-delete-${menuAnchor?.presetId}`} onClick={() => {
+                        const id = menuAnchor?.presetId;
+                        handleMenuClose();
+                        if (id !== undefined) handleDelete(id);
+                    }} sx={{color: 'error.main'}}>
+                        <ListItemIcon><DeleteIcon fontSize="small" color="error"/></ListItemIcon>
+                        Delete
+                    </MenuItem>
+                </PermissionGuard>
+            </Menu>
         </>
-    )
+    );
 }

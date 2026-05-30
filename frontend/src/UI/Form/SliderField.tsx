@@ -1,41 +1,40 @@
 import {ReactNode} from "react";
-import {FormikState} from "formik";
-import {FormikHandlers} from "formik/dist/types";
-import {getValueByKeyPath} from "../../util/formUtils.ts";
+import {useController} from 'react-hook-form';
 import {Grid, Slider, Typography} from "@mui/material";
 
-type SliderFieldProps<T> = {
-    id: string,
+type SliderFieldProps = {
+    name: string,
     label: string,
     min: number,
     max: number,
     step: number
-    icon?: ReactNode
-    formik: FormikState<T> & FormikHandlers
+    icon?: ReactNode,
+    disabled: boolean,
 }
 
-export const SliderField = <T, >({id, label, min, max, step, icon, formik}: SliderFieldProps<T>) => {
-    const value = (getValueByKeyPath(formik.values, id) || 0) as number;
+export const SliderField = ({name, label, min, max, step, icon, disabled}: SliderFieldProps) => {
+    const {field} = useController({name});
 
     return <>
         <Typography gutterBottom>
             {label}
         </Typography>
-        <Grid container spacing={2} alignItems="center">
-            {icon && <Grid item>
+        <Grid container spacing={2} sx={{alignItems: "center"}}>
+            {icon && <Grid>
                 {icon}
             </Grid>}
-            <Grid item xs>
+            <Grid size="grow">
                 <Slider
                     aria-label={label}
-                    id={id}
-                    name={id}
-                    value={value}
+                    id={name}
+                    name={name}
+                    value={(field.value as number) || 0}
                     valueLabelDisplay="auto"
-                    onChange={formik.handleChange}
+                    onChange={(_, value) => field.onChange(value)}
                     step={step}
                     min={min}
                     max={max}
+                    disabled={disabled}
                 />
             </Grid>
         </Grid>

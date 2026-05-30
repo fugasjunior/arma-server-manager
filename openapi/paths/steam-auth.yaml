@@ -1,0 +1,66 @@
+/config/auth:
+  get:
+    tags: [SteamAuth]
+    operationId: getSteamAuth
+    summary: Get current Steam auth credentials
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/steam-auth.yaml#/SteamAuthDto'
+  post:
+    tags: [SteamAuth]
+    operationId: setSteamAuth
+    summary: Set Steam auth credentials
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/steam-auth.yaml#/SteamAuthDto'
+    responses:
+      '200':
+        description: OK
+  delete:
+    tags: [SteamAuth]
+    operationId: clearSteamAuth
+    summary: Clear Steam auth credentials
+    responses:
+      '204':
+        description: No Content
+
+/config/auth/status:
+  get:
+    tags: [SteamAuth]
+    operationId: getSteamAuthStatus
+    summary: Check if Steam auth is configured
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/steam-auth.yaml#/SteamAuthStatusDto'
+
+/config/auth/verify:
+  post:
+    tags: [SteamAuth]
+    operationId: verifySteamAuth
+    summary: Verify Steam credentials and detect 2FA requirements
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/steam-auth.yaml#/SteamAuthDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/steam-auth.yaml#/AuthVerificationResultDto'
+      '500':
+        $ref: '../components/responses.yaml#/ApiError'

@@ -1,0 +1,178 @@
+/users:
+  get:
+    tags: [Users]
+    operationId: getUsers
+    summary: List all users
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../components/schemas/user-management.yaml#/UserDto'
+  post:
+    tags: [Users]
+    operationId: createUser
+    summary: Create a new user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/user-management.yaml#/CreateUserRequest'
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/UserDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '409':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/users/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  get:
+    tags: [Users]
+    operationId: getUser
+    summary: Get a user by ID
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/UserDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  put:
+    tags: [Users]
+    operationId: updateUser
+    summary: Update a user (enabled flag)
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/user-management.yaml#/UpdateUserRequest'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/UserDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  delete:
+    tags: [Users]
+    operationId: deleteUser
+    summary: Delete a user
+    responses:
+      '204':
+        description: No Content
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/users/{id}/roles:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  put:
+    tags: [Users]
+    operationId: setUserRoles
+    summary: Replace the set of roles assigned to a user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [roleIds]
+            properties:
+              roleIds:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/UserDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/users/{id}/password:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  put:
+    tags: [Users]
+    operationId: resetUserPassword
+    summary: Admin-reset a user's password
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/user-management.yaml#/ChangePasswordRequest'
+    responses:
+      '204':
+        description: No Content
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/users/me:
+  get:
+    tags: [Users]
+    operationId: getCurrentUser
+    summary: Get the currently authenticated user including their permissions
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/CurrentUserDto'
+
+/users/me/password:
+  patch:
+    tags: [Users]
+    operationId: changeMyPassword
+    summary: Change own password
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/user-management.yaml#/ChangePasswordRequest'
+    responses:
+      '204':
+        description: No Content
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'

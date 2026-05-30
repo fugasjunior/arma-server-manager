@@ -1,0 +1,62 @@
+ServerType:
+  type: string
+  enum: [ARMA3, DAYZ, DAYZ_EXP, REFORGER]
+
+InstallationStatus:
+  type: string
+  enum: [INSTALLATION_IN_PROGRESS, ERROR, FINISHED]
+
+ErrorStatus:
+  type: string
+  enum: [WRONG_AUTH, IO, TIMEOUT, NO_MATCH, NO_SUBSCRIPTION, RATE_LIMIT, GENERIC, INTERRUPTED, NOT_CONSUMED_BY_GAME, SERVER_NOT_INSTALLED]
+
+InstallationBranch:
+  type: string
+  enum: [PUBLIC, PROFILING, CONTACT, CREATORDLC]
+
+OSType:
+  type: string
+  enum: [WINDOWS, LINUX, MAC, UNKNOWN]
+
+SteamCmdStatus:
+  type: string
+  enum: [IN_QUEUE, FINISHED, VERIFYING, DOWNLOADING, PREALLOCATING, COMMITTING]
+
+AuthStatus:
+  type: string
+  enum: [SUCCESS, REQUIRES_2FA, INVALID_CREDENTIALS, ERROR]
+
+AuthType:
+  type: string
+  enum: [NONE, EMAIL, MOBILE, UNKNOWN]
+
+ApiErrorDto:
+  type: object
+  properties:
+    status:
+      type: string
+    message:
+      type: string
+    errors:
+      type: array
+      items:
+        type: string
+
+LaunchParameterDto:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+    value:
+      type: string
+
+AutomaticRestartDto:
+  type: object
+  properties:
+    enabled:
+      type: boolean
+    time:
+      type: string
+      format: time
+      description: "Restart time in HH:mm:ss format"

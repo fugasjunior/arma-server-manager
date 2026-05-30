@@ -4,7 +4,7 @@ import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
-import cz.forgottenempire.servermanager.serverinstance.process.ServerProcess;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,8 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,10 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Configurable
 public abstract class Server {
-
-    protected transient PathsFactory pathsFactory;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,20 +55,11 @@ public abstract class Server {
     @Column(name = "automatic_restart_time")
     private LocalTime automaticRestartTime;
 
-    public abstract List<String> getLaunchParameters();
+    public abstract List<String> getLaunchParameters(ServerLaunchContext ctx);
 
-    public abstract Collection<ServerConfig> getConfigFiles();
+    public abstract Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx);
 
-    public LogFile getLog() {
+    public LogFile getLog(PathsFactory pathsFactory) {
         return new LogFile(pathsFactory.getServerLogFile(type, id));
-    }
-
-    public ServerProcess getProcess() {
-        return new ServerProcess(id);
-    }
-
-    @Autowired
-    void setPathsFactory(PathsFactory pathsFactory) {
-        this.pathsFactory = pathsFactory;
     }
 }

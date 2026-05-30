@@ -1,15 +1,15 @@
-import {FormikState} from "formik";
-import {Arma3ServerDto} from "../../../dtos/ServerDto.ts";
-import {FormikHandlers} from "formik/dist/types";
+import {useController} from 'react-hook-form';
 import {FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@mui/material";
 import {LocationSearching, School} from "@mui/icons-material";
 import {SliderField} from "../../../UI/Form/SliderField.tsx";
 
-type Arma3AiSkillSettingsProps = {
-    formik: FormikState<Arma3ServerDto> & FormikHandlers
+interface Arma3AiSkillSettingsProps {
+    disabled?: boolean
 }
 
-export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
+export const Arma3AiSkillSettings = ({disabled}: Arma3AiSkillSettingsProps) => {
+    const {field} = useController({name: 'difficultySettings.aiLevelPreset'});
+
     return <>
         <FormGroup>
             <FormControl>
@@ -18,8 +18,8 @@ export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
                     row
                     id="difficultySettings.aiLevelPreset"
                     name="difficultySettings.aiLevelPreset"
-                    onChange={formik.handleChange}
-                    value={formik.values.difficultySettings.aiLevelPreset}
+                    onChange={field.onChange}
+                    value={field.value ?? 0}
                 >
                     <FormControlLabel value="0" control={<Radio/>} label="Low"/>
                     <FormControlLabel value="1" control={<Radio/>} label="Normal"/>
@@ -28,9 +28,9 @@ export const Arma3AiSkillSettings = ({formik}: Arma3AiSkillSettingsProps) => {
                 </RadioGroup>
             </FormControl>
         </FormGroup>
-        <SliderField id='difficultySettings.skillAI' label='AI skill' min={0} max={1} step={0.05}
-                     icon={<School/>} formik={formik}/>
-        <SliderField id='difficultySettings.precisionAI' label='AI precision' min={0} max={1} step={0.05}
-                     icon={<LocationSearching/>} formik={formik}/>
+        <SliderField name='difficultySettings.skillAI' label='AI skill' min={0} max={1} step={0.05}
+                     icon={<School/>} disabled={disabled ?? false}/>
+        <SliderField name='difficultySettings.precisionAI' label='AI precision' min={0} max={1} step={0.05}
+                     icon={<LocationSearching/>} disabled={disabled ?? false}/>
     </>;
 }

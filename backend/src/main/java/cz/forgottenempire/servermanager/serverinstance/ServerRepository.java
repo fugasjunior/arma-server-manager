@@ -2,7 +2,7 @@ package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import java.util.List;
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

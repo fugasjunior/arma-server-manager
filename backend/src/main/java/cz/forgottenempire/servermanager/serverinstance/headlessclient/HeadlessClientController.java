@@ -1,15 +1,17 @@
 package cz.forgottenempire.servermanager.serverinstance.headlessclient;
 
+import cz.forgottenempire.servermanager.api.HeadlessClientApi;
+import cz.forgottenempire.servermanager.api.model.SetHeadlessClientsTargetRequest;
+import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/server/{id}/hc")
 @Slf4j
-class HeadlessClientController {
+public class HeadlessClientController implements HeadlessClientApi {
 
     private final HeadlessClientService headlessClientService;
 
@@ -18,15 +20,10 @@ class HeadlessClientController {
         this.headlessClientService = headlessClientService;
     }
 
-    @PostMapping("/start")
-    public ResponseEntity<?> addHeadlessClient(@PathVariable Long id) {
-        headlessClientService.addHeadlessClient(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @DeleteMapping("/stop")
-    public ResponseEntity<?> removeHeadlessClient(@PathVariable Long id) {
-        headlessClientService.removeHeadlessClient(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_OPERATE + "')")
+    public ResponseEntity<Void> setHeadlessClientsTarget(Long id, SetHeadlessClientsTargetRequest request) {
+        headlessClientService.setTargetCount(id, request.getTargetHeadlessClientsCount());
+        return ResponseEntity.ok().build();
     }
 }

@@ -3,9 +3,10 @@ package cz.forgottenempire.servermanager.installation;
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
-import cz.forgottenempire.servermanager.util.SystemUtils;
-import cz.forgottenempire.servermanager.util.SystemUtils.OSType;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,17 @@ public class ServerInstallationService {
 
     public boolean isServerInstalled(ServerType type) {
         return getServerInstallation(type).getInstallationStatus() == InstallationStatus.FINISHED;
+    }
+
+    public Collection<ServerType> getInstalledRelatedServerTypes(ServerType serverType) {
+        Set<ServerType> serverTypes = new HashSet<>();
+        if (isServerInstalled(serverType)) {
+            serverTypes.add(serverType);
+        }
+        if (serverType == ServerType.DAYZ && isServerInstalled(ServerType.DAYZ_EXP)) {
+            serverTypes.add(ServerType.DAYZ_EXP);
+        }
+        return serverTypes;
     }
 
     public void setServerBranch(ServerInstallation serverInstallation, ServerInstallation.Branch branch) {

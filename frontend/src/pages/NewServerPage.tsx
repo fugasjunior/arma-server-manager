@@ -1,18 +1,21 @@
 import {useNavigate, useParams} from "react-router-dom";
-import {createServer} from "../services/serversService";
-import {toast} from "material-react-toastify";
+import {serversApi} from "../api/client";
+import {toast} from "react-toastify";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../api/queryKeys";
 import EditArma3ServerSettingsForm from "../components/servers/EditArma3ServerSettingsForm";
 import {Typography} from "@mui/material";
 import EditDayZServerSettingsForm from "../components/servers/EditDayZServerSettingsForm";
 import SERVER_NAMES from "../util/serverNames";
 import EditReforgerServerSettingsForm from "../components/servers/EditReforgerServerSettingsForm";
 import {arma3ServerInitialState, dayzServerInitialState, reforgerServerInitialState} from "./initialServerStateCreator";
-import {ServerType} from "../dtos/ServerDto";
+import {ServerType} from "../api/generated";
 
 
 const NewServerPage = () => {
     const {type} = useParams<{ type: string }>();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     type FixMeLater = any;
 
@@ -25,8 +28,9 @@ const NewServerPage = () => {
         }
 
         try {
-            await createServer(server);
+            await serversApi.createServer({serverDto: server});
             toast.success("Server successfully created");
+            await queryClient.invalidateQueries({queryKey: queryKeys.servers});
             navigate("/servers");
         } catch (e) {
             console.error(e);
@@ -40,20 +44,20 @@ const NewServerPage = () => {
 
     return (
         <>
-            <Typography variant="h4" mb={2}>New {SERVER_NAMES.get(ServerType[type as keyof typeof ServerType])} server</Typography>
-            {type === ServerType.ARMA3 &&
+            <Typography variant="h4" sx={{mb: 2}}>New {SERVER_NAMES.get(type as ServerType)} server</Typography>
+            {type === ServerType.Arma3 &&
                 <EditArma3ServerSettingsForm server={arma3ServerInitialState()}
                                              onCancel={handleCancel}
                                              onSubmit={handleSubmit}
                 />
             }
-            {(type === ServerType.DAYZ || type === ServerType.DAYZ_EXP) &&
+            {(type === ServerType.Dayz || type === ServerType.DayzExp) &&
                 <EditDayZServerSettingsForm server={{...dayzServerInitialState(), type}}
                                             onCancel={handleCancel}
                                             onSubmit={handleSubmit}
                 />
             }
-            {(type === ServerType.REFORGER) &&
+            {(type === ServerType.Reforger) &&
                 <EditReforgerServerSettingsForm server={reforgerServerInitialState()}
                                                 onCancel={handleCancel}
                                                 onSubmit={handleSubmit}

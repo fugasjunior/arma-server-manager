@@ -7,7 +7,7 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import {Link} from "react-router-dom";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import {AddCircleOutlined as AddCircleOutlineIcon} from '@mui/icons-material';
 
 export default function NewServerButton() {
     const [open, setOpen] = useState(false);

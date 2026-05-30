@@ -1,0 +1,66 @@
+/server/installation:
+  get:
+    tags: [ServerInstallation]
+    operationId: getServerInstallations
+    summary: Get all server installations
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/installation.yaml#/ServerInstallationsDto'
+
+/server/installation/{type}:
+  get:
+    tags: [ServerInstallation]
+    operationId: getServerInstallation
+    summary: Get a specific server installation
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverType'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/installation.yaml#/ServerInstallationDto'
+  post:
+    tags: [ServerInstallation]
+    operationId: installServer
+    summary: Install or update a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverType'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/installation.yaml#/ServerInstallationDto'
+  patch:
+    tags: [ServerInstallation]
+    operationId: setActiveBranch
+    summary: Set the active branch for a server installation
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverType'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/installation.yaml#/ActiveBranchDto'
+    responses:
+      '200':
+        description: OK
+  delete:
+    tags: [ServerInstallation]
+    operationId: uninstallServer
+    summary: Uninstall a server — wipes all files from disk and resets installation state
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverType'
+    responses:
+      '204':
+        description: No Content
+      '409':
+        description: Server is running or installation is in progress

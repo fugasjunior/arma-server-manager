@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -24,7 +26,8 @@ public class LogFile {
         return logFile;
     }
 
-    public void prepare() {
+    public void prepare(int maxFiles) {
+        rotate(maxFiles);
         if (logFile.exists()) {
             return;
         }
@@ -35,6 +38,51 @@ public class LogFile {
         } catch (IOException e) {
             log.error("Could not create log file {}", logFile.getAbsolutePath());
         }
+    }
+
+    public void rotate(int maxFiles) {
+        if (!logFile.exists() || logFile.length() == 0) {
+            return;
+        }
+        deleteOldestArchiveIfExceeded(maxFiles);
+        try {
+            shiftExistingArchives(maxFiles);
+        } catch (IOException e) {
+            log.error("Failed to shift log archives for {}, skipping rotation", logFile.getAbsolutePath(), e);
+            return;
+        }
+        archiveCurrentLogFile();
+    }
+
+    private void deleteOldestArchiveIfExceeded(int maxFiles) {
+        File oldest = archivedFile(maxFiles);
+        if (oldest.exists() && !oldest.delete()) {
+            log.warn("Could not delete old log archive {}", oldest.getAbsolutePath());
+        }
+    }
+
+    private void shiftExistingArchives(int maxFiles) throws IOException {
+        for (int i = maxFiles - 1; i >= 1; i--) {
+            File archive = archivedFile(i);
+            if (archive.exists()) {
+                Files.move(archive.toPath(), archivedFile(i + 1).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
+
+    private void archiveCurrentLogFile() {
+        try {
+            Files.copy(logFile.toPath(), archivedFile(1).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            try (RandomAccessFile raf = new RandomAccessFile(logFile, "rw")) {
+                raf.setLength(0);
+            }
+        } catch (IOException e) {
+            log.error("Failed to rotate log file {} by copy-truncate", logFile.getAbsolutePath(), e);
+        }
+    }
+
+    private File archivedFile(int index) {
+        return new File(logFile.getPath() + "." + index);
     }
 
     public String getLastLines(int count) {
@@ -61,11 +109,6 @@ public class LogFile {
         }
     }
 
-    /**
-     * Generated using ChatGTP
-     * This method is efficient for large files such as server logs, as it doesn't load the whole content
-     * into memory
-     */
     private String getLastNLines(File file, int n) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "r");
 

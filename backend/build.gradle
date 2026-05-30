@@ -1,15 +1,18 @@
 plugins {
-    id 'org.springframework.boot' version '3.3.1'
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.springframework.boot' version '4.0.6'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
-    id 'org.flywaydb.flyway' version '10.15.2'
-    id 'io.freefair.aspectj.post-compile-weaving' version '8.6'
+    id 'org.flywaydb.flyway' version '11.14.1'
     id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'org.openapi.generator' version '7.12.0'
 }
 
 group = 'cz.forgottenempire'
-version = '1.4.1'
-sourceCompatibility = '17'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 
 configurations {
     developmentOnly
@@ -28,52 +31,131 @@ repositories {
 tasks.register('copyWebApp', Copy) {
     dependsOn(':frontend:appNpmBuild')
 
+    doFirst {
+        delete "$rootDir/backend/build/resources/main/static"
+    }
+
     from "$rootDir/frontend/build"
     into "$rootDir/backend/build/resources/main/static/."
 }
 
-compileJava.dependsOn copyWebApp
-bootJar.dependsOn copyWebApp
-resolveMainClassName.dependsOn copyWebApp
-jar.dependsOn copyWebApp
+/**
+ * Skip frontend build in two cases:
+ * 1. When running from IntelliJ IDEA (automatically sets idea.active=true)
+ * 2. When explicitly requested by setting -DskipFrontendBuild=true JVM parameter
+ *
+ * Example usage:
+ * - Running from command line: ./gradlew bootRun -DskipFrontendBuild=true
+ * - Running from another IDE: Configure the run configuration to include -DskipFrontendBuild=true
+ */
+def isRunningFromIdea = System.getProperty("idea.active") == "true"
+def skipFrontendBuild = System.getProperty("skipFrontendBuild") == "true"
+
+if (!isRunningFromIdea && !skipFrontendBuild) {
+    compileJava.dependsOn copyWebApp
+    bootJar.dependsOn copyWebApp
+    resolveMainClassName.dependsOn copyWebApp
+    jar.dependsOn copyWebApp
+} else {
+    def reason = isRunningFromIdea ? "IntelliJ IDEA" : "skipFrontendBuild property"
+    println "Skipping frontend build step (reason: $reason)"
+}
 
 dependencies {
     runtimeOnly project(':frontend')
 
-    implementation group: 'org.aspectj', name: 'aspectjrt', version: '1.9.22.1'
-    implementation group: 'org.springframework', name: 'spring-aspects', version: '6.1.10'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.3.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '3.3.1'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
-    implementation group: 'com.ibasco.agql', name: 'agql-source-query', version: '1.2.2'
-    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.33'
-    implementation group: 'org.springframework', name: 'spring-context-support', version: '6.1.10'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.2.1-jre'
-    implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.6.0.Beta2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.15.2'
-    implementation group: 'org.jsoup', name: 'jsoup', version: '1.17.2'
-    implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '10.15.2'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation "commons-io:commons-io:2.22.0"
+    implementation "com.auth0:java-jwt:4.2.2"
+    implementation "com.ibasco.agql:agql-source-query:1.2.2"
+    implementation "com.google.guava:guava:33.6.0-jre"
+    implementation "org.mapstruct:mapstruct:1.6.3"
+    implementation "org.jsoup:jsoup:1.22.2"
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
-
-    runtimeOnly group: 'com.mysql', name: 'mysql-connector-j', version: '9.0.0'
-
-    aspect group: 'org.springframework', name: 'spring-aspects', version: '6.1.10'
+    runtimeOnly 'org.springframework.boot:spring-boot-starter-flyway'
+    runtimeOnly 'org.flywaydb:flyway-mysql'
+    runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0.Beta2'
+    annotationProcessor "org.projectlombok:lombok:1.18.46"
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.3.1'
-    testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '6.3.1'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
+    testImplementation 'org.testcontainers:mysql:1.20.4'
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.5.0'
+    testImplementation 'org.awaitility:awaitility:4.2.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testCompileOnly "org.projectlombok:lombok:1.18.46"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.46"
+
+    compileOnly 'io.swagger.core.v3:swagger-annotations:2.2.28'
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
+}
+
+openApiGenerate {
+    generatorName = 'spring'
+    inputSpec = "$rootDir/openapi/openapi.yaml"
+    outputDir = "$buildDir/generated/openapi"
+    apiPackage = 'cz.forgottenempire.servermanager.api'
+    modelPackage = 'cz.forgottenempire.servermanager.api.model'
+    invokerPackage = 'cz.forgottenempire.servermanager.api.invoker'
+    configOptions = [
+        interfaceOnly          : 'true',
+        useSpringBoot3         : 'true',
+        useTags                : 'true',
+        skipDefaultInterface   : 'true',
+        openApiNullable        : 'false',
+        useBeanValidation      : 'true',
+        dateLibrary            : 'java8',
+        useJakartaEe           : 'true',
+        serializationLibrary   : 'jackson',
+        enumUnknownDefaultCase : 'false',
+    ]
+    typeMappings = [
+        'set': 'java.util.Set'
+    ]
+    importMappings = [
+        'ServerType'       : 'cz.forgottenempire.servermanager.common.ServerType',
+        'InstallationStatus': 'cz.forgottenempire.servermanager.common.InstallationStatus',
+        'ErrorStatus'      : 'cz.forgottenempire.servermanager.steamcmd.ErrorStatus',
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated/openapi/src/main/java"
+        }
+    }
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+bootJar {
+    archiveFileName = 'app.jar'
 }
 
 test {
     useJUnitPlatform()
+}
+
+tasks.register('e2eApp', JavaExec) {
+    dependsOn compileTestJava, processTestResources
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'cz.forgottenempire.servermanager.e2e.E2EApplication'
+    jvmArgs '--enable-preview'
+    description = 'Run backend with E2E test profile (fake SteamCMD, fake processes, Testcontainers MySQL).'
+    group = 'e2e'
 }

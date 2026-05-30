@@ -1,0 +1,5 @@
+Logging in user 'testuser' to Steam Public...OK
+Connecting anonymously to Steam Public...OK
+Downloading item 450814997 ...
+ [####################] 100%
+Success. Downloaded item 450814997 to "/mods/steamapps/workshop/content/107410/450814997" (4006126 bytes, took 1.24 seconds).

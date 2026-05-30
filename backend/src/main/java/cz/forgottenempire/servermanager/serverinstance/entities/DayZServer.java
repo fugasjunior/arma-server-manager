@@ -1,13 +1,11 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Constants;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
-import cz.forgottenempire.servermanager.workshop.WorkshopMod;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -18,12 +16,15 @@ import lombok.Setter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "dayzserver")
 public class DayZServer extends Server {
 
     @Min(0)
@@ -47,14 +48,21 @@ public class DayZServer extends Server {
     @Column(columnDefinition = "LONGTEXT")
     private String additionalOptions;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<WorkshopMod> activeMods;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "dayzserver_id", nullable = false)
+    @OrderColumn(name = "mod_order")
+    private List<DayZServerActiveMod> activeMods = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "dayzserver_id", nullable = false)
+    @OrderColumn(name = "mod_order")
+    private List<DayZServerActiveLocalMod> activeLocalMods = new ArrayList<>();
 
     @Override
-    public List<String> getLaunchParameters() {
+    public List<String> getLaunchParameters(ServerLaunchContext ctx) {
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=" + getConfigFile().getAbsolutePath());
+        parameters.add("-config=" + getConfigFile(ctx.pathsFactory()).getAbsolutePath());
         parameters.add("-limitFPS=60");
         parameters.add("-dologs");
         parameters.add("-adminlog");
@@ -65,42 +73,38 @@ public class DayZServer extends Server {
     }
 
     @Override
-    public Collection<ServerConfig> getConfigFiles() {
-        return List.of(new ServerConfig(getConfigFile(), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this));
+    public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
+        return List.of(new ServerConfig(getConfigFile(ctx.pathsFactory()), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this, ctx.freeMarkerConfigurer()));
     }
 
-    private File getConfigFile() {
+    private File getConfigFile(PathsFactory pathsFactory) {
         String fileName = "DAYZ_" + getId() + ".cfg";
         return pathsFactory.getConfigFilePath(getType(), fileName).toFile();
     }
 
     private void addModsToParameters(List<String> parameters) {
-        if (activeMods.isEmpty()) {
-            return;
+        List<ActiveModEntry> ordered = orderedActiveMods().toList();
+        addCombinedModParam(
+                ordered.stream().filter(ActiveModEntry::isServerOnly).map(ActiveModEntry::getLaunchName).toList(),
+                "-serverMod=", parameters);
+        addCombinedModParam(
+                ordered.stream().filter(e -> !e.isServerOnly()).map(ActiveModEntry::getLaunchName).toList(),
+                "-mod=", parameters);
+    }
+
+    private static void addCombinedModParam(List<String> names, String prefix, List<String> parameters) {
+        if (!names.isEmpty()) {
+            StringBuilder sb = new StringBuilder(prefix);
+            names.forEach(name -> sb.append(name).append(";"));
+            parameters.add(sb.toString());
         }
-
-        addModsToParameters(getActiveServerMods(), "-serverMod=", parameters);
-        addModsToParameters(getActiveClientMods(), "-mod=", parameters);
     }
 
-    private static void addModsToParameters(List<WorkshopMod> mods, String parameterPrefix, List<String> parameters) {
-        if (!mods.isEmpty()) {
-            StringBuilder serverModsList = new StringBuilder(parameterPrefix);
-            mods.forEach(mod -> serverModsList.append(mod.getNormalizedName()).append(";"));
-            parameters.add(serverModsList.toString());
-        }
-    }
-
-    private List<WorkshopMod> getActiveClientMods() {
-        return getActiveMods().stream()
-                .filter(mod -> !mod.isServerOnly())
-                .toList();
-    }
-
-    private List<WorkshopMod> getActiveServerMods() {
-        return getActiveMods().stream()
-                .filter(WorkshopMod::isServerOnly)
-                .toList();
+    private Stream<ActiveModEntry> orderedActiveMods() {
+        return Stream.concat(
+                activeMods.stream().map(e -> (ActiveModEntry) e),
+                activeLocalMods.stream().map(e -> (ActiveModEntry) e)
+        ).sorted(Comparator.comparingInt(ActiveModEntry::getPosition));
     }
 
     private void addCustomLaunchParameters(List<String> parameters) {

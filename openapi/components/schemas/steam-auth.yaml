@@ -1,0 +1,25 @@
+SteamAuthDto:
+  type: object
+  properties:
+    username:
+      type: string
+    password:
+      type: string
+    steamGuardToken:
+      type: string
+
+SteamAuthStatusDto:
+  type: object
+  properties:
+    isConfigured:
+      type: boolean
+
+AuthVerificationResultDto:
+  type: object
+  properties:
+    status:
+      $ref: './common.yaml#/AuthStatus'
+    message:
+      type: string
+    authType:
+      $ref: './common.yaml#/AuthType'

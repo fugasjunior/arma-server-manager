@@ -1,0 +1,83 @@
+CreatePresetRequestDto:
+  type: object
+  required: [name, mods, type]
+  properties:
+    name:
+      type: string
+      minLength: 1
+    mods:
+      type: array
+      description: >
+        Mods in this preset. Array order is significant: when the preset is applied
+        to a server, mods are loaded in this order.
+      minItems: 1
+      items:
+        type: integer
+        format: int64
+    type:
+      $ref: './common.yaml#/ServerType'
+
+UpdatePresetRequestDto:
+  type: object
+  required: [name, mods]
+  properties:
+    name:
+      type: string
+      minLength: 1
+    mods:
+      type: array
+      description: >
+        Mods in this preset. Array order is significant: when the preset is applied
+        to a server, mods are loaded in this order.
+      minItems: 1
+      items:
+        type: integer
+        format: int64
+
+PresetResponseDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    mods:
+      type: array
+      description: >
+        Mods in this preset. Array order is significant: when the preset is applied
+        to a server, mods are loaded in this order.
+      items:
+        $ref: '#/PresetResponseModDto'
+    type:
+      $ref: './common.yaml#/ServerType'
+    totalModsSize:
+      type: integer
+      format: int64
+
+PresetResponseModDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    shortName:
+      type: string
+
+PresetListResponseDto:
+  type: object
+  properties:
+    presets:
+      type: array
+      items:
+        $ref: '#/PresetResponseDto'
+
+RenamePresetRequestDto:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+      minLength: 1

@@ -1,27 +1,25 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
-import cz.forgottenempire.servermanager.serverinstance.ServerInstanceService;
+import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.headlessclient.HeadlessClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
-@Configurable
 public class Arma3ServerProcess extends ServerProcess {
-    private final long serverId;
+
+    private final String[] additionalMods;
+    private final int logMaxFiles;
     private final Deque<HeadlessClient> headlessClients;
 
-    private ServerInstanceService serverInstanceService;
-
-    public Arma3ServerProcess(long serverId) {
-        super(serverId);
+    public Arma3ServerProcess(long serverId, ServerProcessCreator serverProcessCreator,
+                              ServerLaunchContext launchContext, String[] additionalMods, int logMaxFiles) {
+        super(serverId, serverProcessCreator, launchContext, logMaxFiles);
+        this.additionalMods = additionalMods;
+        this.logMaxFiles = logMaxFiles;
         headlessClients = new LinkedList<>();
-        this.serverId = serverId;
     }
 
     @Override
@@ -33,20 +31,15 @@ public class Arma3ServerProcess extends ServerProcess {
     }
 
     @Override
-    public void restart() {
-        int countOfHeadlessClients = headlessClients.size();
-        super.restart();
-        for (int i = 0; i < countOfHeadlessClients; i++) {
-            addHeadlessClient();
-        }
+    public void restart(Server server) {
+        super.restart(server);
+        reconcileHeadlessClients((Arma3Server) server);
     }
 
-    public void addHeadlessClient() {
-        Server server = serverInstanceService.getServer(serverId).orElseThrow();
-        if (!(server instanceof Arma3Server arma3Server)) {
-            throw new IllegalStateException("Server ID " + server + " is not Arma 3 server");
-        }
-        headlessClients.push(new HeadlessClient(headlessClients.size() + 1, arma3Server).start());
+    public void addHeadlessClient(Arma3Server server) {
+        headlessClients.push(
+                new HeadlessClient(headlessClients.size() + 1, server, launchContext.pathsFactory(),
+                        serverProcessCreator, additionalMods, logMaxFiles).start());
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 
@@ -58,14 +51,20 @@ public class Arma3ServerProcess extends ServerProcess {
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 
-    public void checkHeadlessClients() {
-        List<HeadlessClient> crashedHeadlessClients = headlessClients.stream().filter(hc -> !hc.isAlive()).toList();
-        crashedHeadlessClients.forEach(headlessClients::remove);
+    public void reconcileHeadlessClients(Arma3Server server) {
+        headlessClients.removeIf(hc -> !hc.isAlive());
+        // If server process is dead, caller (crash handler) is responsible for stopping remaining HCs via stop()
+        if (!isAlive()) {
+            instanceInfo.setHeadlessClientsCount(headlessClients.size());
+            return;
+        }
+        int target = server.getTargetHeadlessClientsCount();
+        while (headlessClients.size() < target) {
+            addHeadlessClient(server);
+        }
+        while (headlessClients.size() > target) {
+            removeHeadlessClient();
+        }
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
-    }
-
-    @Autowired
-    void setServerInstanceService(ServerInstanceService serverInstanceService) {
-        this.serverInstanceService = serverInstanceService;
     }
 }

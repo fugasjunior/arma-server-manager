@@ -84,13 +84,13 @@ export const EnhancedTable = (
     function getInitialRowsPerPage() {
         const rowsPerPageSetting = localStorage.getItem(getRowsPerPageLocalStorageKey(id));
         if (rowsPerPageSetting === null) {
-            return 10;
+            return 15;
         }
 
         const rowsPerPage = Number(rowsPerPageSetting);
         if (isNaN(rowsPerPage)) {
             localStorage.removeItem(getRowsPerPageLocalStorageKey(id));
-            return 10;
+            return 15;
         }
 
         return rowsPerPage;

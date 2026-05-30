@@ -1,0 +1,116 @@
+/mod:
+  get:
+    tags: [Mods]
+    operationId: getMods
+    summary: List all workshop mods (optionally filtered by server type)
+    parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          $ref: '../components/schemas/common.yaml#/ServerType'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mods.yaml#/ModsDto'
+  post:
+    tags: [Mods]
+    operationId: addMods
+    summary: Add workshop mods by Steam IDs
+    parameters:
+      - name: modIds
+        in: query
+        required: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mods.yaml#/ModsDto'
+  delete:
+    tags: [Mods]
+    operationId: deleteMods
+    summary: Delete multiple workshop mods
+    parameters:
+      - name: modIds
+        in: query
+        required: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+    responses:
+      '204':
+        description: No Content
+
+/mod/{id}:
+  get:
+    tags: [Mods]
+    operationId: getMod
+    summary: Get a workshop mod by ID
+    parameters:
+      - $ref: '../components/parameters.yaml#/modId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mods.yaml#/ModDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  post:
+    tags: [Mods]
+    operationId: updateMod
+    summary: Update (re-download) a single workshop mod
+    parameters:
+      - $ref: '../components/parameters.yaml#/modId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/mods.yaml#/ModDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  delete:
+    tags: [Mods]
+    operationId: deleteMod
+    summary: Delete a workshop mod
+    parameters:
+      - $ref: '../components/parameters.yaml#/modId'
+    responses:
+      '204':
+        description: No Content
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/mod/{id}/serverOnly:
+  patch:
+    tags: [Mods]
+    operationId: setModServerOnly
+    summary: Toggle server-only flag for a workshop mod
+    parameters:
+      - $ref: '../components/parameters.yaml#/modId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mods.yaml#/ServerOnlyDto'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'

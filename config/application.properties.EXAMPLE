@@ -5,22 +5,36 @@ steam.api.key=<API-KEY>
 
 ### App Login
 # Username and password used for logging into the admin UI.
-auth.username=user
-auth.password=password
+# These are optional. If not set:
+# - auth.username defaults to 'admin'
+# - auth.password is auto-generated on first run and printed to the startup log
+# Uncomment and set these only if you want to override the defaults
+# auth.username=admin
+# auth.password=your-password
 
 # JWT secret
 # Used for creating JSON web tokens for app authentication.
-# Any string can be used as a secret. The secret should be at least 32 characters long.
-jwt.secret=<JWT secret key>
+# Optional; auto-generated on first run and persisted to config/secrets.properties
+# Uncomment and set this only if you want to override the generated value
+# jwt.secret=your-secret-key-here
+
+# CORS allowed origin patterns
+# Comma-separated list of allowed origin patterns for CORS (e.g. https://myserver.example.com, http://localhost:3000)
+# Defaults to * (allow all origins) for local development
+cors.allowedOriginPatterns=*
 
 # Database encryption secret used for encrypting the Steam account password inside the database.
-# Must be a valid AES 256-bit key (https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx).
-# This setting is optional. In case the secret is not provided, the password will be stored in plain text form.
-database.encryption.secret=<AES-256 key>
+# Optional; auto-generated on first run and persisted to config/secrets.properties
+# If not set, Steam account passwords will be stored in plain text
+# Uncomment and set this only if you want to override the generated value or provide your own AES-256 key
+# database.encryption.secret=your-aes-key-here
 
 ### Paths
 # Absolute path to SteamCMD executable.
 steamcmd.path=/usr/games/steamcmd
+
+# Absolute path to SteamCMD cache file (typically config.vdf)
+steamcmd.cache.path=/path/to/config.vdf
 
 # Absolute path to a directory where the mods (and temporary server files) are installed.
 directory.mods=/home/armaservermanager/mods
@@ -31,6 +45,16 @@ directory.servers=/home/armaservermanager/servers/
 # Logs directory for all servers.
 directory.logs=/home/armaservermanager/logs/server
 
+
+### Log rotation
+# Maximum number of rotated log files to keep per server (older files are deleted).
+# Default: 5
+log.rotation.max-files=5
+
+# Log file size threshold in MB for mid-session rotation (copytruncate approach).
+# When a running log file exceeds this size, it's copied to archive and truncated.
+# Default: 10
+log.rotation.max-size-mb=10
 
 ### Server config
 # Additional mods to be activated when running the server that are not managed through the UI.

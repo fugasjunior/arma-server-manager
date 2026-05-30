@@ -1,7 +1,9 @@
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {Backdrop, Box, Button, CircularProgress, Modal, Stack, TextField} from "@mui/material";
-import {getServer, updateServer} from "../../services/serversService";
-import {toast} from "material-react-toastify";
+import {serversApi} from "../../api/client";
+import {ServerDto, ServerInstanceInfoDto} from "../../api/generated";
+import {ReforgerServerDto} from "../../api/serverModels";
+import {toast} from "react-toastify";
 import AddIcon from "@mui/icons-material/Add";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
@@ -12,7 +14,10 @@ import TableBody from "@mui/material/TableBody";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MemoryIcon from '@mui/icons-material/Memory';
-import {ReforgerServerDto} from "../../dtos/ServerDto";
+import {useServer} from "../../hooks/queries/useServer";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
 
 const modalStyle = {
     position: 'absolute',
@@ -32,32 +37,25 @@ type ReforgerModEditProps = {
 }
 
 const ReforgerModEdit = (props: ReforgerModEditProps) => {
-    const [server, setServer] = useState<ReforgerServerDto>();
+    const queryClient = useQueryClient();
+    const canModify = usePermission('MOD_MODIFY');
     const [isOpen, setIsOpen] = useState(false);
-    const [mods, setMods] = useState(props.server.activeMods);
+    const [mods, setMods] = useState<Array<{id: string, name: string}>>(props.server.activeMods ?? []);
     const [newModName, setNewModName] = useState("");
     const [newModId, setNewModId] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+
+    const {data: serverData, isLoading} = useServer(props.server.id, {enabled: isOpen});
+
+    useEffect(() => {
+        if (!isOpen || !serverData) return;
+        setMods((serverData as ReforgerServerDto).activeMods ?? []);
+    }, [isOpen, serverData]);
 
     const serverRunning = props.serverStatus != null && props.serverStatus.alive;
 
-    async function handleManageModsButtonClick() {
-        if (props.server.id === undefined) {
-            return;
-        }
-
-        setIsLoading(true);
-        setIsOpen(false);
-        try {
-            const {data: serverDto} = await getServer(props.server.id);
-            setServer(serverDto);
-            setMods(serverDto.activeMods);
-            setIsOpen(true);
-        } catch (e: any) {
-            console.error(e);
-            toast.error(e.response.data || "Could not load server data");
-        }
-        setIsLoading(false);
+    function handleManageModsButtonClick() {
+        if (props.server.id === undefined) return;
+        setIsOpen(true);
     }
 
     function handleNewModNameChange(event: ChangeEvent<HTMLInputElement>) {
@@ -81,17 +79,19 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
     }
 
     async function handleConfirm() {
-        if (props.server.id === undefined) {
-            return;
-        }
+        if (props.server.id === undefined) return;
 
         setIsOpen(false);
         try {
-            await updateServer(props.server.id, {...server, activeMods: mods});
+            await serversApi.updateServer({
+                id: props.server.id,
+                serverDto: {...serverData, activeMods: mods} as unknown as ServerDto
+            });
             toast.success("Mods successfully set");
+            await queryClient.invalidateQueries({queryKey: queryKeys.servers});
         } catch (e: any) {
             console.error(e);
-            toast.error(e.data.response || "Failed to update the server");
+            toast.error(e.data?.response || "Failed to update the server");
         }
     }
 
@@ -101,28 +101,30 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
 
     return (
         <>
-            <Backdrop open={isLoading}>
+            <Backdrop open={isOpen && isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
             <Button onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="contained">
                 Mods
             </Button>
-            <Modal open={isOpen} onClose={handleClose}>
+            <Modal open={isOpen && !isLoading} onClose={handleClose}>
                 <Box sx={modalStyle}>
-                    <Stack direction="row" spacing={1} mb={2} justifyItems="center" justifyContent="space-between">
+                    <Stack direction="row" spacing={1} sx={{mb: 2, justifyItems: "center", justifyContent: "space-between"}}>
                         <TextField id="mod-id" label="Mod ID" placeholder="Mod ID" size="small" required
-                                   variant="standard" value={newModId} onChange={handleNewModIdChange}/>
+                                   variant="standard" value={newModId} onChange={handleNewModIdChange}
+                                   disabled={!canModify}/>
                         <TextField id="mod-name" label="Mod name" placeholder="Mod name" size="small" required
-                                   variant="standard" value={newModName} onChange={handleNewModNameChange}/>
+                                   variant="standard" value={newModName} onChange={handleNewModNameChange}
+                                   disabled={!canModify}/>
                         <Button variant="contained" startIcon={<AddIcon/>} color="success"
                                 onClick={handleAddNewMod}
-                                disabled={newModId.length === 0 || newModName.length === 0}
+                                disabled={!canModify || newModId.length === 0 || newModName.length === 0}
                         >
                             Add
                         </Button>
                     </Stack>
                     {mods.length > 0 &&
-                        <Box overflow="auto" maxHeight={400}>
+                        <Box sx={{overflow: "auto", maxHeight: 400}}>
                             <TableContainer>
                                 <Table size="small">
                                     <TableHead>
@@ -138,11 +140,11 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
                                                 <TableCell>{mod.id}</TableCell>
                                                 <TableCell>{mod.name}</TableCell>
                                                 <TableCell align="right">
-                                                    <IconButton
+                                                    {canModify && <IconButton
                                                         aria-label="delete"
                                                         onClick={() => handleDeleteMod(mod.id)}>
                                                         <DeleteIcon color="error"/>
-                                                    </IconButton>
+                                                    </IconButton>}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -154,13 +156,13 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
                     <Stack>
                         <Button onClick={handleConfirm} variant="contained" color="primary"
                                 sx={{mt: 1, mb: 1}}
-                                disabled={serverRunning}>Confirm</Button>
+                                disabled={serverRunning || !canModify}>Confirm</Button>
                         <Button onClick={handleClose} variant="outlined" color="error">Cancel</Button>
                     </Stack>
                 </Box>
             </Modal>
         </>
-    )
-}
+    );
+};
 
 export default ReforgerModEdit;

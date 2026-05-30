@@ -1,10 +1,10 @@
 import {Button, Grid, Stack, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
-import {useFormik} from "formik";
-import {clearAuth, getAuth, setAuth} from "../../services/configService";
-import {toast} from "material-react-toastify";
+import {useForm, FormProvider} from "react-hook-form";
+import {steamAuthApi} from "../../api/client";
+import {toast} from "react-toastify";
 import ConfirmationDialog from "../../UI/ConfirmationDialog";
-import {SteamAuthDto} from "../../dtos/SteamAuthDto.ts";
+import {SteamAuthDto} from "../../api/generated";
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
 
 const SteamAuthForm = () => {
@@ -16,10 +16,14 @@ const SteamAuthForm = () => {
     const [clearDialogOpen, setClearDialogOpen] = useState(false);
     const [loaded, setLoaded] = useState(false);
 
+    const methods = useForm<SteamAuthDto>({
+        defaultValues: loadedAuth
+    });
+
     useEffect(() => {
         const fetchAuth = async () => {
             try {
-                const {data: auth} = await getAuth();
+                const {data: auth} = await steamAuthApi.getSteamAuth();
                 setLoadedAuth({
                     username: auth.username ?? "",
                     password: auth.password ?? "",
@@ -35,13 +39,17 @@ const SteamAuthForm = () => {
         fetchAuth();
     }, []);
 
+    useEffect(() => {
+        methods.reset(loadedAuth);
+    }, [loadedAuth, methods]);
+
     const handleSubmit = async (values: SteamAuthDto) => {
         try {
-            await setAuth({
+            await steamAuthApi.setSteamAuth({steamAuthDto: {
                 username: values.username,
                 password: values.password,
-                steamGuardToken: values.steamGuardToken.trim()
-            });
+                steamGuardToken: values.steamGuardToken?.trim()
+            }});
             setLoadedAuth(prevState => {
                 return {...prevState, password: ""};
             });
@@ -56,23 +64,26 @@ const SteamAuthForm = () => {
         setClearDialogOpen(prevState => !prevState);
     }
 
-    const formik = useFormik({
-        initialValues: loadedAuth,
-        onSubmit: handleSubmit,
-        enableReinitialize: true
-    });
-
     const handleClear = async () => {
         setLoadedAuth({
             username: "",
             password: "",
             steamGuardToken: ""
         });
-        formik.resetForm();
+        methods.reset({
+            username: "",
+            password: "",
+            steamGuardToken: ""
+        });
         setClearDialogOpen(false);
-        await clearAuth();
+        await steamAuthApi.clearSteamAuth();
         toast.success("Steam Auth successfully cleared.");
     }
+
+    const handleReopenWizard = () => {
+        localStorage.removeItem('wizardCompleted');
+        window.dispatchEvent(new Event('steam-auth-wizard:open'));
+    };
 
     return (
         <>
@@ -89,27 +100,33 @@ const SteamAuthForm = () => {
                 Steam account with a copy of Arma 3 is needed for downloading workshop mods and keeping
                 them up to date.
             </Typography>
-            <Typography variant='body1' marginTop={1}>
+            <Typography variant='body1' sx={{marginTop: 1}}>
                 If you have Steam Guard 2FA enabled, please fill in the optional token field. You will receive
                 this token in your email upon the first attempt to download any server or workshop item.
             </Typography>
-            {loaded && <form onSubmit={formik.handleSubmit}>
-                <Grid container spacing={3} marginTop={2}>
-                    <CustomTextField id='username' label='User name' required containerMd={12} formik={formik}/>
-                    <CustomTextField id='password' label='Password' type='password' containerMd={12}
-                                     helperText='By leaving the password empty, previously saved password will be used instead.'
-                                     formik={formik}/>
-                    <CustomTextField id='steamGuardToken' label='Steam Guard token' containerMd={12} formik={formik}/>
+            {loaded && <FormProvider {...methods}>
+                <form onSubmit={methods.handleSubmit(handleSubmit)}>
+                    <Grid container spacing={3} sx={{marginTop: 2}}>
+                        <CustomTextField name='username' label='User name' required containerMd={12}/>
+                        <CustomTextField name='password' label='Password' type='password' containerMd={12}
+                                         helperText='By leaving the password empty, previously saved password will be used instead.'/>
+                        <CustomTextField name='steamGuardToken' label='Steam Guard token' containerMd={12}/>
 
-                    <Grid item xs={12}>
-                        <Stack direction='column' spacing={2}>
-                            <Button fullWidth variant="contained" type="submit">Submit</Button>
-                            <Button fullWidth variant="outlined" color="error"
-                                    onClick={handleToggleClearDialog}>Clear</Button>
-                        </Stack>
+                        <Grid size={12}>
+                            <Stack direction='column' spacing={2}>
+                                <Button fullWidth variant="contained" type="submit">Submit</Button>
+                                <Button fullWidth variant="outlined" color="error"
+                                        onClick={handleToggleClearDialog}>Clear</Button>
+                                <Button fullWidth variant="outlined"
+                                        onClick={handleReopenWizard}
+                                        data-testid="reopen-steam-auth-wizard">
+                                    Re-run setup wizard
+                                </Button>
+                            </Stack>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </form>}
+                </form>
+            </FormProvider>}
         </>
     );
 };

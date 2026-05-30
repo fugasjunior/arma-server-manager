@@ -25,3 +25,10 @@ yarn-error.log*
 pnpm*
 
 .eslintcache
+
+/src/api/generated
+
+# Playwright E2E
+/e2e/playwright-report/
+/e2e/test-results/
+/e2e/.auth/

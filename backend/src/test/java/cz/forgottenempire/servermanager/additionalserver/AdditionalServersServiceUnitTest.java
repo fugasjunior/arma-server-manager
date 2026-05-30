@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
+import cz.forgottenempire.servermanager.serverinstance.LogRotationProperties;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +33,9 @@ class AdditionalServersServiceUnitTest {
         instanceInfoRepository = mock(AdditionalServerInstanceInfoRepository.class);
         processFactory = mock(ProcessFactory.class);
 
-        serversService = new AdditionalServersService(serverRepository, instanceInfoRepository, processFactory, "");
+        LogRotationProperties props = new LogRotationProperties();
+        props.setMaxFiles(5);
+        serversService = new AdditionalServersService(serverRepository, instanceInfoRepository, processFactory, "", props);
     }
 
     private static AdditionalServer createServer(Long id, String name) {

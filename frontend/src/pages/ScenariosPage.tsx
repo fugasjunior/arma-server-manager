@@ -1,35 +1,20 @@
-import {ChangeEvent, useEffect, useState} from "react";
-import {deleteScenario, downloadScenario, getScenarios, uploadScenarios} from "../services/scenarioService";
-import {toast} from "material-react-toastify";
+import {ChangeEvent, useState} from "react";
+import {scenariosApi} from "../api/client";
+import {downloadScenario} from "../api/downloads";
+import {toast} from "react-toastify";
 import {ScenariosTable} from "../components/scenarios/ScenariosTable";
-import {Arma3ScenarioDto} from "../dtos/Arma3ScenarioDto.ts";
+import {useArma3Scenarios} from "../hooks/queries/useArma3Scenarios";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../api/queryKeys";
+import {usePermission} from "../hooks/usePermission";
 
 const ScenariosPage = () => {
-    const [scenarios, setScenarios] = useState<Array<Arma3ScenarioDto>>([]);
+    const queryClient = useQueryClient();
+    const canViewScenarios = usePermission("SCENARIO_VIEW");
+    const {data: scenarios = []} = useArma3Scenarios({enabled: canViewScenarios});
     const [selected, setSelected] = useState<Array<string>>([]);
     const [uploadInProgress, setUploadInProgress] = useState(false);
     const [percentUploaded, setPercentUploaded] = useState(0);
-
-    useEffect(() => {
-        refreshScenarios();
-    }, []);
-
-    const refreshScenarios = async () => {
-        const {data: scenariosDto} = await getScenarios();
-        const scenarios = scenariosDto.scenarios.map((scenario: Arma3ScenarioDto) => {
-            const createdOn = scenario.createdOn ? new Date(scenario.createdOn) : "";
-            return {
-                ...scenario,
-                createdOn
-            };
-        });
-        setScenarios(scenarios);
-    };
-
-    const handleProgress = (e: ProgressEvent) => {
-        const percentCompleted = Math.round((e.loaded * 100) / e.total);
-        setPercentUploaded(percentCompleted);
-    }
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -38,15 +23,10 @@ const ScenariosPage = () => {
         }
 
         try {
-            const formData = new FormData();
-            [...e.target.files].forEach(file => {
-                formData.append(`file`, file, file.name);
-            })
             setUploadInProgress(true);
-
-            await uploadScenarios(formData, {onUploadProgress: handleProgress});
-            await refreshScenarios();
+            await scenariosApi.uploadScenarios({file: Array.from(e.target.files)});
             toast.success("Scenarios successfully uploaded");
+            await queryClient.invalidateQueries({queryKey: queryKeys.arma3Scenarios});
         } catch (ex: any) {
             console.error(ex);
             toast.error(ex.response.data);
@@ -67,25 +47,21 @@ const ScenariosPage = () => {
 
     const handleDelete = async () => {
         try {
-            setScenarios(prevState => {
-                    return prevState.filter(scenario => selected.indexOf(scenario.name) === -1)
-                }
-            );
-
             for (const scenario of selected) {
-                await deleteScenario(scenario);
+                await scenariosApi.deleteScenario({name: scenario});
             }
             toast.success("Scenario(s) deleted successfully");
             setSelected([]);
+            await queryClient.invalidateQueries({queryKey: queryKeys.arma3Scenarios});
         } catch (e) {
             console.error(e);
             toast.error("Error deleting scenarios");
         }
-    }
+    };
 
     const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = scenarios.map((n) => n.name);
+            const newSelected = scenarios.map((n) => n.name ?? "").filter(Boolean);
             setSelected(newSelected);
             return;
         }
@@ -122,7 +98,7 @@ const ScenariosPage = () => {
                         percentUploaded={percentUploaded} uploadInProgress={uploadInProgress}
                         onDownloadClicked={handleDownload}
         />
-    )
-}
+    );
+};
 
 export default ScenariosPage;

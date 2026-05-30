@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   db:
     image: mysql:8.3.0
@@ -13,6 +11,12 @@ services:
       - "3306:3306"
     volumes:
       - armaservermanager-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=tcp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   adminer:
     image: adminer
@@ -25,25 +29,30 @@ services:
     restart: always
     # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host
+    security_opt:
+      - seccomp=unconfined
     # uncomment when running on Windows and add additional ports according to your needs
     #    ports:
     #      - "8080:8080"
     #      - "2302-2305:2302-2305/udp"
     #      - "27016:27016/udp"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - "${STORAGE_PATH}:/home/steam/armaservermanager/"
+      - armaservermanager-config:/home/steam/config
     environment:
-      AUTH_USERNAME: "${AUTH_USERNAME}"
-      AUTH_PASSWORD: "${AUTH_PASSWORD}"
-      SPRING_DATASOURCE_URL: "${MYSQL_DB_URL}"
-      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER}"
-      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD}"
-      STEAM_API_KEY: "${STEAM_API_KEY}"
-      JWT_SECRET: "${JWT_SECRET}"
-      DATABASE_ENCRYPTION_SECRET: "${DATABASE_ENCRYPTION_SECRET}"
-      TZ: "${TIMEZONE}"
+      - AUTH_USERNAME
+      - AUTH_PASSWORD
+      - SPRING_DATASOURCE_URL=${MYSQL_DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - STEAM_API_KEY=${STEAM_API_KEY}
+      - JWT_SECRET
+      - DATABASE_ENCRYPTION_SECRET
+      - TZ=${TIMEZONE}
 
 volumes:
   armaservermanager-db:
+  armaservermanager-config:

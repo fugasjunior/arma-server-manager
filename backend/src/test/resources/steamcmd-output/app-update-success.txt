@@ -1,0 +1,7 @@
+Logging in user 'testuser' to Steam Public...OK
+Connecting anonymously to Steam Public...OK
+Update state (0x3) reconfiguring, progress: 0.00 (0 / 0)
+Update state (0x61) downloading, progress: 0.00 (0 / 4570066424)
+Update state (0x61) downloading, progress: 50.00 (2285033212 / 4570066424)
+Update state (0x101) committing, progress: 0.00 (0 / 4570066424)
+Success! App '233780' fully installed.

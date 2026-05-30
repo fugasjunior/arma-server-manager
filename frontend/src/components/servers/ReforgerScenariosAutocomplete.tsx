@@ -1,26 +1,19 @@
-import {ReforgerScenarioDto} from "../../dtos/ReforgerScenarioDto.ts";
+import {ReforgerScenarioDto} from "../../api/generated";
 import {Autocomplete, AutocompleteValue, Box, TextField} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {getReforgerScenarios} from "../../services/scenarioService.ts";
-import {FormikState} from "formik";
-import {ReforgerServerDto} from "../../dtos/ServerDto.ts";
+import React, {SyntheticEvent} from "react";
+import {useController} from "react-hook-form";
+import {useReforgerScenarios} from "../../hooks/queries/useReforgerScenarios";
+import {usePermission} from "../../hooks/usePermission";
 
 type ReforgerScenariosAutocompleteProps = {
-    onChange: (_: any, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
-    formik: FormikState<ReforgerServerDto>
+    onChange: (_: SyntheticEvent | null, value: AutocompleteValue<ReforgerScenarioDto, false, false, true> | null) => void,
 };
 
-export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenariosAutocompleteProps) {
-    const [scenarios, setScenarios] = useState<Array<ReforgerScenarioDto>>([]);
+export function ReforgerScenariosAutocomplete({onChange}: ReforgerScenariosAutocompleteProps) {
+    const {field, fieldState} = useController({name: 'scenarioId'});
+    const canViewScenarios = usePermission('SCENARIO_VIEW');
+    const {data: scenarios = []} = useReforgerScenarios({enabled: canViewScenarios});
 
-    useEffect(() => {
-        const fetchScenarios = async () => {
-            const {data: scenariosDto} = await getReforgerScenarios();
-            setScenarios(scenariosDto.scenarios);
-        };
-
-        fetchScenarios();
-    }, []);
     const getScenarioDisplayName = (scenario: ReforgerScenarioDto) => {
         if (scenario.name) {
             return `${scenario.name} (${scenario.value})`;
@@ -44,9 +37,9 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
         getOptionLabel={(option) => {
             if (typeof option === "string")
                 return option;
-            return option.value;
+            return option.value ?? '';
         }}
-        value={formik.values.scenarioId}
+        value={field.value}
         onChange={onChange}
         renderOption={(props, option) => (
             <Box component="li"  {...props}>
@@ -60,12 +53,11 @@ export function ReforgerScenariosAutocomplete({onChange, formik}: ReforgerScenar
                 id="scenarioId"
                 name="scenarioId"
                 label="Scenario ID"
-                value={formik.values.scenarioId}
-                error={formik.touched.scenarioId && Boolean(
-                    formik.errors.scenarioId)}
-                inputProps={{
-                    ...params.inputProps,
-                    autoComplete: 'new-password'
+                value={field.value}
+                error={Boolean(fieldState.error)}
+                slotProps={{
+                    ...params.slotProps,
+                    htmlInput: {...(params.slotProps?.htmlInput as object), autoComplete: 'new-password'},
                 }}
             />
         )}

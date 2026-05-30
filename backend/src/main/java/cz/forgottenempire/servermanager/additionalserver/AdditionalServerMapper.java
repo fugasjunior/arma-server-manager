@@ -1,9 +1,11 @@
 package cz.forgottenempire.servermanager.additionalserver;
 
+import cz.forgottenempire.servermanager.api.model.AdditionalServerDto;
+import cz.forgottenempire.servermanager.common.DateTimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {DateTimeMapper.class})
 interface AdditionalServerMapper {
 
     @Mapping(source = "additionalServer.id", target = "id")
@@ -12,5 +14,4 @@ interface AdditionalServerMapper {
     @Mapping(source = "instanceInfo.alive", target = "alive")
     @Mapping(source = "instanceInfo.startedAt", target = "startedAt")
     AdditionalServerDto from(AdditionalServer additionalServer, AdditionalServerInstanceInfo instanceInfo);
-
 }

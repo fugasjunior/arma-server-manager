@@ -1,4 +1,5 @@
 import {Avatar, List, ListItem, ListItemAvatar, ListItemText} from "@mui/material";
+import {ServerInstanceInfoDto} from "../../../api/generated";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import MapIcon from "@mui/icons-material/Map";
 

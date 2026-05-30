@@ -1,0 +1,25 @@
+/system:
+  get:
+    tags: [System]
+    operationId: getSystemDetails
+    summary: Get server system details (disk, memory, CPU)
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/system.yaml#/ServerDetailsDto'
+
+/system/os:
+  get:
+    tags: [System]
+    operationId: getSystemOs
+    summary: Get server OS type
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/system.yaml#/ServerOSDto'

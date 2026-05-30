@@ -1,7 +1,7 @@
 # --- Build ---
-FROM eclipse-temurin:17-jdk AS build
+FROM eclipse-temurin:25-jdk AS build
 
-ENV NODE_VERSION=20.15.0
+ENV NODE_VERSION=24.15.0
 ENV NVM_DIR=/root/.nvm
 
 # Install Node
@@ -12,7 +12,7 @@ RUN apt-get update \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
@@ -22,41 +22,53 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 WORKDIR /app
 
 COPY ./build.gradle /app
+COPY ./gradle.properties /app
+COPY ./settings.gradle /app
 COPY ./gradle /app/gradle
 COPY ./gradlew /app
-COPY ./settings.gradle /app
 COPY ./frontend /app/frontend
 COPY ./backend /app/backend
+COPY ./openapi /app/openapi
 
 # Build
 RUN chmod 555 ./gradlew \
 #    fix CRLF line endings in gradlew
     && sed -i -e 's/\r$//' ./gradlew \
-    && ./gradlew assemble
+    && ./gradlew install -x :backend:test
 
-# -- Create runtime image ---
+# --- Custom minimal JRE via jlink ---
+FROM eclipse-temurin:25-jdk AS jre-build
+
+COPY --from=build /app/backend/build/libs/app.jar /app.jar
+RUN jlink \
+      --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql,java.sql.rowset,java.xml,java.xml.crypto,jdk.attach,jdk.crypto.ec,jdk.httpserver,jdk.jfr,jdk.management,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.unsupported,jdk.unsupported.desktop \
+      --strip-debug --no-man-pages --no-header-files \
+      --compress=zip-9 --output /jre
+
+# --- Runtime image ---
 FROM cm2network/steamcmd AS runtime
 
-ENV APP_VERSION=1.4.1
+COPY --from=jre-build /jre /opt/java/openjdk
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # TODO try to make the user not root. currently there are problems with mounted volumes ownership
 USER root
 RUN dpkg --add-architecture i386 \
     && apt-get update \
-    && apt-get install -y \
-          ca-certificates-java \
+    && apt-get install -y --no-install-recommends \
           lib32gcc-s1 \
-          lib32stdc++6  \
+          lib32stdc++6 \
           libcap2 \
-          openjdk-17-jre \
           expect \
+          libtbbmalloc2 \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 WORKDIR /home/steam
 COPY ./config/application-docker.properties /home/steam/config/application.properties
-COPY --from=build /app/backend/build/libs/backend-$APP_VERSION.jar /home/steam/app.jar
+COPY --from=build /app/backend/build/libs/app.jar /home/steam/app.jar
 
 RUN chown -R root:root /home/steam \
     && chmod -R 755 /home/steam

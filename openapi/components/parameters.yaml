@@ -1,0 +1,30 @@
+serverId:
+  name: id
+  in: path
+  required: true
+  schema:
+    type: integer
+    format: int64
+
+serverType:
+  name: type
+  in: path
+  required: true
+  schema:
+    $ref: './schemas/common.yaml#/ServerType'
+
+modId:
+  name: id
+  in: path
+  required: true
+  schema:
+    type: integer
+    format: int64
+
+presetId:
+  name: id
+  in: path
+  required: true
+  schema:
+    type: integer
+    format: int64

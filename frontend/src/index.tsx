@@ -5,27 +5,36 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextProvider} from "./store/auth-context";
-import {DevSupport} from "@react-buddy/ide-toolbox";
-import {ComponentPreviews, useInitial} from "./dev";
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 0,
+            refetchOnWindowFocus: false,
+            retry: 1,
+        },
+    },
+});
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <AuthContextProvider>
-                <BrowserRouter>
-                    <React.StrictMode>
-                        <DevSupport ComponentPreviews={ComponentPreviews}
-                                    useInitialHook={useInitial}
-                        >
+            <QueryClientProvider client={queryClient}>
+                <AuthContextProvider>
+                    <BrowserRouter>
+                        <React.StrictMode>
                             <App/>
-                        </DevSupport>
-                    </React.StrictMode>
-                </BrowserRouter>
-            </AuthContextProvider>
+                        </React.StrictMode>
+                    </BrowserRouter>
+                </AuthContextProvider>
+                <ReactQueryDevtools initialIsOpen={false}/>
+            </QueryClientProvider>
         </LocalizationProvider>
     );
 }

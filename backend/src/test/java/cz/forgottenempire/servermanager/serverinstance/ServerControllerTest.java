@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import cz.forgottenempire.servermanager.serverinstance.dtos.ServerInstanceInfoDto;
+import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -25,22 +26,31 @@ class ServerControllerTest {
 
     private final ServerInstanceService serverInstanceService;
     private final ServerProcessService serverProcessService;
+    private final ServerMapper serverMapper;
 
     private final ServerController controller;
 
     public ServerControllerTest() {
         serverInstanceService = mock(ServerInstanceService.class, withSettings().stubOnly());
         serverProcessService = mock(ServerProcessService.class, withSettings().stubOnly());
-        controller = new ServerController(serverInstanceService, serverProcessService);
+        serverMapper = mock(ServerMapper.class, withSettings().stubOnly());
+        controller = new ServerController(serverInstanceService, serverProcessService, serverMapper,
+                mock(PathsFactory.class, withSettings().stubOnly()),
+                mock(ServerSecretsMasker.class, withSettings().stubOnly()));
     }
 
     @Test
     void getInstanceInfo_whenServiceReturnsNull_thenNonRunningServerInstanceDtoIsReturned() {
+        ServerInstanceInfoDto expectedDto = new ServerInstanceInfoDto()
+                .alive(false)
+                .playersOnline(0)
+                .maxPlayers(0)
+                .headlessClientsCount(0);
         when(serverProcessService.getServerInstanceInfo(SERVER_ID)).thenReturn(null);
+        when(serverMapper.mapServerInstanceInfoToDto(any())).thenReturn(expectedDto);
 
-        ResponseEntity<ServerInstanceInfoDto> response = controller.getInstanceInfo(SERVER_ID);
+        ResponseEntity<ServerInstanceInfoDto> response = controller.getServerStatus(SERVER_ID);
 
-        ServerInstanceInfoDto expectedDto = new ServerInstanceInfoDto(false, null, 0, 0, null, null, null, 0);
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(expectedDto);
@@ -50,12 +60,20 @@ class ServerControllerTest {
     void getInstanceInfo_whenServiceReturnsInstanceInfo_thenServerInstanceDtoIsReturned() {
         ServerInstanceInfo instanceInfo = new ServerInstanceInfo(STARTED_AT, PLAYERS_ONLINE, MAX_PLAYERS, VERSION, MAP,
                 DESCRIPTION, HEADLESS_CLIENTS_COUNT);
+        ServerInstanceInfoDto expectedDto = new ServerInstanceInfoDto()
+                .alive(true)
+                .startedAt(STARTED_AT.format(DateTimeFormatter.ISO_DATE_TIME))
+                .playersOnline(PLAYERS_ONLINE)
+                .maxPlayers(MAX_PLAYERS)
+                .version(VERSION)
+                .map(MAP)
+                .description(DESCRIPTION)
+                .headlessClientsCount(HEADLESS_CLIENTS_COUNT);
         when(serverProcessService.getServerInstanceInfo(SERVER_ID)).thenReturn(instanceInfo);
+        when(serverMapper.mapServerInstanceInfoToDto(instanceInfo)).thenReturn(expectedDto);
 
-        ResponseEntity<ServerInstanceInfoDto> response = controller.getInstanceInfo(SERVER_ID);
+        ResponseEntity<ServerInstanceInfoDto> response = controller.getServerStatus(SERVER_ID);
 
-        ServerInstanceInfoDto expectedDto = new ServerInstanceInfoDto(true, STARTED_AT.format(DateTimeFormatter.ISO_DATE_TIME),
-                PLAYERS_ONLINE, MAX_PLAYERS, VERSION, MAP, DESCRIPTION, HEADLESS_CLIENTS_COUNT);
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(expectedDto);

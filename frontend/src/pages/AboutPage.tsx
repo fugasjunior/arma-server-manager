@@ -9,18 +9,18 @@ import config from "../config.ts";
 const AboutPage = () => {
 
     return (
-        <Grid container justifyContent="center">
-            <Stack alignItems="center">
+        <Grid container sx={{justifyContent: "center"}}>
+            <Stack sx={{alignItems: "center"}}>
                 <img
                     alt="Arma Server Manager Logo"
                     title="Arma Server Manager"
                     src={logo}
                     style={{height: 100}}
                 />
-                <Typography variant="h4" mt={1}>Arma Server Manager</Typography>
+                <Typography variant="h4" sx={{mt: 1}}>Arma Server Manager</Typography>
                 <Typography variant="subtitle2">{config.version}</Typography>
                 <Typography variant="subtitle1">by fugasjunior</Typography>
-                <Stack direction="row" mt={2} spacing={2}>
+                <Stack direction="row" spacing={2} sx={{mt: 2}}>
                     <Button target="_blank" href="https://github.com/fugasjunior/arma-server-manager"
                             variant="contained"
                             startIcon={<GitHubIcon/>}
@@ -34,7 +34,7 @@ const AboutPage = () => {
                         Discord
                     </Button>
                 </Stack>
-                <Typography variant="h6" mt={2}>Support</Typography>
+                <Typography variant="h6" sx={{mt: 2}}>Support</Typography>
                 <Stack direction="row" spacing={3}>
                     <Button target="_blank" href="https://www.buymeacoffee.com/fugasjunior"
                             startIcon={<BuyMeACoffeeIcon/>}

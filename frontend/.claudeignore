@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build & dist
+build/
+dist/
+
+# Generated API (never edit manually)
+src/api/generated/
+
+# Test artifacts
+coverage/
+*.lcov
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+
+# OS
+.DS_Store
+
+# IDE (inherited from root, but list for clarity)
+.vscode/

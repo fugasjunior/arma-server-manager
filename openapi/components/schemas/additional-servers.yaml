@@ -1,0 +1,22 @@
+AdditionalServerDto:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    name:
+      type: string
+    alive:
+      type: boolean
+    startedAt:
+      type: string
+    imageUrl:
+      type: string
+
+AdditionalServersDto:
+  type: object
+  properties:
+    servers:
+      type: array
+      items:
+        $ref: '#/AdditionalServerDto'

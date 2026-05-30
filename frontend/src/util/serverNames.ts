@@ -1,10 +1,10 @@
-import {ServerType} from "../dtos/ServerDto.ts";
+import {ServerType} from "../api/generated";
 
 const SERVER_NAMES = new Map<ServerType, string>([
-    [ServerType.ARMA3, "Arma 3"],
-    [ServerType.DAYZ, "DayZ"],
-    [ServerType.DAYZ_EXP, "DayZ Experimental"],
-    [ServerType.REFORGER, "Arma Reforger"]
+    [ServerType.Arma3, "Arma 3"],
+    [ServerType.Dayz, "DayZ"],
+    [ServerType.DayzExp, "DayZ Experimental"],
+    [ServerType.Reforger, "Arma Reforger"]
 ]);
 
 export default SERVER_NAMES;

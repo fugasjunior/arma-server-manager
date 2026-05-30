@@ -1,0 +1,192 @@
+/server:
+  get:
+    tags: [Servers]
+    operationId: getServers
+    summary: List all servers
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/servers.yaml#/ServersDto'
+  post:
+    tags: [Servers]
+    operationId: createServer
+    summary: Create a server
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/servers.yaml#/ServerDto'
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/servers.yaml#/ServerDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}:
+  get:
+    tags: [Servers]
+    operationId: getServer
+    summary: Get a server by ID
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/servers.yaml#/ServerDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  put:
+    tags: [Servers]
+    operationId: updateServer
+    summary: Update a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/servers.yaml#/ServerDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/servers.yaml#/ServerDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  delete:
+    tags: [Servers]
+    operationId: deleteServer
+    summary: Delete a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '204':
+        description: No Content
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/start:
+  post:
+    tags: [Servers]
+    operationId: startServer
+    summary: Start a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/stop:
+  post:
+    tags: [Servers]
+    operationId: stopServer
+    summary: Stop a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/restart:
+  post:
+    tags: [Servers]
+    operationId: restartServer
+    summary: Restart a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/status:
+  get:
+    tags: [Servers]
+    operationId: getServerStatus
+    summary: Get live server instance info
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/servers.yaml#/ServerInstanceInfoDto'
+
+/server/{id}/log:
+  get:
+    tags: [Servers]
+    operationId: getServerLog
+    summary: Get server log (last N lines)
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+    responses:
+      '200':
+        description: OK
+        content:
+          text/plain:
+            schema:
+              type: string
+
+/server/{id}/log/download:
+  get:
+    tags: [Servers]
+    operationId: downloadServerLog
+    summary: Download server log file
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/autorestart:
+  patch:
+    tags: [Servers]
+    operationId: setAutoRestart
+    summary: Configure automatic restart for a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/common.yaml#/AutomaticRestartDto'
+    responses:
+      '200':
+        description: OK

@@ -1,14 +1,16 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
-import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
+import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -16,19 +18,27 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public
-class ServerInstanceService {
+public class ServerInstanceService {
 
     private final ServerRepository serverRepository;
     private final ServerProcessService processService;
+    private final PathsFactory pathsFactory;
+    private final FreeMarkerConfigurer freeMarkerConfigurer;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public ServerInstanceService(
             ServerRepository serverRepository,
-            ServerProcessService processService
+            ServerProcessService processService,
+            PathsFactory pathsFactory,
+            FreeMarkerConfigurer freeMarkerConfigurer
     ) {
         this.serverRepository = serverRepository;
         this.processService = processService;
+        this.pathsFactory = pathsFactory;
+        this.freeMarkerConfigurer = freeMarkerConfigurer;
     }
 
     public List<Server> getAllServers() {
@@ -42,7 +52,8 @@ class ServerInstanceService {
     public Server createServer(Server server) {
         server.getCustomLaunchParameters().forEach(param -> param.setServer(server));
         Server persistedServer = serverRepository.save(server);
-        persistedServer.getConfigFiles().forEach(ServerConfig::generate);
+        ServerLaunchContext ctx = new ServerLaunchContext(pathsFactory, freeMarkerConfigurer);
+        persistedServer.getConfigFiles(ctx).forEach(ServerConfig::generate);
         return persistedServer;
     }
 
@@ -64,5 +75,9 @@ class ServerInstanceService {
         server.setRestartAutomatically(enabled);
         server.setAutomaticRestartTime(time);
         serverRepository.save(server);
+    }
+
+    public void flush() {
+        entityManager.flush();
     }
 }

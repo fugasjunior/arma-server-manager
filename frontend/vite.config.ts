@@ -6,5 +6,15 @@ export default defineConfig({
     build: {
         outDir: 'build',
     },
-    plugins: [react()]
+    plugins: [react()],
+    server: {
+        // Add proxy for API requests during development
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8080',
+                changeOrigin: true,
+                secure: false
+            }
+        }
+    }
 })

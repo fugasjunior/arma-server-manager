@@ -1,109 +1,75 @@
-import {useEffect, useState} from "react";
 import {Grid, SelectChangeEvent} from "@mui/material";
-import {useInterval} from "../../hooks/use-interval";
-import {changeServerBranch, getServerInstallations, installServer} from "../../services/serverInstallationsService";
+import {serverInstallationApi} from "../../api/client";
+import {InstallationBranch, InstallationStatus, ServerInstallationDto, ServerType} from "../../api/generated";
 import ServerInstallationItem from "./ServerInstallationItem";
-import {ServerInstallationDto} from "../../dtos/ServerInstallationDto.ts";
-import {ServerType} from "../../dtos/ServerDto.ts";
-import {SteamCmdItemInfoDto} from "../../dtos/SteamCmdItemInfoDto.ts";
-import {getItemInfo} from "../../services/steamCmdService.ts";
-
-type WorkshopItemInfoResponse = {
-    [id: number]: SteamCmdItemInfoDto
-}
+import {useServerInstallations} from "../../hooks/queries/useServerInstallations";
+import {useSteamCmdItemInfos} from "../../hooks/queries/useSteamCmdItemInfos";
+import {useQueryClient} from "@tanstack/react-query";
+import {queryKeys} from "../../api/queryKeys";
+import {usePermission} from "../../hooks/usePermission";
+import PermissionGuard from "../auth/PermissionGuard";
 
 const ServerInstallations = () => {
-    const [serverInstallations, setServerInstallations] = useState<Array<ServerInstallationDto>>([]);
-    const [steamCmdItemInfo, setSteamCmdItemInfo] = useState<WorkshopItemInfoResponse>({});
-
-    useEffect(() => {
-        void fetchServerInstallations();
-        void fetchSteamCmdItemInfo();
-    }, []);
-
-    useInterval(() => {
-        void fetchServerInstallations();
-        void fetchSteamCmdItemInfo();
-    }, 5000);
-
-    const fetchServerInstallations = async () => {
-        const {data: serverInstallationsDto} = await getServerInstallations();
-        const installations = serverInstallationsDto.serverInstallations
-            .sort((a: ServerInstallationDto, b: ServerInstallationDto) => a.type.localeCompare(b.type));
-        setServerInstallations(installations);
-    };
-
-    const fetchSteamCmdItemInfo = async () => {
-        const {data} = await getItemInfo();
-        setSteamCmdItemInfo(data);
-    };
+    const queryClient = useQueryClient();
+    const canViewInstall = usePermission("INSTALL_VIEW");
+    const canPollSteamCmd = usePermission("STEAM_AUTH_ADMIN");
+    const {data: serverInstallations = []} = useServerInstallations({refetchInterval: 5000, enabled: canViewInstall});
+    const {data: steamCmdItemInfo = {}} = useSteamCmdItemInfos({refetchInterval: 5000, enabled: canPollSteamCmd});
 
     const handleUpdateClicked = async (serverType: ServerType) => {
-        await installServer(serverType);
-
-        setSteamCmdItemInfo(prevState => {
-            const newState = {...prevState};
-            delete newState[serverTypeToId(serverType)];
-            return newState;
-        })
-
-        setServerInstallations(prevState => {
-            const newState = [...prevState];
-            const installation = newState.find(i => i.type === serverType);
-            if (!installation) {
-                return prevState;
-            }
-
-            installation.installationStatus = "INSTALLATION_IN_PROGRESS";
-            installation.errorStatus = null;
-            return newState;
+        queryClient.setQueryData(queryKeys.serverInstallations, (old: ServerInstallationDto[] = []) =>
+            old.map(i => i.type === serverType
+                ? {...i, installationStatus: InstallationStatus.InstallationInProgress, errorStatus: undefined}
+                : i
+            )
+        );
+        queryClient.setQueryData(queryKeys.steamCmdItemInfos, (old: Record<string, unknown> = {}) => {
+            const updated = {...old};
+            delete updated[serverTypeToId(serverType)];
+            return updated;
         });
+        await serverInstallationApi.installServer({type: serverType});
+        await queryClient.invalidateQueries({queryKey: queryKeys.serverInstallations});
+    };
+
+    const handleUninstallConfirmed = async (serverType: ServerType) => {
+        await serverInstallationApi.uninstallServer({type: serverType});
+        await queryClient.invalidateQueries({queryKey: queryKeys.serverInstallations});
     };
 
     const handleBranchChanged = async (e: SelectChangeEvent, serverType: ServerType) => {
-        const selectedBranch = e.target.value;
-
-        setServerInstallations(prevState => {
-            const newState = [...prevState];
-            const installation = newState.find(i => i.type === serverType);
-            if (!installation) {
-                return prevState;
-            }
-
-            installation.branch = selectedBranch;
-            return newState;
-        });
-
-        await changeServerBranch(serverType, selectedBranch);
+        const selectedBranch = e.target.value as InstallationBranch;
+        queryClient.setQueryData(queryKeys.serverInstallations, (old: ServerInstallationDto[] = []) =>
+            old.map(i => i.type === serverType ? {...i, branch: selectedBranch} : i)
+        );
+        await serverInstallationApi.setActiveBranch({type: serverType, activeBranchDto: {branch: selectedBranch}});
     };
 
     const serverTypeToId = (type: ServerType): number => {
         switch (type) {
-            case ServerType.ARMA3:
-                return 233780;
-            case ServerType.REFORGER:
-                return 1874900;
-            case ServerType.DAYZ:
-                return 223350;
-            case ServerType.DAYZ_EXP:
-                return 1042420;
+            case ServerType.Arma3: return 233780;
+            case ServerType.Reforger: return 1874900;
+            case ServerType.Dayz: return 223350;
+            case ServerType.DayzExp: return 1042420;
+            default: return 0;
         }
-    }
+    };
 
     return (
-        <>
+        <PermissionGuard permission="INSTALL_VIEW">
             <Grid container spacing={2}>
                 {serverInstallations.map(installation => (
-                    <Grid item xs={12} md={6} key={installation.type}>
+                    <Grid size={{xs: 12, md: 6}} key={installation.type}>
                         <ServerInstallationItem installation={installation}
-                                                steamCmdItemInfo={steamCmdItemInfo[serverTypeToId(installation.type)]}
+                                                steamCmdItemInfo={steamCmdItemInfo[serverTypeToId(installation.type!)]}
                                                 onBranchChanged={handleBranchChanged}
                                                 onUpdateClicked={handleUpdateClicked}
+                                                onUninstallConfirmed={handleUninstallConfirmed}
                         />
                     </Grid>
                 ))}
             </Grid>
-        </>
+        </PermissionGuard>
     );
 };
 

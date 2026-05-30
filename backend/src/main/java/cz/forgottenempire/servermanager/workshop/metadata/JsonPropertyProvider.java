@@ -1,6 +1,6 @@
 package cz.forgottenempire.servermanager.workshop.metadata;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 class JsonPropertyProvider {
 
@@ -18,8 +18,12 @@ class JsonPropertyProvider {
         return getValueFromJson("consumer_appid", modInfoJson);
     }
 
+    public String findPublishedFileId() {
+        return getValueFromJson("publishedfileid", modInfoJson);
+    }
+
     private String getValueFromJson(String key, JsonNode modInfoJson) {
         JsonNode value = modInfoJson.findValue(key);
-        return value != null ? value.asText() : null;
+        return value != null ? value.asString() : null;
     }
 }

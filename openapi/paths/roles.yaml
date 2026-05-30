@@ -1,0 +1,89 @@
+/roles:
+  get:
+    tags: [Roles]
+    operationId: getRoles
+    summary: List all roles
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../components/schemas/user-management.yaml#/RoleDto'
+  post:
+    tags: [Roles]
+    operationId: createRole
+    summary: Create a new role
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/user-management.yaml#/CreateRoleRequest'
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/RoleDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '409':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/roles/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  get:
+    tags: [Roles]
+    operationId: getRole
+    summary: Get a role by ID
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/RoleDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  put:
+    tags: [Roles]
+    operationId: updateRole
+    summary: Update a role's description and/or permissions
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/user-management.yaml#/UpdateRoleRequest'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user-management.yaml#/RoleDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  delete:
+    tags: [Roles]
+    operationId: deleteRole
+    summary: Delete a role (built-in roles cannot be deleted)
+    responses:
+      '204':
+        description: No Content
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'

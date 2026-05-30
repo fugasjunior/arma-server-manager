@@ -5,7 +5,7 @@ import {humanFileSize} from "../../util/util";
 import {EnhancedTable, EnhancedTableHeadCell} from "../../UI/EnhancedTable/EnhancedTable.tsx";
 import {Button} from "@mui/material";
 import {ScenariosTableToolbar} from "./ScenariosTableToolbar.tsx";
-import {Arma3ScenarioDto} from "../../dtos/Arma3ScenarioDto.ts";
+import {Arma3ScenarioDto} from "../../api/generated";
 
 const headCells: Array<EnhancedTableHeadCell> = [
     {
@@ -54,23 +54,23 @@ export const ScenariosTable = (
     const getRows = () => {
         return rows.map(scenarioDto => {
             return {
-                id: scenarioDto.name,
+                id: scenarioDto.name ?? "",
                 cells: [
                     {
                         id: "name",
-                        value: scenarioDto.name,
-                        displayValue: <Button onClick={(e) => onDownloadClicked(scenarioDto.name, e)}>
+                        value: scenarioDto.name ?? "",
+                        displayValue: <Button onClick={(e) => onDownloadClicked(scenarioDto.name ?? "", e)}>
                             {scenarioDto.name}
                         </Button>
                     },
                     {
                         id: "fileSize",
-                        value: scenarioDto.fileSize,
-                        displayValue: humanFileSize(scenarioDto.fileSize)
+                        value: scenarioDto.fileSize ?? 0,
+                        displayValue: humanFileSize(scenarioDto.fileSize ?? 0)
                     },
                     {
                         id: "createdOn",
-                        value: scenarioDto.createdOn
+                        value: scenarioDto.createdOn ? new Date(scenarioDto.createdOn) : new Date()
                     },
                 ]
             };

@@ -1,0 +1,35 @@
+ServerInstallationDto:
+  type: object
+  properties:
+    type:
+      $ref: './common.yaml#/ServerType'
+    version:
+      type: string
+    installationStatus:
+      $ref: './common.yaml#/InstallationStatus'
+    errorStatus:
+      $ref: './common.yaml#/ErrorStatus'
+    lastUpdatedAt:
+      type: string
+    branch:
+      $ref: './common.yaml#/InstallationBranch'
+    availableBranches:
+      type: array
+      uniqueItems: true
+      items:
+        $ref: './common.yaml#/InstallationBranch'
+
+ServerInstallationsDto:
+  type: object
+  properties:
+    serverInstallations:
+      type: array
+      items:
+        $ref: '#/ServerInstallationDto'
+
+ActiveBranchDto:
+  type: object
+  required: [branch]
+  properties:
+    branch:
+      $ref: './common.yaml#/InstallationBranch'

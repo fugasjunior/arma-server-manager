@@ -1,3 +1,11 @@
 */node_modules/
 */.idea/
 */build/
+.gradle/
+.git/
+*.md
+**/*.log
+frontend/dist/
+frontend/coverage/
+playwright-report/
+test-results/

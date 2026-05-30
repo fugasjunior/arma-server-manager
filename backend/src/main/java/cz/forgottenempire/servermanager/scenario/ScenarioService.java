@@ -4,6 +4,8 @@ import static java.time.ZoneId.systemDefault;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import cz.forgottenempire.servermanager.api.model.Arma3ScenarioDto;
+import cz.forgottenempire.servermanager.api.model.ReforgerScenarioDto;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
@@ -38,7 +40,6 @@ class ScenarioService {
     private final ProcessFactory processFactory;
     private final PathsFactory pathsFactory;
 
-
     @Autowired
     public ScenarioService(ProcessFactory processFactory, PathsFactory pathsFactory) {
         this.processFactory = processFactory;
@@ -56,7 +57,6 @@ class ScenarioService {
             return;
         }
 
-        // as some files may already be URI-endoded, decode them
         scenarioName = UriUtils.decode(scenarioName, Charset.defaultCharset());
 
         log.info("Handling scenario upload {} (size {})", scenarioName, file.getSize());
@@ -71,7 +71,7 @@ class ScenarioService {
     }
 
     public List<Arma3ScenarioDto> getAllScenarios() {
-        List<Arma3ScenarioDto> arma3ScenarioDtos = new ArrayList<>();
+        List<Arma3ScenarioDto> scenarioDtos = new ArrayList<>();
 
         String[] extensions = new String[]{"pbo"};
         File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
@@ -80,13 +80,13 @@ class ScenarioService {
         }
         for (Iterator<File> it = FileUtils.iterateFiles(missionsFolder, extensions, false); it.hasNext(); ) {
             File scenarioFile = it.next();
-            Arma3ScenarioDto arma3ScenarioDtoDto = new Arma3ScenarioDto();
-            arma3ScenarioDtoDto.setName(scenarioFile.getName());
-            arma3ScenarioDtoDto.setFileSize(scenarioFile.length());
-            setScenarioFileCreationTime(scenarioFile, arma3ScenarioDtoDto);
-            arma3ScenarioDtos.add(arma3ScenarioDtoDto);
+            Arma3ScenarioDto dto = new Arma3ScenarioDto()
+                    .name(scenarioFile.getName())
+                    .fileSize(scenarioFile.length());
+            setScenarioFileCreationTime(scenarioFile, dto);
+            scenarioDtos.add(dto);
         }
-        return arma3ScenarioDtos;
+        return scenarioDtos;
     }
 
     public boolean deleteScenario(String name) {
@@ -110,13 +110,9 @@ class ScenarioService {
         File executable = pathsFactory.getServerExecutableWithFallback(ServerType.REFORGER);
 
         try {
-            // adding "-logStats 1" makes the process flush it's output and not hang before printing the scenarios table
             Process process = processFactory.startProcess(executable, List.of("-listScenarios", "-logStats", "1"));
-
-            // start a fail-safe in case the process hangs as it likes to do
             startWatchdogThread(process);
 
-            //delimiter in the process output marks the list of scenarios in process output
             String delimiter = "--------------------------------------------------";
             int delimitersFound = 0;
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -125,15 +121,10 @@ class ScenarioService {
             while ((line = in.readLine()) != null) {
                 if (line.contains(delimiter)) {
                     delimitersFound++;
-
                 } else if (delimitersFound == 2 || delimitersFound == 4) {
-
-                    // there should be scenarios listed on these lines
                     boolean isOfficialScenario = delimitersFound == 2;
                     scenarios.add(parseLineToScenarioDto(line, isOfficialScenario));
-
                 } else if (delimitersFound == 5) {
-                    // we're done, kill it with fire
                     break;
                 }
             }
@@ -157,22 +148,22 @@ class ScenarioService {
     }
 
     private ReforgerScenarioDto parseLineToScenarioDto(String line, boolean official) {
-        line = line.replaceAll(".*\\{", "{"); // remove leading log
-        String[] split = line.split("\\s", 2); // there might be human-readable scenario name after first whitespace
+        line = line.replaceAll(".*\\{", "{");
+        String[] split = line.split("\\s", 2);
         String value = split[0];
         String name = "";
         if (split.length > 1) {
             name = split[1].replaceAll("[()]", "");
         }
-        return new ReforgerScenarioDto(value, name, official);
+        return new ReforgerScenarioDto().value(value).name(name).official(official);
     }
 
-    private void setScenarioFileCreationTime(File scenarioFile, Arma3ScenarioDto arma3ScenarioDtoDto) {
+    private void setScenarioFileCreationTime(File scenarioFile, Arma3ScenarioDto dto) {
         try {
             BasicFileAttributes attr = Files.readAttributes(scenarioFile.toPath(), BasicFileAttributes.class);
             FileTime fileCreationTime = attr.creationTime();
             LocalDateTime dateTime = LocalDateTime.ofInstant(fileCreationTime.toInstant(), systemDefault());
-            arma3ScenarioDtoDto.setCreatedOn(dateTime);
+            dto.createdOn(dateTime.atZone(systemDefault()).toOffsetDateTime());
         } catch (IOException e) {
             log.warn("Could not get file creation time for scenario file '{}'", scenarioFile.getName());
         }
