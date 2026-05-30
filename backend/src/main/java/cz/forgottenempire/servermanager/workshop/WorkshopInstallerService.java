@@ -214,6 +214,10 @@ class WorkshopInstallerService {
     }
 
     private void deleteBiKeys(WorkshopMod mod) {
+        if (mod.getServerType() == ServerType.ARMA3) {
+            // Arma 3 keys are derived per-instance at start; no shared dir to delete from
+            return;
+        }
         mod.getBiKeys().forEach(biKey -> {
             for (ServerType serverType : installationService.getInstalledRelatedServerTypes(mod.getServerType())) {
                 File keyFile = pathsFactory.getServerKeyPath(biKey, serverType).toFile();
@@ -223,6 +227,11 @@ class WorkshopInstallerService {
     }
 
     private void installNewBiKeys(WorkshopMod mod) throws IOException {
+        if (mod.getServerType() == ServerType.ARMA3) {
+            // Arma 3 keys are derived per-instance at start; not copied to a shared dir
+            return;
+        }
+
         String[] extensions = new String[]{"bikey"};
         File modDirectory = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
 

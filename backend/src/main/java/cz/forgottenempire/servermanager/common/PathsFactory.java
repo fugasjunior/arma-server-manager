@@ -77,20 +77,8 @@ public class PathsFactory {
         return Path.of(getServerPath(type).toString(), dirName);
     }
 
-    public Path getScenariosBasePath() {
-        return Path.of(getServerPath(ServerType.ARMA3).toString(), "mpmissions");
-    }
-
-    public Path getScenarioPath(String scenarioName) {
-        return Path.of(getScenariosBasePath().toString(), scenarioName);
-    }
-
     public Path getConfigFilePath(ServerType type, String configName) {
         return Path.of(getServerPath(type).toString(), configName).toAbsolutePath();
-    }
-
-    public Path getProfilesDirectoryPath() {
-        return Path.of(getServerPath(ServerType.ARMA3).toString(), "custom_profiles");
     }
 
     public File getServerExecutableWithFallback(ServerType type) {

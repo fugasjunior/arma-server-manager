@@ -44,6 +44,13 @@ public class ServerProcess {
         var executable = launchContext.pathsFactory().getServerExecutableWithFallback(server.getType());
         List<String> parameters = server.getLaunchParameters(launchContext);
 
+        try {
+            server.prepareLaunchEnvironment(launchContext);
+        } catch (IOException e) {
+            log.error("Could not prepare launch environment for server ID {}", server.getId(), e);
+            return null;
+        }
+
         server.getConfigFiles(launchContext).forEach(ServerConfig::generateIfNecessary);
         var logFile = server.getLog(launchContext.pathsFactory());
         logFile.prepare(logMaxFiles);

@@ -25,7 +25,7 @@ export default defineConfig({
         {
             command: './gradlew :backend:e2eApp --no-daemon -DskipFrontendBuild=true',
             cwd: '../../',
-            url: `${BACKEND_URL}/api/login`,
+            url: `${BACKEND_URL}/api/health`,
             reuseExistingServer: !process.env.CI,
             timeout: 180_000,
             stdout: 'pipe',

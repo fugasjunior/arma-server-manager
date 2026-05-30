@@ -90,7 +90,7 @@ const ListBuilderDLCsEdit = (props: ListBuilderDLCsEditProps) => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button onClick={handleManageDLCsButtonClick} startIcon={<ApartmentIcon/>} variant="contained">
+            <Button onClick={handleManageDLCsButtonClick} startIcon={<ApartmentIcon/>} variant="outlined">
                 DLCs
             </Button>
             <Modal open={isOpen && !isLoading} onClose={handleClose}>

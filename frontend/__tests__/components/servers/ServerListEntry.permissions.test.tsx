@@ -1,5 +1,5 @@
 import React from 'react';
-import {screen} from '@testing-library/react';
+import {fireEvent, screen} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ServerListEntry from '../../../src/components/servers/serverListEntry/ServerListEntry';
 import {useServerStatus} from '../../../src/hooks/queries/useServerStatus';
@@ -10,6 +10,18 @@ jest.mock('../../../src/hooks/queries/useServerStatus');
 jest.mock('../../../src/api/client', () => ({
     headlessClientApi: {setHeadlessClientsTarget: jest.fn()},
     serversApi: {},
+    scenariosApi: {},
+}));
+jest.mock('../../../src/hooks/queries/useServerScenarios', () => ({
+    useServerScenarios: () => ({data: [], isLoading: false}),
+}));
+jest.mock('../../../src/config', () => ({
+    __esModule: true,
+    default: {
+        apiUrl: '/api',
+        dateFormat: {year: 'numeric', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit'},
+        version: 'test',
+    },
 }));
 jest.mock('react-router-dom', () => ({
     Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,
@@ -36,29 +48,16 @@ const defaultProps = {
     onDuplicateServer: jest.fn(),
 };
 
+const openActionsMenu = () => {
+    fireEvent.click(screen.getByTestId(`server-${server.id}-actions-btn`));
+};
+
 beforeEach(() => {
     jest.clearAllMocks();
     mockUseServerStatus.mockReturnValue({data: null} as any);
 });
 
 describe('ServerListEntry permissions', () => {
-    it('hides settings button without SERVER_VIEW', () => {
-        renderWithPermissions(
-            <table><tbody><ServerListEntry {...defaultProps}/></tbody></table>,
-            [],
-        );
-        expect(screen.queryByTestId(`server-${server.id}-settings-btn`) ??
-               screen.queryByText('Settings')).not.toBeInTheDocument();
-    });
-
-    it('shows settings button with SERVER_VIEW', () => {
-        renderWithPermissions(
-            <table><tbody><ServerListEntry {...defaultProps}/></tbody></table>,
-            ['SERVER_VIEW'],
-        );
-        expect(screen.getByText('Settings')).toBeInTheDocument();
-    });
-
     it('hides server controls without SERVER_OPERATE', () => {
         mockUseServerStatus.mockReturnValue({data: {alive: false}} as any);
         renderWithPermissions(
@@ -77,21 +76,41 @@ describe('ServerListEntry permissions', () => {
         expect(screen.getByText('Start')).toBeInTheDocument();
     });
 
-    it('hides delete button without SERVER_DELETE when server stopped', () => {
+    it('hides delete button without SERVER_DELETE', () => {
         mockUseServerStatus.mockReturnValue({data: {alive: false}} as any);
         renderWithPermissions(
             <table><tbody><ServerListEntry {...defaultProps}/></tbody></table>,
             ['SERVER_VIEW'],
         );
+        openActionsMenu();
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
 
-    it('shows delete button with SERVER_DELETE when server stopped', () => {
+    it('shows delete button with SERVER_DELETE', () => {
         mockUseServerStatus.mockReturnValue({data: {alive: false}} as any);
         renderWithPermissions(
             <table><tbody><ServerListEntry {...defaultProps}/></tbody></table>,
             ['SERVER_VIEW', 'SERVER_DELETE'],
         );
+        openActionsMenu();
         expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('hides duplicate button without SERVER_MODIFY', () => {
+        renderWithPermissions(
+            <table><tbody><ServerListEntry {...defaultProps}/></tbody></table>,
+            ['SERVER_VIEW'],
+        );
+        openActionsMenu();
+        expect(screen.queryByText('Duplicate')).not.toBeInTheDocument();
+    });
+
+    it('shows duplicate button with SERVER_MODIFY', () => {
+        renderWithPermissions(
+            <table><tbody><ServerListEntry {...defaultProps}/></tbody></table>,
+            ['SERVER_VIEW', 'SERVER_MODIFY'],
+        );
+        openActionsMenu();
+        expect(screen.getByText('Duplicate')).toBeInTheDocument();
     });
 });

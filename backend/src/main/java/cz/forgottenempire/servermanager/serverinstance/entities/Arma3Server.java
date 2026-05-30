@@ -1,7 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.Constants;
-import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ConfigFileKey;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,16 +78,19 @@ public class Arma3Server extends Server {
 
     @Override
     public List<String> getLaunchParameters(ServerLaunchContext ctx) {
+        Arma3InstancePaths paths = ctx.arma3InstancePaths();
         List<String> parameters = new ArrayList<>();
         parameters.add("-port=" + getPort());
-        parameters.add("-config=\"" + getConfigFile(ctx.pathsFactory()).getAbsolutePath() + "\"");
+        parameters.add("-config=\"" + getConfigFile(paths).getAbsolutePath() + "\"");
 
         if (networkSettings != null || ctx.getRawOverride(ConfigFileKey.ARMA3_NETWORK_CFG) != null) {
-            parameters.add("-cfg=\"" + getNetworkConfigFile(ctx.pathsFactory()).getAbsolutePath() + "\"");
+            parameters.add("-cfg=\"" + getNetworkConfigFile(paths).getAbsolutePath() + "\"");
         }
 
-        parameters.add("-profiles=\"" + getProfilesDirectoryPath(ctx.pathsFactory()) + "\"");
+        parameters.add("-profiles=\"" + paths.getInstanceProfilesPath(getId()) + "\"");
         parameters.add("-name=" + ServerType.ARMA3 + "_" + getId());
+        parameters.add("-mpmissions=\"" + paths.getInstanceMpmissionsRelativePath(getId()) + "\"");
+        parameters.add("-keysFolder=\"" + paths.getInstanceKeysPath(getId()) + "\"");
         parameters.add("-nosplash");
         parameters.add("-skipIntro");
         parameters.add("-world=empty");
@@ -96,16 +100,23 @@ public class Arma3Server extends Server {
     }
 
     @Override
+    public void prepareLaunchEnvironment(ServerLaunchContext ctx) throws IOException {
+        Files.createDirectories(ctx.arma3InstancePaths().getInstanceMpmissionsPath(getId()));
+        ctx.arma3KeyService().rebuildInstanceBikeys(this); // creates + populates keys/
+    }
+
+    @Override
     public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
+        Arma3InstancePaths paths = ctx.arma3InstancePaths();
         List<ServerConfig> configs = new ArrayList<>();
         configs.add(new ServerConfig(
-                getConfigFile(ctx.pathsFactory()),
+                getConfigFile(paths),
                 Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3),
                 this,
                 ctx.freeMarkerConfigurer(),
                 ctx.getRawOverride(ConfigFileKey.ARMA3_SERVER_CFG)));
         configs.add(new ServerConfig(
-                getProfileFile(ctx.pathsFactory()),
+                getProfileFile(paths),
                 Constants.ARMA3_PROFILE_TEMPLATE,
                 Objects.requireNonNullElseGet(difficultySettings, Arma3DifficultySettings::new),
                 ctx.freeMarkerConfigurer(),
@@ -113,7 +124,7 @@ public class Arma3Server extends Server {
         String networkOverride = ctx.getRawOverride(ConfigFileKey.ARMA3_NETWORK_CFG);
         if (networkSettings != null || networkOverride != null) {
             configs.add(new ServerConfig(
-                    getNetworkConfigFile(ctx.pathsFactory()),
+                    getNetworkConfigFile(paths),
                     Constants.ARMA3_NETWORK_SETTINGS,
                     Objects.requireNonNullElseGet(networkSettings, Arma3NetworkSettings::new),
                     ctx.freeMarkerConfigurer(),
@@ -166,25 +177,24 @@ public class Arma3Server extends Server {
         return Arrays.stream(additionalMods == null ? new String[0] : additionalMods).map(mod -> "-mod=" + mod);
     }
 
-    private File getConfigFile(PathsFactory pathsFactory) {
-        String fileName = "ARMA3_" + getId() + ".cfg";
-        return pathsFactory.getConfigFilePath(ServerType.ARMA3, fileName).toFile();
+    private File getConfigFile(Arma3InstancePaths paths) {
+        String fileName = Arma3InstancePaths.instanceDirName(getId()) + ".cfg";
+        return paths.getInstanceConfigsPath(getId()).resolve(fileName).toAbsolutePath().toFile();
     }
 
-    private File getNetworkConfigFile(PathsFactory pathsFactory) {
-        String fileName = "ARMA3_" + getId() + "_network.cfg";
-        return pathsFactory.getConfigFilePath(ServerType.ARMA3, fileName).toFile();
+    private File getNetworkConfigFile(Arma3InstancePaths paths) {
+        String fileName = Arma3InstancePaths.instanceDirName(getId()) + "_network.cfg";
+        return paths.getInstanceConfigsPath(getId()).resolve(fileName).toAbsolutePath().toFile();
     }
 
-    private File getProfileFile(PathsFactory pathsFactory) {
-        String serverProfile = "ARMA3_" + getId();
+    private File getProfileFile(Arma3InstancePaths paths) {
+        String serverProfile = Arma3InstancePaths.instanceDirName(getId());
         String profileSubdirectory = SystemUtils.getOsType() == SystemUtils.OSType.WINDOWS ? "Users" : "home";
-        return Path.of(getProfilesDirectoryPath(pathsFactory), profileSubdirectory,
-                serverProfile, serverProfile + ".Arma3Profile").toFile();
-    }
-
-    private String getProfilesDirectoryPath(PathsFactory pathsFactory) {
-        return pathsFactory.getProfilesDirectoryPath().toString();
+        return paths.getInstanceProfilesPath(getId())
+                .resolve(profileSubdirectory)
+                .resolve(serverProfile)
+                .resolve(serverProfile + ".Arma3Profile")
+                .toFile();
     }
 
     private void addCustomLaunchParameters(List<String> parameters) {

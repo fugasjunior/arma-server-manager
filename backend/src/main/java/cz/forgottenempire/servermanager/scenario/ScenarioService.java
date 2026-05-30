@@ -6,16 +6,17 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import cz.forgottenempire.servermanager.api.model.Arma3ScenarioDto;
 import cz.forgottenempire.servermanager.api.model.ReforgerScenarioDto;
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
@@ -37,20 +38,41 @@ class ScenarioService {
     private final Supplier<List<ReforgerScenarioDto>> memoizedReforgerScenarios = Suppliers.memoizeWithExpiration(
             this::getReforgerScenariosFromServerExecutable, 5, TimeUnit.MINUTES);
 
+    private final Arma3InstancePaths arma3InstancePaths;
     private final ProcessFactory processFactory;
     private final PathsFactory pathsFactory;
 
     @Autowired
-    public ScenarioService(ProcessFactory processFactory, PathsFactory pathsFactory) {
+    public ScenarioService(Arma3InstancePaths arma3InstancePaths, ProcessFactory processFactory, PathsFactory pathsFactory) {
+        this.arma3InstancePaths = arma3InstancePaths;
         this.processFactory = processFactory;
         this.pathsFactory = pathsFactory;
     }
 
-    public void uploadScenarioToServer(MultipartFile file) {
-        File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
-        if (!missionsFolder.isDirectory()) {
-            throw new ServerNotInitializedException();
+    public void uploadScenarioToServer(long serverId, MultipartFile file) {
+        uploadScenarioToDir(arma3InstancePaths.getInstanceMpmissionsPath(serverId), file);
+    }
+
+    public List<Arma3ScenarioDto> getAllScenarios(long serverId) {
+        return listScenariosInDir(arma3InstancePaths.getInstanceMpmissionsPath(serverId));
+    }
+
+    public boolean deleteScenario(long serverId, String name) {
+        return deleteScenarioFromDir(arma3InstancePaths.getInstanceMpmissionsPath(serverId), name);
+    }
+
+    public List<ReforgerScenarioDto> getReforgerScenarios() {
+        return memoizedReforgerScenarios.get();
+    }
+
+    private void uploadScenarioToDir(Path dir, MultipartFile file) {
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            log.error("Could not create scenarios directory {}", dir, e);
+            throw new RuntimeException(e);
         }
+        File missionsFolder = dir.toFile();
 
         String scenarioName = file.getOriginalFilename();
         if (scenarioName == null) {
@@ -70,13 +92,13 @@ class ScenarioService {
         }
     }
 
-    public List<Arma3ScenarioDto> getAllScenarios() {
+    private List<Arma3ScenarioDto> listScenariosInDir(Path dir) {
         List<Arma3ScenarioDto> scenarioDtos = new ArrayList<>();
 
         String[] extensions = new String[]{"pbo"};
-        File missionsFolder = pathsFactory.getScenariosBasePath().toFile();
+        File missionsFolder = dir.toFile();
         if (!missionsFolder.isDirectory()) {
-            throw new ServerNotInitializedException();
+            return scenarioDtos;
         }
         for (Iterator<File> it = FileUtils.iterateFiles(missionsFolder, extensions, false); it.hasNext(); ) {
             File scenarioFile = it.next();
@@ -89,19 +111,15 @@ class ScenarioService {
         return scenarioDtos;
     }
 
-    public boolean deleteScenario(String name) {
+    private boolean deleteScenarioFromDir(Path dir, String name) {
         try {
-            Files.delete(pathsFactory.getScenarioPath(name));
+            Files.delete(dir.resolve(name));
             log.info("Successfully deleted scenario {}", name);
         } catch (IOException e) {
             log.error("Could not delete scenario {}", name, e);
             return false;
         }
         return true;
-    }
-
-    public List<ReforgerScenarioDto> getReforgerScenarios() {
-        return memoizedReforgerScenarios.get();
     }
 
     private List<ReforgerScenarioDto> getReforgerScenariosFromServerExecutable() {

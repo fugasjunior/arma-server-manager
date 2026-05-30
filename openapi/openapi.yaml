@@ -34,6 +34,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server'
   /server/{id}:
     $ref: './paths/servers.yaml#/~1server~1{id}'
+  /server/{id}/duplicate:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1duplicate'
   /server/{id}/start:
     $ref: './paths/servers.yaml#/~1server~1{id}~1start'
   /server/{id}/stop:
@@ -106,12 +108,20 @@ paths:
     $ref: './paths/arma-launcher-preset.yaml#/~1mod~1launcher_preset'
 
   # ── Scenarios ──────────────────────────────────────────────────────────────
-  /scenarios:
-    $ref: './paths/scenarios.yaml#/~1scenarios'
   /scenarios/REFORGER:
     $ref: './paths/scenarios.yaml#/~1scenarios~1REFORGER'
-  /scenarios/download:
-    $ref: './paths/scenarios.yaml#/~1scenarios~1download'
+  /server/{id}/scenarios:
+    $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios'
+  /server/{id}/scenarios/{name}:
+    $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios~1{name}'
+
+  # ── Keys ───────────────────────────────────────────────────────────────────
+  /server/{id}/keys:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1keys'
+  /server/{id}/keys/{name}:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1keys~1{name}'
+  /server/{id}/provided-keys:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1provided-keys'
 
   # ── Steam Auth ─────────────────────────────────────────────────────────────
   /config/auth:
@@ -290,6 +300,12 @@ components:
       $ref: './components/schemas/scenarios.yaml#/ReforgerScenarioDto'
     ReforgerScenariosDto:
       $ref: './components/schemas/scenarios.yaml#/ReforgerScenariosDto'
+
+    # ── Keys ──────────────────────────────────────────────────────────────────
+    Arma3KeyDto:
+      $ref: './components/schemas/keys.yaml#/Arma3KeyDto'
+    Arma3KeysDto:
+      $ref: './components/schemas/keys.yaml#/Arma3KeysDto'
 
     # ── Steam Auth ────────────────────────────────────────────────────────────
     SteamAuthDto:

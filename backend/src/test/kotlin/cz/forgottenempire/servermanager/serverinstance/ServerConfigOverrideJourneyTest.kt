@@ -383,7 +383,7 @@ class ServerConfigOverrideJourneyTest : AbstractIntegrationTest() {
 
     private fun getArma3ConfigFile(serverId: Long): File {
         val base = System.getProperty("java.io.tmpdir") + "/arma-server-manager-test/servers"
-        return File("$base/ARMA3/ARMA3_$serverId.cfg")
+        return File("$base/ARMA3/profiles/ARMA3_$serverId/configs/ARMA3_$serverId.cfg")
     }
 
     private fun getArma3ProfileFile(serverId: Long): File {
@@ -394,7 +394,7 @@ class ServerConfigOverrideJourneyTest : AbstractIntegrationTest() {
 
     private fun getArma3NetworkConfigFile(serverId: Long): File {
         val base = System.getProperty("java.io.tmpdir") + "/arma-server-manager-test/servers"
-        return File("$base/ARMA3/ARMA3_${serverId}_network.cfg")
+        return File("$base/ARMA3/profiles/ARMA3_$serverId/configs/ARMA3_${serverId}_network.cfg")
     }
 
     @Test

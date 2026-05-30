@@ -34,7 +34,8 @@ type ScenariosTableProps = {
     onFileChange: ChangeEventHandler,
     onDownloadClicked: (name: string, event: any) => void,
     uploadInProgress: boolean,
-    percentUploaded: number
+    percentUploaded: number,
+    disabled?: boolean
 }
 
 export const ScenariosTable = (
@@ -47,7 +48,8 @@ export const ScenariosTable = (
         onFileChange,
         onDownloadClicked,
         uploadInProgress,
-        percentUploaded
+        percentUploaded,
+        disabled = false
     }: ScenariosTableProps
 ) => {
 
@@ -92,7 +94,8 @@ export const ScenariosTable = (
                                    onDeleteClicked={onDeleteClicked}
                                    percentUploaded={percentUploaded}
                                    selectedScenariosCount={selectedScenarioIds.length}
-                                   uploadInProgress={uploadInProgress}/>
+                                   uploadInProgress={uploadInProgress}
+                                   disabled={disabled}/>
                                }
                 />
             </Paper>

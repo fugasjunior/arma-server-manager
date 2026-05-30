@@ -16,7 +16,8 @@ type EnhancedTableHeadProps = {
     orderBy: string,
     rowCount: number,
     search?: string,
-    headCells: Array<EnhancedTableHeadCell>
+    headCells: Array<EnhancedTableHeadCell>,
+    selectable?: boolean
 };
 
 const EnhancedTableHead = (
@@ -28,7 +29,8 @@ const EnhancedTableHead = (
         rowCount,
         onRequestSort,
         headCells,
-        search
+        search,
+        selectable = true
     }: EnhancedTableHeadProps
 ) => {
     const createSortHandler = (property: string) => (_event: unknown) => {
@@ -38,7 +40,7 @@ const EnhancedTableHead = (
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                {selectable && <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -48,7 +50,7 @@ const EnhancedTableHead = (
                             input: {"aria-label": "select all"},
                         }}
                     />
-                </TableCell>
+                </TableCell>}
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}

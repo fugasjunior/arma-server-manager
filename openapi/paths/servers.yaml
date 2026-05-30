@@ -81,6 +81,23 @@
       '404':
         $ref: '../components/responses.yaml#/ApiError'
 
+/server/{id}/duplicate:
+  post:
+    tags: [Servers]
+    operationId: duplicateServer
+    summary: Duplicate a server (copies config and per-instance filesystem assets)
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/servers.yaml#/ServerDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
 /server/{id}/start:
   post:
     tags: [Servers]

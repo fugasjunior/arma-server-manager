@@ -10,6 +10,7 @@ type EnhancedTableBodyProps = {
     selectedRowIds: Array<string | number>,
     emptyRowsCount: number,
     onRowSelect: (rowId: string | number) => void,
+    selectable?: boolean,
 }
 
 export const EnhancedTableBody = (
@@ -17,24 +18,27 @@ export const EnhancedTableBody = (
         rows,
         selectedRowIds,
         emptyRowsCount,
-        onRowSelect
+        onRowSelect,
+        selectable = true,
     }: EnhancedTableBodyProps
 ) => {
     const isSelected = (rowId: number | string) => selectedRowIds.indexOf(rowId) !== -1;
 
     return <TableBody>
         {rows.map((row) => {
-            const selected = isSelected(row.id);
+            const selected = selectable && isSelected(row.id);
             return (
-                <TableRow key={row.id} data-testid={`row-${row.id}`} hover onClick={() => onRowSelect(row.id)} role="checkbox"
-                          aria-checked={selected} tabIndex={-1} selected={selected}>
-                    <TableCell padding="checkbox">
+                <TableRow key={row.id} data-testid={`row-${row.id}`} hover={selectable}
+                          onClick={selectable ? () => onRowSelect(row.id) : undefined}
+                          role={selectable ? "checkbox" : undefined}
+                          aria-checked={selectable ? selected : undefined} tabIndex={-1} selected={selected}>
+                    {selectable && <TableCell padding="checkbox">
                         <Checkbox checked={selected} color="primary"
                                   slotProps={{
                                       input: {"aria-labelledby": String(row.id)},
                                   }}
                         />
-                    </TableCell>
+                    </TableCell>}
                     {row.cells.map((cell, index) => {
                         const valueToShow = cell.displayValue ?? cell.value;
                         if (valueToShow instanceof Date) {

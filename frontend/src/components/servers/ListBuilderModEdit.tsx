@@ -196,7 +196,7 @@ const ListBuilderModEdit = (props: ListBuilderModEditProps) => {
             <Backdrop open={isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button id="manage-mods-btn" onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="contained">
+            <Button id="manage-mods-btn" onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="outlined">
                 Mods
             </Button>
             <Modal open={isOpen && !isLoading} onClose={handleClose}>
