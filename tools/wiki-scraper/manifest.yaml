@@ -1,0 +1,62 @@
+# BI Wiki scrape manifest
+# Each entry: title (exact wiki page title), slug (output filename), game, file (config file it belongs to), extractor (param extraction strategy)
+# extractor values: table | sections | codeblock | skip
+# Add new pages here; scraper is generic.
+
+games:
+  arma3:
+    - title: "Arma 3: Server Config File"
+      slug: arma3-server-config
+      file: server.cfg
+      extractor: table
+    - title: "Arma 3: Basic Server Config File"
+      slug: arma3-basic-config
+      file: basic.cfg
+      extractor: table
+    - title: "Arma 3: Startup Parameters"
+      slug: arma3-startup-parameters
+      file: startup
+      extractor: sections
+    - title: "Arma 3: Server Profile"
+      slug: arma3-server-profile
+      file: server.armaprofile
+      extractor: codeblock
+    - title: "Arma 3: Dedicated Server"
+      slug: arma3-dedicated-server
+      file: general
+      extractor: skip   # narrative overview, not a param-table page
+    - title: "Mission Parameters"
+      slug: arma3-mission-parameters
+      file: description.ext
+      extractor: skip   # narrative guide for mission makers; params are user-defined, not fixed
+
+  dayz:
+    - title: "DayZ:Server Configuration"
+      slug: dayz-server-config
+      file: serverDZ.cfg
+      extractor: codeblock
+
+  reforger:
+    - title: "Arma Reforger:Server Config"
+      slug: reforger-server-config
+      file: serverconfig.json
+      extractor: sections
+    - title: "Arma Reforger:Startup Parameters"
+      slug: reforger-startup-parameters
+      file: startup
+      extractor: sections
+    - title: "Arma Reforger:Server Hosting"
+      slug: reforger-server-hosting
+      file: general
+      extractor: skip
+
+  reforger-exp:
+    - title: "Arma Reforger:Server Config"
+      slug: reforger-exp-server-config
+      file: serverconfig.json
+      extractor: sections
+      note: "Same source page as reforger; tagged separately for exp-branch context."
+    - title: "Arma Reforger:Startup Parameters"
+      slug: reforger-exp-startup-parameters
+      file: startup
+      extractor: sections
