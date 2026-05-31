@@ -63,8 +63,10 @@ public abstract class Server {
     /**
      * Hook called before config generation and process start.
      * Subclasses override to create instance-specific directories or perform other setup.
+     * Default: no-op.
      */
-    public abstract void prepareLaunchEnvironment(ServerLaunchContext ctx) throws IOException;
+    public void prepareLaunchEnvironment(ServerLaunchContext ctx) throws IOException {
+    }
 
     public LogFile getLog(PathsFactory pathsFactory) {
         return new LogFile(pathsFactory.getServerLogFile(type, id));

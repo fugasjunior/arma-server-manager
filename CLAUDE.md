@@ -17,6 +17,12 @@ docker-compose up -d db adminer
 cd frontend && npm run dev
 ```
 
+
+### Code style
+
+- Prefer short, well-named methods over comments.
+- Use annotation-based Mockito with AssertJ for backend unit tests. Prefer stub-only mocks where possible.
+
 ### Build
 
 ```bash
