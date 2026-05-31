@@ -179,7 +179,7 @@ instance dir; integration start of an Arma 3 server creates `configs/keys/mpmiss
 
 ---
 
-### F2 — Per-instance bikeys at start
+### F2 — Per-instance bikeys at start ✅
 
 Decouple mod install from key placement. Today both installers copy **every**
 mod's bikeys into the single shared `servers/ARMA3/keys/` at install time. After

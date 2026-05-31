@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.entities;
 
 import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
+import cz.forgottenempire.servermanager.common.Arma3KeyService;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,7 @@ class Arma3ServerLaunchEnvironmentTest {
         ctx = new ServerLaunchContext(
                 mock(PathsFactory.class, withSettings().stubOnly()),
                 arma3InstancePaths,
+                mock(Arma3KeyService.class, withSettings().stubOnly()),
                 mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
     }
 
@@ -81,21 +83,23 @@ class Arma3ServerLaunchEnvironmentTest {
 
     @Test
     void prepareLaunchEnvironment_createsKeysAndMpmissionsDirectories(@TempDir Path tempDir) throws IOException {
-        Arma3InstancePaths realPaths = new Arma3InstancePaths(
-                new PathsFactory(
-                        tempDir.toString(),
-                        tempDir.resolve("mods").toString(),
-                        tempDir.resolve("logs").toString(),
-                        "/steamcmd/steamcmd",
-                        "/steamcmd/cache.json"));
+        PathsFactory realPathsFactory = new PathsFactory(
+                tempDir.toString(),
+                tempDir.resolve("mods").toString(),
+                tempDir.resolve("logs").toString(),
+                "/steamcmd/steamcmd",
+                "/steamcmd/cache.json");
+        Arma3InstancePaths realInstancePaths = new Arma3InstancePaths(realPathsFactory);
+        Arma3KeyService realKeyService = new Arma3KeyService(realPathsFactory, realInstancePaths);
         ServerLaunchContext realCtx = new ServerLaunchContext(
                 mock(PathsFactory.class, withSettings().stubOnly()),
-                realPaths,
+                realInstancePaths,
+                realKeyService,
                 mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
         server.prepareLaunchEnvironment(realCtx);
 
-        assertThat(realPaths.getInstanceKeysPath(SERVER_ID)).isDirectory();
-        assertThat(realPaths.getInstanceMpmissionsPath(SERVER_ID)).isDirectory();
+        assertThat(realInstancePaths.getInstanceKeysPath(SERVER_ID)).isDirectory();
+        assertThat(realInstancePaths.getInstanceMpmissionsPath(SERVER_ID)).isDirectory();
     }
 }
