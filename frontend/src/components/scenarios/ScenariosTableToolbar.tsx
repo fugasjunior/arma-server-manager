@@ -10,7 +10,8 @@ type ScenariosTableToolbarProps = {
     uploadInProgress: boolean,
     percentUploaded: number,
     onFileChange: ChangeEventHandler,
-    onDeleteClicked: MouseEventHandler
+    onDeleteClicked: MouseEventHandler,
+    disabled?: boolean
 }
 
 export const ScenariosTableToolbar = (
@@ -19,20 +20,21 @@ export const ScenariosTableToolbar = (
         onFileChange,
         percentUploaded,
         onDeleteClicked,
-        uploadInProgress
+        uploadInProgress,
+        disabled = false
     }: ScenariosTableToolbarProps
 ) => <>
     <PermissionGuard permission="SCENARIO_MODIFY">
-        {!uploadInProgress && <Button variant="contained" component="label" data-testid="scenario-upload-btn">
+        {!uploadInProgress && <Button variant="contained" component="label" data-testid="scenario-upload-btn" disabled={disabled}>
             Upload
-            <input hidden multiple type="file" data-testid="scenario-upload-input" onChange={onFileChange}/>
+            <input hidden multiple type="file" data-testid="scenario-upload-input" onChange={onFileChange} disabled={disabled}/>
         </Button>}
         {uploadInProgress && <CircularProgress variant="determinate" value={percentUploaded}/>}
     </PermissionGuard>
     <PermissionGuard permission="SCENARIO_DELETE">
-        <Tooltip title="Delete">
+        <Tooltip title={disabled ? "Stop the server before deleting scenarios" : "Delete"}>
                             <span>
-                                <IconButton data-testid="scenario-delete-btn" disabled={selectedScenariosCount === 0} onClick={onDeleteClicked}>
+                                <IconButton data-testid="scenario-delete-btn" disabled={selectedScenariosCount === 0 || disabled} onClick={onDeleteClicked}>
                                     <DeleteIcon/>
                                 </IconButton>
                             </span>

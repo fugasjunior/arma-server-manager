@@ -11,7 +11,6 @@ import ModsPage from "./pages/ModsPage";
 import NewServerPage from "./pages/NewServerPage";
 import {Container, createTheme, CssBaseline, ThemeProvider, useMediaQuery} from "@mui/material";
 import 'react-toastify/dist/ReactToastify.css'
-import ScenariosPage from "./pages/ScenariosPage";
 import AppConfigPage from "./pages/AppConfigPage";
 import AdditionalServersPage from "./pages/AdditionalServersPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -70,9 +69,6 @@ const App = () => {
                         }/>
                         <Route path="servers/:id" element={
                             <ProtectedRoute><ServerSettingsPage/></ProtectedRoute>
-                        }/>
-                        <Route path="scenarios" element={
-                            <ProtectedRoute><ScenariosPage/></ProtectedRoute>
                         }/>
                         <Route path="mods/:section" element={
                             <ProtectedRoute><ModsPage/></ProtectedRoute>

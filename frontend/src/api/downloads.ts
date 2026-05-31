@@ -30,8 +30,8 @@ export function downloadSteamCmdLog() {
     });
 }
 
-export function downloadScenario(name: string) {
-    scenariosApi.downloadScenario({name}, {responseType: "blob"}).then((response) => {
+export function downloadScenario(serverId: number, name: string) {
+    scenariosApi.downloadServerScenario({id: serverId, name}, {responseType: "blob"}).then((response) => {
         triggerBrowserDownload(response, name);
     });
 }

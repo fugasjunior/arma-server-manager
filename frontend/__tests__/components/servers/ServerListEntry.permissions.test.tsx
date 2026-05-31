@@ -10,6 +10,18 @@ jest.mock('../../../src/hooks/queries/useServerStatus');
 jest.mock('../../../src/api/client', () => ({
     headlessClientApi: {setHeadlessClientsTarget: jest.fn()},
     serversApi: {},
+    scenariosApi: {},
+}));
+jest.mock('../../../src/hooks/queries/useServerScenarios', () => ({
+    useServerScenarios: () => ({data: [], isLoading: false}),
+}));
+jest.mock('../../../src/config', () => ({
+    __esModule: true,
+    default: {
+        apiUrl: '/api',
+        dateFormat: {year: 'numeric', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit'},
+        version: 'test',
+    },
 }));
 jest.mock('react-router-dom', () => ({
     Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,

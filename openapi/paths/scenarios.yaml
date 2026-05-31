@@ -1,50 +1,3 @@
-/scenarios:
-  get:
-    tags: [Scenarios]
-    operationId: getArma3Scenarios
-    summary: List all Arma 3 scenarios
-    responses:
-      '200':
-        description: OK
-        content:
-          application/json:
-            schema:
-              $ref: '../components/schemas/scenarios.yaml#/Arma3ScenariosDto'
-  post:
-    tags: [Scenarios]
-    operationId: uploadScenarios
-    summary: Upload scenario files
-    requestBody:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            type: object
-            properties:
-              file:
-                type: array
-                items:
-                  type: string
-                  format: binary
-    responses:
-      '200':
-        description: OK
-  delete:
-    tags: [Scenarios]
-    operationId: deleteScenario
-    summary: Delete a scenario
-    parameters:
-      - name: name
-        in: query
-        required: true
-        schema:
-          type: string
-    responses:
-      '204':
-        description: No Content
-      '400':
-        $ref: '../components/responses.yaml#/ApiError'
-
 /scenarios/REFORGER:
   get:
     tags: [Scenarios]
@@ -57,28 +10,6 @@
           application/json:
             schema:
               $ref: '../components/schemas/scenarios.yaml#/ReforgerScenariosDto'
-
-/scenarios/download:
-  get:
-    tags: [Scenarios]
-    operationId: downloadScenario
-    summary: Download a scenario file
-    parameters:
-      - name: name
-        in: query
-        required: true
-        schema:
-          type: string
-    responses:
-      '200':
-        description: OK
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      '404':
-        $ref: '../components/responses.yaml#/ApiError'
 
 /server/{id}/scenarios:
   parameters:

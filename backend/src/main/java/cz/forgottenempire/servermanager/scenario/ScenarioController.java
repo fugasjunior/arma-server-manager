@@ -6,7 +6,6 @@ import cz.forgottenempire.servermanager.api.model.Arma3ScenariosDto;
 import cz.forgottenempire.servermanager.api.model.ReforgerScenarioDto;
 import cz.forgottenempire.servermanager.api.model.ReforgerScenariosDto;
 import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
-import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
@@ -37,47 +36,18 @@ public class ScenarioController implements ScenariosApi {
     private final ServerInstallationService serverInstallationService;
     private final ServerInstanceService serverInstanceService;
     private final Arma3InstancePaths arma3InstancePaths;
-    private final PathsFactory pathsFactory;
 
     @Autowired
     public ScenarioController(
             ScenarioService scenarioService,
             ServerInstallationService serverInstallationService,
             ServerInstanceService serverInstanceService,
-            Arma3InstancePaths arma3InstancePaths,
-            PathsFactory pathsFactory
+            Arma3InstancePaths arma3InstancePaths
     ) {
         this.scenarioService = scenarioService;
         this.serverInstallationService = serverInstallationService;
         this.serverInstanceService = serverInstanceService;
         this.arma3InstancePaths = arma3InstancePaths;
-        this.pathsFactory = pathsFactory;
-    }
-
-    // ── Global (legacy) ──────────────────────────────────────────────────────
-
-    @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.SCENARIO_VIEW + "')")
-    public ResponseEntity<Arma3ScenariosDto> getArma3Scenarios() {
-        List<Arma3ScenarioDto> scenarios = scenarioService.getAllScenarios();
-        return ResponseEntity.ok(new Arma3ScenariosDto().scenarios(scenarios));
-    }
-
-    @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.SCENARIO_VIEW + "')")
-    public ResponseEntity<Resource> downloadScenario(String name) {
-        File file = pathsFactory.getScenarioPath(name).toFile();
-        try {
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-            return ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=" + file.getName())
-                    .contentLength(file.length())
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(resource);
-        } catch (FileNotFoundException e) {
-            log.warn("File {} not found", file);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @Override
@@ -89,41 +59,6 @@ public class ScenarioController implements ScenariosApi {
         List<ReforgerScenarioDto> scenarios = scenarioService.getReforgerScenarios();
         return ResponseEntity.ok(new ReforgerScenariosDto().scenarios(scenarios));
     }
-
-    @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.SCENARIO_MODIFY + "')")
-    public ResponseEntity<Void> uploadScenarios(List<MultipartFile> file) {
-        if (file != null) {
-            file.forEach(f -> {
-                log.info("Receiving file upload ({})", f.getOriginalFilename());
-
-                if (f.getOriginalFilename() == null) {
-                    log.warn("Could not determine file name, skipping");
-                    return;
-                }
-
-                if (!f.getOriginalFilename().endsWith(".pbo")) {
-                    log.warn("File {} is not a PBO file, skipping", f.getOriginalFilename());
-                    return;
-                }
-
-                scenarioService.uploadScenarioToServer(f);
-            });
-        }
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.SCENARIO_DELETE + "')")
-    public ResponseEntity<Void> deleteScenario(String name) {
-        log.info("Received request to delete scenario {}", name);
-        if (!scenarioService.deleteScenario(name)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    // ── Per-instance ─────────────────────────────────────────────────────────
 
     @Override
     @PreAuthorize("hasAuthority('" + PermissionCode.SCENARIO_VIEW + "')")

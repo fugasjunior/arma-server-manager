@@ -103,12 +103,8 @@ paths:
     $ref: './paths/arma-launcher-preset.yaml#/~1mod~1launcher_preset'
 
   # ── Scenarios ──────────────────────────────────────────────────────────────
-  /scenarios:
-    $ref: './paths/scenarios.yaml#/~1scenarios'
   /scenarios/REFORGER:
     $ref: './paths/scenarios.yaml#/~1scenarios~1REFORGER'
-  /scenarios/download:
-    $ref: './paths/scenarios.yaml#/~1scenarios~1download'
   /server/{id}/scenarios:
     $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios'
   /server/{id}/scenarios/{name}:
