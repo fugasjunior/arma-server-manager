@@ -150,6 +150,21 @@ Frontend tests use Jest + jsdom + ts-jest. Tests in `frontend/__tests__/`. Mock 
 
 Never assert launch-parameter or server-config behavior from memory. Consult `docs/wiki-db/` (offline BI wiki scrape: `params/<game>.json` for exact lookup, `guides/*.md` for context — 546 params, 13 guides). If `docs/wiki-db/` is absent on the current branch, it lives on `feature/per-instance-server-management`; read it via `git show` rather than guessing.
 
+## Server config reference
+
+`docs/wiki-db/` contains a local offline database scraped from the BI community wiki — use it instead of fetching the wiki live.
+
+- `docs/wiki-db/params/<game>.json` — structured param records (name, type, default, description, since, example). Games: `arma3`, `dayz`, `reforger`, `reforger-exp`. 546 params total.
+- `docs/wiki-db/guides/*.md` — cleaned Markdown guides (one per wiki page) with front-matter tags.
+
+Quick lookup:
+```bash
+grep -r "paramName" docs/wiki-db/params/
+grep -rl "topic" docs/wiki-db/guides/
+```
+
+Refresh: `cd tools/wiki-scraper && .venv/bin/python scrape.py`
+
 ## Agents
 
 Delegate aggressively to keep the main thread's context lean — the main thread reasons on summaries, subagents do the gathering:
