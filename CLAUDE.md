@@ -66,13 +66,17 @@ cd frontend && npm run generate
 ```
 arma-server-manager/
 ├── openapi/openapi.yaml          # Single source of truth for API contract
-├── backend/                      # Spring Boot 4 / Java 25
+├── backend/                      # Spring Boot 4 / Java 25 + Kotlin 2.3.21
 └── frontend/                     # React 19 / TypeScript / Vite
 ```
 
 OpenAPI spec drives both sides: backend generates Spring controller interfaces + DTOs; frontend generates TypeScript-Axios client. **Never hand-write API interfaces or DTOs on either side** — edit `openapi/openapi.yaml` and regenerate.
 
 Frontend build output copied into `backend/build/resources/main/static/` so backend serves SPA.
+
+### Language policy
+
+New backend files must be written in **Kotlin** (`src/main/kotlin` / `src/test/kotlin`). Editing existing Java files is fine — do not mass-convert. OpenAPI classes remain Java-generated; Kotlin consumes them via standard Java interop.
 
 ### Backend architecture
 

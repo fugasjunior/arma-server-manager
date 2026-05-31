@@ -6,12 +6,12 @@ This guide will help you set up the Arma Server Manager project for development.
 
 The project consists of two main components:
 
-- **Backend**: Spring Boot application (Java 25)
+- **Backend**: Spring Boot application (Java 25 + Kotlin 2.3.21, mixed)
 - **Frontend**: React application with TypeScript, Vite, and Jest
 
 ## Prerequisites
 
-- JDK 25 or higher
+- JDK 25 or higher (Kotlin 2.3.21 also runs on the same toolchain)
 - Node.js 24 or higher
 - npm 11 or higher
 - Docker and Docker Compose (for database and optional containerized development)
@@ -106,6 +106,7 @@ The frontend development server will start on http://localhost:5173 and will pro
 ### Backend Development
 
 - The backend uses Spring Boot and follows a standard layered architecture
+- **Language policy**: new backend files should be written in **Kotlin** (`src/main/kotlin` / `src/test/kotlin`). Editing existing Java files is fine — do not mass-convert. Three Kotlin Gradle plugins are active: `kotlin.jvm`, `kotlin.plugin.spring` (makes `@Service`/`@RestController`/etc. classes open for Spring proxying), and `kotlin.plugin.jpa` (generates no-arg constructors for `@Entity` classes). OpenAPI classes are still generated as Java and consumed from Kotlin via interop.
 - Changes to the database schema are managed with Flyway migrations
 - Run tests with `./gradlew test`
 
