@@ -89,7 +89,7 @@ public class Arma3Server extends Server {
 
         parameters.add("-profiles=\"" + paths.getInstanceProfilesPath(getId()) + "\"");
         parameters.add("-name=" + ServerType.ARMA3 + "_" + getId());
-        parameters.add("-mpmissions=\"" + paths.getInstanceMpmissionsPath(getId()) + "\"");
+        parameters.add("-mpmissions=\"" + paths.getInstanceMpmissionsRelativePath(getId()) + "\"");
         parameters.add("-keysFolder=\"" + paths.getInstanceKeysPath(getId()) + "\"");
         parameters.add("-nosplash");
         parameters.add("-skipIntro");

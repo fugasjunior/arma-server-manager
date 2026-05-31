@@ -43,6 +43,8 @@ class Arma3ServerLaunchEnvironmentTest {
                 .thenReturn(Path.of("/servers/ARMA3/profiles/ARMA3_42/keys"));
         when(arma3InstancePaths.getInstanceMpmissionsPath(SERVER_ID))
                 .thenReturn(Path.of("/servers/ARMA3/profiles/ARMA3_42/mpmissions"));
+        when(arma3InstancePaths.getInstanceMpmissionsRelativePath(SERVER_ID))
+                .thenReturn(Path.of("profiles/ARMA3_42/mpmissions"));
 
         ctx = new ServerLaunchContext(
                 mock(PathsFactory.class, withSettings().stubOnly()),
@@ -55,8 +57,8 @@ class Arma3ServerLaunchEnvironmentTest {
     void getLaunchParameters_containsMpmissionsFlag() {
         List<String> params = server.getLaunchParameters(ctx);
 
-        assertThat(params).anyMatch(p -> p.startsWith("-mpmissions="));
-        assertThat(params).anyMatch(p -> p.contains("profiles/ARMA3_42/mpmissions"));
+        assertThat(params).anyMatch(p -> p.equals("-mpmissions=\"profiles/ARMA3_42/mpmissions\""));
+        assertThat(params).noneMatch(p -> p.startsWith("-mpmissions=\"/"));
     }
 
     @Test
