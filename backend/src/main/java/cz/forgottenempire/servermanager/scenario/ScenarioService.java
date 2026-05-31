@@ -50,22 +50,6 @@ class ScenarioService {
         this.pathsFactory = pathsFactory;
     }
 
-    // ── Global (legacy) ──────────────────────────────────────────────────────
-
-    public void uploadScenarioToServer(MultipartFile file) {
-        uploadScenarioToDir(pathsFactory.getScenariosBasePath(), file);
-    }
-
-    public List<Arma3ScenarioDto> getAllScenarios() {
-        return listScenariosInDir(pathsFactory.getScenariosBasePath());
-    }
-
-    public boolean deleteScenario(String name) {
-        return deleteScenarioFromDir(pathsFactory.getScenariosBasePath(), name);
-    }
-
-    // ── Per-instance ─────────────────────────────────────────────────────────
-
     public void uploadScenarioToServer(long serverId, MultipartFile file) {
         uploadScenarioToDir(arma3InstancePaths.getInstanceMpmissionsPath(serverId), file);
     }

@@ -12,7 +12,7 @@ export const queryKeys = {
     systemDetails: ["systemDetails"] as const,
     serverInstallations: ["serverInstallations"] as const,
     creatorDlcs: (filter?: ServerType) => ["creatorDlcs", filter ?? "all"] as const,
-    arma3Scenarios: ["arma3Scenarios"] as const,
+    serverScenarios: (id: number) => ["serverScenarios", id] as const,
     reforgerScenarios: ["reforgerScenarios"] as const,
     users: ["users"] as const,
     user: (id: number) => ["users", id] as const,
