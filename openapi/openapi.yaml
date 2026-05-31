@@ -109,6 +109,10 @@ paths:
     $ref: './paths/scenarios.yaml#/~1scenarios~1REFORGER'
   /scenarios/download:
     $ref: './paths/scenarios.yaml#/~1scenarios~1download'
+  /server/{id}/scenarios:
+    $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios'
+  /server/{id}/scenarios/{name}:
+    $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios~1{name}'
 
   # ── Steam Auth ─────────────────────────────────────────────────────────────
   /config/auth:
