@@ -13,6 +13,7 @@ HELP.md
 build/
 !**/src/main/**
 !**/src/test/**
+.kotlin/
 
 ### STS ###
 .apt_generated

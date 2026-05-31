@@ -13,13 +13,14 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.io.IOException
 
+private const val USERNAME = "username"
+private const val PASSWORD = "password"
+private const val STEAM_GUARD_TOKEN = "ABCDE"
+
 @ExtendWith(MockitoExtension::class)
 class SteamAuthVerifierUnitTest {
 
     companion object {
-        private const val USERNAME = "username"
-        private const val PASSWORD = "password"
-        private const val STEAM_GUARD_TOKEN = "ABCDE"
         private val AUTH_DTO = SteamAuthDto().username(USERNAME).password(PASSWORD).steamGuardToken(STEAM_GUARD_TOKEN)
         private val EXPECTED_AUTH = SteamAuth(null, USERNAME, PASSWORD, STEAM_GUARD_TOKEN)
     }
