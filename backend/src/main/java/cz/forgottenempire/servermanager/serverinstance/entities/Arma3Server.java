@@ -100,9 +100,8 @@ public class Arma3Server extends Server {
 
     @Override
     public void prepareLaunchEnvironment(ServerLaunchContext ctx) throws IOException {
-        Arma3InstancePaths paths = ctx.arma3InstancePaths();
-        Files.createDirectories(paths.getInstanceKeysPath(getId()));
-        Files.createDirectories(paths.getInstanceMpmissionsPath(getId()));
+        Files.createDirectories(ctx.arma3InstancePaths().getInstanceMpmissionsPath(getId()));
+        ctx.arma3KeyService().rebuildInstanceBikeys(this); // creates + populates keys/
     }
 
     @Override

@@ -69,34 +69,6 @@ class LocalModInstallerServiceTest {
     }
 
     @Test
-    void installBiKeys_copiesBikeyToServerKeysDir() throws IOException {
-        ServerType serverType = ServerType.ARMA3;
-
-        Path baseModsPath = tempDir.resolve("local/ARMA3");
-        Files.createDirectories(baseModsPath);
-        Path modDir = baseModsPath.resolve("testMod");
-        Files.createDirectories(modDir);
-        Files.createFile(modDir.resolve("mod.bikey"));
-
-        Path serverKeysDir = tempDir.resolve("servers/ARMA3/keys");
-        Files.createDirectories(serverKeysDir);
-        Path keyPath = serverKeysDir.resolve("mod.bikey");
-        Path linkPath = tempDir.resolve("servers/ARMA3/testMod");
-
-        when(modService.getNamesForServerType(serverType)).thenReturn(List.of());
-        when(modService.getAllMods(serverType)).thenReturn(List.of());
-        when(pathsFactory.getLocalModsBasePath(serverType)).thenReturn(baseModsPath);
-        when(pathsFactory.getLocalModPath("testMod", serverType)).thenReturn(modDir);
-        when(pathsFactory.getLocalModLinkPath("testMod", serverType)).thenReturn(linkPath);
-        when(pathsFactory.getServerKeyPath("mod.bikey", serverType)).thenReturn(keyPath);
-        when(modService.saveMod(any(LocalMod.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        assertThatCode(() -> installerService.syncMods(serverType)).doesNotThrowAnyException();
-
-        assertThat(keyPath).exists();
-    }
-
-    @Test
     void createSymlink_skipsIfAlreadyExists() throws IOException {
         ServerType serverType = ServerType.ARMA3;
 

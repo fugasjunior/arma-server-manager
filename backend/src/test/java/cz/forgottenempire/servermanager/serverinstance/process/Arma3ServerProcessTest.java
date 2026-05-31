@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
 import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
+import cz.forgottenempire.servermanager.common.Arma3KeyService;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
@@ -61,6 +62,7 @@ class Arma3ServerProcessTest {
         ServerLaunchContext launchContext = new ServerLaunchContext(
                 pathsFactory,
                 mock(Arma3InstancePaths.class, withSettings().stubOnly()),
+                mock(Arma3KeyService.class, withSettings().stubOnly()),
                 mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
         arma3ServerProcess = new Arma3ServerProcess(SERVER_ID, processCreator, launchContext, new String[0], 5);

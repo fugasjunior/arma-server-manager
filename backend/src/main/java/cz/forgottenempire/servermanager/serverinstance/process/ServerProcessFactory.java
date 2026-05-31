@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
 import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
+import cz.forgottenempire.servermanager.common.Arma3KeyService;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.LogRotationProperties;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
@@ -23,11 +24,12 @@ public class ServerProcessFactory {
     public ServerProcessFactory(ServerProcessCreator serverProcessCreator,
                                 PathsFactory pathsFactory,
                                 Arma3InstancePaths arma3InstancePaths,
+                                Arma3KeyService arma3KeyService,
                                 FreeMarkerConfigurer freeMarkerConfigurer,
                                 @Value("${additionalMods:#{null}}") String[] additionalMods,
                                 LogRotationProperties logRotationProperties) {
         this.serverProcessCreator = serverProcessCreator;
-        this.launchContext = new ServerLaunchContext(pathsFactory, arma3InstancePaths, freeMarkerConfigurer, additionalMods);
+        this.launchContext = new ServerLaunchContext(pathsFactory, arma3InstancePaths, arma3KeyService, freeMarkerConfigurer, additionalMods);
         this.additionalMods = additionalMods;
         this.logMaxFiles = logRotationProperties.getMaxFiles();
     }

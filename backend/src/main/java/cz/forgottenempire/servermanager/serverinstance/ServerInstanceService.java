@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
+import cz.forgottenempire.servermanager.common.Arma3KeyService;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
@@ -25,6 +26,7 @@ public class ServerInstanceService {
     private final ServerProcessService processService;
     private final PathsFactory pathsFactory;
     private final Arma3InstancePaths arma3InstancePaths;
+    private final Arma3KeyService arma3KeyService;
     private final FreeMarkerConfigurer freeMarkerConfigurer;
 
     @PersistenceContext
@@ -36,12 +38,14 @@ public class ServerInstanceService {
             ServerProcessService processService,
             PathsFactory pathsFactory,
             Arma3InstancePaths arma3InstancePaths,
+            Arma3KeyService arma3KeyService,
             FreeMarkerConfigurer freeMarkerConfigurer
     ) {
         this.serverRepository = serverRepository;
         this.processService = processService;
         this.pathsFactory = pathsFactory;
         this.arma3InstancePaths = arma3InstancePaths;
+        this.arma3KeyService = arma3KeyService;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
     }
 
@@ -56,7 +60,7 @@ public class ServerInstanceService {
     public Server createServer(Server server) {
         server.getCustomLaunchParameters().forEach(param -> param.setServer(server));
         Server persistedServer = serverRepository.save(server);
-        ServerLaunchContext ctx = new ServerLaunchContext(pathsFactory, arma3InstancePaths, freeMarkerConfigurer);
+        ServerLaunchContext ctx = new ServerLaunchContext(pathsFactory, arma3InstancePaths, arma3KeyService, freeMarkerConfigurer);
         persistedServer.getConfigFiles(ctx).forEach(ServerConfig::generate);
         return persistedServer;
     }
