@@ -79,3 +79,81 @@
               format: binary
       '404':
         $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/scenarios:
+  parameters:
+    - $ref: '../components/parameters.yaml#/serverId'
+  get:
+    tags: [Scenarios]
+    operationId: getServerScenarios
+    summary: List all Arma 3 scenarios for a server instance
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/scenarios.yaml#/Arma3ScenariosDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  post:
+    tags: [Scenarios]
+    operationId: uploadServerScenarios
+    summary: Upload scenario files to a server instance
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              file:
+                type: array
+                items:
+                  type: string
+                  format: binary
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/scenarios.yaml#/Arma3ScenariosDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/scenarios/{name}:
+  parameters:
+    - $ref: '../components/parameters.yaml#/serverId'
+    - name: name
+      in: path
+      required: true
+      schema:
+        type: string
+  get:
+    tags: [Scenarios]
+    operationId: downloadServerScenario
+    summary: Download a scenario file from a server instance
+    responses:
+      '200':
+        description: OK
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  delete:
+    tags: [Scenarios]
+    operationId: deleteServerScenario
+    summary: Delete a scenario from a server instance
+    responses:
+      '204':
+        description: No Content
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'

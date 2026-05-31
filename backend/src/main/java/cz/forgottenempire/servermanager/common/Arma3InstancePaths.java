@@ -40,6 +40,14 @@ public class Arma3InstancePaths {
         return getInstanceBasePath(id).resolve("mpmissions");
     }
 
+    /**
+     * Relative to the server install root (process cwd) — required by the {@code -mpmissions} flag.
+     * Returns {@code profiles/ARMA3_<id>/mpmissions}.
+     */
+    public Path getInstanceMpmissionsRelativePath(long id) {
+        return pathsFactory.getServerPath(ServerType.ARMA3).relativize(getInstanceMpmissionsPath(id));
+    }
+
     /** Single source of truth for the on-disk per-instance dir name. */
     public static String instanceDirName(long id) {
         return "ARMA3_" + id;
