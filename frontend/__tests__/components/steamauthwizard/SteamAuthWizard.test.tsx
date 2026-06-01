@@ -1,8 +1,8 @@
-import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SteamAuthWizard from '../../../src/components/steamauthwizard/SteamAuthWizard.tsx';
 import {steamAuthApi} from '../../../src/api/client';
+import renderWithPermissions from '../../helpers/renderWithPermissions';
 
 jest.mock('../../../src/api/client', () => ({
   steamAuthApi: {
@@ -77,7 +77,7 @@ describe('SteamAuthWizard', () => {
     // Mock localStorage to indicate wizard was completed
     (localStorage.getItem as jest.Mock).mockReturnValue('true');
     
-    render(<SteamAuthWizard />);
+    renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     
     // Wait for useEffect to complete
     await waitFor(() => {
@@ -98,7 +98,7 @@ describe('SteamAuthWizard', () => {
     });
     
     await act(async () => {
-      render(<SteamAuthWizard />);
+      renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     });
     
     // Wait for useEffect to complete
@@ -123,7 +123,7 @@ describe('SteamAuthWizard', () => {
     });
     
     await act(async () => {
-      render(<SteamAuthWizard />);
+      renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     });
     
     // Wait for useEffect to complete
@@ -145,7 +145,7 @@ describe('SteamAuthWizard', () => {
     });
     
     await act(async () => {
-      render(<SteamAuthWizard />);
+      renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     });
     
     // Wait for useEffect to complete
@@ -191,7 +191,7 @@ describe('SteamAuthWizard', () => {
     });
     
     await act(async () => {
-      render(<SteamAuthWizard />);
+      renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     });
     
     // Navigate to Credentials step
@@ -221,7 +221,7 @@ describe('SteamAuthWizard', () => {
     });
     
     await act(async () => {
-      render(<SteamAuthWizard />);
+      renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     });
     
     // Navigate through all steps
@@ -249,22 +249,36 @@ describe('SteamAuthWizard', () => {
   it('skips the wizard when Skip is clicked', async () => {
     // Mock localStorage to indicate wizard was not completed
     (localStorage.getItem as jest.Mock).mockReturnValue(null);
-    
+
     // Mock API response
     (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
       data: { isConfigured: false }
     });
-    
+
     await act(async () => {
-      render(<SteamAuthWizard />);
+      renderWithPermissions(<SteamAuthWizard />, ['STEAM_AUTH_ADMIN']);
     });
-    
+
     // Skip the wizard
     await act(async () => {
       screen.getByText('Skip').click();
     });
-    
+
     // Check that localStorage was updated
     expect(localStorage.setItem).toHaveBeenCalledWith('wizardCompleted', 'true');
+  });
+
+  it('does not call getSteamAuthStatus when user lacks STEAM_AUTH_ADMIN permission', async () => {
+    (localStorage.getItem as jest.Mock).mockReturnValue(null);
+    (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
+      data: { isConfigured: false }
+    });
+
+    await act(async () => {
+      renderWithPermissions(<SteamAuthWizard />, []);
+    });
+
+    expect(mockedSteamAuthApi.getSteamAuthStatus).not.toHaveBeenCalled();
+    expect(screen.queryByText('Steam Authentication Setup')).not.toBeInTheDocument();
   });
 });

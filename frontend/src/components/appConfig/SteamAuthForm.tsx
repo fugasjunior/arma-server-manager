@@ -50,8 +50,10 @@ const SteamAuthForm = () => {
                 password: values.password,
                 steamGuardToken: values.steamGuardToken?.trim()
             }});
-            setLoadedAuth(prevState => {
-                return {...prevState, password: ""};
+            setLoadedAuth({
+                username: values.username ?? "",
+                password: "",
+                steamGuardToken: values.steamGuardToken?.trim() ?? ""
             });
             toast.success("Steam Auth successfully set.");
         } catch (e) {

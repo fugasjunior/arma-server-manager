@@ -16,12 +16,15 @@ import WelcomeStep from './WelcomeStep';
 import CredentialsStep from './CredentialsStep';
 import TokenStep from './TokenStep';
 import CompletionStep from './CompletionStep';
+import {usePermission} from '../../hooks/usePermission';
 
 /**
  * Steam Authentication Wizard component
  * Shows a multi-step wizard for setting up Steam credentials on first application startup
  */
 const SteamAuthWizard: React.FC = () => {
+    const canManageSteamAuth = usePermission('STEAM_AUTH_ADMIN');
+
     const [open, setOpen] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -37,6 +40,10 @@ const SteamAuthWizard: React.FC = () => {
 
     // Check if wizard should be shown
     useEffect(() => {
+        if (!canManageSteamAuth) {
+            return;
+        }
+
         const checkAuthStatus = async () => {
             try {
                 const wizardCompleted = localStorage.getItem('wizardCompleted') === 'true';
@@ -54,7 +61,7 @@ const SteamAuthWizard: React.FC = () => {
         };
 
         void checkAuthStatus();
-    }, []);
+    }, [canManageSteamAuth]);
 
     // Allow re-opening from Settings via custom event
     useEffect(() => {
