@@ -215,7 +215,7 @@ mods' bikeys + game bikeys; mod install no longer writes into any shared keys di
 
 ---
 
-### F3 — Per-instance scenarios (backend)
+### F3 — Per-instance scenarios (backend) ✅
 
 Make scenario CRUD instance-scoped against `getInstanceMpmissionsPath(id)`.
 
@@ -246,7 +246,7 @@ right instance dir.
 
 ---
 
-### F4 — Frontend overhaul (summary; expand when reached)
+### F4 — Frontend overhaul (summary; expand when reached) ✅
 
 - Remove `pages/ScenariosPage.tsx` + route + nav entry + `scenarioService` global calls.
 - Add a scenarios tab/section inside server detail (`ServerSettingsPage` /
@@ -262,7 +262,7 @@ instance. New endpoints + UI. Out of scope for first delivery.
 
 ---
 
-### F6 — Migration (auto on startup; part of the F1–F4 release)
+### F6 — Migration (auto on startup; part of the F1–F4 release) ✅
 
 What regenerates vs what must move:
 - **Configs** (`*.cfg`) — FreeMarker-generated from the DB at start
