@@ -14,6 +14,9 @@ public final class PermissionCode {
     public static final String SCENARIO_VIEW             = "SCENARIO_VIEW";
     public static final String SCENARIO_MODIFY           = "SCENARIO_MODIFY";
     public static final String SCENARIO_DELETE           = "SCENARIO_DELETE";
+    public static final String BIKEY_VIEW                = "BIKEY_VIEW";
+    public static final String BIKEY_MODIFY              = "BIKEY_MODIFY";
+    public static final String BIKEY_DELETE              = "BIKEY_DELETE";
     public static final String INSTALL_VIEW              = "INSTALL_VIEW";
     public static final String INSTALL_MANAGE            = "INSTALL_MANAGE";
     public static final String STEAM_AUTH_ADMIN          = "STEAM_AUTH_ADMIN";

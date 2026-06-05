@@ -19,8 +19,8 @@ class Arma3KeyService @Autowired constructor(
         val instanceKeys = arma3InstancePaths.getInstanceKeysPath(id)
 
         clearExistingBikeys(instanceKeys)
-        copyGameBikeys(instanceKeys)
         copyModBikeys(server, instanceKeys)
+        copyCustomBikeys(server.id, instanceKeys)
 
         log.debug("Rebuilt instance keys for server {} in {}", id, instanceKeys)
     }
@@ -39,14 +39,15 @@ class Arma3KeyService @Autowired constructor(
         }
     }
 
-    private fun copyGameBikeys(instanceKeys: Path) {
-        copyBikeys(pathsFactory.getServerKeysPath(ServerType.ARMA3), instanceKeys)
+    private fun copyCustomBikeys(serverId: Long, instanceKeys: Path) {
+        copyBikeys(arma3InstancePaths.getInstanceCustomBikeysPath(serverId), instanceKeys)
     }
 
     private fun copyBikeys(src: Path, dst: Path) {
         val srcDir = src.toFile()
         if (!srcDir.isDirectory) return
         FileUtils.iterateFiles(srcDir, arrayOf("bikey"), true).forEach { key ->
+            log.debug("Copying bikey {} to {}", key, dst)
             FileUtils.copyFileToDirectory(key, dst.toFile())
         }
     }

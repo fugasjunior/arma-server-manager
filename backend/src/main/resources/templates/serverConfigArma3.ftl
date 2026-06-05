@@ -19,9 +19,4 @@ persistent = ${persistent?then('1', '0')};
 timeStampFormat = "short";
 BattlEye = ${battlEye?then('1', '0')};
 
-// SIGNATURE VERIFICATION
-onUnsignedData = "kick (_this select 0)";
-onHackedData = "kick (_this select 0)";
-onDifferentData = "";
-
 ${additionalOptions!}

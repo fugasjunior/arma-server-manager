@@ -8,8 +8,6 @@ import org.hamcrest.Matchers.hasItem
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import org.springframework.mock.web.MockMultipartFile
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.nio.file.Files
@@ -32,32 +30,20 @@ class ServerScenarioJourneyTest : AbstractIntegrationTest() {
                 .andExpect(jsonPath("$.scenarios[*].name", hasItem(pboName)))
 
             // List
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverId)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverId/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", hasItem(pboName)))
 
             // Download (path param)
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios/{name}", serverId, pboName)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverId/scenarios/$pboName")
                 .andExpect(status().isOk)
 
             // Delete (path param)
-            mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/server/{id}/scenarios/{name}", serverId, pboName)
-                    .header("Authorization", auth.getToken())
-            )
+            api().delete("/api/server/{id}/scenarios/{name}", serverId, pboName)
                 .andExpect(status().isNoContent)
 
             // Confirm gone
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverId)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverId/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", not(hasItem(pboName))))
         } finally {
@@ -87,24 +73,15 @@ class ServerScenarioJourneyTest : AbstractIntegrationTest() {
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.scenarios[*].name", hasItem(pboName)))
 
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverId)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverId/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", hasItem(pboName)))
 
             // URI-template form encodes '#' → '%23', mirroring encodeURIComponent in Axios
-            mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/server/{id}/scenarios/{name}", serverId, pboName)
-                    .header("Authorization", auth.getToken())
-            )
+            api().delete("/api/server/{id}/scenarios/{name}", serverId, pboName)
                 .andExpect(status().isNoContent)
 
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverId)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverId/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", not(hasItem(pboName))))
         } finally {
@@ -124,33 +101,21 @@ class ServerScenarioJourneyTest : AbstractIntegrationTest() {
                 .andExpect(status().isCreated)
 
             // A sees it
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverA)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverA/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", hasItem(pboName)))
 
             // B does not see it
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverB)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverB/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", not(hasItem(pboName))))
 
             // Delete from A
-            mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/server/{id}/scenarios/{name}", serverA, pboName)
-                    .header("Authorization", auth.getToken())
-            )
+            api().delete("/api/server/{id}/scenarios/{name}", serverA, pboName)
                 .andExpect(status().isNoContent)
 
             // A no longer sees it
-            mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/server/{id}/scenarios", serverA)
-                    .header("Authorization", auth.getToken())
-            )
+            api().get("/api/server/$serverA/scenarios")
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.scenarios[*].name", not(hasItem(pboName))))
         } finally {
@@ -161,10 +126,7 @@ class ServerScenarioJourneyTest : AbstractIntegrationTest() {
 
     @Test
     fun `scenario nonExistentServer returns 404`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/server/{id}/scenarios", 999999L)
-                .header("Authorization", auth.getToken())
-        )
+        api().get("/api/server/999999/scenarios")
             .andExpect(status().isNotFound)
     }
 
@@ -189,9 +151,11 @@ class ServerScenarioJourneyTest : AbstractIntegrationTest() {
     }
 
     private fun uploadPbo(serverId: Int, pboName: String) =
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/api/server/{id}/scenarios", serverId)
-                .file(MockMultipartFile("file", pboName, MediaType.APPLICATION_OCTET_STREAM_VALUE, "FAKEPBODATA".toByteArray()))
-                .header("Authorization", auth.getToken())
+        api().multipartPost(
+            "/api/server/$serverId/scenarios",
+            "file",
+            pboName,
+            "FAKEPBODATA".toByteArray(),
+            MediaType.APPLICATION_OCTET_STREAM_VALUE
         )
 }

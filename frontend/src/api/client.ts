@@ -5,6 +5,7 @@ import {
     ArmaLauncherPresetApi,
     Configuration,
     HeadlessClientApi,
+    KeysApi,
     LocalModsApi,
     ModPresetsApi,
     ModsApi,
@@ -69,6 +70,7 @@ export const localModsApi = new LocalModsApi(apiConfig, "", apiAxiosInstance);
 export const modPresetsApi = new ModPresetsApi(apiConfig, "", apiAxiosInstance);
 export const armaLauncherPresetApi = new ArmaLauncherPresetApi(apiConfig, "", apiAxiosInstance);
 export const scenariosApi = new ScenariosApi(apiConfig, "", apiAxiosInstance);
+export const keysApi = new KeysApi(apiConfig, "", apiAxiosInstance);
 export const steamAuthApi = new SteamAuthApi(apiConfig, "", apiAxiosInstance);
 export const steamCmdApi = new SteamCmdApi(apiConfig, "", apiAxiosInstance);
 export const systemApi = new SystemApi(apiConfig, "", apiAxiosInstance);

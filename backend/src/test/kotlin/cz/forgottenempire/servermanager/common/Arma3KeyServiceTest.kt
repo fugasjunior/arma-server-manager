@@ -37,10 +37,6 @@ class Arma3KeyServiceTest {
         arma3InstancePaths = Arma3InstancePaths(pathsFactory)
         arma3KeyService = Arma3KeyService(pathsFactory, arma3InstancePaths)
 
-        val gameKeys = pathsFactory.getServerKeysPath(ServerType.ARMA3)
-        Files.createDirectories(gameKeys)
-        Files.createFile(gameKeys.resolve("a3.bikey"))
-
         val modStore = pathsFactory.getModInstallationPath(WORKSHOP_MOD_ID, ServerType.ARMA3)
         Files.createDirectories(modStore)
         Files.createFile(modStore.resolve("mod.bikey"))
@@ -73,12 +69,11 @@ class Arma3KeyServiceTest {
     }
 
     @Test
-    fun rebuildInstanceBikeys_populatesGameAndActiveModBikeys() {
+    fun rebuildInstanceBikeys_populatesActiveModBikeys() {
         arma3KeyService.rebuildInstanceBikeys(serverWith(includeWorkshop = true, includeLocal = true))
 
         val instanceKeys = arma3InstancePaths.getInstanceKeysPath(SERVER_ID)
         assertThat(instanceKeys).isDirectory()
-        assertThat(instanceKeys.resolve("a3.bikey")).exists()
         assertThat(instanceKeys.resolve("mod.bikey")).exists()
         assertThat(instanceKeys.resolve("local.bikey")).exists()
     }
@@ -88,7 +83,6 @@ class Arma3KeyServiceTest {
         arma3KeyService.rebuildInstanceBikeys(serverWith(includeWorkshop = false, includeLocal = false))
 
         val instanceKeys = arma3InstancePaths.getInstanceKeysPath(SERVER_ID)
-        assertThat(instanceKeys.resolve("a3.bikey")).exists()
         assertThat(instanceKeys.resolve("mod.bikey")).doesNotExist()
         assertThat(instanceKeys.resolve("local.bikey")).doesNotExist()
     }
@@ -100,7 +94,38 @@ class Arma3KeyServiceTest {
 
         val instanceKeys = arma3InstancePaths.getInstanceKeysPath(SERVER_ID)
         assertThat(instanceKeys.resolve("mod.bikey")).doesNotExist()
-        assertThat(instanceKeys.resolve("a3.bikey")).exists()
+    }
+
+    @Test
+    fun rebuildInstanceBikeys_mergesCustomBikeys() {
+        val customDir = arma3InstancePaths.getInstanceCustomBikeysPath(SERVER_ID)
+        Files.createDirectories(customDir)
+        Files.createFile(customDir.resolve("community.bikey"))
+
+        arma3KeyService.rebuildInstanceBikeys(serverWith(includeWorkshop = false, includeLocal = false))
+
+        val instanceKeys = arma3InstancePaths.getInstanceKeysPath(SERVER_ID)
+        assertThat(instanceKeys.resolve("community.bikey")).exists()
+    }
+
+    @Test
+    fun rebuildInstanceBikeys_customBikeysSurviveSecondRebuild() {
+        val customDir = arma3InstancePaths.getInstanceCustomBikeysPath(SERVER_ID)
+        Files.createDirectories(customDir)
+        Files.createFile(customDir.resolve("community.bikey"))
+
+        arma3KeyService.rebuildInstanceBikeys(serverWith(includeWorkshop = false, includeLocal = false))
+        arma3KeyService.rebuildInstanceBikeys(serverWith(includeWorkshop = false, includeLocal = false))
+
+        val instanceKeys = arma3InstancePaths.getInstanceKeysPath(SERVER_ID)
+        assertThat(instanceKeys.resolve("community.bikey")).exists()
+    }
+
+    @Test
+    fun rebuildInstanceBikeys_whenCustomBikeysAbsent_doesNotThrow() {
+        assertThatNoException().isThrownBy {
+            arma3KeyService.rebuildInstanceBikeys(serverWith(includeWorkshop = false, includeLocal = false))
+        }
     }
 
     @Test
