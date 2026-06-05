@@ -40,6 +40,11 @@ public class Arma3InstancePaths {
         return getInstanceBasePath(id).resolve("mpmissions");
     }
 
+    /** Persisted custom bikeys; merged into {@code keys/} at server start. */
+    public Path getInstanceCustomBikeysPath(long id) {
+        return getInstanceBasePath(id).resolve("custom_bikeys");
+    }
+
     /**
      * Relative to the server install root (process cwd) — required by the {@code -mpmissions} flag.
      * Returns {@code profiles/ARMA3_<id>/mpmissions}.

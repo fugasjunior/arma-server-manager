@@ -21,6 +21,7 @@ class Arma3KeyService @Autowired constructor(
         clearExistingBikeys(instanceKeys)
         copyGameBikeys(instanceKeys)
         copyModBikeys(server, instanceKeys)
+        copyCustomBikeys(server.id, instanceKeys)
 
         log.debug("Rebuilt instance keys for server {} in {}", id, instanceKeys)
     }
@@ -41,6 +42,10 @@ class Arma3KeyService @Autowired constructor(
 
     private fun copyGameBikeys(instanceKeys: Path) {
         copyBikeys(pathsFactory.getServerKeysPath(ServerType.ARMA3), instanceKeys)
+    }
+
+    private fun copyCustomBikeys(serverId: Long, instanceKeys: Path) {
+        copyBikeys(arma3InstancePaths.getInstanceCustomBikeysPath(serverId), instanceKeys)
     }
 
     private fun copyBikeys(src: Path, dst: Path) {

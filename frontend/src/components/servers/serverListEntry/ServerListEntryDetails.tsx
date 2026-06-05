@@ -4,6 +4,7 @@ import {Button, Stack} from "@mui/material";
 import ModEditButton from "../ModEditButton.tsx";
 import ListBuilderDLCsEdit from "../ListBuilderDLCsEdit.tsx";
 import Arma3ScenariosControl from "../Arma3ScenariosControl.tsx";
+import Arma3BikeysControl from "../Arma3BikeysControl.tsx";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import AutomaticRestartSettings from "./AutomaticRestartSettings.tsx";
 import {HeadlessClientControls} from "./HeadlessClientControls.tsx";
@@ -30,6 +31,10 @@ export function ServerListEntryDetails(props: {
             {props.server.type === ServerType.Arma3 &&
                 <PermissionGuard permission="SCENARIO_VIEW">
                     <Arma3ScenariosControl server={props.server} status={props.serverStatus}/>
+                </PermissionGuard>}
+            {props.server.type === ServerType.Arma3 &&
+                <PermissionGuard permission="BIKEY_VIEW">
+                    <Arma3BikeysControl server={props.server} status={props.serverStatus}/>
                 </PermissionGuard>}
             <PermissionGuard permission="SERVER_LOGS_VIEW">
                 <Button

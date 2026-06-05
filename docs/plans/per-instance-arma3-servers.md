@@ -255,10 +255,73 @@ right instance dir.
 
 ---
 
-### F5 — Manual per-instance key management (future)
+### F5 — Manual per-instance key management
 
-On top of F2's instance `keys/`: upload/enable/disable individual bikeys per
-instance. New endpoints + UI. Out of scope for first delivery.
+On top of F2's instance `keys/`: let users upload and delete custom bikeys per
+server instance through a modal in the UI. Independently shippable on top of the
+already-released F1–F4/F6.
+
+**Design decisions:**
+- **Per-instance storage.** Custom keys live in `custom_bikeys/` under the
+  instance base — consistent with scenarios. Re-upload accepted for sharing.
+- **Upload/delete only (v1).** No activate/deactivate; present = active.
+  No DB state, no migration.
+- **Magic-byte content validation.** Validate `.bikey` RSA1 blob, not just
+  extension.
+- **Derived-keys view** (F5.4) is a separable follow-on sub-task.
+
+**Collision avoided:** `Arma3KeyService.rebuildInstanceBikeys` wipes the entire
+`keys/` dir on every server start (`FileUtils.deleteDirectory`). Custom keys
+live in `custom_bikeys/` and are merged in as a 4th copy step during rebuild,
+so they survive restarts.
+
+**Build order:** F5.1 → F5.2 → F5.3 ship together as the core release. F5.4
+is an optional follow-on.
+
+#### F5.1 — Storage path + rebuild merge + validator
+
+**Touch points:** `common/Arma3InstancePaths.java`, `common/Arma3KeyService.kt`,
+new `keymgmt/BiKeyValidator.kt`.
+
+- Add `getInstanceCustomBikeysPath(long id)` → `…/ARMA3_<id>/custom_bikeys`.
+- In `Arma3KeyService.rebuildInstanceBikeys`, add a 4th `copyCustomBikeys` step
+  using the existing `copyBikeys(src, dst)` helper (no-op if dir absent).
+- `BiKeyValidator`: (a) `.bikey` extension; (b) file contains `RSA1` magic
+  (`0x52 0x53 0x41 0x31`); (c) leading `keyNameLength` uint32 LE is sane.
+  Verify exact offsets against a sample bikey before finalizing.
+
+#### F5.2 — Backend CRUD API + permissions
+
+**Touch points:** `openapi/paths/keys.yaml` (new),
+`openapi/components/schemas/keys.yaml` (new), `openapi/openapi.yaml` (wire),
+new `keymgmt/BiKeyService.kt` + `BiKeyController.kt` (Kotlin),
+`security/permission/PermissionCode.java`, new `V1_4_0__KEY_PERMISSIONS.sql`.
+
+- Endpoints (singular `/server/{id}` style, mirror `scenarios.yaml`):
+  - `GET    /server/{id}/keys` → `Arma3KeysDto`
+  - `POST   /server/{id}/keys` → multipart `file: File[]`, returns `201`
+  - `DELETE /server/{id}/keys/{name}` → `204` / `400`
+- `listKeys`: empty list if dir absent (no `ServerNotInitializedException`).
+- Permissions: `KEY_VIEW/MODIFY/DELETE`; `V1_4_0` migration grants them to
+  built-in roles mirroring the SCENARIO grants exactly.
+
+#### F5.3 — Frontend modal
+
+**Touch points:** `api/client.ts`, new `components/servers/Arma3BikeysControl.tsx`,
+new `components/keys/KeysTable.tsx` + `KeysTableToolbar.tsx`, new
+`hooks/queries/useServerKeys.ts`, `serverListEntry/ServerListEntryDetails.tsx`.
+
+- Self-contained modal (mirrors `Arma3ScenariosControl.tsx`), disabled while
+  server is running (changes apply on next start — surface a hint).
+- Trigger button in `ServerListEntryDetails.tsx` next to `Arma3ScenariosControl`,
+  gated `ServerType.Arma3` + `<PermissionGuard permission="KEY_VIEW">`.
+
+#### F5.4 — Derived-keys view (follow-on)
+
+Add a `GET /server/{id}/keys/derived` endpoint returning game + active-mod bikeys
+(extract a `collectDerivedBikeys(server)` helper from `Arma3KeyService`).
+Frontend: show/hide toggle in the modal; derived rows rendered read-only with
+distinct styling.
 
 ---
 
@@ -331,3 +394,8 @@ contains the scenarios; second startup is a no-op (no move/copy, no clobber).
 - `scenario/ScenarioService.java`, `ScenarioController.java` — scope to instance (F3).
 - `openapi/paths/scenarios.yaml`, `openapi/openapi.yaml` — scenario contract (F3).
 - `serverinstance/ServerConfig.java` — confirms configs regenerate from DB (F6).
+- `common/Arma3KeyService.kt` — rebuild logic; `copyCustomBikeys` added in F5.1.
+- `common/Arma3InstancePaths.java` — `getInstanceCustomBikeysPath` added in F5.1.
+- `keymgmt/BiKeyService.kt`, `keymgmt/BiKeyController.kt` — F5.2 CRUD (Kotlin).
+- `openapi/paths/keys.yaml`, `openapi/components/schemas/keys.yaml` — F5.2 contract.
+- `security/permission/PermissionCode.java` — `KEY_VIEW/MODIFY/DELETE` added F5.2.

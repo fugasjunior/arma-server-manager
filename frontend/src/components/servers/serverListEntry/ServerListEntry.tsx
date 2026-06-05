@@ -95,7 +95,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                         </PermissionGuard>}
                 </TableCell>
                 <TableCell>
-                    <IconButton onClick={handleExpandClick}>
+                    <IconButton data-testid={`server-${server.id}-expand-btn`} onClick={handleExpandClick}>
                         {isExpanded ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
                     </IconButton>
                 </TableCell>

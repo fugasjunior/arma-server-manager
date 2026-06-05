@@ -1,0 +1,63 @@
+/server/{id}/keys:
+  parameters:
+    - $ref: '../components/parameters.yaml#/serverId'
+  get:
+    tags: [Keys]
+    operationId: getServerKeys
+    summary: List custom bikeys for a server instance
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/keys.yaml#/Arma3KeysDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+  post:
+    tags: [Keys]
+    operationId: uploadServerKeys
+    summary: Upload bikey files to a server instance
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              file:
+                type: array
+                items:
+                  type: string
+                  format: binary
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/keys.yaml#/Arma3KeysDto'
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
+/server/{id}/keys/{name}:
+  parameters:
+    - $ref: '../components/parameters.yaml#/serverId'
+    - name: name
+      in: path
+      required: true
+      schema:
+        type: string
+  delete:
+    tags: [Keys]
+    operationId: deleteServerKey
+    summary: Delete a custom bikey from a server instance
+    responses:
+      '204':
+        description: No Content
+      '400':
+        $ref: '../components/responses.yaml#/ApiError'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
