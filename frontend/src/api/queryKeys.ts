@@ -13,6 +13,7 @@ export const queryKeys = {
     serverInstallations: ["serverInstallations"] as const,
     creatorDlcs: (filter?: ServerType) => ["creatorDlcs", filter ?? "all"] as const,
     serverScenarios: (id: number) => ["serverScenarios", id] as const,
+    serverKeys: (id: number) => ["serverKeys", id] as const,
     reforgerScenarios: ["reforgerScenarios"] as const,
     users: ["users"] as const,
     user: (id: number) => ["users", id] as const,

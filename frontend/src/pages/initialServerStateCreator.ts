@@ -20,7 +20,12 @@ export function arma3ServerInitialState(): Arma3ServerDto {
         activeMods: [],
         activeDLCs: [],
         additionalOptions: `headlessClients[] = {"127.0.0.1"}; 
-localClient[] = { "127.0.0.1"};`,
+localClient[] = { "127.0.0.1"};
+
+// SIGNATURE VERIFICATION
+onUnsignedData = "kick (_this select 0)";
+onHackedData = "kick (_this select 0)";
+onDifferentData = "kick (_this select 0)";`,
         difficultySettings: {
             groupIndicators: 0,
             friendlyTags: 0,

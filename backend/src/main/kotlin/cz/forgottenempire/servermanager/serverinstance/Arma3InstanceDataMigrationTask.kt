@@ -23,9 +23,12 @@ import java.nio.file.Path
  *   `servers/ARMA3/profiles/ARMA3_<id>/<sub>/ARMA3_<id>/`.
  * - **Scenarios** (*.pbo): copied from the old shared `servers/ARMA3/mpmissions/` into
  *   each instance's `servers/ARMA3/profiles/ARMA3_<id>/mpmissions/`.
+ * - **Shared mod bikeys**: deleted from `servers/ARMA3/keys/` if a bikey with the same
+ *   name exists in any installed workshop or local mod directory. Game bikeys (shipped
+ *   with Arma 3 itself) are left untouched.
  *
- * Configs and keys need no migration — configs are regenerated from the database at
- * every startup, and keys are rebuilt from active mods before each server launch.
+ * Configs need no migration — they are regenerated from the database at every startup.
+ * Per-instance keys are rebuilt from active mods before each server launch.
  *
  * A marker file (`servers/ARMA3/.instance-dirs-migrated`) guards the task so it runs
  * exactly once. Per-server failures are logged and do not abort startup.
@@ -59,6 +62,7 @@ class Arma3InstanceDataMigrationTask @Autowired constructor(
             }
         }
 
+        pruneSharedModBikeys()
         Files.createFile(markerFile)
         log.info("Arma 3 per-instance directory migration complete ({} servers processed)", migratedCount)
     }
@@ -105,6 +109,27 @@ class Arma3InstanceDataMigrationTask @Autowired constructor(
             if (!dest.toFile().exists()) {
                 FileUtils.copyFileToDirectory(pbo, destDir.toFile())
                 log.debug("Copied scenario {} to {}", pbo.name, destDir)
+            }
+        }
+    }
+
+    private fun pruneSharedModBikeys() {
+        val sharedKeys = pathsFactory.getServerKeysPath(ServerType.ARMA3)
+        if (!sharedKeys.toFile().isDirectory) return
+
+        val modBases = listOf(
+            pathsFactory.getModsPath(ServerType.ARMA3),
+            pathsFactory.getLocalModsBasePath(ServerType.ARMA3)
+        )
+
+        for (modBase in modBases) {
+            if (!modBase.toFile().isDirectory) continue
+            FileUtils.iterateFiles(modBase.toFile(), arrayOf("bikey"), true).forEach { bikey ->
+                val sharedCopy = sharedKeys.resolve(bikey.name)
+                if (sharedCopy.toFile().exists()) {
+                    Files.delete(sharedCopy)
+                    log.debug("Deleted mod bikey {} from shared keys dir", bikey.name)
+                }
             }
         }
     }
