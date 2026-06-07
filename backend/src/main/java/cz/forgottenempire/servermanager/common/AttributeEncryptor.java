@@ -42,7 +42,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
-        if (!encryptionEnabled) {
+        if (!encryptionEnabled || attribute == null) {
             return attribute;
         }
 

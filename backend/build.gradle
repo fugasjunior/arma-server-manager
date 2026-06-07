@@ -77,7 +77,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation "commons-io:commons-io:2.22.0"
-    implementation "com.auth0:java-jwt:4.2.2"
     implementation "com.ibasco.agql:agql-source-query:1.2.2"
     implementation "com.google.guava:guava:33.6.0-jre"
     implementation "org.mapstruct:mapstruct:1.6.3"

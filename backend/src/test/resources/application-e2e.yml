@@ -2,9 +2,6 @@ auth:
   username: testuser
   password: testpassword
 
-jwt:
-  secret: e2e-test-secret-key-long-enough-for-hmac512-algorithm-padding
-
 directory:
   servers: ${java.io.tmpdir}/arma-server-manager-e2e/servers
   mods: ${java.io.tmpdir}/arma-server-manager-e2e/mods
@@ -17,6 +14,10 @@ steamcmd:
 steam:
   api:
     key: e2e-test-api-key
+
+database:
+  encryption:
+    secret: e2eEncryptionSecretKey0123456789
 
 server:
   port: 8080

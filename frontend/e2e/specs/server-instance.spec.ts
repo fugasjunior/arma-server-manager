@@ -3,7 +3,6 @@ import { getAuthenticatedPage } from '../fixtures/auth';
 import { ServersPage } from '../pages/ServersPage';
 import { NewServerPage } from '../pages/NewServerPage';
 import { createBackendHelper } from '../fixtures/backend';
-import { BACKEND_URL } from '../config';
 
 test.beforeEach(async () => {
     const backend = await createBackendHelper();
@@ -31,18 +30,13 @@ test('start and stop server', async ({ browser }) => {
     const backend = await createBackendHelper();
 
     // Create server via API
-    const token = await backend.getToken();
-    const res = await page.request.post(`${BACKEND_URL}/api/server`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        data: {
-            name: 'Arma3 E2E',
-            type: 'ARMA3',
-            port: 2302,
-            queryPort: 2303,
-            maxPlayers: 32,
-        },
+    const { id } = await backend.postJson<{ id: number }>('/api/server', {
+        name: 'Arma3 E2E',
+        type: 'ARMA3',
+        port: 2302,
+        queryPort: 2303,
+        maxPlayers: 32,
     });
-    const { id } = await res.json();
 
     await backend.scriptServerProcessAlive();
     await backend.dispose();
@@ -65,18 +59,13 @@ test('delete server removes it from the list', async ({ browser }) => {
     const page = await getAuthenticatedPage(browser);
     const backend = await createBackendHelper();
 
-    const token = await backend.getToken();
-    const res = await page.request.post(`${BACKEND_URL}/api/server`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        data: {
-            name: 'Delete Me',
-            type: 'ARMA3',
-            port: 2302,
-            queryPort: 2303,
-            maxPlayers: 32,
-        },
+    const { id } = await backend.postJson<{ id: number }>('/api/server', {
+        name: 'Delete Me',
+        type: 'ARMA3',
+        port: 2302,
+        queryPort: 2303,
+        maxPlayers: 32,
     });
-    const { id } = await res.json();
     await backend.dispose();
 
     const serversPage = new ServersPage(page);
@@ -93,18 +82,13 @@ test('edit server persists changes', async ({ browser }) => {
     const page = await getAuthenticatedPage(browser);
     const backend = await createBackendHelper();
 
-    const token = await backend.getToken();
-    const res = await page.request.post(`${BACKEND_URL}/api/server`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        data: {
-            name: 'Original Name',
-            type: 'ARMA3',
-            port: 2302,
-            queryPort: 2303,
-            maxPlayers: 32,
-        },
+    const { id } = await backend.postJson<{ id: number }>('/api/server', {
+        name: 'Original Name',
+        type: 'ARMA3',
+        port: 2302,
+        queryPort: 2303,
+        maxPlayers: 32,
     });
-    const { id } = await res.json();
     await backend.dispose();
 
     await page.goto(`/servers/${id}`);

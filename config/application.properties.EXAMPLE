@@ -12,12 +12,6 @@ steam.api.key=<API-KEY>
 # auth.username=admin
 # auth.password=your-password
 
-# JWT secret
-# Used for creating JSON web tokens for app authentication.
-# Optional; auto-generated on first run and persisted to config/secrets.properties
-# Uncomment and set this only if you want to override the generated value
-# jwt.secret=your-secret-key-here
-
 # CORS allowed origin patterns
 # Comma-separated list of allowed origin patterns for CORS (e.g. https://myserver.example.com, http://localhost:3000)
 # Defaults to * (allow all origins) for local development

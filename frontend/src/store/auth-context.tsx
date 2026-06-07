@@ -1,5 +1,6 @@
 import {createContext, useCallback, useEffect, useState} from "react";
-import {setJwt, usersApi} from "../api/client";
+import {usersApi} from "../api/client";
+import {login as loginService, logout as logoutService} from "../services/authService";
 import {useQueryClient} from "@tanstack/react-query";
 
 interface CurrentUser {
@@ -10,83 +11,55 @@ interface CurrentUser {
 }
 
 interface AuthContextType {
-    token: string | null;
     isLoggedIn: boolean;
     isLoadingUser: boolean;
     currentUser: CurrentUser | null;
     hasPermission: (permission: string) => boolean;
-    login: (token: string, expiresIn: number) => void;
-    logout: () => void;
+    login: (username: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-    token: "",
     isLoggedIn: false,
-    isLoadingUser: false,
+    isLoadingUser: true,
     currentUser: null,
     hasPermission: () => false,
-    login: () => undefined,
-    logout: () => undefined,
+    login: async () => undefined,
+    logout: async () => undefined,
 });
 
-export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
-    const tokenData = retrieveStoredToken();
-    let initialToken: string | null = null;
-    if (tokenData) {
-        initialToken = tokenData.storedToken;
-    }
-
-    const [token, setToken] = useState<string | null>(initialToken);
-    const [isLoadingUser, setIsLoadingUser] = useState(false);
-    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
-        const stored = localStorage.getItem('currentUser');
-        return stored ? JSON.parse(stored) : null;
-    });
+export const AuthContextProvider = ({children}: {children: React.ReactNode}) => {
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
+    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const queryClient = useQueryClient();
 
     const fetchCurrentUser = useCallback(async () => {
         try {
             setIsLoadingUser(true);
             const response = await usersApi.getCurrentUser();
-            const user = response.data as CurrentUser;
-            setCurrentUser(user);
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            setCurrentUser(response.data as CurrentUser);
         } catch {
             setCurrentUser(null);
-            localStorage.removeItem('currentUser');
         } finally {
             setIsLoadingUser(false);
         }
     }, []);
 
+    // Bootstrap: check for an existing session on mount.
+    // A 401 from /users/me means no session — the interceptor silently rejects it
+    // without redirecting, so fetchCurrentUser just sets currentUser to null.
     useEffect(() => {
-        if (token) {
-            setJwt(token);
-        }
-    }, [token]);
+        fetchCurrentUser();
+    }, [fetchCurrentUser]);
 
-    useEffect(() => {
-        if (token) {
-            fetchCurrentUser();
-        }
-    }, [token, fetchCurrentUser]);
+    const loginHandler = useCallback(async (username: string, password: string) => {
+        await loginService(username, password);
+        await fetchCurrentUser();
+    }, [fetchCurrentUser]);
 
-    const userIsLoggedIn = !!token;
-
-    const loginHandler = useCallback((token: string, expiresIn: number) => {
-        localStorage.setItem('token', token);
-        localStorage.setItem('expirationTime', calculateExpirationTime(expiresIn).toISOString());
-        setJwt(token);
-        setToken(token);
-    }, []);
-
-    const logoutHandler = useCallback(() => {
-        setJwt("");
-        setToken(null);
+    const logoutHandler = useCallback(async () => {
+        await logoutService();
         setCurrentUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('expirationTime');
-        localStorage.removeItem('currentUser');
         queryClient.clear();
     }, [queryClient]);
 
@@ -95,8 +68,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     }, [currentUser]);
 
     const contextValue: AuthContextType = {
-        token,
-        isLoggedIn: userIsLoggedIn,
+        isLoggedIn: currentUser !== null,
         isLoadingUser,
         currentUser,
         hasPermission,
@@ -105,32 +77,4 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     };
 
     return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
-};
-
-const retrieveStoredToken = () => {
-    const storedToken = localStorage.getItem('token');
-    const expirationTime = localStorage.getItem('expirationTime');
-
-    if (!storedToken || !expirationTime) {
-        return null;
-    }
-
-    const remainingTime = calculateRemainingTime(new Date(expirationTime));
-    if (remainingTime < 60000) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('expirationTime');
-        localStorage.removeItem('currentUser');
-        return null;
-    }
-
-    return {storedToken, remainingTime};
-};
-
-const calculateRemainingTime = (time: Date) => {
-    const currentDate = new Date();
-    return +time - +currentDate;
-};
-
-const calculateExpirationTime = (millis: number) => {
-    return new Date(Date.now() + millis);
 };

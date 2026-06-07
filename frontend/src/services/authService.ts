@@ -1,11 +1,14 @@
 import {apiAxiosInstance} from "../api/client";
 
-const apiEndpoint = "/login";
+export async function login(username: string, password: string): Promise<void> {
+    const body = new URLSearchParams();
+    body.append("username", username);
+    body.append("password", password);
+    await apiAxiosInstance.post("/login", body, {
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    });
+}
 
-export async function login(username: string, password: string) {
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
-    const {data} = await apiAxiosInstance.post(apiEndpoint, formData);
-    return data;
+export async function logout(): Promise<void> {
+    await apiAxiosInstance.post("/logout");
 }

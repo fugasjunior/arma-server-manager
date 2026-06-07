@@ -21,18 +21,12 @@ public class SecretsEnvironmentPostProcessor implements EnvironmentPostProcessor
     private static final Logger log = LoggerFactory.getLogger(SecretsEnvironmentPostProcessor.class);
 
     private static final String SECRETS_FILE = "config/secrets.properties";
-    private static final String JWT_SECRET_KEY = "jwt.secret";
     private static final String DB_ENCRYPTION_KEY = "database.encryption.secret";
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Properties fileSecrets = loadSecretsFile();
         Properties toGenerate = new Properties();
-
-        if (!environment.containsProperty(JWT_SECRET_KEY) && !fileSecrets.containsKey(JWT_SECRET_KEY)) {
-            toGenerate.setProperty(JWT_SECRET_KEY, generateBase64Secret(48));
-            log.info("Generated JWT secret");
-        }
 
         if (!environment.containsProperty(DB_ENCRYPTION_KEY) && !fileSecrets.containsKey(DB_ENCRYPTION_KEY)) {
             // AES-256: key must be exactly 32 bytes; Base64 of 24 random bytes = 32 ASCII chars

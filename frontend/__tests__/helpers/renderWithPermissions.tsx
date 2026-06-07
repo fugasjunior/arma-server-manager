@@ -9,11 +9,11 @@ const renderWithPermissions = (ui: ReactElement, permissions: string[]) => {
         <QueryClientProvider client={queryClient}>
             <AuthContext.Provider value={{
                 hasPermission: (p: string) => permissions.includes(p),
-                token: null,
-                isLoggedIn: false,
+                isLoggedIn: true,
+                isLoadingUser: false,
                 currentUser: null,
-                login: () => undefined,
-                logout: () => undefined,
+                login: async () => undefined,
+                logout: async () => undefined,
             }}>
                 {ui}
             </AuthContext.Provider>

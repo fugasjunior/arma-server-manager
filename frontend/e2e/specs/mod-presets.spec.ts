@@ -1,19 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { getAuthenticatedPage } from '../fixtures/auth';
-import { ModsPage } from '../pages/ModsPage';
-import { PresetsPage } from '../pages/PresetsPage';
-import { createBackendHelper } from '../fixtures/backend';
-import { BACKEND_URL } from '../config';
+import { getAuthenticatedPage } from '@/fixtures/auth';
+import { ModsPage } from '@/pages/ModsPage';
+import { PresetsPage } from '@/pages/PresetsPage';
+import { createBackendHelper } from '@/fixtures/backend';
 import path from 'path';
 
 async function seedPreset(backend: Awaited<ReturnType<typeof createBackendHelper>>, name: string, modId: number) {
-    const token = await backend.getToken();
-    const res = await fetch(`${BACKEND_URL}/api/mod/preset`, {
-        method: 'POST',
-        headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify({name, mods: [modId], type: 'ARMA3'}),
-    });
-    return await res.json() as {id: number};
+    return backend.postJson<{ id: number }>('/api/mod/preset', { name, mods: [modId], type: 'ARMA3' });
 }
 
 const CBA_A3_ID = 450814997;
@@ -59,13 +52,7 @@ test('delete preset removes it', async ({ browser }) => {
     await backend.markInstalled('ARMA3');
     await seedMod(backend);
 
-    const token = await backend.getToken();
-    const res = await fetch(`${BACKEND_URL}/api/mod/preset`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Deletable', mods: [CBA_A3_ID], type: 'ARMA3' }),
-    });
-    const { id } = await res.json();
+    const { id } = await backend.postJson<{ id: number }>('/api/mod/preset', { name: 'Deletable', mods: [CBA_A3_ID], type: 'ARMA3' });
     await backend.dispose();
 
     const page = await getAuthenticatedPage(browser);
@@ -100,13 +87,7 @@ test('export preset triggers file download', async ({ browser }) => {
     await backend.markInstalled('ARMA3');
     await seedMod(backend);
 
-    const token = await backend.getToken();
-    const res = await fetch(`${BACKEND_URL}/api/mod/preset`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Export Me', mods: [CBA_A3_ID], type: 'ARMA3' }),
-    });
-    const { id } = await res.json();
+    const { id } = await backend.postJson<{ id: number }>('/api/mod/preset', { name: 'Export Me', mods: [CBA_A3_ID], type: 'ARMA3' });
     await backend.dispose();
 
     const page = await getAuthenticatedPage(browser);

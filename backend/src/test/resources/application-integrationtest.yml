@@ -2,9 +2,6 @@ auth:
   username: testuser
   password: testpassword
 
-jwt:
-  secret: integration-test-secret-key-long-enough-for-hmac512-algorithm
-
 directory:
   servers: ${java.io.tmpdir}/arma-server-manager-test/servers
   mods: ${java.io.tmpdir}/arma-server-manager-test/mods

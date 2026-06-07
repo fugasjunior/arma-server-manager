@@ -1,4 +1,4 @@
-bearerAuth:
-  type: http
-  scheme: bearer
-  bearerFormat: JWT
+sessionAuth:
+  type: apiKey
+  in: cookie
+  name: JSESSIONID

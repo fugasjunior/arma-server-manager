@@ -7,14 +7,13 @@ const ProtectedRoute = ({children}: any) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!authCtx.isLoggedIn) {
+        if (!authCtx.isLoadingUser && !authCtx.isLoggedIn) {
             navigate("/login");
         }
-    }, [authCtx.isLoggedIn]);
+    }, [authCtx.isLoadingUser, authCtx.isLoggedIn]);
 
-    if (!authCtx.isLoggedIn) {
-        return;
-    }
+    if (authCtx.isLoadingUser) return null;
+    if (!authCtx.isLoggedIn) return null;
 
     return children;
 };

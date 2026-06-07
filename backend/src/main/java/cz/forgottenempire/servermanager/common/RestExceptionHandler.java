@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.common;
 import cz.forgottenempire.servermanager.common.exceptions.CustomUserErrorException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -84,6 +85,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, new HttpHeaders(), error.getStatus());
     }
 
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex) {
+        ApiError error = ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .message(ex.getLocalizedMessage())
+                .build();
+        return new ResponseEntity<>(error, new HttpHeaders(), error.getStatus());
+    }
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception ex) {

@@ -48,10 +48,10 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void resetBeforeEach() {
         fakeProcesses.reset();
-        auth.invalidateToken();
+        auth.invalidateSession();
     }
 
     protected Api api() {
-        return new Api(mockMvc, auth::getToken);
+        return new Api(mockMvc, auth::getSession);
     }
 }

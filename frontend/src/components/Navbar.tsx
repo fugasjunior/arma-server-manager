@@ -18,8 +18,8 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
     const isLoggedIn = authCtx.isLoggedIn;
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        authCtx.logout();
+    const handleLogout = async () => {
+        await authCtx.logout();
         navigate("/login");
     }
 

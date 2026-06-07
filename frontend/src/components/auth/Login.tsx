@@ -1,5 +1,4 @@
 import {ChangeEvent, FormEvent, useContext, useState} from 'react';
-import {login} from "../../services/authService";
 import {toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
 import {Box, Button, Stack, TextField, Typography} from "@mui/material";
@@ -17,8 +16,7 @@ const Login = () => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const data = await login(username, password);
-            authCtx.login(data.token, data.expiresIn * 1000);
+            await authCtx.login(username, password);
             navigate("/");
         } catch (error: any) {
             toast.error("Invalid username or password.");
@@ -65,7 +63,7 @@ const Login = () => {
                                required
                                value={password}
                                onChange={handlePasswordChange}/>
-                    <Button fullWidth variant="contained" size="large" type="submit" data-testid="login-submit">Submit</Button>
+                    <Button fullWidth variant="contained" size="large" type="submit" data-testid="login-submit" disabled={authCtx.isLoadingUser}>Submit</Button>
                 </Stack>
             </form>
         </Box>

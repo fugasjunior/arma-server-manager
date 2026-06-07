@@ -7,7 +7,7 @@ servers:
   - url: /api
 
 security:
-  - bearerAuth: []
+  - sessionAuth: []
 
 tags:
   - name: Servers
@@ -155,8 +155,8 @@ paths:
 components:
 
   securitySchemes:
-    bearerAuth:
-      $ref: './components/security-schemes.yaml#/bearerAuth'
+    sessionAuth:
+      $ref: './components/security-schemes.yaml#/sessionAuth'
 
   parameters:
     serverId:

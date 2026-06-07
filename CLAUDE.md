@@ -95,7 +95,7 @@ Standard Spring layered architecture per domain feature. Key packages under `cz.
 | `additionalserver/` | Non-native servers (Minecraft, etc.) |
 | `scenario/` | Scenario (.pbo) upload/management |
 | `system/` | System resource monitoring |
-| `security/` | JWT auth, user config |
+| `security/` | Session-based auth (Spring Security form login + CSRF), user config |
 | `security/user/` | User CRUD, password management |
 | `security/role/` | Role and permission management (RBAC) |
 | `localmod/` | Local filesystem mod sync and management |
@@ -111,7 +111,7 @@ Schema migrations in `backend/src/main/resources/db/migration/`. Server config f
 frontend/src/
 ├── api/
 │   ├── generated/        # Generated — never edit
-│   ├── client.ts         # Shared Axios instance (JWT interceptor, error toasts), all API instances
+│   ├── client.ts         # Shared Axios instance (withCredentials, XSRF auto-attach, error toasts), all API instances
 │   ├── downloads.ts      # Blob download helpers
 │   └── serverModels.ts   # Extends generated types (Arma3/DayZ/Reforger ServerDto with type-specific fields)
 ├── pages/                # Route-level components
@@ -129,7 +129,7 @@ All API calls go through instances exported from `src/api/client.ts`. Generator 
 
 ### Configuration
 
-`config/application.properties` (not committed) required to run backend. Copy from `config/application.properties.EXAMPLE`. Key fields: `steam.api.key`, `steamcmd.path`, directory paths, DB credentials, `auth.username`/`auth.password`, `auth.jwt.secret`.
+`config/application.properties` (not committed) required to run backend. Copy from `config/application.properties.EXAMPLE`. Key fields: `steam.api.key`, `steamcmd.path`, directory paths, DB credentials, `auth.username`/`auth.password`.
 
 `.env` at repo root used by Docker Compose — also not committed.
 

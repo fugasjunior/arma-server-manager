@@ -14,6 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,7 +95,8 @@ class ModPresetCrudJourneyTest extends AbstractIntegrationTest {
         mockMvc.perform(multipart("/api/mod/launcher_preset")
                         .file(file)
                         .param("name", "My Custom Preset")
-                        .header("Authorization", "Bearer " + auth.getToken()))
+                        .with(csrf())
+                        .session(auth.getSession()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", equalTo("My Custom Preset")));
     }
@@ -119,7 +121,8 @@ class ModPresetCrudJourneyTest extends AbstractIntegrationTest {
         mockMvc.perform(multipart("/api/mod/launcher_preset")
                         .file(file)
                         .param("name", "Existing Preset")
-                        .header("Authorization", "Bearer " + auth.getToken()))
+                        .with(csrf())
+                        .session(auth.getSession()))
                 .andExpect(status().isConflict());
     }
 

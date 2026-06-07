@@ -20,7 +20,9 @@ import {
 } from "./generated";
 import config from "../config";
 
-export const apiAxiosInstance = axios.create({baseURL: config.apiUrl});
+// withCredentials sends the session cookie (JSESSIONID) and allows Axios to auto-attach
+// the XSRF-TOKEN cookie value as the X-XSRF-TOKEN header on mutating requests.
+export const apiAxiosInstance = axios.create({baseURL: config.apiUrl, withCredentials: true});
 
 apiAxiosInstance.interceptors.response.use(undefined, (error) => {
     const expectedError =
@@ -36,6 +38,16 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
         return Promise.reject(error);
     }
 
+    if (error.response?.status === 401) {
+        // /users/me is the session bootstrap probe — 401 means "not logged in", not an error.
+        // All other 401s redirect to /login (e.g. session expired mid-use).
+        const isCurrentUserEndpoint = error.config?.url?.includes('/users/me');
+        if (!isCurrentUserEndpoint) {
+            window.location.href = "/login";
+        }
+        return Promise.reject(error);
+    }
+
     if (!expectedError) {
         console.error(error.response?.data?.message);
         toast.error("An unexpected error occurred.");
@@ -45,10 +57,6 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
 
     return Promise.reject(error);
 });
-
-export function setJwt(jwt: string) {
-    apiAxiosInstance.defaults.headers.common["Authorization"] = jwt;
-}
 
 const apiConfig = new Configuration({basePath: ""});
 

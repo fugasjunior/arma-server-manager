@@ -1,14 +1,16 @@
 package cz.forgottenempire.servermanager.support;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @Component
 @Profile("integrationtest")
@@ -23,35 +25,34 @@ public class AuthTestHelper {
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private MockHttpSession cachedSession;
 
-    private String cachedToken;
-
-    public String getToken() {
-        if (cachedToken == null) {
+    public MockHttpSession getSession() {
+        if (cachedSession == null) {
             try {
                 MvcResult result = mockMvc.perform(
                         MockMvcRequestBuilders.post("/api/login")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                                 .param("username", username)
                                 .param("password", password)
                 ).andReturn();
 
-                String body = result.getResponse().getContentAsString();
-                cachedToken = objectMapper.readTree(body).path("token").asText(null);
-                if (cachedToken == null) {
-                    throw new IllegalStateException("Login failed, response: " + body);
+                cachedSession = (MockHttpSession) result.getRequest().getSession(false);
+                if (cachedSession == null) {
+                    throw new IllegalStateException("Login failed: no session created. Response: "
+                            + result.getResponse().getContentAsString());
                 }
             } catch (IllegalStateException e) {
                 throw e;
             } catch (Exception e) {
-                throw new RuntimeException("Failed to obtain auth token", e);
+                throw new RuntimeException("Failed to obtain auth session", e);
             }
         }
-        return cachedToken;
+        return cachedSession;
     }
 
-    public void invalidateToken() {
-        cachedToken = null;
+    public void invalidateSession() {
+        cachedSession = null;
     }
 }

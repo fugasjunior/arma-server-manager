@@ -114,7 +114,7 @@ There are two ways to run the project.
 #### Installation
 Download `docker-compose.yml` and `.env` from the root of this repository and place them in the same directory. Follow the comments inside `.env` to configure the required values (database credentials, storage path, Steam API key). The remaining settings are optional and have sensible defaults.
 
-`JWT_SECRET` and `DATABASE_ENCRYPTION_SECRET` in `.env` are optional — if omitted, the app auto-generates secure values on first startup and persists them to `config/secrets.properties` inside the container volume so they survive restarts.
+`DATABASE_ENCRYPTION_SECRET` in `.env` is optional — if omitted, the app auto-generates a secure value on first startup and persists it to `config/secrets.properties` inside the container volume so it survives restarts.
 
 After you've set up the values, run `docker compose up` to start the database and the server manager. The app will be accessible at http://localhost:8080 by default.
 
@@ -152,7 +152,7 @@ file which contains sample configuration. Copy this file and name it `applicatio
 
 Open the new file and set all the required properties as described.
 
-`auth.jwt.secret` and `database.encryption.secret` in `application.properties` are optional — if omitted, the app auto-generates secure random values on first startup and persists them to `config/secrets.properties` so they survive restarts. Do not commit this file.
+`database.encryption.secret` in `application.properties` is optional — if omitted, the app auto-generates a secure random value on first startup and persists it to `config/secrets.properties` so it survives restarts. Do not commit this file.
 
 #### Setting up MySQL database with Docker
 In the project you can find `docker-compose.yml` file for the MySQL database Docker container. Edit the environment
