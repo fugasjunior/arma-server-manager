@@ -33,11 +33,27 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
       - name: Compute and apply release version
         env:
           RELEASE_TYPE: ${{ inputs.release_type }}
           RC_NUMBER: ${{ inputs.rc_number }}
         run: bash .github/scripts/bump-version.sh
+
+      - name: Build JAR
+        run: |
+          ./gradlew :backend:build -x test
+          mv backend/build/libs/app.jar "arma-server-manager-v${{ env.RELEASE_VERSION }}.jar"
 
       - name: Compute Docker tags
         id: docker-tags
@@ -88,5 +104,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh release create "v${{ env.RELEASE_VERSION }}" \
+            "arma-server-manager-v${{ env.RELEASE_VERSION }}.jar" \
             --generate-notes \
             ${{ inputs.release_type == 'rc' && '--prerelease' || '--latest' }}
