@@ -139,6 +139,24 @@ Backend integration tests extend `AbstractIntegrationTest` — spins up MySQL vi
 
 Frontend tests use Jest + jsdom + ts-jest. Tests in `frontend/__tests__/`. Mock `src/api/client` for tests calling API methods — use `jest.mocked()` for type-safe mock access (not `as any`).
 
+**E2E (Playwright):** use the `/e2e` skill. Before any E2E run, check for and kill a stale backend on port 8080 (`fuser -k 8080/tcp`) — Playwright's `reuseExistingServer` reuses whatever is listening and produces false failures. Playwright starts its own backend (`:backend:e2eApp`) and Vite dev server; never start them manually for E2E.
+
+### Java/Kotlin conventions
+
+- This is a JPA/Hibernate project: **never use Kotlin data classes for JPA entities** — use normal classes with manual `equals`/`hashCode`.
+- Lombok interop from Kotlin uses the Kotlin Lombok compiler plugin, not kapt.
+
+### Arma/DayZ/Reforger domain reference
+
+Never assert launch-parameter or server-config behavior from memory. Consult `docs/wiki-db/` (offline BI wiki scrape: `params/<game>.json` for exact lookup, `guides/*.md` for context — 546 params, 13 guides). If `docs/wiki-db/` is absent on the current branch, it lives on `feature/per-instance-server-management`; read it via `git show` rather than guessing.
+
 ## Agents
 
-For codebase exploration use `Explore` subagent or `cavecrew-investigator` (returns ~60% compressed output). For 1-2 file edits use `cavecrew-builder`.
+Delegate aggressively to keep the main thread's context lean — the main thread reasons on summaries, subagents do the gathering:
+
+- Codebase exploration / "where is X": `cavecrew-investigator` (~60% compressed output) or `Explore`.
+- 1-2 file mechanical edits: `cavecrew-builder`.
+- Diff review: `cavecrew-reviewer`.
+- Log parsing, bulk file reads, test-output triage, web research: `general-purpose` subagent with `model: sonnet` (or haiku for trivial scans); have it return a short summary, not raw output.
+
+Do the work inline only when it needs the main thread's full conversation context or is a quick single-file read.
