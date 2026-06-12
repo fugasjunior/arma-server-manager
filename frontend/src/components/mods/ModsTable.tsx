@@ -38,7 +38,11 @@ const headCells: Array<EnhancedTableHeadCell> = [
     },
     {
         id: 'serverOnly',
-        label: 'Server only'
+        label: 'Server mod'
+    },
+    {
+        id: 'loadOnHeadlessClient',
+        label: 'Headless client'
     },
     {
         id: 'lastUpdated',
@@ -68,6 +72,7 @@ type ModsTableProps = {
     onRowClick: (rowId: number | string) => void,
     onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
     onServerOnlyChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void,
+    onLoadOnHcChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void,
 }
 
 const ModsTable = (props: ModsTableProps) => {
@@ -141,6 +146,21 @@ const ModsTable = (props: ModsTableProps) => {
                                 size="small"
                             />
                         </span>
+                    },
+                    {
+                        id: "loadOnHeadlessClient",
+                        value: "loadOnHeadlessClient",
+                        displayValue: modDto.serverType === ServerType.Arma3
+                            ? <span data-testid={`mod-load-on-hc-switch-${modDto.id}`}>
+                                <Switch
+                                    checked={modDto.loadOnHeadlessClient ?? true}
+                                    disabled={!canModify}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => props.onLoadOnHcChanged(e, modDto.id!)}
+                                    size="small"
+                                />
+                            </span>
+                            : undefined
                     },
                     {
                         id: "lastUpdated",

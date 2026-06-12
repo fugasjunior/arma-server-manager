@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.api.LocalModsApi;
 import cz.forgottenempire.servermanager.api.model.LocalModDto;
 import cz.forgottenempire.servermanager.api.model.LocalModSyncStatusDto;
 import cz.forgottenempire.servermanager.api.model.LocalModsDto;
+import cz.forgottenempire.servermanager.api.model.LoadOnHeadlessClientDto;
 import cz.forgottenempire.servermanager.api.model.ServerOnlyDto;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.security.permission.PermissionCode;
@@ -44,6 +45,13 @@ public class LocalModsController implements LocalModsApi {
     @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<Void> setLocalModServerOnly(Long id, ServerOnlyDto serverOnlyDto) {
         facade.setServerOnly(id, serverOnlyDto.getServerOnly());
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
+    public ResponseEntity<Void> setLocalModLoadOnHeadlessClient(Long id, LoadOnHeadlessClientDto loadOnHeadlessClientDto) {
+        facade.setLoadOnHeadlessClient(id, loadOnHeadlessClientDto.getLoadOnHeadlessClient());
         return ResponseEntity.ok().build();
     }
 

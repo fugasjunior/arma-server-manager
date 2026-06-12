@@ -30,6 +30,9 @@ public class WorkshopMod {
     @Column(name = "server_only")
     private boolean serverOnly;
 
+    @Column(name = "load_on_headless_client")
+    private boolean loadOnHeadlessClient = true;
+
     @Enumerated(EnumType.STRING)
     private InstallationStatus installationStatus;
 

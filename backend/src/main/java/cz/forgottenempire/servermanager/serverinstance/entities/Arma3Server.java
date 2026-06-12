@@ -133,6 +133,12 @@ public class Arma3Server extends Server {
                 .map(e -> "-mod=" + e.getLaunchName());
     }
 
+    public Stream<String> getHeadlessClientModsAsParameters() {
+        return orderedActiveMods()
+                .filter(ActiveModEntry::isLoadOnHeadlessClient)
+                .map(e -> "-mod=" + e.getLaunchName());
+    }
+
     private Stream<ActiveModEntry> orderedActiveMods() {
         return Stream.concat(
                 activeMods.stream().map(e -> (ActiveModEntry) e),

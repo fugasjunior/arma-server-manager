@@ -21,6 +21,12 @@ class Arma3ServerLaunchParametersTest {
         return entry;
     }
 
+    private Arma3ServerActiveMod workshopEntry(long id, String name, boolean serverOnly, boolean loadOnHc, int order) {
+        Arma3ServerActiveMod entry = workshopEntry(id, name, serverOnly, order);
+        entry.getMod().setLoadOnHeadlessClient(loadOnHc);
+        return entry;
+    }
+
     private Arma3ServerActiveLocalMod localEntry(long id, String name, boolean serverOnly, int order) {
         LocalMod mod = new LocalMod();
         mod.setId(id);
@@ -93,6 +99,40 @@ class Arma3ServerLaunchParametersTest {
         List<String> clientMods = params.stream().filter(p -> p.startsWith("-mod=")).toList();
         assertThat(serverMods).containsExactly("-serverMod=@ServerZ", "-serverMod=@ServerA");
         assertThat(clientMods).containsExactly("-mod=@ClientC", "-mod=@ClientA");
+    }
+
+    @Test
+    void getHeadlessClientModsAsParameters_excludesModsWithLoadOnHcFalse() {
+        Arma3Server server = new Arma3Server();
+        server.setActiveDLCs(List.of());
+        server.setActiveLocalMods(List.of());
+        server.setActiveMods(List.of(
+                workshopEntry(1L, "AlwaysLoad", false, true, 0),
+                workshopEntry(2L, "SkipOnHc",  false, false, 1)
+        ));
+
+        List<String> hcParams = server.getHeadlessClientModsAsParameters().toList();
+        List<String> allClientParams = server.getClientModsAsParameters().toList();
+
+        // HC only sees AlwaysLoad
+        assertThat(hcParams).containsExactly("-mod=@AlwaysLoad");
+        // Main server still sees both
+        assertThat(allClientParams).containsExactly("-mod=@AlwaysLoad", "-mod=@SkipOnHc");
+    }
+
+    @Test
+    void getHeadlessClientModsAsParameters_includesServerOnlyModWhenLoadOnHcTrue() {
+        Arma3Server server = new Arma3Server();
+        server.setActiveDLCs(List.of());
+        server.setActiveLocalMods(List.of());
+        server.setActiveMods(List.of(
+                workshopEntry(1L, "ServerMod", true, true, 0)   // serverOnly=true, loadOnHc=true
+        ));
+
+        List<String> hcParams = server.getHeadlessClientModsAsParameters().toList();
+
+        // serverOnly is irrelevant to HC; loadOnHeadlessClient=true means load on HC
+        assertThat(hcParams).containsExactly("-mod=@ServerMod");
     }
 
     @Test

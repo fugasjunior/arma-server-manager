@@ -82,4 +82,9 @@ public class WorkshopModsFacade {
         mod.setServerOnly(serverOnly);
         modsService.saveMod(mod);
     }
+
+    public void setModLoadOnHeadlessClient(WorkshopMod mod, boolean loadOnHeadlessClient) {
+        mod.setLoadOnHeadlessClient(loadOnHeadlessClient);
+        modsService.saveMod(mod);
+    }
 }

@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.api.ModsApi;
 import cz.forgottenempire.servermanager.api.model.CreatorDlcDto;
 import cz.forgottenempire.servermanager.api.model.ModDto;
 import cz.forgottenempire.servermanager.api.model.ModsDto;
+import cz.forgottenempire.servermanager.api.model.LoadOnHeadlessClientDto;
 import cz.forgottenempire.servermanager.api.model.ServerOnlyDto;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
@@ -88,6 +89,14 @@ public class WorkshopModsController implements ModsApi {
     public ResponseEntity<Void> setModServerOnly(Long id, ServerOnlyDto serverOnlyDto) {
         WorkshopMod mod = findMod(id);
         modsFacade.setModServerOnly(mod, serverOnlyDto.getServerOnly());
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
+    public ResponseEntity<Void> setModLoadOnHeadlessClient(Long id, LoadOnHeadlessClientDto loadOnHeadlessClientDto) {
+        WorkshopMod mod = findMod(id);
+        modsFacade.setModLoadOnHeadlessClient(mod, loadOnHeadlessClientDto.getLoadOnHeadlessClient());
         return ResponseEntity.ok().build();
     }
 

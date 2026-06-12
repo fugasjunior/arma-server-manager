@@ -19,6 +19,8 @@ ModDto:
       type: string
     serverOnly:
       type: boolean
+    loadOnHeadlessClient:
+      type: boolean
 
 ModsDto:
   type: object
@@ -45,4 +47,11 @@ ServerOnlyDto:
   required: [serverOnly]
   properties:
     serverOnly:
+      type: boolean
+
+LoadOnHeadlessClientDto:
+  type: object
+  required: [loadOnHeadlessClient]
+  properties:
+    loadOnHeadlessClient:
       type: boolean

@@ -126,6 +126,12 @@ export default function ModsManagement() {
         await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
     };
 
+    const handleLoadOnHcChanged = async (e: ChangeEvent<HTMLInputElement>, modId: number) => {
+        const loadOnHeadlessClient = e.target.checked;
+        await modsApi.setModLoadOnHeadlessClient({id: modId, loadOnHeadlessClientDto: {loadOnHeadlessClient}});
+        await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
+    };
+
     const errorOccured = mods.some(mod => mod.installationStatus === "ERROR");
     const arma3ModsCount = mods.filter(mod => mod.serverType === ServerType.Arma3).length;
     const dayZModsCount = mods.filter(mod => mod.serverType === ServerType.Dayz).length;
@@ -143,6 +149,7 @@ export default function ModsManagement() {
                    onModUninstallClicked={handleUninstall} onModInstallClicked={handleInstall}
                    onFilterChange={handleFilterChange} onCreatePresetClicked={handlePresedDialogOpen}
                    onServerOnlyChanged={handleServerOnlyChanged}
+                   onLoadOnHcChanged={handleLoadOnHcChanged}
         />
         <CreatePresetDialog open={newPresetDialogOpen} onClose={handlePresedDialogClose}
                             onConfirmClicked={handleCreateNewPreset}

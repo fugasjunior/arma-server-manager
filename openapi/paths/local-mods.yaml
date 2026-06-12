@@ -41,6 +41,30 @@
       '404':
         $ref: '../components/responses.yaml#/ApiError'
 
+/local-mod/{id}/loadOnHeadlessClient:
+  patch:
+    tags: [LocalMods]
+    operationId: setLocalModLoadOnHeadlessClient
+    summary: Toggle load-on-headless-client flag for a local mod
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
 /local-mod/sync:
   post:
     tags: [LocalMods]

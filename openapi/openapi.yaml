@@ -75,12 +75,16 @@ paths:
     $ref: './paths/mods.yaml#/~1mod~1{id}'
   /mod/{id}/serverOnly:
     $ref: './paths/mods.yaml#/~1mod~1{id}~1serverOnly'
+  /mod/{id}/loadOnHeadlessClient:
+    $ref: './paths/mods.yaml#/~1mod~1{id}~1loadOnHeadlessClient'
 
   # ── Local Mods ────────────────────────────────────────────────────────────
   /local-mod:
     $ref: './paths/local-mods.yaml#/~1local-mod'
   /local-mod/{id}/serverOnly:
     $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1serverOnly'
+  /local-mod/{id}/loadOnHeadlessClient:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1loadOnHeadlessClient'
   /local-mod/sync:
     $ref: './paths/local-mods.yaml#/~1local-mod~1sync'
   /local-mod/sync/status:
@@ -253,6 +257,8 @@ components:
       $ref: './components/schemas/mods.yaml#/CreatorDlcDto'
     ServerOnlyDto:
       $ref: './components/schemas/mods.yaml#/ServerOnlyDto'
+    LoadOnHeadlessClientDto:
+      $ref: './components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
 
     # ── Mod Presets ───────────────────────────────────────────────────────────
     CreatePresetRequestDto:

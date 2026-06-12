@@ -16,7 +16,8 @@ import {LocalModSyncStatusDtoStatus} from "../../api/generated/models/local-mod-
 import SERVER_NAMES from "../../util/serverNames";
 import {
     useLocalMods,
-    useSetLocalModServerOnly
+    useSetLocalModServerOnly,
+    useSetLocalModLoadOnHeadlessClient
 } from "../../hooks/queries/useLocalMods";
 import {usePermission} from "../../hooks/usePermission";
 import {useSyncLocalMods, useLocalModSyncStatus} from "../../hooks/useLocalModSync";
@@ -39,7 +40,8 @@ const headCells: EnhancedTableHeadCell[] = [
     {id: "name", label: "Name", sortable: true, searchable: true},
     {id: "serverType", label: "Game", sortable: true},
     {id: "fileSize", label: "Size", sortable: true, type: "numeric"},
-    {id: "serverOnly", label: "Server-only", sortable: false},
+    {id: "serverOnly", label: "Server mod", sortable: false},
+    {id: "loadOnHeadlessClient", label: "Headless client", sortable: false},
     {id: "uploadedAt", label: "Uploaded", sortable: true, type: "date"},
 ];
 
@@ -51,6 +53,7 @@ export default function LocalModsManagement() {
     const queryClient = useQueryClient();
     const {data: localMods = [], isLoading} = useLocalMods();
     const serverOnlyMutation = useSetLocalModServerOnly();
+    const loadOnHcMutation = useSetLocalModLoadOnHeadlessClient();
     const syncMutation = useSyncLocalMods();
     const syncStatus = useLocalModSyncStatus(isSyncing);
     const seenInProgressRef = useRef(false);
@@ -80,6 +83,10 @@ export default function LocalModsManagement() {
 
     async function handleServerOnlyToggle(id: number, current: boolean) {
         await serverOnlyMutation.mutateAsync({id, serverOnly: !current});
+    }
+
+    async function handleLoadOnHcToggle(id: number, current: boolean) {
+        await loadOnHcMutation.mutateAsync({id, loadOnHeadlessClient: !current});
     }
 
     async function handleSync() {
@@ -115,6 +122,20 @@ export default function LocalModsManagement() {
                         size="small"
                     />
                 )
+            } as EnhancedTableCell,
+            {
+                id: "loadOnHeadlessClient", value: mod.loadOnHeadlessClient ?? true,
+                displayValue: mod.serverType === ServerType.Arma3
+                    ? (
+                        <Switch
+                            checked={mod.loadOnHeadlessClient ?? true}
+                            onChange={() => canModify && handleLoadOnHcToggle(mod.id!, mod.loadOnHeadlessClient ?? true)}
+                            onClick={(e) => e.stopPropagation()}
+                            disabled={!canModify}
+                            size="small"
+                        />
+                    )
+                    : undefined
             } as EnhancedTableCell,
             {
                 id: "uploadedAt",

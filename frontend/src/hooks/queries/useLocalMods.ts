@@ -24,3 +24,14 @@ export function useSetLocalModServerOnly() {
         },
     });
 }
+
+export function useSetLocalModLoadOnHeadlessClient() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({id, loadOnHeadlessClient}: {id: number; loadOnHeadlessClient: boolean}) =>
+            localModsApi.setLocalModLoadOnHeadlessClient({id, loadOnHeadlessClientDto: {loadOnHeadlessClient}}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: queryKeys.localMods()});
+        },
+    });
+}

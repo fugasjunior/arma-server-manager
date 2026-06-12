@@ -29,6 +29,12 @@ public class DayZServerActiveLocalMod implements ActiveModEntry {
         return mod.isServerOnly();
     }
 
+    // Irrelevant for DayZ
+    @Override
+    public boolean isLoadOnHeadlessClient() {
+        return mod.isLoadOnHeadlessClient();
+    }
+
     @Override
     public String getLaunchName() {
         return mod.getName();

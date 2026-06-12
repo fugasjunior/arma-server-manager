@@ -13,6 +13,8 @@ LocalModDto:
       format: int64
     serverOnly:
       type: boolean
+    loadOnHeadlessClient:
+      type: boolean
     uploadedAt:
       type: string
 

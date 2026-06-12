@@ -32,6 +32,12 @@ public class LocalModFacade {
         modService.saveMod(mod);
     }
 
+    public void setLoadOnHeadlessClient(Long id, boolean loadOnHeadlessClient) {
+        LocalMod mod = modService.requireMod(id);
+        mod.setLoadOnHeadlessClient(loadOnHeadlessClient);
+        modService.saveMod(mod);
+    }
+
     public void startSync() {
         if (!syncRunning.compareAndSet(false, true)) {
             log.warn("Local mod sync already in progress, ignoring request");

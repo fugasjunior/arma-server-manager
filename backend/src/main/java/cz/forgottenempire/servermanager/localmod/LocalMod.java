@@ -31,6 +31,9 @@ public class LocalMod {
     @Column(name = "server_only")
     private boolean serverOnly;
 
+    @Column(name = "load_on_headless_client")
+    private boolean loadOnHeadlessClient = true;
+
     private LocalDateTime uploadedAt;
 
     @ElementCollection(fetch = FetchType.EAGER)

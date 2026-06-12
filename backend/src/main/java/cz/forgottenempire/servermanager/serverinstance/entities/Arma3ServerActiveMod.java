@@ -30,6 +30,11 @@ public class Arma3ServerActiveMod implements ActiveModEntry {
     }
 
     @Override
+    public boolean isLoadOnHeadlessClient() {
+        return mod.isLoadOnHeadlessClient();
+    }
+
+    @Override
     public String getLaunchName() {
         return mod.getNormalizedName();
     }

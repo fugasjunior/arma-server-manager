@@ -82,7 +82,7 @@ public class HeadlessClient {
         }
 
         List<String> modParameters = Stream.of(
-                        server.getClientModsAsParameters(),
+                        server.getHeadlessClientModsAsParameters(),
                         server.getCreatorDlcsAsParameters(),
                         server.getAdditionalModsAsParameters(additionalMods)
                 )

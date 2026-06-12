@@ -114,3 +114,22 @@
         description: OK
       '404':
         $ref: '../components/responses.yaml#/ApiError'
+
+/mod/{id}/loadOnHeadlessClient:
+  patch:
+    tags: [Mods]
+    operationId: setModLoadOnHeadlessClient
+    summary: Toggle load-on-headless-client flag for a workshop mod
+    parameters:
+      - $ref: '../components/parameters.yaml#/modId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
