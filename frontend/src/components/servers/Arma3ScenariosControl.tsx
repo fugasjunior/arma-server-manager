@@ -123,7 +123,7 @@ const Arma3ScenariosControl = ({server, status}: Arma3ScenariosControlProps) => 
 
     return (
         <>
-            <Button onClick={handleOpen} startIcon={<MapIcon/>} variant="contained">
+            <Button onClick={handleOpen} startIcon={<MapIcon/>} variant="outlined">
                 Scenarios
             </Button>
             <Modal open={isOpen} onClose={handleClose}>

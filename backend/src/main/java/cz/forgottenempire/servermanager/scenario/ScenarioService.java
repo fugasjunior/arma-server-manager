@@ -10,7 +10,6 @@ import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.common.exceptions.ServerNotInitializedException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -67,10 +66,13 @@ class ScenarioService {
     }
 
     private void uploadScenarioToDir(Path dir, MultipartFile file) {
-        File missionsFolder = dir.toFile();
-        if (!missionsFolder.isDirectory()) {
-            throw new ServerNotInitializedException();
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            log.error("Could not create scenarios directory {}", dir, e);
+            throw new RuntimeException(e);
         }
+        File missionsFolder = dir.toFile();
 
         String scenarioName = file.getOriginalFilename();
         if (scenarioName == null) {
@@ -96,7 +98,7 @@ class ScenarioService {
         String[] extensions = new String[]{"pbo"};
         File missionsFolder = dir.toFile();
         if (!missionsFolder.isDirectory()) {
-            throw new ServerNotInitializedException();
+            return scenarioDtos;
         }
         for (Iterator<File> it = FileUtils.iterateFiles(missionsFolder, extensions, false); it.hasNext(); ) {
             File scenarioFile = it.next();

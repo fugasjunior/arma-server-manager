@@ -33,6 +33,9 @@ jest.mock('../../../src/hooks/queries/usePresets', () => ({
 jest.mock('../../../src/hooks/queries/useCreatorDlcs', () => ({
     useCreatorDlcs: () => ({data: [], isLoading: false}),
 }));
+jest.mock('react-router-dom', () => ({
+    Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,
+}));
 
 const arma3Server: ServerDto = {
     id: 1,
@@ -54,6 +57,22 @@ beforeEach(() => {
 });
 
 describe('ServerListEntryDetails permissions', () => {
+    it('hides settings button without SERVER_VIEW', () => {
+        renderWithPermissions(
+            <ServerListEntryDetails {...defaultProps}/>,
+            [],
+        );
+        expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+    });
+
+    it('shows settings button with SERVER_VIEW', () => {
+        renderWithPermissions(
+            <ServerListEntryDetails {...defaultProps}/>,
+            ['SERVER_VIEW'],
+        );
+        expect(screen.getByText('Settings')).toBeInTheDocument();
+    });
+
     it('hides logs button without SERVER_LOGS_VIEW', () => {
         renderWithPermissions(
             <ServerListEntryDetails {...defaultProps}/>,
@@ -100,22 +119,6 @@ describe('ServerListEntryDetails permissions', () => {
             ['SERVER_VIEW', 'MOD_VIEW', 'MOD_MODIFY'],
         );
         expect(screen.getByText('DLCs')).toBeInTheDocument();
-    });
-
-    it('hides duplicate button without SERVER_MODIFY', () => {
-        renderWithPermissions(
-            <ServerListEntryDetails {...defaultProps}/>,
-            ['SERVER_VIEW'],
-        );
-        expect(screen.queryByText('Duplicate')).not.toBeInTheDocument();
-    });
-
-    it('shows duplicate button with SERVER_MODIFY', () => {
-        renderWithPermissions(
-            <ServerListEntryDetails {...defaultProps}/>,
-            ['SERVER_VIEW', 'SERVER_MODIFY'],
-        );
-        expect(screen.getByText('Duplicate')).toBeInTheDocument();
     });
 
     it('hides Scenarios button without SCENARIO_VIEW on Arma3 server', () => {

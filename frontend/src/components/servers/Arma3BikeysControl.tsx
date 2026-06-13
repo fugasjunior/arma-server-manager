@@ -110,7 +110,7 @@ const Arma3BikeysControl = ({server, status}: Arma3BikeysControlProps) => {
     return (
         <>
             <Tooltip title={serverRunning ? "Changes apply on next server start" : ""}>
-                <Button onClick={handleOpen} startIcon={<KeyIcon/>} variant="contained">
+                <Button onClick={handleOpen} startIcon={<KeyIcon/>} variant="outlined">
                     Bikeys
                 </Button>
             </Tooltip>

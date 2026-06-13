@@ -6,16 +6,26 @@ import path from 'path';
 
 const TEST_PBO = path.join(__dirname, '../fixtures/test.pbo');
 
+let serverId: number;
+
 test.beforeEach(async () => {
     const backend = await createBackendHelper();
     await backend.reset();
+    const server = await backend.postJson<{ id: number }>('/api/server', {
+        name: 'Scenario E2E Server',
+        type: 'ARMA3',
+        port: 2302,
+        queryPort: 2303,
+        maxPlayers: 32,
+    });
+    serverId = server.id;
     await backend.dispose();
 });
 
 test('upload scenario appears in list', async ({ browser }) => {
     const page = await getAuthenticatedPage(browser);
     const scenariosPage = new ScenariosPage(page);
-    await scenariosPage.goto();
+    await scenariosPage.goto(serverId);
 
     await scenariosPage.uploadFile(TEST_PBO);
 
@@ -28,7 +38,7 @@ test('upload scenario appears in list', async ({ browser }) => {
 test('select and delete scenario removes it', async ({ browser }) => {
     const page = await getAuthenticatedPage(browser);
     const scenariosPage = new ScenariosPage(page);
-    await scenariosPage.goto();
+    await scenariosPage.goto(serverId);
 
     await scenariosPage.uploadFile(TEST_PBO);
     await scenariosPage.waitForScenario('test.pbo');
@@ -45,7 +55,7 @@ test('select and delete scenario removes it', async ({ browser }) => {
 test('download scenario returns a file', async ({ browser }) => {
     const page = await getAuthenticatedPage(browser);
     const scenariosPage = new ScenariosPage(page);
-    await scenariosPage.goto();
+    await scenariosPage.goto(serverId);
 
     await scenariosPage.uploadFile(TEST_PBO);
     await scenariosPage.waitForScenario('test.pbo');
