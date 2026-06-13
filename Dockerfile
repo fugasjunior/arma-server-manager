@@ -52,7 +52,9 @@ COPY --from=jre-build /jre /opt/java/openjdk
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# TODO try to make the user not root. currently there are problems with mounted volumes ownership
+# The container starts as root so the entrypoint can remap the steam user to
+# the operator's uid/gid and migrate mounted data ownership, then drops to
+# the steam user via gosu before launching the JVM.
 USER root
 RUN dpkg --add-architecture i386 \
     && apt-get update \
@@ -61,6 +63,7 @@ RUN dpkg --add-architecture i386 \
           lib32stdc++6 \
           libcap2 \
           expect \
+          gosu \
           libtbbmalloc2 \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
@@ -69,9 +72,11 @@ RUN dpkg --add-architecture i386 \
 WORKDIR /home/steam
 COPY ./config/application-docker.properties /home/steam/config/application.properties
 COPY --from=build /app/backend/build/libs/app.jar /home/steam/app.jar
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN chown -R root:root /home/steam \
-    && chmod -R 755 /home/steam
+RUN chown -R steam:steam /home/steam \
+    && chmod -R 755 /home/steam \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
@@ -83,5 +88,5 @@ ENV DIRECTORY_MODS=/home/steam/armaservermanager/mods
 ENV DIRECTORY_LOGS=/home/steam/armaservermanager/logs
 
 EXPOSE 8080/tcp
-ENTRYPOINT ["java"]
-CMD ["-jar", "./app.jar"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["java", "-jar", "./app.jar"]

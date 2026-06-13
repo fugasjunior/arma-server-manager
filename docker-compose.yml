@@ -30,6 +30,7 @@ services:
     # 'host' network mode is not available on Windows. If you need to run this image on Windows, you need to set up port mappings manually.
     network_mode: host
     security_opt:
+      - no-new-privileges:true
       - seccomp=unconfined
     # uncomment when running on Windows and add additional ports according to your needs
     #    ports:
@@ -51,6 +52,10 @@ services:
       - STEAM_API_KEY=${STEAM_API_KEY}
       - DATABASE_ENCRYPTION_SECRET
       - TZ=${TIMEZONE}
+      # Optional: force the uid/gid the app runs as. Leave unset to auto-detect
+      # from the owner of STORAGE_PATH. Only needed if that dir is root-owned.
+      # - PUID=${PUID}
+      # - PGID=${PGID}
 
 volumes:
   armaservermanager-db:
