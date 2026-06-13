@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {
     Box,
     Button,
@@ -10,6 +10,7 @@ import {
     Tabs,
     Typography,
 } from "@mui/material";
+import {toast} from "react-toastify";
 import PermissionGuard from "../auth/PermissionGuard";
 import {ServerType} from "../../api/generated";
 import {LocalModSyncStatusDtoStatus} from "../../api/generated/models/local-mod-sync-status-dto";
@@ -56,20 +57,16 @@ export default function LocalModsManagement() {
     const loadOnHcMutation = useSetLocalModLoadOnHeadlessClient();
     const syncMutation = useSyncLocalMods();
     const syncStatus = useLocalModSyncStatus(isSyncing);
-    const seenInProgressRef = useRef(false);
 
     useEffect(() => {
-        const status = syncStatus.data?.status;
         if (!isSyncing) return;
-        if (status === LocalModSyncStatusDtoStatus.InProgress) {
-            seenInProgressRef.current = true;
-        } else if (seenInProgressRef.current && status === LocalModSyncStatusDtoStatus.Finished) {
-            seenInProgressRef.current = false;
+        const status = syncStatus.data?.status;
+        if (status === LocalModSyncStatusDtoStatus.Finished) {
             setIsSyncing(false);
             queryClient.invalidateQueries({ queryKey: ['localMods'] });
-        } else if (seenInProgressRef.current && status === LocalModSyncStatusDtoStatus.Error) {
-            seenInProgressRef.current = false;
+        } else if (status === LocalModSyncStatusDtoStatus.Error) {
             setIsSyncing(false);
+            toast.error("Local mods sync failed.");
         }
     }, [syncStatus.data?.status, isSyncing, queryClient]);
 
@@ -90,7 +87,7 @@ export default function LocalModsManagement() {
     }
 
     async function handleSync() {
-        seenInProgressRef.current = false;
+        queryClient.setQueryData(['localModSyncStatus'], {status: LocalModSyncStatusDtoStatus.InProgress});
         setIsSyncing(true);
         try {
             await syncMutation.mutateAsync();
