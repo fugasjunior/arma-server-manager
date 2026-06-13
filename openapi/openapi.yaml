@@ -34,6 +34,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server'
   /server/{id}:
     $ref: './paths/servers.yaml#/~1server~1{id}'
+  /server/{id}/duplicate:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1duplicate'
   /server/{id}/start:
     $ref: './paths/servers.yaml#/~1server~1{id}~1start'
   /server/{id}/stop:

@@ -95,8 +95,7 @@ const ServersPage = () => {
     };
 
     const handleDuplicateServer = async (server: ServerDto) => {
-        const duplicatedServer = {...server, name: server.name + " (copy)"};
-        await serversApi.createServer({serverDto: duplicatedServer});
+        await serversApi.duplicateServer({id: server.id!});
         toast.success(`Server '${server.name}' successfully duplicated`);
         await queryClient.invalidateQueries({queryKey: queryKeys.servers});
     };

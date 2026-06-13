@@ -10,6 +10,7 @@ import cz.forgottenempire.servermanager.api.model.ServersDto;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
+import cz.forgottenempire.servermanager.serverinstance.Arma3InstanceDataCopier;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
@@ -41,6 +42,7 @@ class ServerController implements ServersApi {
     private final PathsFactory pathsFactory;
     private final ServerSecretsMasker secretsMasker;
     private final ConfigOverrideService configOverrideService;
+    private final Arma3InstanceDataCopier arma3InstanceDataCopier;
 
     @Autowired
     public ServerController(
@@ -49,13 +51,15 @@ class ServerController implements ServersApi {
             ServerMapper serverMapper,
             PathsFactory pathsFactory,
             ServerSecretsMasker secretsMasker,
-            ConfigOverrideService configOverrideService) {
+            ConfigOverrideService configOverrideService,
+            Arma3InstanceDataCopier arma3InstanceDataCopier) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
         this.serverMapper = serverMapper;
         this.pathsFactory = pathsFactory;
         this.secretsMasker = secretsMasker;
         this.configOverrideService = configOverrideService;
+        this.arma3InstanceDataCopier = arma3InstanceDataCopier;
     }
 
     @Override
@@ -95,6 +99,27 @@ class ServerController implements ServersApi {
         server = serverInstanceService.createServer(server, overrides);
         ServerDto dto = serverMapper.mapServerToDto(server);
         attachOverrides(server, dto);
+        secretsMasker.maskIfUnauthorized(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
+    public ResponseEntity<ServerDto> duplicateServer(Long id) {
+        Server source = getServerEntity(id);
+        Long sourceId = source.getId();
+        ServerDto sourceDto = serverMapper.mapServerToDto(source);
+        attachOverrides(source, sourceDto);
+        Server clone = serverMapper.mapServerDtoToEntity(sourceDto);
+        clone.setId(null);
+        clone.setName(source.getName() + " (copy)");
+        List<ConfigOverrideDto> overrides = extractOverridesFromDto(sourceDto);
+        Server created = serverInstanceService.createServer(clone, overrides);
+        if (source instanceof Arma3Server) {
+            arma3InstanceDataCopier.copyInstanceData(sourceId, created.getId());
+        }
+        ServerDto dto = serverMapper.mapServerToDto(created);
         secretsMasker.maskIfUnauthorized(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
