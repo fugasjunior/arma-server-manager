@@ -74,9 +74,6 @@ const EditArma3ServerSettingsForm = (props: EditArma3ServerSettingsFormProps) =>
                                     <SwitchField name='persistent' label='Persistent' disabled={!canModify}/>
                                 </FormGroup>
                             </Grid>
-                            <CustomTextField name='targetHeadlessClientsCount' label='Target headless clients'
-                                             type='number'
-                                             containerMd={6} disabled={!canModify}/>
                             <CustomTextField name='additionalOptions' label='Additional options' multiline
                                              containerMd={12} disabled={!canModify}/>
                         <Grid size={12}>

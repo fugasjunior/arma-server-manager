@@ -52,7 +52,6 @@ localClient[] = { "127.0.0.1"};`,
             time: undefined
         },
         networkSettings: undefined,
-        targetHeadlessClientsCount: 0
     };
 }
 
