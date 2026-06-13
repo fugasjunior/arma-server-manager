@@ -1,5 +1,6 @@
-import {Button, Grid, Stack, Typography} from "@mui/material";
-import logo from "../img/asm_logo_black.png";
+import {Button, Grid, Stack, Typography, useTheme} from "@mui/material";
+import logoBlack from "../img/asm_logo_black.png";
+import logoWhite from "../img/asm_logo.png";
 import {DiscordIcon} from "../icons/DiscordIcon.tsx";
 import {GitHubIcon} from "../icons/GitHubIcon.tsx";
 import {BuyMeACoffeeIcon} from "../icons/BuyMeACoffeeIcon.tsx";
@@ -7,6 +8,8 @@ import {PayPalIcon} from "../icons/PayPalIcon.tsx";
 import config from "../config.ts";
 
 const AboutPage = () => {
+    const theme = useTheme();
+    const logo = theme.palette.mode === "dark" ? logoWhite : logoBlack;
 
     return (
         <Grid container sx={{justifyContent: "center"}}>
@@ -37,12 +40,16 @@ const AboutPage = () => {
                 <Typography variant="h6" sx={{mt: 2}}>Support</Typography>
                 <Stack direction="row" spacing={3}>
                     <Button target="_blank" href="https://www.buymeacoffee.com/fugasjunior"
+                            variant="contained"
                             startIcon={<BuyMeACoffeeIcon/>}
+                            sx={{bgcolor: "#FFDD00", color: "#000", "&:hover": {bgcolor: "#e5c700"}}}
                     >
                         Buy Me A Coffee
                     </Button>
                     <Button target="_blank" href="https://paypal.me/fugasjunior"
+                            variant="contained"
                             startIcon={<PayPalIcon/>}
+                            sx={{bgcolor: "#0070BA", color: "#fff", "&:hover": {bgcolor: "#005c99"}}}
                     >
                         Donate with PayPal
                     </Button>

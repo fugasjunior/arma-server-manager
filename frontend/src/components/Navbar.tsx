@@ -1,11 +1,12 @@
 import {useContext} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
-import {AppBar, Button, Stack, Toolbar} from "@mui/material";
+import {AppBar, Button, Stack, Toolbar, Tooltip} from "@mui/material";
 import {AuthContext} from "../store/auth-context";
 import logo from "../img/asm_logo.png"
 import IconButton from "@mui/material/IconButton";
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import PermissionGuard from "./auth/PermissionGuard";
 
 type NavbarProps = {
@@ -79,6 +80,11 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
                         <IconButton onClick={onModeChange}>
                             {mode === "dark" ? <LightModeIcon/> : <DarkModeIcon style={{color: "white"}}/>}
                         </IconButton>
+                        <Tooltip title="Support this project">
+                            <IconButton component={NavLink} to="/about">
+                                <FavoriteIcon sx={{color: "#ff5a79"}}/>
+                            </IconButton>
+                        </Tooltip>
                         <Button component={NavLink} to="/about" sx={{color: '#fff'}}>
                             About
                         </Button>
