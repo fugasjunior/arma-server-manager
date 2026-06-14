@@ -1,0 +1,100 @@
+package cz.forgottenempire.servermanager.workshop;
+
+import cz.forgottenempire.servermanager.common.InstallationStatus;
+import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.installation.ServerInstallationService;
+import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
+import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
+import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class WorkshopInstallerServiceTest {
+
+    private static final long MOD_ID = 450814997L;
+
+    @Mock
+    private PathsFactory pathsFactory;
+
+    @Mock
+    private WorkshopModsService modsService;
+
+    @Mock
+    private SteamCmdService steamCmdService;
+
+    @Mock
+    private ServerInstallationService installationService;
+
+    @Mock
+    private ModMetadataService metadataService;
+
+    @InjectMocks
+    private WorkshopInstallerService installerService;
+
+    @TempDir
+    Path tempDir;
+
+    private WorkshopMod mod;
+    private SteamCmdJob timedOutJob;
+
+    @BeforeEach
+    void setUp() {
+        mod = new WorkshopMod(MOD_ID);
+        mod.setName("CBA_A3");
+        mod.setServerType(ServerType.ARMA3);
+        mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+
+        timedOutJob = new SteamCmdJob(List.of(mod), null);
+        timedOutJob.setErrorStatus(ErrorStatus.TIMEOUT);
+
+        when(pathsFactory.getModInstallationPath(MOD_ID, ServerType.ARMA3))
+                .thenReturn(tempDir.resolve("mods").resolve(String.valueOf(MOD_ID)));
+    }
+
+    @Test
+    void installsDownloadedModEvenWhenAnotherItemCausedBatchTimeout() throws IOException {
+        Path modDirectory = pathsFactory.getModInstallationPath(MOD_ID, ServerType.ARMA3);
+        Files.createDirectories(modDirectory);
+
+        Path serverPath = tempDir.resolve("server");
+        Files.createDirectories(serverPath);
+        Path linkPath = serverPath.resolve(mod.getNormalizedName());
+        when(installationService.getInstalledRelatedServerTypes(ServerType.ARMA3))
+                .thenReturn(List.of(ServerType.ARMA3));
+        when(pathsFactory.getModLinkPath(mod.getNormalizedName(), ServerType.ARMA3))
+                .thenReturn(linkPath);
+
+        installerService.handleInstallation(mod, timedOutJob);
+
+        assertThat(mod.getInstallationStatus()).isEqualTo(InstallationStatus.FINISHED);
+        assertThat(mod.getErrorStatus()).isNull();
+        assertThat(linkPath).isSymbolicLink();
+        verify(modsService).saveMod(mod);
+    }
+
+    @Test
+    void marksOnlyMissingModAsTimedOut() {
+        installerService.handleInstallation(mod, timedOutJob);
+
+        assertThat(mod.getInstallationStatus()).isEqualTo(InstallationStatus.ERROR);
+        assertThat(mod.getErrorStatus()).isEqualTo(ErrorStatus.TIMEOUT);
+        verify(modsService).saveMod(mod);
+    }
+}
