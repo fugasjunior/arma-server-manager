@@ -52,6 +52,7 @@ localClient[] = { "127.0.0.1"};`,
             time: undefined
         },
         networkSettings: undefined,
+        configOverrides: [],
     };
 }
 
@@ -87,7 +88,8 @@ export function dayzServerInitialState(): DayZServerDto {
         automaticRestart: {
             enabled: false,
             time: undefined
-        }
+        },
+        configOverrides: [],
     };
 }
 
@@ -106,6 +108,7 @@ export function reforgerServerInitialState(): ReforgerServerDto {
         thirdPersonViewEnabled: true,
         activeMods: [],
         customLaunchParameters: [],
+        configOverrides: [],
         automaticRestart: {
             enabled: false,
             time: undefined

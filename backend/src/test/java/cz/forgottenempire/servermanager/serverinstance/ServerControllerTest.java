@@ -36,7 +36,8 @@ class ServerControllerTest {
         serverMapper = mock(ServerMapper.class, withSettings().stubOnly());
         controller = new ServerController(serverInstanceService, serverProcessService, serverMapper,
                 mock(PathsFactory.class, withSettings().stubOnly()),
-                mock(ServerSecretsMasker.class, withSettings().stubOnly()));
+                mock(ServerSecretsMasker.class, withSettings().stubOnly()),
+                mock(ConfigOverrideService.class, withSettings().stubOnly()));
     }
 
     @Test

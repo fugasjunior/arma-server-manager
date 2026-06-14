@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ConfigFileKey;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import cz.forgottenempire.servermanager.util.SystemUtils;
@@ -80,7 +81,7 @@ public class Arma3Server extends Server {
         parameters.add("-port=" + getPort());
         parameters.add("-config=\"" + getConfigFile(ctx.pathsFactory()).getAbsolutePath() + "\"");
 
-        if (networkSettings != null) {
+        if (networkSettings != null || ctx.getRawOverride(ConfigFileKey.ARMA3_NETWORK_CFG) != null) {
             parameters.add("-cfg=\"" + getNetworkConfigFile(ctx.pathsFactory()).getAbsolutePath() + "\"");
         }
 
@@ -97,15 +98,26 @@ public class Arma3Server extends Server {
     @Override
     public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
         List<ServerConfig> configs = new ArrayList<>();
-        configs.add(new ServerConfig(getConfigFile(ctx.pathsFactory()), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3), this, ctx.freeMarkerConfigurer()));
+        configs.add(new ServerConfig(
+                getConfigFile(ctx.pathsFactory()),
+                Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.ARMA3),
+                this,
+                ctx.freeMarkerConfigurer(),
+                ctx.getRawOverride(ConfigFileKey.ARMA3_SERVER_CFG)));
         configs.add(new ServerConfig(
                 getProfileFile(ctx.pathsFactory()),
                 Constants.ARMA3_PROFILE_TEMPLATE,
                 Objects.requireNonNullElseGet(difficultySettings, Arma3DifficultySettings::new),
-                ctx.freeMarkerConfigurer())
-        );
-        if (networkSettings != null) {
-            configs.add(new ServerConfig(getNetworkConfigFile(ctx.pathsFactory()), Constants.ARMA3_NETWORK_SETTINGS, networkSettings, ctx.freeMarkerConfigurer()));
+                ctx.freeMarkerConfigurer(),
+                ctx.getRawOverride(ConfigFileKey.ARMA3_PROFILE)));
+        String networkOverride = ctx.getRawOverride(ConfigFileKey.ARMA3_NETWORK_CFG);
+        if (networkSettings != null || networkOverride != null) {
+            configs.add(new ServerConfig(
+                    getNetworkConfigFile(ctx.pathsFactory()),
+                    Constants.ARMA3_NETWORK_SETTINGS,
+                    Objects.requireNonNullElseGet(networkSettings, Arma3NetworkSettings::new),
+                    ctx.freeMarkerConfigurer(),
+                    networkOverride));
         }
         return configs;
     }

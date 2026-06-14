@@ -47,6 +47,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server~1{id}~1log~1download'
   /server/{id}/autorestart:
     $ref: './paths/servers.yaml#/~1server~1{id}~1autorestart'
+  /server/config-overrides/seed:
+    $ref: './paths/servers.yaml#/~1server~1config-overrides~1seed'
 
   # ── Headless Client ─────────────────────────────────────────────────────────
   /server/{id}/hc/target:

@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance;
 import cz.forgottenempire.servermanager.api.model.Arma3DifficultySettingsDto;
 import cz.forgottenempire.servermanager.api.model.Arma3NetworkSettingsDto;
 import cz.forgottenempire.servermanager.api.model.Arma3ServerDto;
+import cz.forgottenempire.servermanager.api.model.ConfigOverrideDto;
 import cz.forgottenempire.servermanager.api.model.CreatorDlcDto;
 import cz.forgottenempire.servermanager.api.model.DayZServerDto;
 import cz.forgottenempire.servermanager.api.model.LaunchParameterDto;
@@ -27,8 +28,10 @@ import cz.forgottenempire.servermanager.serverinstance.entities.LaunchParameter;
 import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerMod;
 import cz.forgottenempire.servermanager.serverinstance.entities.ReforgerServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
+import cz.forgottenempire.servermanager.serverinstance.entities.ServerConfigOverride;
 import cz.forgottenempire.servermanager.workshop.Arma3CDLC;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -61,6 +64,7 @@ interface ServerMapper {
 
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
     @Mapping(target = "activeMods", ignore = true)
     @Mapping(target = "activeLocalMods", ignore = true)
@@ -91,6 +95,7 @@ interface ServerMapper {
 
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
     @Mapping(target = "activeMods", ignore = true)
     @Mapping(target = "activeLocalMods", ignore = true)
@@ -108,6 +113,7 @@ interface ServerMapper {
 
     @Mapping(source = "automaticRestart.enabled", target = "restartAutomatically")
     @Mapping(source = "automaticRestart.time", target = "automaticRestartTime")
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "type", expression = "java(cz.forgottenempire.servermanager.common.ServerType.valueOf(serverDto.getType()))")
     void updateReforgerServerFromDto(ReforgerServerDto serverDto, @MappingTarget ReforgerServer server);
 
@@ -270,6 +276,22 @@ interface ServerMapper {
         } else {
             throw new IllegalStateException("Unsupported server type");
         }
+    }
+
+    default ConfigOverrideDto mapOverrideToDto(ServerConfigOverride override) {
+        if (override == null || override.getConfigKey() == null) return null;
+        return new ConfigOverrideDto()
+                .configKey(override.getConfigKey().name())
+                .advanced(true)
+                .content(override.getContent());
+    }
+
+    default List<ConfigOverrideDto> mapOverridesToDtos(List<ServerConfigOverride> overrides) {
+        if (overrides == null) return List.of();
+        return overrides.stream()
+                .filter(o -> o.getConfigKey() != null)
+                .map(this::mapOverrideToDto)
+                .toList();
     }
 
 }

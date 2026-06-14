@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance.entities;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
+import cz.forgottenempire.servermanager.serverinstance.ConfigFileKey;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
 import jakarta.persistence.*;
@@ -74,7 +75,12 @@ public class DayZServer extends Server {
 
     @Override
     public Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx) {
-        return List.of(new ServerConfig(getConfigFile(ctx.pathsFactory()), Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ), this, ctx.freeMarkerConfigurer()));
+        return List.of(new ServerConfig(
+                getConfigFile(ctx.pathsFactory()),
+                Constants.SERVER_CONFIG_TEMPLATES.get(ServerType.DAYZ),
+                this,
+                ctx.freeMarkerConfigurer(),
+                ctx.getRawOverride(ConfigFileKey.DAYZ_SERVER_CFG)));
     }
 
     private File getConfigFile(PathsFactory pathsFactory) {

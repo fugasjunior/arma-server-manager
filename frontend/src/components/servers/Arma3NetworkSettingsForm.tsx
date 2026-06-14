@@ -1,8 +1,11 @@
-import {Accordion, AccordionDetails, AccordionSummary, Grid, Typography} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Box, Grid, Typography} from "@mui/material";
 import {InputHTMLAttributes} from "react";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {CustomTextField} from "../../UI/Form/CustomTextField.tsx";
+import AdvancedConfigToggle from "./AdvancedConfigToggle.tsx";
+import AdvancedConfigSection from "./AdvancedConfigSection.tsx";
+import {ConfigOverrideDto, ServerDto} from "../../api/generated";
 
 type NetworkSettingField = {
     name: string,
@@ -62,39 +65,64 @@ const networkSettingFields: Array<NetworkSettingField> = [
 ];
 
 interface Arma3NetworkSettingsFormProps {
-    canModify?: boolean
+    canModify?: boolean;
+    serverDraft: ServerDto;
+    override: ConfigOverrideDto | undefined;
+    onOverrideChange: (override: ConfigOverrideDto | undefined) => void;
 }
 
-const Arma3DifficultySettingsForm = ({canModify}: Arma3NetworkSettingsFormProps) => {
+const Arma3NetworkSettingsForm = ({canModify, serverDraft, override, onOverrideChange}: Arma3NetworkSettingsFormProps) => {
     return <Accordion>
         <AccordionSummary
             expandIcon={<ExpandMoreIcon/>}
             aria-controls="panel1a-content"
             id="panel1a-header"
         >
-            <Typography>Custom network settings (advanced)</Typography>
+            <Typography sx={{flexGrow: 1}}>Custom network settings (advanced)</Typography>
+            <Box onClick={e => e.stopPropagation()}>
+                <AdvancedConfigToggle
+                    configKey="ARMA3_NETWORK_CFG"
+                    switchLabel="Advanced edit (basic.cfg)"
+                    enableDialogText="This will replace the network settings form with a raw text editor.
+                        Your current network settings will be used to generate an initial config."
+                    serverDraft={serverDraft}
+                    override={override}
+                    onOverrideChange={onOverrideChange}
+                />
+            </Box>
         </AccordionSummary>
         <AccordionDetails>
-            <Typography variant='body2' sx={{mb: 2}}>
-                For further info, refer to&nbsp;
-                <a href='https://community.bistudio.com/wiki/Arma_3:_Basic_Server_Config_File' target="_blank">
-                    Community Wiki: Basic Server Config File
-                </a>
-            </Typography>
-            <Grid container spacing={1}>
-                {networkSettingFields.map(field =>
-                    <CustomTextField key={field.name}
-                                     name={field.name}
-                                     label={field.label}
-                                     helperText={field.description}
-                                     type='number'
-                                     inputProps={field.inputProps}
-                                     disabled={!canModify}
-                    />
-                )}
-            </Grid>
+            {!override ? (
+                <>
+                    <Typography variant='body2' sx={{mb: 2}}>
+                        For further info, refer to&nbsp;
+                        <a href='https://community.bistudio.com/wiki/Arma_3:_Basic_Server_Config_File' target="_blank">
+                            Community Wiki: Basic Server Config File
+                        </a>
+                    </Typography>
+                    <Grid container spacing={1}>
+                        {networkSettingFields.map(field =>
+                            <CustomTextField key={field.name}
+                                             name={field.name}
+                                             label={field.label}
+                                             helperText={field.description}
+                                             type='number'
+                                             inputProps={field.inputProps}
+                                             disabled={!canModify}
+                            />
+                        )}
+                    </Grid>
+                </>
+            ) : (
+                <AdvancedConfigSection
+                    configKey="ARMA3_NETWORK_CFG"
+                    label="basic.cfg"
+                    override={override}
+                    onOverrideChange={onOverrideChange}
+                />
+            )}
         </AccordionDetails>
     </Accordion>
 }
 
-export default Arma3DifficultySettingsForm;
+export default Arma3NetworkSettingsForm;

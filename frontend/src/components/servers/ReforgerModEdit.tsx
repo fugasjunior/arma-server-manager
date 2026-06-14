@@ -33,7 +33,8 @@ const modalStyle = {
 
 type ReforgerModEditProps = {
     server: ReforgerServerDto,
-    serverStatus: ServerInstanceInfoDto | null
+    serverStatus: ServerInstanceInfoDto | null,
+    disabled?: boolean
 }
 
 const ReforgerModEdit = (props: ReforgerModEditProps) => {
@@ -104,7 +105,8 @@ const ReforgerModEdit = (props: ReforgerModEditProps) => {
             <Backdrop open={isOpen && isLoading}>
                 <CircularProgress color="inherit"/>
             </Backdrop>
-            <Button onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="contained">
+            <Button onClick={handleManageModsButtonClick} startIcon={<MemoryIcon/>} variant="contained"
+                    disabled={props.disabled}>
                 Mods
             </Button>
             <Modal open={isOpen && !isLoading} onClose={handleClose}>

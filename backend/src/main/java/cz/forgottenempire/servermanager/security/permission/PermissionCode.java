@@ -21,6 +21,7 @@ public final class PermissionCode {
     public static final String ADDITIONAL_SERVER_OPERATE = "ADDITIONAL_SERVER_OPERATE";
     public static final String SYSTEM_VIEW               = "SYSTEM_VIEW";
     public static final String USER_ADMIN                = "USER_ADMIN";
+    public static final String ADVANCED_CONFIG_EDIT      = "ADVANCED_CONFIG_EDIT";
 
     private PermissionCode() {}
 }

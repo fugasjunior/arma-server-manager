@@ -2,6 +2,8 @@ package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.api.ServersApi;
 import cz.forgottenempire.servermanager.api.model.AutomaticRestartDto;
+import cz.forgottenempire.servermanager.api.model.ConfigOverrideDto;
+import cz.forgottenempire.servermanager.api.model.SeedConfigOverrideRequest;
 import cz.forgottenempire.servermanager.api.model.ServerDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.api.model.ServersDto;
@@ -11,6 +13,7 @@ import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
+import cz.forgottenempire.servermanager.serverinstance.entities.ServerConfigOverride;
 import java.io.IOException;
 import java.time.LocalTime;
 
@@ -37,6 +40,7 @@ class ServerController implements ServersApi {
     private final ServerMapper serverMapper;
     private final PathsFactory pathsFactory;
     private final ServerSecretsMasker secretsMasker;
+    private final ConfigOverrideService configOverrideService;
 
     @Autowired
     public ServerController(
@@ -44,41 +48,53 @@ class ServerController implements ServersApi {
             ServerProcessService serverProcessService,
             ServerMapper serverMapper,
             PathsFactory pathsFactory,
-            ServerSecretsMasker secretsMasker) {
+            ServerSecretsMasker secretsMasker,
+            ConfigOverrideService configOverrideService) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
         this.serverMapper = serverMapper;
         this.pathsFactory = pathsFactory;
         this.secretsMasker = secretsMasker;
+        this.configOverrideService = configOverrideService;
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_VIEW + "')")
     public ResponseEntity<ServersDto> getServers() {
         List<ServerDto> serverDtos = serverInstanceService.getAllServers()
                 .stream()
-                .map(serverMapper::mapServerToDto)
+                .map(server -> {
+                    ServerDto dto = serverMapper.mapServerToDto(server);
+                    attachOverrides(server, dto);
+                    return dto;
+                })
                 .peek(secretsMasker::maskIfUnauthorized)
                 .toList();
         return ResponseEntity.ok(new ServersDto().servers(serverDtos));
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_VIEW + "')")
     public ResponseEntity<ServerDto> getServer(Long id) {
         Server server = getServerEntity(id);
         ServerDto dto = serverMapper.mapServerToDto(server);
+        attachOverrides(server, dto);
         secretsMasker.maskIfUnauthorized(dto);
         return ResponseEntity.ok(dto);
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
     public ResponseEntity<ServerDto> createServer(ServerDto serverDto) {
+        List<ConfigOverrideDto> overrides = extractOverridesFromDto(serverDto);
         Server server = serverMapper.mapServerDtoToEntity(serverDto);
         server.setId(null);
-        server = serverInstanceService.createServer(server);
+        server = serverInstanceService.createServer(server, overrides);
         ServerDto dto = serverMapper.mapServerToDto(server);
+        attachOverrides(server, dto);
         secretsMasker.maskIfUnauthorized(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
@@ -87,15 +103,18 @@ class ServerController implements ServersApi {
     @Transactional
     @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
     public ResponseEntity<ServerDto> updateServer(Long id, ServerDto serverDto) {
+        List<ConfigOverrideDto> overrides = extractOverridesFromDto(serverDto);
         Server existing = getServerEntity(id);
         if (!secretsMasker.canViewSecrets()) {
             preserveExistingPasswords(serverDto, existing);
+            overrides = preserveExistingOverrides(id);
         }
         clearModCollections(existing);
         serverInstanceService.flush();
         serverMapper.updateServerFromDto(serverDto, existing);
-        Server server = serverInstanceService.updateServer(existing);
+        Server server = serverInstanceService.updateServer(existing, overrides);
         ServerDto dto = serverMapper.mapServerToDto(server);
+        attachOverrides(server, dto);
         secretsMasker.maskIfUnauthorized(dto);
         return ResponseEntity.ok(dto);
     }
@@ -108,6 +127,10 @@ class ServerController implements ServersApi {
             dz.getActiveMods().clear();
             dz.getActiveLocalMods().clear();
         }
+    }
+
+    private List<ConfigOverrideDto> preserveExistingOverrides(long id) {
+        return serverMapper.mapOverridesToDtos(configOverrideService.getServerOverrides(id));
     }
 
     private void preserveExistingPasswords(ServerDto serverDto, Server existing) {
@@ -206,8 +229,74 @@ class ServerController implements ServersApi {
         return ResponseEntity.ok().build();
     }
 
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.ADVANCED_CONFIG_EDIT + "') and hasAuthority('" + PermissionCode.SERVER_SECRETS_VIEW + "')")
+    public ResponseEntity<ConfigOverrideDto> seedConfigOverride(SeedConfigOverrideRequest request) {
+        ConfigFileKey configKey = ConfigFileKey.valueOf(request.getConfigKey());
+        ServerDto draft = request.getServer();
+
+        Long serverId = null;
+        String serverName = "new";
+        if (draft instanceof cz.forgottenempire.servermanager.api.model.DayZServerDto dz) {
+            serverId = dz.getId();
+            serverName = dz.getName();
+        } else if (draft instanceof cz.forgottenempire.servermanager.api.model.Arma3ServerDto a3) {
+            serverId = a3.getId();
+            serverName = a3.getName();
+        } else if (draft instanceof cz.forgottenempire.servermanager.api.model.ReforgerServerDto rf) {
+            serverId = rf.getId();
+            serverName = rf.getName();
+        }
+
+        log.info("Seed config override: server='{}'(id={}) key={}", serverName, serverId, configKey);
+
+        Server transientEntity = serverMapper.mapServerDtoToEntity(draft);
+        ConfigOverrideDto result = configOverrideService.seedConfigOverride(configKey, serverId, transientEntity);
+        return ResponseEntity.ok(result);
+    }
+
     private Server getServerEntity(long id) {
         return serverInstanceService.getServer(id)
                 .orElseThrow(() -> new NotFoundException("Server ID " + id + " doesn't exist"));
+    }
+
+    private void attachOverrides(Server server, ServerDto dto) {
+        List<ServerConfigOverride> overrides = configOverrideService.getServerOverrides(server.getId());
+        if (overrides.isEmpty()) {
+            setOverridesNull(dto);
+            return;
+        }
+        List<ConfigOverrideDto> dtos = serverMapper.mapOverridesToDtos(overrides);
+        if (dto instanceof cz.forgottenempire.servermanager.api.model.Arma3ServerDto a3) {
+            a3.setConfigOverrides(dtos);
+        } else if (dto instanceof cz.forgottenempire.servermanager.api.model.DayZServerDto dz) {
+            dz.setConfigOverrides(dtos);
+        } else if (dto instanceof cz.forgottenempire.servermanager.api.model.ReforgerServerDto rf) {
+            rf.setConfigOverrides(dtos);
+        }
+    }
+
+    private void setOverridesNull(ServerDto dto) {
+        if (dto instanceof cz.forgottenempire.servermanager.api.model.Arma3ServerDto a3) {
+            a3.setConfigOverrides(null);
+        } else if (dto instanceof cz.forgottenempire.servermanager.api.model.DayZServerDto dz) {
+            dz.setConfigOverrides(null);
+        } else if (dto instanceof cz.forgottenempire.servermanager.api.model.ReforgerServerDto rf) {
+            rf.setConfigOverrides(null);
+        }
+    }
+
+    private List<ConfigOverrideDto> extractOverridesFromDto(ServerDto dto) {
+        if (dto instanceof cz.forgottenempire.servermanager.api.model.Arma3ServerDto a3
+                && a3.getConfigOverrides() != null) {
+            return a3.getConfigOverrides();
+        } else if (dto instanceof cz.forgottenempire.servermanager.api.model.DayZServerDto dz
+                && dz.getConfigOverrides() != null) {
+            return dz.getConfigOverrides();
+        } else if (dto instanceof cz.forgottenempire.servermanager.api.model.ReforgerServerDto rf
+                && rf.getConfigOverrides() != null) {
+            return rf.getConfigOverrides();
+        }
+        return List.of();
     }
 }

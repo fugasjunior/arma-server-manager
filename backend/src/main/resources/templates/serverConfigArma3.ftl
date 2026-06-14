@@ -1,5 +1,4 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server" -->
-
 // GLOBAL SETTINGS
 hostname = "${name}";
 password = "${password!}";

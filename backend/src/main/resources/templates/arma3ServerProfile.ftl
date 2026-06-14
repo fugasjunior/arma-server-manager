@@ -19,37 +19,37 @@ class DifficultyPresets
         class Options
         {
             /* Simulation */
-            reducedDamage = ${reducedDamage?then('1', '0')};        // Reduced damage
+            reducedDamage = ${reducedDamage?then('1', '0')};
 
             /* Situational awareness */
-            groupIndicators = ${groupIndicators};                   // Group indicators (0 = never, 1 = limited distance, 2 = always)
-            friendlyTags = ${friendlyTags};                         // Friendly name tags (0 = never, 1 = limited distance, 2 = always)
-            enemyTags = ${enemyTags};                               // Enemy name tags (0 = never, 1 = limited distance, 2 = always)
-            detectedMines = ${detectedMines};                       // Detected mines (0 = never, 1 = limited distance, 2 = always)
-            commands = ${commands};                                 // Commands (0 = never, 1 = fade out, 2 = always)
-            waypoints = ${waypoints};                               // Waypoints (0 = never, 1 = fade out, 2 = always)
-            tacticalPing = ${tacticalPing};                         // Tactical ping (0 = disabled, 1 = in 3D scene, 2 = on map, 3 = both)
+            groupIndicators = ${groupIndicators};
+            friendlyTags = ${friendlyTags};
+            enemyTags = ${enemyTags};
+            detectedMines = ${detectedMines};
+            commands = ${commands};
+            waypoints = ${waypoints};
+            tacticalPing = ${tacticalPing};
 
             /* Personal awareness */
-            weaponInfo = ${weaponInfo};                             // Weapon info (0 = never, 1 = fade out, 2 = always)
-            stanceIndicator = ${stanceIndicator};                   // Stance indicator (0 = never, 1 = fade out, 2 = always)
-            staminaBar = ${staminaBar?then('1', '0')};              // Stamina bar
-            weaponCrosshair = ${weaponCrosshair?then('1', '0')};    // Weapon crosshair
-            visionAid = ${visionAid?then('1', '0')};                // Vision aid
+            weaponInfo = ${weaponInfo};
+            stanceIndicator = ${stanceIndicator};
+            staminaBar = ${staminaBar?then('1', '0')};
+            weaponCrosshair = ${weaponCrosshair?then('1', '0')};
+            visionAid = ${visionAid?then('1', '0')};
 
             /* View */
-            thirdPersonView = ${thirdPersonView};                   // 3rd person view (0 = disabled, 1 = enabled, 2 = enabled for vehicles only)
-            cameraShake = ${cameraShake?then('1', '0')};            // Camera shake
+            thirdPersonView = ${thirdPersonView};
+            cameraShake = ${cameraShake?then('1', '0')};
 
             /* Multiplayer */
-            scoreTable = ${scoreTable?then('1', '0')};              // Score table
-            deathMessages = ${deathMessages?then('1', '0')};        // Killed by
-            vonID = ${vonID?then('1', '0')};                        // VoN ID
+            scoreTable = ${scoreTable?then('1', '0')};
+            deathMessages = ${deathMessages?then('1', '0')};
+            vonID = ${vonID?then('1', '0')};
 
             /* Misc */
-            mapContent = ${mapContent?then('1', '0')};              // Extended map content
-            autoReport = ${autoReport?then('1', '0')};              // Automatic reporting of spotted enemies by players only. This doesn't have any effect on AIs.
-            multipleSaves = 0;                                      // Multiple saves
+            mapContent = ${mapContent?then('1', '0')};
+            autoReport = ${autoReport?then('1', '0')};
+            multipleSaves = 0;
         };
 
         // aiLevelPreset defines AI skill level and is counted from 0 and can have following values: 0 (Low), 1 (Normal), 2 (High), 3 (Custom).

@@ -1,5 +1,4 @@
 <#-- @ftlvariable name="" type="cz.forgottenempire.servermanager.serverinstance.entities.Arma3NetworkSettings" -->
-
 <#if maxMessagesSend??>
     MaxMsgSend = ${maxMessagesSend};
 </#if>
@@ -24,7 +23,7 @@
 <#if maxPacketSize??>
     class sockets
     {
-    maxPacketSize = ${maxPacketSize};
+        maxPacketSize = ${maxPacketSize};
     };
 </#if>
 <#if maxCustomFileSize??>

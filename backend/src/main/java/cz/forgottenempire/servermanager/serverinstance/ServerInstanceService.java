@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.api.model.ConfigOverrideDto;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.exceptions.ModifyingRunningServerException;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,7 @@ public class ServerInstanceService {
     private final ServerProcessService processService;
     private final PathsFactory pathsFactory;
     private final FreeMarkerConfigurer freeMarkerConfigurer;
+    private final ConfigOverrideService configOverrideService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -33,12 +36,14 @@ public class ServerInstanceService {
             ServerRepository serverRepository,
             ServerProcessService processService,
             PathsFactory pathsFactory,
-            FreeMarkerConfigurer freeMarkerConfigurer
+            FreeMarkerConfigurer freeMarkerConfigurer,
+            ConfigOverrideService configOverrideService
     ) {
         this.serverRepository = serverRepository;
         this.processService = processService;
         this.pathsFactory = pathsFactory;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
+        this.configOverrideService = configOverrideService;
     }
 
     public List<Server> getAllServers() {
@@ -49,19 +54,22 @@ public class ServerInstanceService {
         return serverRepository.findById(id);
     }
 
-    public Server createServer(Server server) {
+    public Server createServer(Server server, List<ConfigOverrideDto> overrides) {
         server.getCustomLaunchParameters().forEach(param -> param.setServer(server));
         Server persistedServer = serverRepository.save(server);
-        ServerLaunchContext ctx = new ServerLaunchContext(pathsFactory, freeMarkerConfigurer);
+        Map<ConfigFileKey, String> overrideMap = configOverrideService.syncOverrides(persistedServer, overrides);
+        ServerLaunchContext ctx = new ServerLaunchContext(
+                pathsFactory, freeMarkerConfigurer, null,
+                overrideMap.isEmpty() ? null : overrideMap);
         persistedServer.getConfigFiles(ctx).forEach(ServerConfig::generate);
         return persistedServer;
     }
 
-    public Server updateServer(Server server) {
+    public Server updateServer(Server server, List<ConfigOverrideDto> overrides) {
         if (processService.isServerInstanceRunning(server)) {
             throw new ModifyingRunningServerException("Cannot modify running server '" + server.getName() + "'");
         }
-        return createServer(server);
+        return createServer(server, overrides);
     }
 
     public void deleteServer(Server server) {

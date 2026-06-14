@@ -1,3 +1,17 @@
+ConfigOverrideDto:
+  type: object
+  properties:
+    configKey:
+      type: string
+      description: Config file key
+    advanced:
+      type: boolean
+      description: True when this override exists (existence flag)
+    content:
+      type: string
+      nullable: true
+      description: Raw config content. Present only for callers with both ADVANCED_CONFIG_EDIT and SERVER_SECRETS_VIEW permissions.
+
 ServerDto:
   type: object
   required: [type]
@@ -48,6 +62,10 @@ BaseServerDto:
         $ref: './common.yaml#/LaunchParameterDto'
     automaticRestart:
       $ref: './common.yaml#/AutomaticRestartDto'
+    configOverrides:
+      type: array
+      items:
+        $ref: '#/ConfigOverrideDto'
 
 Arma3ServerDto:
   allOf:
@@ -315,6 +333,16 @@ Arma3NetworkSettingsDto:
       type: integer
     maxCustomFileSize:
       type: integer
+
+SeedConfigOverrideRequest:
+  type: object
+  required: [configKey, server]
+  properties:
+    configKey:
+      type: string
+      description: Config file key (e.g. DAYZ_SERVER_CFG)
+    server:
+      $ref: '#/ServerDto'
 
 SetHeadlessClientsTargetRequest:
   type: object
