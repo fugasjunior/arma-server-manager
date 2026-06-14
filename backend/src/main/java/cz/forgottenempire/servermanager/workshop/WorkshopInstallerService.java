@@ -169,20 +169,27 @@ class WorkshopInstallerService {
         return !installationService.isServerInstalled(serverType);
     }
 
-    private void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
-        if (steamCmdJob.getErrorStatus() != null) {
+    void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
+        boolean downloaded = verifyModDirectoryExists(mod.getId(), mod.getServerType());
+
+        if (downloaded) {
+            if (steamCmdJob.getErrorStatus() != null) {
+                log.info("Mod '{}' (ID {}) was downloaded before the SteamCMD batch failed; installing it normally",
+                        mod.getName(), mod.getId());
+            } else {
+                log.info("Mod '{}' (ID {}) successfully downloaded, now installing", mod.getName(), mod.getId());
+            }
+            installMod(mod);
+        } else if (steamCmdJob.getErrorStatus() != null) {
             log.error("Download of mod '{}' (id {}) failed, reason: {}",
                     mod.getName(), mod.getId(), steamCmdJob.getErrorStatus());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(steamCmdJob.getErrorStatus());
-        } else if (!verifyModDirectoryExists(mod.getId(), mod.getServerType())) {
+        } else {
             log.error("Could not find downloaded mod directory for mod '{}' (id {}) " +
                     "even though download finished successfully", mod.getName(), mod.getId());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.GENERIC);
-        } else {
-            log.info("Mod '{}' (ID {}) successfully downloaded, now installing", mod.getName(), mod.getId());
-            installMod(mod);
         }
 
         modsService.saveMod(mod);
