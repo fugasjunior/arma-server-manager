@@ -120,6 +120,8 @@ paths:
     $ref: './paths/keys.yaml#/~1server~1{id}~1keys'
   /server/{id}/keys/{name}:
     $ref: './paths/keys.yaml#/~1server~1{id}~1keys~1{name}'
+  /server/{id}/provided-keys:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1provided-keys'
 
   # ── Steam Auth ─────────────────────────────────────────────────────────────
   /config/auth:

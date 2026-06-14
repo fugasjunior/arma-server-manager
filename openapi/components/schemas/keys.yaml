@@ -17,3 +17,19 @@ Arma3KeysDto:
       type: array
       items:
         $ref: '#/Arma3KeyDto'
+
+Arma3ProvidedKeyDto:
+  type: object
+  properties:
+    name:
+      type: string
+    source:
+      type: string
+
+Arma3ProvidedKeysDto:
+  type: object
+  properties:
+    keys:
+      type: array
+      items:
+        $ref: '#/Arma3ProvidedKeyDto'

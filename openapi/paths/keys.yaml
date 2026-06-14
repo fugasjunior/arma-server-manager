@@ -42,6 +42,23 @@
       '404':
         $ref: '../components/responses.yaml#/ApiError'
 
+/server/{id}/provided-keys:
+  parameters:
+    - $ref: '../components/parameters.yaml#/serverId'
+  get:
+    tags: [Keys]
+    operationId: getServerProvidedKeys
+    summary: List all non-custom bikeys active on a server instance (mod-provided and base-game)
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/keys.yaml#/Arma3ProvidedKeysDto'
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
 /server/{id}/keys/{name}:
   parameters:
     - $ref: '../components/parameters.yaml#/serverId'

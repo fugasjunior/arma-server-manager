@@ -22,12 +22,13 @@ class Arma3KeyServiceTest {
     @TempDir
     private lateinit var tempDir: Path
 
+    private lateinit var pathsFactory: PathsFactory
     private lateinit var arma3InstancePaths: Arma3InstancePaths
     private lateinit var arma3KeyService: Arma3KeyService
 
     @BeforeEach
     fun setUp() {
-        val pathsFactory = PathsFactory(
+        pathsFactory = PathsFactory(
             tempDir.toString(),
             tempDir.resolve("mods").toString(),
             tempDir.resolve("logs").toString(),
@@ -139,5 +140,78 @@ class Arma3KeyServiceTest {
         server.activeMods = listOf(entry)
 
         assertThatNoException().isThrownBy { arma3KeyService.rebuildInstanceBikeys(server) }
+    }
+
+    @Test
+    fun listProvidedKeys_workshopMod_returnsKeyTaggedWithModName() {
+        val mod = WorkshopMod(WORKSHOP_MOD_ID)
+        mod.name = "ACE3"
+        val entry = Arma3ServerActiveMod()
+        entry.mod = mod
+        val server = serverWith(includeWorkshop = false, includeLocal = false)
+        server.activeMods = listOf(entry)
+
+        val result = arma3KeyService.listProvidedKeys(server)
+
+        assertThat(result).containsExactly(ProvidedKeyInfo("mod.bikey", "ACE3"))
+    }
+
+    @Test
+    fun listProvidedKeys_workshopModWithoutName_fallsBackToModId() {
+        val entry = Arma3ServerActiveMod()
+        entry.mod = WorkshopMod(WORKSHOP_MOD_ID) // name is null
+        val server = serverWith(includeWorkshop = false, includeLocal = false)
+        server.activeMods = listOf(entry)
+
+        val result = arma3KeyService.listProvidedKeys(server)
+
+        assertThat(result).containsExactly(ProvidedKeyInfo("mod.bikey", WORKSHOP_MOD_ID.toString()))
+    }
+
+    @Test
+    fun listProvidedKeys_localMod_returnsKeyTaggedWithModName() {
+        val result = arma3KeyService.listProvidedKeys(serverWith(includeWorkshop = false, includeLocal = true))
+
+        assertThat(result).containsExactly(ProvidedKeyInfo("local.bikey", LOCAL_MOD_NAME))
+    }
+
+    @Test
+    fun listProvidedKeys_baseGameDir_returnsKeyTaggedWithBaseGameSource() {
+        val baseGameKeys = pathsFactory.getServerKeysPath(ServerType.ARMA3)
+        Files.createDirectories(baseGameKeys)
+        Files.createFile(baseGameKeys.resolve("game.bikey"))
+
+        val result = arma3KeyService.listProvidedKeys(serverWith(includeWorkshop = false, includeLocal = false))
+
+        assertThat(result).containsExactly(ProvidedKeyInfo("game.bikey", ProvidedKeyInfo.BASE_GAME_SOURCE))
+    }
+
+    @Test
+    fun listProvidedKeys_allSources_returnsAllKeys() {
+        val baseGameKeys = pathsFactory.getServerKeysPath(ServerType.ARMA3)
+        Files.createDirectories(baseGameKeys)
+        Files.createFile(baseGameKeys.resolve("game.bikey"))
+
+        val result = arma3KeyService.listProvidedKeys(serverWith(includeWorkshop = true, includeLocal = true))
+
+        assertThat(result).extracting("name")
+            .containsExactlyInAnyOrder("mod.bikey", "local.bikey", "game.bikey")
+    }
+
+    @Test
+    fun listProvidedKeys_noActiveMods_noBaseGameDir_returnsEmpty() {
+        val result = arma3KeyService.listProvidedKeys(serverWith(includeWorkshop = false, includeLocal = false))
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun listProvidedKeys_modStoreMissing_doesNotThrow() {
+        val entry = Arma3ServerActiveMod()
+        entry.mod = WorkshopMod(9999L) // no dir seeded for this id
+        val server = serverWith(includeWorkshop = false, includeLocal = false)
+        server.activeMods = listOf(entry)
+
+        assertThatNoException().isThrownBy { arma3KeyService.listProvidedKeys(server) }
     }
 }

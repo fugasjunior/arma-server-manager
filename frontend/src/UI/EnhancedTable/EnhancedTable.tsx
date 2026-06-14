@@ -32,11 +32,12 @@ export type EnhancedTableHeadCell = {
 type EnhancedTableProps = {
     id: string,
     rows: Array<EnhancedTableRow>,
-    selectedRowIds: Array<string | number>,
+    selectedRowIds?: Array<string | number>,
     title: string,
     headCells: Array<EnhancedTableHeadCell>,
-    onRowSelect: (rowId: string | number) => void,
-    onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
+    onRowSelect?: (rowId: string | number) => void,
+    onSelectAllRowsClick?: (event: ChangeEvent<HTMLInputElement>) => void,
+    selectable?: boolean,
     loading?: boolean
     defaultSortColumnId?: string,
     customTopControls?: ReactNode
@@ -49,11 +50,12 @@ export const EnhancedTable = (
     {
         id,
         rows,
-        selectedRowIds,
+        selectedRowIds = [],
         title,
         headCells,
-        onRowSelect,
-        onSelectAllRowsClick,
+        onRowSelect = () => {},
+        onSelectAllRowsClick = () => {},
+        selectable = true,
         loading,
         defaultSortColumnId,
         customTopControls,
@@ -152,9 +154,11 @@ export const EnhancedTable = (
                     rowCount={rows.length}
                     headCells={headCells}
                     search={searchTerm}
+                    selectable={selectable}
                 />
                 {!loading && <EnhancedTableBody rows={getPaginatedRows()} selectedRowIds={selectedRowIds}
-                                                emptyRowsCount={emptyRowsCount} onRowSelect={onRowSelect}/>}
+                                                emptyRowsCount={emptyRowsCount} onRowSelect={onRowSelect}
+                                                selectable={selectable}/>}
             </Table>
             <TableGhosts display={!!loading} count={15}/>
         </TableContainer>

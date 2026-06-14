@@ -2,6 +2,9 @@ package cz.forgottenempire.servermanager.keymgmt
 
 import cz.forgottenempire.servermanager.api.KeysApi
 import cz.forgottenempire.servermanager.api.model.Arma3KeysDto
+import cz.forgottenempire.servermanager.api.model.Arma3ProvidedKeyDto
+import cz.forgottenempire.servermanager.api.model.Arma3ProvidedKeysDto
+import cz.forgottenempire.servermanager.common.Arma3KeyService
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException
 import cz.forgottenempire.servermanager.security.permission.PermissionCode
 import cz.forgottenempire.servermanager.serverinstance.ServerInstanceService
@@ -17,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 class BiKeyController @Autowired constructor(
     private val biKeyService: BiKeyService,
+    private val arma3KeyService: Arma3KeyService,
     private val serverInstanceService: ServerInstanceService
 ) : KeysApi {
 
@@ -24,6 +28,14 @@ class BiKeyController @Autowired constructor(
     override fun getServerKeys(id: Long): ResponseEntity<Arma3KeysDto> {
         requireArma3Server(id)
         return ResponseEntity.ok(Arma3KeysDto().keys(biKeyService.listKeys(id)))
+    }
+
+    @PreAuthorize("hasAuthority('${PermissionCode.BIKEY_VIEW}')")
+    override fun getServerProvidedKeys(id: Long): ResponseEntity<Arma3ProvidedKeysDto> {
+        val server = getArma3Server(id)
+        val keys = arma3KeyService.listProvidedKeys(server)
+            .map { Arma3ProvidedKeyDto().name(it.name).source(it.source) }
+        return ResponseEntity.ok(Arma3ProvidedKeysDto().keys(keys))
     }
 
     @PreAuthorize("hasAuthority('${PermissionCode.BIKEY_MODIFY}')")
@@ -51,10 +63,14 @@ class BiKeyController @Autowired constructor(
         return ResponseEntity.noContent().build()
     }
 
-    private fun requireArma3Server(id: Long) {
+    private fun getArma3Server(id: Long): Arma3Server =
         serverInstanceService.getServer(id)
             .filter { it is Arma3Server }
+            .map { it as Arma3Server }
             .orElseThrow { NotFoundException("Arma 3 server with ID $id doesn't exist") }
+
+    private fun requireArma3Server(id: Long) {
+        getArma3Server(id)
     }
 
     companion object {

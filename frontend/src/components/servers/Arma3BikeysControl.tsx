@@ -4,7 +4,9 @@ import {ServerDto, ServerInstanceInfoDto} from "../../api/generated";
 import {keysApi} from "../../api/client";
 import {toast} from "react-toastify";
 import {KeysTable} from "../keys/KeysTable";
+import {ActiveKeysTable} from "../keys/ActiveKeysTable";
 import {useServerKeys} from "../../hooks/queries/useServerKeys";
+import {useServerProvidedKeys} from "../../hooks/queries/useServerProvidedKeys";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "../../api/queryKeys";
 import KeyIcon from "@mui/icons-material/Key";
@@ -37,6 +39,7 @@ const Arma3BikeysControl = ({server, status}: Arma3BikeysControlProps) => {
     const serverRunning = status?.alive ?? false;
 
     const {data: keys = []} = useServerKeys(serverId, {enabled: isOpen});
+    const {data: modKeys = []} = useServerProvidedKeys(serverId, {enabled: isOpen});
 
     const handleOpen = () => {
         if (server.id === undefined) return;
@@ -126,6 +129,7 @@ const Arma3BikeysControl = ({server, status}: Arma3BikeysControlProps) => {
                         uploadInProgress={uploadInProgress}
                         disabled={serverRunning}
                     />
+                    <ActiveKeysTable rows={modKeys}/>
                 </Box>
             </Modal>
         </>
