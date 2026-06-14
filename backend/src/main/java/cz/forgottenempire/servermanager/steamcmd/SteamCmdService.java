@@ -64,6 +64,7 @@ public class SteamCmdService {
 
         String username = steamAuthService.getAuthAccount().getUsername();
         SteamCmdParameters.Builder parameters = new SteamCmdParameters.Builder()
+                .continueOnFailedCommand()
                 .withInstallDir(pathsFactory.getModsBasePath().toAbsolutePath().toString())
                 .withCachedLogin(username);
 

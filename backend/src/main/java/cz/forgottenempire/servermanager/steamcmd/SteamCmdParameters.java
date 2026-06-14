@@ -33,6 +33,12 @@ public class SteamCmdParameters {
             parameters.add("+@ShutdownOnFailedCommand 1");
         }
 
+        public Builder continueOnFailedCommand() {
+            parameters.parameters.remove("+@ShutdownOnFailedCommand 1");
+            parameters.add("+@ShutdownOnFailedCommand 0");
+            return this;
+        }
+
         /** Username-only login that reuses the cached session in config.vdf. Used by all jobs and the session probe. */
         public Builder withCachedLogin(String username) {
             parameters.add("+login " + username);
