@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.0]
+
+### Added
+- Advanced server configuration editing — edit raw server config directly with config overrides
+- Headless client mod selection — assign mods per headless client
+
+### Changed
+- Authentication switched from JWT to session-based auth
+
+### Fixed
+- Container now runs as a non-root user
+- Local mod directories are now initialized on startup
+- Removed non-functional headless client field from the Arma 3 server settings form
+- Steam Auth form and unauthorized API call handling
+- About page rendering in dark mode
+
 ## [1.5.0]
 
 ### Added
