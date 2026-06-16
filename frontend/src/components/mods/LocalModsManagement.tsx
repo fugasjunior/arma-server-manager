@@ -5,21 +5,16 @@ import {
     CircularProgress,
     Paper,
     Stack,
-    Switch,
     Tab,
     Tabs,
     Typography,
 } from "@mui/material";
 import {toast} from "react-toastify";
 import PermissionGuard from "../auth/PermissionGuard";
-import {ServerType} from "../../api/generated";
+import {ModFlagsDto, ServerType} from "../../api/generated";
 import {LocalModSyncStatusDtoStatus} from "../../api/generated/models/local-mod-sync-status-dto";
 import SERVER_NAMES from "../../util/serverNames";
-import {
-    useLocalMods,
-    useSetLocalModServerOnly,
-    useSetLocalModLoadOnHeadlessClient
-} from "../../hooks/queries/useLocalMods";
+import {useLocalMods, useSetLocalModFlags} from "../../hooks/queries/useLocalMods";
 import {usePermission} from "../../hooks/usePermission";
 import {useSyncLocalMods, useLocalModSyncStatus} from "../../hooks/useLocalModSync";
 import {useQueryClient} from "@tanstack/react-query";
@@ -29,6 +24,7 @@ import {
     EnhancedTableHeadCell,
     EnhancedTableRow
 } from "../../UI/EnhancedTable/EnhancedTable";
+import ModFlagsToggleGroup from "./ModFlagsToggleGroup";
 
 function formatBytes(bytes?: number | null): string {
     if (!bytes) return "—";
@@ -41,8 +37,7 @@ const headCells: EnhancedTableHeadCell[] = [
     {id: "name", label: "Name", sortable: true, searchable: true},
     {id: "serverType", label: "Game", sortable: true},
     {id: "fileSize", label: "Size", sortable: true, type: "numeric"},
-    {id: "serverOnly", label: "Server mod", sortable: false},
-    {id: "loadOnHeadlessClient", label: "Headless client", sortable: false},
+    {id: "loadedOn", label: "Loaded on", sortable: false},
     {id: "uploadedAt", label: "Uploaded", sortable: true, type: "date"},
 ];
 
@@ -53,8 +48,7 @@ export default function LocalModsManagement() {
 
     const queryClient = useQueryClient();
     const {data: localMods = [], isLoading} = useLocalMods();
-    const serverOnlyMutation = useSetLocalModServerOnly();
-    const loadOnHcMutation = useSetLocalModLoadOnHeadlessClient();
+    const flagsMutation = useSetLocalModFlags();
     const syncMutation = useSyncLocalMods();
     const syncStatus = useLocalModSyncStatus(isSyncing);
 
@@ -78,12 +72,8 @@ export default function LocalModsManagement() {
         setFilter(newValue);
     }
 
-    async function handleServerOnlyToggle(id: number, current: boolean) {
-        await serverOnlyMutation.mutateAsync({id, serverOnly: !current});
-    }
-
-    async function handleLoadOnHcToggle(id: number, current: boolean) {
-        await loadOnHcMutation.mutateAsync({id, loadOnHeadlessClient: !current});
+    async function handleFlagsChange(id: number, flags: ModFlagsDto) {
+        await flagsMutation.mutateAsync({id, flags});
     }
 
     async function handleSync() {
@@ -109,30 +99,22 @@ export default function LocalModsManagement() {
                 displayValue: formatBytes(mod.fileSize)
             } as EnhancedTableCell,
             {
-                id: "serverOnly", value: mod.serverOnly ?? false,
+                id: "loadedOn",
+                value: "loadedOn",
                 displayValue: (
-                    <Switch
-                        checked={mod.serverOnly ?? false}
-                        onChange={() => canModify && handleServerOnlyToggle(mod.id!, mod.serverOnly ?? false)}
-                        onClick={(e) => e.stopPropagation()}
-                        disabled={!canModify}
-                        size="small"
-                    />
-                )
-            } as EnhancedTableCell,
-            {
-                id: "loadOnHeadlessClient", value: mod.loadOnHeadlessClient ?? true,
-                displayValue: mod.serverType === ServerType.Arma3
-                    ? (
-                        <Switch
-                            checked={mod.loadOnHeadlessClient ?? true}
-                            onChange={() => canModify && handleLoadOnHcToggle(mod.id!, mod.loadOnHeadlessClient ?? true)}
-                            onClick={(e) => e.stopPropagation()}
+                    <span data-testid={`local-mod-flags-${mod.id}`}>
+                        <ModFlagsToggleGroup
+                            flags={{
+                                loadOnClient: mod.loadOnClient ?? true,
+                                loadOnServer: mod.loadOnServer ?? true,
+                                loadOnHeadlessClient: mod.loadOnHeadlessClient ?? true,
+                            }}
+                            serverType={mod.serverType as ServerType}
                             disabled={!canModify}
-                            size="small"
+                            onChange={(flags) => canModify && handleFlagsChange(mod.id!, flags)}
                         />
-                    )
-                    : undefined
+                    </span>
+                )
             } as EnhancedTableCell,
             {
                 id: "uploadedAt",

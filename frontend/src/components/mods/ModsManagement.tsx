@@ -3,7 +3,7 @@ import ModsTable from "./ModsTable";
 import CreatePresetDialog from "./CreatePresetDialog";
 import {ChangeEvent, useMemo, useState} from "react";
 import {toast} from "react-toastify";
-import {ModDto, ServerType} from "../../api/generated";
+import {ModDto, ModFlagsDto, ServerType} from "../../api/generated";
 import {modsApi, modPresetsApi} from "../../api/client";
 import {useMods} from "../../hooks/queries/useMods";
 import {useSteamCmdItemInfos} from "../../hooks/queries/useSteamCmdItemInfos";
@@ -120,15 +120,8 @@ export default function ModsManagement() {
         await queryClient.invalidateQueries({queryKey: queryKeys.presets()});
     };
 
-    const handleServerOnlyChanged = async (e: ChangeEvent<HTMLInputElement>, modId: number) => {
-        const isServerOnly = e.target.checked;
-        await modsApi.setModServerOnly({id: modId, serverOnlyDto: {serverOnly: isServerOnly}});
-        await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
-    };
-
-    const handleLoadOnHcChanged = async (e: ChangeEvent<HTMLInputElement>, modId: number) => {
-        const loadOnHeadlessClient = e.target.checked;
-        await modsApi.setModLoadOnHeadlessClient({id: modId, loadOnHeadlessClientDto: {loadOnHeadlessClient}});
+    const handleFlagsChange = async (modId: number, flags: ModFlagsDto) => {
+        await modsApi.setModFlags({id: modId, modFlagsDto: flags});
         await queryClient.invalidateQueries({queryKey: queryKeys.mods()});
     };
 
@@ -148,8 +141,7 @@ export default function ModsManagement() {
                    onModUpdateClicked={handleModUpdate}
                    onModUninstallClicked={handleUninstall} onModInstallClicked={handleInstall}
                    onFilterChange={handleFilterChange} onCreatePresetClicked={handlePresedDialogOpen}
-                   onServerOnlyChanged={handleServerOnlyChanged}
-                   onLoadOnHcChanged={handleLoadOnHcChanged}
+                   onFlagsChange={handleFlagsChange}
         />
         <CreatePresetDialog open={newPresetDialogOpen} onClose={handlePresedDialogClose}
                             onConfirmClicked={handleCreateNewPreset}

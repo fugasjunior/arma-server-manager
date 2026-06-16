@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.workshop;
 
+import cz.forgottenempire.servermanager.api.model.ModFlagsDto;
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
@@ -78,13 +79,10 @@ public class WorkshopModsFacade {
         modsService.deleteMod(workshopMod);
     }
 
-    public void setModServerOnly(WorkshopMod mod, boolean serverOnly) {
-        mod.setServerOnly(serverOnly);
-        modsService.saveMod(mod);
-    }
-
-    public void setModLoadOnHeadlessClient(WorkshopMod mod, boolean loadOnHeadlessClient) {
-        mod.setLoadOnHeadlessClient(loadOnHeadlessClient);
+    public void setModFlags(WorkshopMod mod, ModFlagsDto dto) {
+        mod.setLoadOnClient(dto.getLoadOnClient());
+        mod.setLoadOnServer(dto.getLoadOnServer());
+        mod.setLoadOnHeadlessClient(dto.getLoadOnHeadlessClient());
         modsService.saveMod(mod);
     }
 }

@@ -10,8 +10,12 @@ import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Stream
 
 private const val SERVER_ID = 1L
 private const val WORKSHOP_MOD_ID = 100L
@@ -213,5 +217,67 @@ class Arma3KeyServiceTest {
         server.activeMods = listOf(entry)
 
         assertThatNoException().isThrownBy { arma3KeyService.listProvidedKeys(server) }
+    }
+
+    @ParameterizedTest(name = "client={0} server={1} hc={2} → copied={3}")
+    @MethodSource("shouldCopyBikeysArgs")
+    fun rebuildInstanceBikeys_copiesOrSkipsByFlags(
+        loadOnClient: Boolean, loadOnServer: Boolean, loadOnHc: Boolean, expectCopied: Boolean
+    ) {
+        val server = Arma3Server()
+        server.id = SERVER_ID
+        server.activeDLCs = listOf()
+        val mod = WorkshopMod(WORKSHOP_MOD_ID)
+        mod.isLoadOnClient = loadOnClient
+        mod.isLoadOnServer = loadOnServer
+        mod.isLoadOnHeadlessClient = loadOnHc
+        val entry = Arma3ServerActiveMod()
+        entry.mod = mod
+        server.activeMods = listOf(entry)
+        server.activeLocalMods = listOf()
+
+        arma3KeyService.rebuildInstanceBikeys(server)
+
+        val instanceKeys = arma3InstancePaths.getInstanceKeysPath(SERVER_ID)
+        if (expectCopied) {
+            assertThat(instanceKeys.resolve("mod.bikey")).exists()
+        } else {
+            assertThat(instanceKeys.resolve("mod.bikey")).doesNotExist()
+        }
+    }
+
+    @ParameterizedTest(name = "client={0} server={1} hc={2} → included={3}")
+    @MethodSource("shouldCopyBikeysArgs")
+    fun listProvidedKeys_includesOrSkipsByFlags(
+        loadOnClient: Boolean, loadOnServer: Boolean, loadOnHc: Boolean, expectedIncluded: Boolean
+    ) {
+        val mod = WorkshopMod(WORKSHOP_MOD_ID)
+        mod.name = "TestMod"
+        mod.isLoadOnClient = loadOnClient
+        mod.isLoadOnServer = loadOnServer
+        mod.isLoadOnHeadlessClient = loadOnHc
+        val entry = Arma3ServerActiveMod()
+        entry.mod = mod
+        val server = serverWith(includeWorkshop = false, includeLocal = false)
+        server.activeMods = listOf(entry)
+
+        val result = arma3KeyService.listProvidedKeys(server)
+
+        if (expectedIncluded) {
+            assertThat(result).isNotEmpty()
+        } else {
+            assertThat(result).isEmpty()
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun shouldCopyBikeysArgs(): Stream<Arguments> = Stream.of(
+            Arguments.of(false, false, false, false), // all off → skip
+            Arguments.of(false, true,  false, true),  // server only → copy
+            Arguments.of(true,  false, false, true),  // client only → copy
+            Arguments.of(false, false, true,  true),  // HC only → copy
+            Arguments.of(true,  true,  true,  true),  // all on → copy
+        )
     }
 }

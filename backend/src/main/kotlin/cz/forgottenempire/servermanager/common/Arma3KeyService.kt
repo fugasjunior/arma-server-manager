@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.common
 
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server
+import cz.forgottenempire.servermanager.serverinstance.entities.ActiveModEntry
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,14 +36,18 @@ class Arma3KeyService @Autowired constructor(
     fun listProvidedKeys(server: Arma3Server): List<ProvidedKeyInfo> {
         val result = mutableListOf<ProvidedKeyInfo>()
         for (entry in server.activeMods) {
-            val source = entry.mod.name ?: entry.mod.id.toString()
-            findBikeys(pathsFactory.getModInstallationPath(entry.mod.id, ServerType.ARMA3))
-                .mapTo(result) { ProvidedKeyInfo(it.name, source) }
+            if (shouldCopyBikeys(entry)) {
+                val source = entry.mod.name ?: entry.mod.id.toString()
+                findBikeys(pathsFactory.getModInstallationPath(entry.mod.id, ServerType.ARMA3))
+                    .mapTo(result) { ProvidedKeyInfo(it.name, source) }
+            }
         }
         for (entry in server.activeLocalMods) {
-            val source = entry.mod.name
-            findBikeys(pathsFactory.getLocalModPath(source, ServerType.ARMA3))
-                .mapTo(result) { ProvidedKeyInfo(it.name, source) }
+            if (shouldCopyBikeys(entry)) {
+                val source = entry.mod.name
+                findBikeys(pathsFactory.getLocalModPath(source, ServerType.ARMA3))
+                    .mapTo(result) { ProvidedKeyInfo(it.name, source) }
+            }
         }
         findBikeys(pathsFactory.getServerKeysPath(ServerType.ARMA3))
             .mapTo(result) { ProvidedKeyInfo(it.name, ProvidedKeyInfo.BASE_GAME_SOURCE) }
@@ -57,10 +62,14 @@ class Arma3KeyService @Autowired constructor(
 
     private fun copyModBikeys(server: Arma3Server, instanceKeys: Path) {
         for (entry in server.activeMods) {
-            copyBikeys(pathsFactory.getModInstallationPath(entry.mod.id, ServerType.ARMA3), instanceKeys)
+            if (shouldCopyBikeys(entry)) {
+                copyBikeys(pathsFactory.getModInstallationPath(entry.mod.id, ServerType.ARMA3), instanceKeys)
+            }
         }
         for (entry in server.activeLocalMods) {
-            copyBikeys(pathsFactory.getLocalModPath(entry.mod.name, ServerType.ARMA3), instanceKeys)
+            if (shouldCopyBikeys(entry)) {
+                copyBikeys(pathsFactory.getLocalModPath(entry.mod.name, ServerType.ARMA3), instanceKeys)
+            }
         }
     }
 
@@ -80,6 +89,9 @@ class Arma3KeyService @Autowired constructor(
         if (!srcDir.isDirectory) return emptyList()
         return FileUtils.iterateFiles(srcDir, arrayOf("bikey"), true).asSequence().toList()
     }
+
+    private fun shouldCopyBikeys(entry: ActiveModEntry): Boolean =
+        entry.isLoadOnClient || entry.isLoadOnServer || entry.isLoadOnHeadlessClient
 
     companion object {
         private val log = LoggerFactory.getLogger(Arma3KeyService::class.java)

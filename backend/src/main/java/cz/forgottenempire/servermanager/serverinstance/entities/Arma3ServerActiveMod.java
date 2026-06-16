@@ -25,8 +25,13 @@ public class Arma3ServerActiveMod implements ActiveModEntry {
     private int position;
 
     @Override
-    public boolean isServerOnly() {
-        return mod.isServerOnly();
+    public boolean isLoadOnClient() {
+        return mod.isLoadOnClient();
+    }
+
+    @Override
+    public boolean isLoadOnServer() {
+        return mod.isLoadOnServer();
     }
 
     @Override

@@ -44,7 +44,7 @@ beforeEach(() => {
 describe('ListBuilderModEdit local mods', () => {
     it('shows local mod with (LOCAL) subtitle in available list', async () => {
         mockUseLocalMods.mockReturnValue({
-            data: [{id: 1, name: '@MyLocalMod', serverType: ServerType.Arma3, serverOnly: false}],
+            data: [{id: 1, name: '@MyLocalMod', serverType: ServerType.Arma3, loadOnClient: true, loadOnServer: true, loadOnHeadlessClient: true}],
             isLoading: false,
         } as any);
 
@@ -64,7 +64,7 @@ describe('ListBuilderModEdit local mods', () => {
             isLoading: false,
         } as any);
         mockUseLocalMods.mockReturnValue({
-            data: [{id: 1, name: '@LocalMod', serverType: ServerType.Arma3, serverOnly: false}],
+            data: [{id: 1, name: '@LocalMod', serverType: ServerType.Arma3, loadOnClient: true, loadOnServer: true, loadOnHeadlessClient: true}],
             isLoading: false,
         } as any);
 
