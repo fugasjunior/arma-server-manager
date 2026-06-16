@@ -107,7 +107,7 @@ class ServerControllerTest {
         when(serverInstanceService.getServer(SERVER_ID)).thenReturn(Optional.of(source));
         when(serverMapper.mapServerToDto(source)).thenReturn(sourceDto);
         when(serverMapper.mapServerDtoToEntity(any())).thenReturn(new Arma3Server());
-        when(serverInstanceService.createServer(any())).thenAnswer(inv -> {
+        when(serverInstanceService.createServer(any(), any())).thenAnswer(inv -> {
             Server clone = inv.getArgument(0);
             assertThat(clone.getId()).isNull();
             assertThat(clone.getName()).isEqualTo("My Server (copy)");
@@ -135,7 +135,7 @@ class ServerControllerTest {
         when(serverInstanceService.getServer(SERVER_ID)).thenReturn(Optional.of(source));
         when(serverMapper.mapServerToDto(source)).thenReturn(sourceDto);
         when(serverMapper.mapServerDtoToEntity(any())).thenReturn(new DayZServer());
-        when(serverInstanceService.createServer(any())).thenReturn(saved);
+        when(serverInstanceService.createServer(any(), any())).thenReturn(saved);
         when(serverMapper.mapServerToDto(saved)).thenReturn(new DayZServerDto());
 
         controller.duplicateServer(SERVER_ID);
