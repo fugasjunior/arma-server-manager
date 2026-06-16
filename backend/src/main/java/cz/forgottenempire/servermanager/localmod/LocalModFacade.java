@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.localmod;
 
+import cz.forgottenempire.servermanager.api.model.ModFlagsDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,15 +27,11 @@ public class LocalModFacade {
         this.statusHolder = statusHolder;
     }
 
-    public void setServerOnly(Long id, boolean serverOnly) {
+    public void setFlags(Long id, ModFlagsDto dto) {
         LocalMod mod = modService.requireMod(id);
-        mod.setServerOnly(serverOnly);
-        modService.saveMod(mod);
-    }
-
-    public void setLoadOnHeadlessClient(Long id, boolean loadOnHeadlessClient) {
-        LocalMod mod = modService.requireMod(id);
-        mod.setLoadOnHeadlessClient(loadOnHeadlessClient);
+        mod.setLoadOnClient(dto.getLoadOnClient());
+        mod.setLoadOnServer(dto.getLoadOnServer());
+        mod.setLoadOnHeadlessClient(dto.getLoadOnHeadlessClient());
         modService.saveMod(mod);
     }
 

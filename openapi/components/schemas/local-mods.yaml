@@ -11,7 +11,9 @@ LocalModDto:
     fileSize:
       type: integer
       format: int64
-    serverOnly:
+    loadOnClient:
+      type: boolean
+    loadOnServer:
       type: boolean
     loadOnHeadlessClient:
       type: boolean

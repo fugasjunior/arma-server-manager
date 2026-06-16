@@ -146,13 +146,13 @@ public class Arma3Server extends Server {
 
     public Stream<String> getServerModsAsParameters() {
         return orderedActiveMods()
-                .filter(ActiveModEntry::isServerOnly)
+                .filter(e -> e.isLoadOnServer() && !e.isLoadOnClient())
                 .map(e -> "-serverMod=" + e.getLaunchName());
     }
 
     public Stream<String> getClientModsAsParameters() {
         return orderedActiveMods()
-                .filter(e -> !e.isServerOnly())
+                .filter(e -> e.isLoadOnServer() && e.isLoadOnClient())
                 .map(e -> "-mod=" + e.getLaunchName());
     }
 

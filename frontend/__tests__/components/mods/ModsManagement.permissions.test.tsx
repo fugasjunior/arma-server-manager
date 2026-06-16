@@ -12,7 +12,7 @@ jest.mock('../../../src/api/client', () => ({
         addMods: jest.fn(),
         deleteMods: jest.fn(),
         updateMod: jest.fn(),
-        setModServerOnly: jest.fn(),
+        setModFlags: jest.fn(),
     },
     modPresetsApi: {
         createPreset: jest.fn(),

@@ -18,7 +18,9 @@ jest.mock('../../../src/config', () => ({
 const sampleMod: ModDto = {
     id: 42,
     name: 'TestMod',
-    serverOnly: false,
+    loadOnClient: true,
+    loadOnServer: true,
+    loadOnHeadlessClient: true,
     installationStatus: InstallationStatus.Finished,
 };
 
@@ -38,7 +40,7 @@ const defaultProps = {
     onFilterChange: jest.fn(),
     onRowClick: jest.fn(),
     onSelectAllRowsClick: jest.fn(),
-    onServerOnlyChanged: jest.fn(),
+    onFlagsChange: jest.fn(),
 };
 
 beforeEach(() => {
@@ -68,17 +70,17 @@ describe('ModsTable permissions', () => {
         });
     });
 
-    describe('server-only switch', () => {
+    describe('flags control', () => {
         it('is disabled without MOD_MODIFY', () => {
             renderWithPermissions(<ModsTable {...defaultProps}/>, ['MOD_VIEW']);
-            const wrapper = screen.getByTestId('mod-server-only-switch-42');
-            expect(within(wrapper).getByRole('switch')).toBeDisabled();
+            const wrapper = screen.getByTestId('mod-flags-42');
+            within(wrapper).getAllByRole('button').forEach(btn => expect(btn).toBeDisabled());
         });
 
         it('is enabled with MOD_MODIFY', () => {
             renderWithPermissions(<ModsTable {...defaultProps}/>, ['MOD_VIEW', 'MOD_MODIFY']);
-            const wrapper = screen.getByTestId('mod-server-only-switch-42');
-            expect(within(wrapper).getByRole('switch')).not.toBeDisabled();
+            const wrapper = screen.getByTestId('mod-flags-42');
+            within(wrapper).getAllByRole('button').forEach(btn => expect(btn).not.toBeDisabled());
         });
     });
 });

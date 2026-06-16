@@ -17,14 +17,14 @@
             schema:
               $ref: '../components/schemas/local-mods.yaml#/LocalModsDto'
 
-/local-mod/{id}/serverOnly:
+/local-mod/{id}/flags:
   patch:
     tags: [LocalMods]
-    operationId: setLocalModServerOnly
-    summary: Toggle server-only flag for a local mod
+    operationId: setLocalModFlags
+    summary: Update local mod flags
     parameters:
-      - name: id
-        in: path
+      - in: path
+        name: id
         required: true
         schema:
           type: integer
@@ -34,36 +34,12 @@
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/mods.yaml#/ServerOnlyDto'
+            $ref: '../components/schemas/mods.yaml#/ModFlagsDto'
     responses:
       '200':
         description: OK
       '404':
-        $ref: '../components/responses.yaml#/ApiError'
-
-/local-mod/{id}/loadOnHeadlessClient:
-  patch:
-    tags: [LocalMods]
-    operationId: setLocalModLoadOnHeadlessClient
-    summary: Toggle load-on-headless-client flag for a local mod
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '../components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
-    responses:
-      '200':
-        description: OK
-      '404':
-        $ref: '../components/responses.yaml#/ApiError'
+        description: Not found
 
 /local-mod/sync:
   post:

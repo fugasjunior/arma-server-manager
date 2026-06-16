@@ -28,8 +28,11 @@ public class LocalMod {
 
     private Long fileSize;
 
-    @Column(name = "server_only")
-    private boolean serverOnly;
+    @Column(name = "load_on_client")
+    private boolean loadOnClient = true;
+
+    @Column(name = "load_on_server")
+    private boolean loadOnServer = true;
 
     @Column(name = "load_on_headless_client")
     private boolean loadOnHeadlessClient = true;

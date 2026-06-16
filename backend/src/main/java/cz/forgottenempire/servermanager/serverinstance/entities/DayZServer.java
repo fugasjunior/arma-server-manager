@@ -91,10 +91,10 @@ public class DayZServer extends Server {
     private void addModsToParameters(List<String> parameters) {
         List<ActiveModEntry> ordered = orderedActiveMods().toList();
         addCombinedModParam(
-                ordered.stream().filter(ActiveModEntry::isServerOnly).map(ActiveModEntry::getLaunchName).toList(),
+                ordered.stream().filter(e -> e.isLoadOnServer() && !e.isLoadOnClient()).map(ActiveModEntry::getLaunchName).toList(),
                 "-serverMod=", parameters);
         addCombinedModParam(
-                ordered.stream().filter(e -> !e.isServerOnly()).map(ActiveModEntry::getLaunchName).toList(),
+                ordered.stream().filter(e -> e.isLoadOnServer() && e.isLoadOnClient()).map(ActiveModEntry::getLaunchName).toList(),
                 "-mod=", parameters);
     }
 

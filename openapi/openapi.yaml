@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Arma Server Manager API
-  version: 1.0.0
+  version: 1.0.1
 
 servers:
   - url: /api
@@ -78,18 +78,14 @@ paths:
     $ref: './paths/mods.yaml#/~1mod'
   /mod/{id}:
     $ref: './paths/mods.yaml#/~1mod~1{id}'
-  /mod/{id}/serverOnly:
-    $ref: './paths/mods.yaml#/~1mod~1{id}~1serverOnly'
-  /mod/{id}/loadOnHeadlessClient:
-    $ref: './paths/mods.yaml#/~1mod~1{id}~1loadOnHeadlessClient'
+  /mod/{id}/flags:
+    $ref: './paths/mods.yaml#/~1mod~1{id}~1flags'
 
   # ── Local Mods ────────────────────────────────────────────────────────────
   /local-mod:
     $ref: './paths/local-mods.yaml#/~1local-mod'
-  /local-mod/{id}/serverOnly:
-    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1serverOnly'
-  /local-mod/{id}/loadOnHeadlessClient:
-    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1loadOnHeadlessClient'
+  /local-mod/{id}/flags:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1flags'
   /local-mod/sync:
     $ref: './paths/local-mods.yaml#/~1local-mod~1sync'
   /local-mod/sync/status:
@@ -274,10 +270,8 @@ components:
       $ref: './components/schemas/mods.yaml#/ModsDto'
     CreatorDlcDto:
       $ref: './components/schemas/mods.yaml#/CreatorDlcDto'
-    ServerOnlyDto:
-      $ref: './components/schemas/mods.yaml#/ServerOnlyDto'
-    LoadOnHeadlessClientDto:
-      $ref: './components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
+    ModFlagsDto:
+      $ref: './components/schemas/mods.yaml#/ModFlagsDto'
 
     # ── Mod Presets ───────────────────────────────────────────────────────────
     CreatePresetRequestDto:

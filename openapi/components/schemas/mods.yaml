@@ -17,7 +17,9 @@ ModDto:
       type: string
     errorStatus:
       type: string
-    serverOnly:
+    loadOnClient:
+      type: boolean
+    loadOnServer:
       type: boolean
     loadOnHeadlessClient:
       type: boolean
@@ -42,16 +44,16 @@ CreatorDlcDto:
     name:
       type: string
 
-ServerOnlyDto:
-  type: object
-  required: [serverOnly]
+ModFlagsDto:
+  required:
+    - loadOnClient
+    - loadOnServer
+    - loadOnHeadlessClient
   properties:
-    serverOnly:
+    loadOnClient:
       type: boolean
-
-LoadOnHeadlessClientDto:
-  type: object
-  required: [loadOnHeadlessClient]
-  properties:
+    loadOnServer:
+      type: boolean
     loadOnHeadlessClient:
       type: boolean
+

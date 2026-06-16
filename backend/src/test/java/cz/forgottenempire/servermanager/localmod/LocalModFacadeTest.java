@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import cz.forgottenempire.servermanager.api.model.ModFlagsDto;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -42,17 +43,23 @@ class LocalModFacadeTest {
     }
 
     @Test
-    void setServerOnly_togglesFlag() {
+    void setFlags_updatesAllFlags() {
         LocalMod mod = new LocalMod();
         mod.setId(1L);
-        mod.setServerOnly(false);
+        mod.setLoadOnClient(true);
+        mod.setLoadOnServer(true);
+        mod.setLoadOnHeadlessClient(true);
+
+        ModFlagsDto flags = new ModFlagsDto(false, true, false);
 
         when(modService.requireMod(1L)).thenReturn(mod);
         when(modService.saveMod(mod)).thenReturn(mod);
 
-        facade.setServerOnly(1L, true);
+        facade.setFlags(1L, flags);
 
-        assertThat(mod.isServerOnly()).isTrue();
+        assertThat(mod.isLoadOnClient()).isFalse();
+        assertThat(mod.isLoadOnServer()).isTrue();
+        assertThat(mod.isLoadOnHeadlessClient()).isFalse();
         verify(modService).saveMod(mod);
     }
 }
