@@ -53,7 +53,7 @@ test.describe('SteamAuthWizard', () => {
     test('success without 2FA jumps straight to completion (no token step flicker)', async ({ browser }) => {
         const backend = await createBackendHelper();
         await backend.reset({ seedSteamAuth: false });
-        await backend.scriptSteamAuthVerify({ status: 'SUCCESS' });
+        await backend.scriptSteamAuthVerify({ result: 'SUCCESS' });
         await backend.dispose();
 
         const page = await getAuthenticatedPageWithWizard(browser);
@@ -79,9 +79,9 @@ test.describe('SteamAuthWizard', () => {
     test('EMAIL 2FA flow completes successfully', async ({ browser }) => {
         const backend = await createBackendHelper();
         await backend.reset({ seedSteamAuth: false });
-        // First verify → REQUIRES_2FA EMAIL, second verify (with token) → SUCCESS
-        await backend.scriptSteamAuthVerify({ status: 'REQUIRES_2FA', authType: 'EMAIL' });
-        await backend.scriptSteamAuthVerify({ status: 'SUCCESS' });
+        // First verify → CODE_REQUIRED EMAIL, second verify (with token) → SUCCESS
+        await backend.scriptSteamAuthVerify({ result: 'CODE_REQUIRED', authType: 'EMAIL' });
+        await backend.scriptSteamAuthVerify({ result: 'SUCCESS' });
         await backend.dispose();
 
         const page = await getAuthenticatedPageWithWizard(browser);
@@ -108,7 +108,7 @@ test.describe('SteamAuthWizard', () => {
     test('invalid credentials shows error and keeps form open', async ({ browser }) => {
         const backend = await createBackendHelper();
         await backend.reset({ seedSteamAuth: false });
-        await backend.scriptSteamAuthVerify({ status: 'INVALID_CREDENTIALS' });
+        await backend.scriptSteamAuthVerify({ result: 'INVALID_CREDENTIALS' });
         await backend.dispose();
 
         const page = await getAuthenticatedPageWithWizard(browser);
@@ -124,10 +124,12 @@ test.describe('SteamAuthWizard', () => {
         await page.close();
     });
 
-    test('MOBILE 2FA shows unsupported error and keeps form open', async ({ browser }) => {
+    test('MOBILE 2FA (TOTP) flow completes successfully', async ({ browser }) => {
         const backend = await createBackendHelper();
         await backend.reset({ seedSteamAuth: false });
-        await backend.scriptSteamAuthVerify({ status: 'REQUIRES_2FA', authType: 'MOBILE' });
+        // First verify → CODE_REQUIRED MOBILE, second verify (with TOTP code) → SUCCESS
+        await backend.scriptSteamAuthVerify({ result: 'CODE_REQUIRED', authType: 'MOBILE' });
+        await backend.scriptSteamAuthVerify({ result: 'SUCCESS' });
         await backend.dispose();
 
         const page = await getAuthenticatedPageWithWizard(browser);
@@ -138,8 +140,16 @@ test.describe('SteamAuthWizard', () => {
         await wizard.fillCredentials('mobile-user', 'pass');
         await wizard.submitCredentials();
 
-        await wizard.expectCredentialsError('Mobile authenticator is not supported');
-        await wizard.expectVisible();
+        // Should reach the token step to enter the mobile authenticator code
+        await expect(wizard.tokenInput).toBeVisible();
+
+        await wizard.fillToken('12345');
+        await wizard.submitToken();
+
+        // Should reach completion
+        await expect(wizard.finishBtn).toBeVisible();
+        await wizard.clickFinish();
+        await wizard.expectHidden();
         await page.close();
     });
 

@@ -156,7 +156,7 @@ export class BackendHelper {
     }
 
     async scriptSteamAuthVerify(opts: {
-        status: 'SUCCESS' | 'REQUIRES_2FA' | 'INVALID_CREDENTIALS' | 'ERROR';
+        result: 'SUCCESS' | 'CODE_REQUIRED' | 'INVALID_CREDENTIALS' | 'INVALID_CODE' | 'RATE_LIMITED' | 'ERROR';
         authType?: 'NONE' | 'EMAIL' | 'MOBILE' | 'UNKNOWN';
         message?: string;
     }): Promise<void> {

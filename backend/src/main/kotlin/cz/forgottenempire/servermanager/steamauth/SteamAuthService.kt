@@ -1,6 +1,5 @@
 package cz.forgottenempire.servermanager.steamauth
 
-import cz.forgottenempire.servermanager.api.model.SteamAuthDto
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -14,10 +13,11 @@ class SteamAuthService(private val authRepository: SteamAuthRepository) {
         authRepository.findAll().firstOrNull() ?: SteamAuth()
 
     @CacheEvict(value = ["steamAuthAccount"], allEntries = true)
-    fun setAuthAccount(auth: SteamAuthDto) {
-        log.info("Setting new Steam Auth account: username '{}'", auth.username)
+    fun saveCredentials(username: String, password: String) {
+        log.info("Saving Steam auth credentials for username '{}'", username)
         val persistedAuth = getAuthAccount()
-        populateAuth(auth, persistedAuth)
+        persistedAuth.username = username
+        persistedAuth.password = password
         authRepository.save(persistedAuth)
     }
 
@@ -30,14 +30,6 @@ class SteamAuthService(private val authRepository: SteamAuthRepository) {
     fun isAuthConfigured(): Boolean {
         val auth = getAuthAccount()
         return auth.username != null && auth.password != null
-    }
-
-    private fun populateAuth(auth: SteamAuthDto, persistedAuth: SteamAuth) {
-        persistedAuth.username = auth.username
-        persistedAuth.steamGuardToken = auth.steamGuardToken
-        if (!auth.password.isNullOrBlank()) {
-            persistedAuth.password = auth.password
-        }
     }
 
     companion object {

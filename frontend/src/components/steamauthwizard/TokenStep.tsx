@@ -1,11 +1,12 @@
 import React from 'react';
-import { Box, Button, CircularProgress, TextField, Typography, Alert } from '@mui/material';
-import { SteamAuthDto } from '../../api/generated';
+import { Alert, Box, Button, CircularProgress, TextField, Typography } from '@mui/material';
+import { AuthType, SteamLoginRequestDto, SteamLoginResult } from '../../api/generated';
 import {steamAuthApi} from '../../api/client';
 
 interface TokenStepProps {
-    credentials: SteamAuthDto;
-    setCredentials: React.Dispatch<React.SetStateAction<SteamAuthDto>>;
+    credentials: SteamLoginRequestDto;
+    setCredentials: React.Dispatch<React.SetStateAction<SteamLoginRequestDto>>;
+    authType: AuthType;
     onNext: () => void;
     onBack: () => void;
     loading: boolean;
@@ -14,13 +15,10 @@ interface TokenStepProps {
     setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-/**
- * Token step of the Steam Auth Wizard
- * Handles Steam Guard token input and verification
- */
 const TokenStep: React.FC<TokenStepProps> = ({
     credentials,
     setCredentials,
+    authType,
     onNext,
     onBack,
     loading,
@@ -29,52 +27,52 @@ const TokenStep: React.FC<TokenStepProps> = ({
     setError,
 }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCredentials(prev => ({
-            ...prev,
-            steamGuardToken: e.target.value
-        }));
+        setCredentials(prev => ({ ...prev, steamGuardCode: e.target.value }));
     };
-    
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validate inputs
-        if (!credentials.steamGuardToken) {
-            setError('Steam Guard token is required');
+
+        if (!credentials.steamGuardCode) {
+            setError('Steam Guard code is required');
             return;
         }
-        
+
         setLoading(true);
         setError(null);
-        
+
         try {
-            // Verify credentials with token
-            const { data } = await steamAuthApi.verifySteamAuth({steamAuthDto: credentials});
-            
-            if (data.status === 'SUCCESS') {
-                // Save the credentials
-                await steamAuthApi.setSteamAuth({steamAuthDto: credentials});
+            const { data } = await steamAuthApi.steamLogin({steamLoginRequestDto: credentials});
+
+            if (data.result === SteamLoginResult.Success) {
                 onNext();
+            } else if (data.result === SteamLoginResult.InvalidCode) {
+                setError('Invalid code. Please try again.');
+            } else if (data.result === SteamLoginResult.RateLimited) {
+                setError('Too many login attempts. Please try again later.');
             } else {
-                setError(data.message || 'Unknown error occurred.');
+                setError(data.message ?? 'Verification failed. Please try again.');
             }
         } catch (err) {
             console.error(err);
-            setError('Failed to verify token. Please try again.');
+            setError('Failed to verify code. Please try again.');
         } finally {
             setLoading(false);
         }
     };
-    
+
+    const isEmail = authType === AuthType.Email;
+
     return (
         <Box component="form" onSubmit={handleSubmit}>
             <Typography variant="h5" gutterBottom>
-                Enter Steam Guard Token
+                Enter Steam Guard Code
             </Typography>
 
             <Typography variant="body1" component="p">
-                A Steam Guard code has been sent to the email address associated with your Steam account.
-                Please check your email and enter the code below.
+                {isEmail
+                    ? 'A Steam Guard code has been sent to the email address associated with your account. Please enter it below.'
+                    : 'Enter the current code from your Steam mobile authenticator app.'}
             </Typography>
 
             {error && (
@@ -86,9 +84,9 @@ const TokenStep: React.FC<TokenStepProps> = ({
             <TextField
                 fullWidth
                 margin="normal"
-                label="Steam Guard Token"
-                name="steamGuardToken"
-                value={credentials.steamGuardToken}
+                label="Steam Guard Code"
+                name="steamGuardCode"
+                value={credentials.steamGuardCode ?? ''}
                 onChange={handleChange}
                 disabled={loading}
                 required
@@ -108,7 +106,7 @@ const TokenStep: React.FC<TokenStepProps> = ({
                     startIcon={loading ? <CircularProgress size={20} /> : null}
                     data-testid="token-submit"
                 >
-                    {loading ? 'Verifying...' : 'Continue'}
+                    {loading ? 'Verifying…' : 'Continue'}
                 </Button>
             </Box>
         </Box>

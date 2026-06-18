@@ -2,21 +2,19 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CredentialsStep from '../../../src/components/steamauthwizard/CredentialsStep.tsx';
-import TokenStep from "../../../src/components/steamauthwizard/TokenStep.tsx";
 
 jest.mock('../../../src/api/client', () => ({
   steamAuthApi: {
-    verifySteamAuth: jest.fn().mockResolvedValue({ data: { status: 'SUCCESS' } }),
-    setSteamAuth: jest.fn().mockResolvedValue({})
+    steamLogin: jest.fn().mockResolvedValue({ data: { result: 'SUCCESS' } }),
   }
 }));
 
 describe('CredentialsStep', () => {
   const mockProps = {
-    credentials: { username: '', password: '', steamGuardToken: '' },
+    credentials: { username: '', password: '' },
     setCredentials: jest.fn(),
-    onNext: jest.fn(),
-    onSuccessNoTwoFactor: jest.fn(),
+    onSuccess: jest.fn(),
+    onCodeRequired: jest.fn(),
     onBack: jest.fn(),
     loading: false,
     setLoading: jest.fn(),
@@ -30,7 +28,7 @@ describe('CredentialsStep', () => {
 
   it('renders the credentials form', () => {
     render(<CredentialsStep {...mockProps} />);
-    
+
     expect(screen.getByText('Enter Your Steam Credentials')).toBeInTheDocument();
     expect(screen.getByText('Steam Username')).toBeInTheDocument();
     expect(screen.getByText('Steam Password')).toBeInTheDocument();
@@ -41,7 +39,7 @@ describe('CredentialsStep', () => {
   it('updates credentials when input values change', () => {
     let capturedUsername: string | null = null;
     let capturedPassword: string | null = null;
-    mockProps.setCredentials.mockImplementation((updaterFn) => {
+    mockProps.setCredentials.mockImplementation((updaterFn: (prev: object) => { username: string; password: string }) => {
       const result = updaterFn({});
       capturedUsername = result.username;
       capturedPassword = result.password;
@@ -61,36 +59,31 @@ describe('CredentialsStep', () => {
 
   it('shows error when submitting with empty fields', () => {
     render(<CredentialsStep {...mockProps} />);
-    
-    const continueButton = screen.getByText('Continue');
-    fireEvent.submit(continueButton);
-    
+
+    fireEvent.submit(screen.getByText('Continue'));
+
     expect(mockProps.setError).toHaveBeenCalledWith('Username and password are required');
-    expect(mockProps.onNext).not.toHaveBeenCalled();
+    expect(mockProps.onSuccess).not.toHaveBeenCalled();
   });
 
   it('calls onBack when Back button is clicked', () => {
     render(<CredentialsStep {...mockProps} />);
-    
-    const backButton = screen.getByText('Back');
-    fireEvent.click(backButton);
-    
+
+    fireEvent.click(screen.getByText('Back'));
+
     expect(mockProps.onBack).toHaveBeenCalledTimes(1);
   });
 
   it('disables buttons when loading', () => {
     render(<CredentialsStep {...mockProps} loading={true} />);
-    
-    const continueButton = screen.getByText('Verifying...');
-    const backButton = screen.getByText('Back');
-    
-    expect(continueButton).toBeDisabled();
-    expect(backButton).toBeDisabled();
+
+    expect(screen.getByText('Logging in…')).toBeDisabled();
+    expect(screen.getByText('Back')).toBeDisabled();
   });
 
   it('displays error message when error state is set', () => {
     render(<CredentialsStep {...mockProps} error="Test error message" />);
-    
+
     expect(screen.getByText('Test error message')).toBeInTheDocument();
   });
 });

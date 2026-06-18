@@ -5,7 +5,26 @@ SteamAuthDto:
       type: string
     password:
       type: string
-    steamGuardToken:
+
+SteamLoginRequestDto:
+  type: object
+  required: [username, password]
+  properties:
+    username:
+      type: string
+    password:
+      type: string
+    steamGuardCode:
+      type: string
+
+SteamLoginResultDto:
+  type: object
+  properties:
+    result:
+      $ref: './common.yaml#/SteamLoginResult'
+    authType:
+      $ref: './common.yaml#/AuthType'
+    message:
       type: string
 
 SteamAuthStatusDto:
@@ -13,13 +32,8 @@ SteamAuthStatusDto:
   properties:
     isConfigured:
       type: boolean
-
-AuthVerificationResultDto:
-  type: object
-  properties:
-    status:
-      $ref: './common.yaml#/AuthStatus'
-    message:
+    sessionStatus:
+      $ref: './common.yaml#/SessionStatus'
+    lastCheckedAt:
       type: string
-    authType:
-      $ref: './common.yaml#/AuthType'
+      format: date-time

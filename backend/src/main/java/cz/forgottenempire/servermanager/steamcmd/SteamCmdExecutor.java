@@ -1,15 +1,12 @@
 package cz.forgottenempire.servermanager.steamcmd;
 
-import com.google.common.base.Strings;
 import cz.forgottenempire.servermanager.common.Constants;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.steamauth.SteamAuth;
-import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
+import cz.forgottenempire.servermanager.steamauth.SteamSessionStatusHolder;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -37,8 +34,11 @@ class SteamCmdExecutor {
     private static final int EXIT_CODE_TIMEOUT_WINDOWS = 10;
     private static final int MAX_ATTEMPTS = 10;
 
+    private static final String[] REAUTH_REQUIRED_ERRORS = {"account logon denied", "steam guard", "expired"};
+    private static final String[] WRONG_AUTH_ERRORS = {"invalid password", "two-factor code mismatch"};
+
     private final PathsFactory pathsFactory;
-    private final SteamAuthService steamAuthService;
+    private final SteamSessionStatusHolder sessionStatusHolder;
     private final ProcessFactory processFactory;
     private final SteamCmdOutputProcessor steamCmdOutputProcessor;
     private final SteamCmdItemInfoRepository itemInfoRepository;
@@ -46,13 +46,13 @@ class SteamCmdExecutor {
     @Autowired
     public SteamCmdExecutor(
             PathsFactory pathsFactory,
-            SteamAuthService steamAuthService,
+            SteamSessionStatusHolder sessionStatusHolder,
             ProcessFactory processFactory,
             SteamCmdOutputProcessor steamCmdOutputProcessor,
             SteamCmdItemInfoRepository itemInfoRepository
     ) {
         this.pathsFactory = pathsFactory;
-        this.steamAuthService = steamAuthService;
+        this.sessionStatusHolder = sessionStatusHolder;
         this.processFactory = processFactory;
         this.steamCmdOutputProcessor = steamCmdOutputProcessor;
         this.itemInfoRepository = itemInfoRepository;
@@ -60,6 +60,10 @@ class SteamCmdExecutor {
 
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+
+    public boolean isBusy() {
+        return executor.getActiveCount() > 0 || !executor.getQueue().isEmpty();
+    }
 
     public void processJob(SteamCmdJob job, CompletableFuture<SteamCmdJob> future) {
         setItemInfoAsQueued(job);
@@ -94,15 +98,12 @@ class SteamCmdExecutor {
             do {
                 attempts++;
                 File steamCmdFile = pathsFactory.getSteamCmdExecutable();
-                Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, getCommands(job.getSteamCmdParameters()));
+                Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, job.getSteamCmdParameters().get());
                 output = steamCmdOutputProcessor.processSteamCmdOutput(process.getInputStream(), job);
                 exitCode = process.waitFor();
             } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
 
             handleProcessResult(output, job);
-        } catch (SteamAuthNotSetException e) {
-            log.error("SteamAuth is not set up");
-            job.setErrorStatus(ErrorStatus.WRONG_AUTH);
         } catch (IOException e) {
             log.error("SteamCMD job failed due to an IO error", e);
             job.setErrorStatus(ErrorStatus.IO);
@@ -116,25 +117,12 @@ class SteamCmdExecutor {
         return exitCode == EXIT_CODE_TIMEOUT_LINUX || exitCode == EXIT_CODE_TIMEOUT_WINDOWS;
     }
 
-    private List<String> getCommands(SteamCmdParameters parameters) {
-        List<String> commands = new ArrayList<>();
-        parameters.get().forEach(parameter -> {
-            if (parameter.contains(SteamCmdParameters.STEAM_CREDENTIALS_PLACEHOLDER)) {
-                commands.add(parameter.replace(SteamCmdParameters.STEAM_CREDENTIALS_PLACEHOLDER, getAuthString()));
-            } else {
-                commands.add(parameter);
-            }
-        });
-        return commands;
-    }
-
     private void handleProcessResult(String result, SteamCmdJob job) {
-        // SteamCMD doesn't provide the user with any proper exit values or standard format for error messages.
+        // SteamCMD doesn't provide proper exit values or a standard error format.
         String errorLine = result.lines()
                 .map(String::toLowerCase)
                 .map(this::removeParametersFromOutputLine)
-                // Issue #69 missing steamservice.so and libSDL3.so.0 caused the job to be marked as failed
-                // TODO find better solution to determine the job result
+                // Issue #69: missing steamservice.so / libSDL3.so.0 caused false positives
                 .filter(line -> !line.contains("cannot open shared object file"))
                 .filter(this::containsErrorKeyword)
                 .findFirst()
@@ -149,20 +137,18 @@ class SteamCmdExecutor {
 
         dumpErrorOutputToLog(result);
 
-        String[] loginRelatedErrors = new String[]{"login", "expired", "account logon denied", "two-factor code mismatch", "invalid password"};
-        if (Arrays.stream(loginRelatedErrors).anyMatch(errorLine::contains)) {
+        if (Arrays.stream(REAUTH_REQUIRED_ERRORS).anyMatch(errorLine::contains)) {
+            job.setErrorStatus(ErrorStatus.REAUTH_REQUIRED);
+            sessionStatusHolder.setExpired();
+        } else if (Arrays.stream(WRONG_AUTH_ERRORS).anyMatch(errorLine::contains)) {
             job.setErrorStatus(ErrorStatus.WRONG_AUTH);
-        }
-        if (errorLine.contains("no subscription")) {
+        } else if (errorLine.contains("no subscription")) {
             job.setErrorStatus(ErrorStatus.NO_SUBSCRIPTION);
-        }
-        if (errorLine.contains("no match")) {
+        } else if (errorLine.contains("no match")) {
             job.setErrorStatus(ErrorStatus.NO_MATCH);
-        }
-        if (errorLine.contains("i/o operation") || errorLine.contains("failed to write file")) {
+        } else if (errorLine.contains("i/o operation") || errorLine.contains("failed to write file")) {
             job.setErrorStatus(ErrorStatus.IO);
-        }
-        if (errorLine.contains("rate limit exceeded")) {
+        } else if (errorLine.contains("rate limit exceeded")) {
             job.setErrorStatus(ErrorStatus.RATE_LIMIT);
         }
     }
@@ -171,19 +157,6 @@ class SteamCmdExecutor {
         log.error("======== SteamCMD ERROR OUTPUT START ======== ");
         log.error(result);
         log.error("======== SteamCMD ERROR OUTPUT END ======== ");
-    }
-
-    private String getAuthString() {
-        SteamAuth steamAuth = steamAuthService.getAuthAccount();
-        if (steamAuth.getUsername() == null || steamAuth.getPassword() == null) {
-            throw new SteamAuthNotSetException();
-        }
-
-        String authString = steamAuth.getUsername() + " " + steamAuth.getPassword();
-        if (!Strings.isNullOrEmpty(steamAuth.getSteamGuardToken())) {
-            authString += " " + steamAuth.getSteamGuardToken();
-        }
-        return authString;
     }
 
     private String removeParametersFromOutputLine(String line) {

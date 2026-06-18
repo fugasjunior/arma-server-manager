@@ -43,6 +43,7 @@ services:
     volumes:
       - "${STORAGE_PATH}:/home/steam/armaservermanager/"
       - armaservermanager-config:/home/steam/config
+      - armaservermanager-steam-config:/home/steam/Steam/config
     environment:
       - AUTH_USERNAME
       - AUTH_PASSWORD
@@ -60,3 +61,4 @@ services:
 volumes:
   armaservermanager-db:
   armaservermanager-config:
+  armaservermanager-steam-config:

@@ -8,7 +8,8 @@ import renderWithPermissions from '../../helpers/renderWithPermissions';
 jest.mock('../../../src/api/client', () => ({
     steamAuthApi: {
         getSteamAuth: jest.fn(),
-        setSteamAuth: jest.fn(),
+        getSteamAuthStatus: jest.fn(),
+        steamLogin: jest.fn(),
         clearSteamAuth: jest.fn(),
     }
 }));
@@ -23,9 +24,14 @@ describe('SteamAuthForm', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         (mockedSteamAuthApi.getSteamAuth as jest.Mock).mockResolvedValue({
-            data: {username: 'olduser', password: '', steamGuardToken: ''}
+            data: {username: 'olduser', password: ''}
         });
-        (mockedSteamAuthApi.setSteamAuth as jest.Mock).mockResolvedValue({});
+        (mockedSteamAuthApi.getSteamAuthStatus as jest.Mock).mockResolvedValue({
+            data: {isConfigured: true, sessionStatus: 'ACTIVE'}
+        });
+        (mockedSteamAuthApi.steamLogin as jest.Mock).mockResolvedValue({
+            data: {result: 'SUCCESS'}
+        });
         (mockedSteamAuthApi.clearSteamAuth as jest.Mock).mockResolvedValue({});
     });
 
@@ -53,16 +59,14 @@ describe('SteamAuthForm', () => {
         });
 
         await waitFor(() => {
-            expect(mockedSteamAuthApi.setSteamAuth).toHaveBeenCalledWith(
+            expect(mockedSteamAuthApi.steamLogin).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    steamAuthDto: expect.objectContaining({username: 'newuser'})
+                    steamLoginRequestDto: expect.objectContaining({username: 'newuser'})
                 })
             );
         });
 
-        // Form must show the newly submitted username, not the old one
         expect(screen.getByLabelText(/user name/i)).toHaveValue('newuser');
-        // Password must be cleared after save
         expect(screen.getByLabelText(/^password$/i)).toHaveValue('');
     });
 });

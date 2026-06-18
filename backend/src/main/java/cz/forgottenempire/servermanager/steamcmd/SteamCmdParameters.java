@@ -3,9 +3,7 @@ package cz.forgottenempire.servermanager.steamcmd;
 import java.util.ArrayList;
 import java.util.List;
 
-class SteamCmdParameters {
-
-    static final String STEAM_CREDENTIALS_PLACEHOLDER = "<{STEAM_CREDENTIALS_PLACEHOLDER}>";
+public class SteamCmdParameters {
 
     private final List<String> parameters;
 
@@ -35,14 +33,22 @@ class SteamCmdParameters {
             parameters.add("+@ShutdownOnFailedCommand 1");
         }
 
-        public Builder withLogin() {
-            String loginParameter = "+login " + STEAM_CREDENTIALS_PLACEHOLDER;
-            parameters.add(loginParameter);
+        /** Username-only login that reuses the cached session in config.vdf. Used by all jobs and the session probe. */
+        public Builder withCachedLogin(String username) {
+            parameters.add("+login " + username);
             return this;
         }
 
-        public Builder withAnonymousLogin() {
-            parameters.add("+login anonymous");
+        /**
+         * Full credentials login that primes the config.vdf cache. If {@code steamGuardCode} is non-blank,
+         * emits {@code +set_steam_guard_code <code>} before {@code +login} so the code is accepted for
+         * both email and mobile-authenticator (TOTP) accounts.
+         */
+        public Builder withCredentialsLogin(String username, String password, String steamGuardCode) {
+            if (steamGuardCode != null && !steamGuardCode.isBlank()) {
+                parameters.add("+set_steam_guard_code " + steamGuardCode);
+            }
+            parameters.add("+login " + username + " " + password);
             return this;
         }
 

@@ -4,7 +4,6 @@ import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
 import cz.forgottenempire.servermanager.support.AbstractIntegrationTest;
-import cz.forgottenempire.servermanager.api.model.SteamAuthDto;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +28,7 @@ class ServerUninstallJourneyTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        steamAuthService.setAuthAccount(new SteamAuthDto().username("testuser").password("testpass"));
+        steamAuthService.saveCredentials("testuser", "testpass");
     }
 
     @AfterEach

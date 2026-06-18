@@ -117,8 +117,8 @@ paths:
     $ref: './paths/steam-auth.yaml#/~1config~1auth'
   /config/auth/status:
     $ref: './paths/steam-auth.yaml#/~1config~1auth~1status'
-  /config/auth/verify:
-    $ref: './paths/steam-auth.yaml#/~1config~1auth~1verify'
+  /config/auth/login:
+    $ref: './paths/steam-auth.yaml#/~1config~1auth~1login'
 
   # ── SteamCmd ───────────────────────────────────────────────────────────────
   /steamcmd:
@@ -193,8 +193,10 @@ components:
       $ref: './components/schemas/common.yaml#/OSType'
     SteamCmdStatus:
       $ref: './components/schemas/common.yaml#/SteamCmdStatus'
-    AuthStatus:
-      $ref: './components/schemas/common.yaml#/AuthStatus'
+    SteamLoginResult:
+      $ref: './components/schemas/common.yaml#/SteamLoginResult'
+    SessionStatus:
+      $ref: './components/schemas/common.yaml#/SessionStatus'
     AuthType:
       $ref: './components/schemas/common.yaml#/AuthType'
     ApiErrorDto:
@@ -289,8 +291,10 @@ components:
       $ref: './components/schemas/steam-auth.yaml#/SteamAuthDto'
     SteamAuthStatusDto:
       $ref: './components/schemas/steam-auth.yaml#/SteamAuthStatusDto'
-    AuthVerificationResultDto:
-      $ref: './components/schemas/steam-auth.yaml#/AuthVerificationResultDto'
+    SteamLoginRequestDto:
+      $ref: './components/schemas/steam-auth.yaml#/SteamLoginRequestDto'
+    SteamLoginResultDto:
+      $ref: './components/schemas/steam-auth.yaml#/SteamLoginResultDto'
 
     # ── SteamCmd ──────────────────────────────────────────────────────────────
     SteamCmdItemInfoDto:

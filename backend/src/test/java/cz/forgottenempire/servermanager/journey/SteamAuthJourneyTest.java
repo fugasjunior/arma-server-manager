@@ -9,19 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class SteamAuthJourneyTest extends AbstractIntegrationTest {
 
-    private static final String CREDENTIALS =
-            "{\"username\":\"steamuser\",\"password\":\"steampass\",\"steamGuardToken\":null}";
+    private static final String LOGIN_REQUEST =
+            "{\"username\":\"steamuser\",\"password\":\"steampass\"}";
 
     @Test
-    void steamAuth_verifyAndPersistCredentials_happyPath() throws Exception {
+    void steamAuth_loginAndPersistCredentials_happyPath() throws Exception {
         fakeProcesses.scriptSteamCmdWithFixture("login-success.txt");
 
-        api().postJson("/api/config/auth/verify", CREDENTIALS)
+        api().postJson("/api/config/auth/login", LOGIN_REQUEST)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", equalTo("SUCCESS")));
-
-        api().postJson("/api/config/auth", CREDENTIALS)
-                .andExpect(status().isOk());
+                .andExpect(jsonPath("$.result", equalTo("SUCCESS")));
 
         api().get("/api/config/auth")
                 .andExpect(status().isOk())
@@ -29,13 +26,15 @@ class SteamAuthJourneyTest extends AbstractIntegrationTest {
 
         api().get("/api/config/auth/status")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isConfigured", is(true)));
+                .andExpect(jsonPath("$.isConfigured", is(true)))
+                .andExpect(jsonPath("$.sessionStatus", equalTo("ACTIVE")));
 
         api().delete("/api/config/auth")
                 .andExpect(status().isNoContent());
 
         api().get("/api/config/auth/status")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isConfigured", is(false)));
+                .andExpect(jsonPath("$.isConfigured", is(false)))
+                .andExpect(jsonPath("$.sessionStatus", equalTo("NOT_CONFIGURED")));
     }
 }

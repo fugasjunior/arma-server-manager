@@ -1,10 +1,10 @@
 package cz.forgottenempire.servermanager.e2e;
 
+import cz.forgottenempire.servermanager.api.model.AuthType;
+import cz.forgottenempire.servermanager.api.model.SteamLoginResult;
 import cz.forgottenempire.servermanager.common.InstallationStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
-import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult;
-import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthStatus;
-import cz.forgottenempire.servermanager.steamauth.AuthVerificationResult.AuthType;
+import cz.forgottenempire.servermanager.steamauth.SteamLoginServiceResult;
 import cz.forgottenempire.servermanager.support.fakes.FakeProcess;
 import cz.forgottenempire.servermanager.support.fakes.FakeProcessFactory;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
@@ -37,7 +37,7 @@ public class E2ETestController {
     private FakeProcessFactory fakeProcessFactory;
 
     @Autowired
-    private FakeSteamAuthVerifier fakeSteamAuthVerifier;
+    private FakeSteamLoginService fakeSteamLoginService;
 
     @Autowired
     private WorkshopModsService workshopModsService;
@@ -46,19 +46,15 @@ public class E2ETestController {
     public ResponseEntity<Void> reset(
             @RequestParam(defaultValue = "true") boolean seedSteamAuth) {
         resetService.reset(seedSteamAuth);
-        fakeSteamAuthVerifier.reset();
+        fakeSteamLoginService.reset();
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/fakes/steam-auth-verify")
     public ResponseEntity<Void> scriptSteamAuthVerify(@RequestBody SteamAuthVerifyRequest request) {
-        AuthStatus status = AuthStatus.valueOf(request.status());
+        SteamLoginResult result = SteamLoginResult.valueOf(request.result());
         AuthType authType = request.authType() != null ? AuthType.valueOf(request.authType()) : AuthType.NONE;
-        fakeSteamAuthVerifier.script(AuthVerificationResult.builder()
-                .status(status)
-                .authType(authType)
-                .message(request.message())
-                .build());
+        fakeSteamLoginService.script(new SteamLoginServiceResult(result, authType, request.message()));
         return ResponseEntity.ok().build();
     }
 
@@ -127,5 +123,5 @@ public class E2ETestController {
         }
     }
 
-    record SteamAuthVerifyRequest(String status, String authType, String message) {}
+    record SteamAuthVerifyRequest(String result, String authType, String message) {}
 }

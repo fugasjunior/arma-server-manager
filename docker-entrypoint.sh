@@ -25,7 +25,7 @@ groupmod -o -g "$TARGET_GID" steam
 usermod  -o -u "$TARGET_UID" -g "$TARGET_GID" steam
 
 # Cheaply fix the mount-point dirs themselves (covers fresh/empty volumes).
-chown steam:steam /home/steam "$DATA_DIR" /home/steam/config 2>/dev/null || true
+chown steam:steam /home/steam "$DATA_DIR" /home/steam/config /home/steam/Steam/config 2>/dev/null || true
 
 # One-time (or on uid/gid change) deep ownership migration.
 # Tracked by a marker file storing the last-applied uid:gid so subsequent

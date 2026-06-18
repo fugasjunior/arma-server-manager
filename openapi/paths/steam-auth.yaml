@@ -2,7 +2,7 @@
   get:
     tags: [SteamAuth]
     operationId: getSteamAuth
-    summary: Get current Steam auth credentials
+    summary: Get current Steam auth credentials (username only)
     responses:
       '200':
         description: OK
@@ -10,19 +10,6 @@
           application/json:
             schema:
               $ref: '../components/schemas/steam-auth.yaml#/SteamAuthDto'
-  post:
-    tags: [SteamAuth]
-    operationId: setSteamAuth
-    summary: Set Steam auth credentials
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '../components/schemas/steam-auth.yaml#/SteamAuthDto'
-    responses:
-      '200':
-        description: OK
   delete:
     tags: [SteamAuth]
     operationId: clearSteamAuth
@@ -35,7 +22,7 @@
   get:
     tags: [SteamAuth]
     operationId: getSteamAuthStatus
-    summary: Check if Steam auth is configured
+    summary: Get Steam auth configuration and session status
     responses:
       '200':
         description: OK
@@ -44,23 +31,23 @@
             schema:
               $ref: '../components/schemas/steam-auth.yaml#/SteamAuthStatusDto'
 
-/config/auth/verify:
+/config/auth/login:
   post:
     tags: [SteamAuth]
-    operationId: verifySteamAuth
-    summary: Verify Steam credentials and detect 2FA requirements
+    operationId: steamLogin
+    summary: Perform a Steam login, optionally with a Steam Guard code
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/steam-auth.yaml#/SteamAuthDto'
+            $ref: '../components/schemas/steam-auth.yaml#/SteamLoginRequestDto'
     responses:
       '200':
         description: OK
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/steam-auth.yaml#/AuthVerificationResultDto'
+              $ref: '../components/schemas/steam-auth.yaml#/SteamLoginResultDto'
       '500':
         $ref: '../components/responses.yaml#/ApiError'

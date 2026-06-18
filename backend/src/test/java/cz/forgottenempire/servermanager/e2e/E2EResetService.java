@@ -83,10 +83,7 @@ class E2EResetService {
     }
 
     private void seedFakeSteamAuth() {
-        SteamAuthDto dto = new SteamAuthDto();
-        dto.setUsername("e2e-fake-steam-user");
-        dto.setPassword("e2e-fake-steam-pass");
-        steamAuthService.setAuthAccount(dto);
+        steamAuthService.saveCredentials("e2e-fake-steam-user", "e2e-fake-steam-pass");
     }
 
     @Transactional
