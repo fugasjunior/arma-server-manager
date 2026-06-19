@@ -49,17 +49,24 @@ public class WorkshopModsFacade {
 
     @Transactional
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
+        return saveAndInstallMods(ids, false);
+    }
+
+    @Transactional
+    public List<WorkshopMod> saveAndInstallMods(List<Long> ids, boolean forceUpdate) {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
                 .toList();
 
         workshopMods.forEach(mod -> {
-            mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+            if (forceUpdate || mod.getInstallationStatus() != InstallationStatus.FINISHED) {
+                mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+            }
             mod.setErrorStatus(null);
         });
         modsService.saveAllModsForInstallation(workshopMods);
 
-        installerService.installOrUpdateMods(workshopMods);
+        installerService.installOrUpdateMods(workshopMods, forceUpdate);
         return workshopMods;
     }
 
@@ -68,7 +75,7 @@ public class WorkshopModsFacade {
         List<Long> allModIds = modsService.getAllMods().stream()
                 .map(WorkshopMod::getId)
                 .toList();
-        saveAndInstallMods(allModIds);
+        saveAndInstallMods(allModIds, true);
     }
 
     public void uninstallMod(long id) {

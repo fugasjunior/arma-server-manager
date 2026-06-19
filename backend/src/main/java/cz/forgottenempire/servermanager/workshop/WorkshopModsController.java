@@ -64,7 +64,7 @@ public class WorkshopModsController implements ModsApi {
     @PreAuthorize("hasAuthority('" + PermissionCode.MOD_MODIFY + "')")
     public ResponseEntity<ModDto> updateMod(Long id) {
         log.info("Installing mod id {}", id);
-        WorkshopMod mod = modsFacade.saveAndInstallMods(List.of(id)).get(0);
+        WorkshopMod mod = modsFacade.saveAndInstallMods(List.of(id), true).get(0);
         return ResponseEntity.ok(modMapper.modToModDto(mod));
     }
 

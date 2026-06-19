@@ -59,10 +59,14 @@ class WorkshopInstallerService {
     }
 
     public void installOrUpdateMods(Collection<WorkshopMod> mods) {
+        installOrUpdateMods(mods, false);
+    }
+
+    public void installOrUpdateMods(Collection<WorkshopMod> mods, boolean forceUpdate) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                CompletableFuture.runAsync(() -> resolveAndInstall(mods));
+                CompletableFuture.runAsync(() -> resolveAndInstall(mods, forceUpdate));
             }
         });
     }
@@ -90,7 +94,7 @@ class WorkshopInstallerService {
      * Resolves metadata for all mods in a single batched Steam API call, validates each mod,
      * then enqueues the download for valid mods. Runs asynchronously after the transaction commits.
      */
-    private void resolveAndInstall(Collection<WorkshopMod> mods) {
+    private void resolveAndInstall(Collection<WorkshopMod> mods, boolean forceUpdate) {
         List<Long> modIds = mods.stream().map(WorkshopMod::getId).toList();
         Map<Long, ModMetadata> metadataMap = metadataService.fetchModMetadata(modIds);
 
@@ -108,6 +112,14 @@ class WorkshopInstallerService {
             try {
                 setModServerType(mod, metadata.consumerAppId());
                 validateServerInitialized(mod);
+                if (!forceUpdate
+                        && mod.getInstallationStatus() == InstallationStatus.FINISHED
+                        && verifyModDirectoryExists(mod.getId(), mod.getServerType())) {
+                    log.info("Mod '{}' (ID {}) is already installed; skipping SteamCMD download",
+                            mod.getName(), mod.getId());
+                    modsService.saveMod(mod);
+                    continue;
+                }
                 validMods.add(mod);
             } catch (ModNotConsumedByGameException e) {
                 log.error("Mod '{}' (id {}) failed validation: {}", mod.getName(), mod.getId(), e.getMessage());
