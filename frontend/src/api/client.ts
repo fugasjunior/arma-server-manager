@@ -40,10 +40,11 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
 
     if (error.response?.status === 401) {
         // /users/me is the session bootstrap probe — 401 means "not logged in", not an error.
-        // All other 401s redirect to /login (e.g. session expired mid-use).
+        // All other 401s mean the session expired mid-use: notify the auth context so it can
+        // clear the user and let ProtectedRoute redirect to /login via the router (no hard reload).
         const isCurrentUserEndpoint = error.config?.url?.includes('/users/me');
         if (!isCurrentUserEndpoint) {
-            window.location.href = "/login";
+            window.dispatchEvent(new Event("auth:unauthorized"));
         }
         return Promise.reject(error);
     }

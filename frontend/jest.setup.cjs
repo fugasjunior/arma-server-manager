@@ -1,6 +1,11 @@
 // Import Jest DOM extensions
 require('@testing-library/jest-dom');
 
+// jsdom does not provide TextEncoder/TextDecoder, which react-router-dom requires
+const {TextEncoder, TextDecoder} = require('util');
+if (!global.TextEncoder) global.TextEncoder = TextEncoder;
+if (!global.TextDecoder) global.TextDecoder = TextDecoder;
+
 // jsdom does not implement Blob/File.prototype.text — polyfill it
 if (!global.Blob.prototype.text) {
     global.Blob.prototype.text = function() {

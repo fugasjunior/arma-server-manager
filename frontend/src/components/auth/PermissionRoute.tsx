@@ -22,8 +22,9 @@ const PermissionRoute = ({permission, children}: PermissionRouteProps) => {
         }
     }, [authCtx.isLoggedIn, authCtx.isLoadingUser, hasPermission, navigate]);
 
-    if (authCtx.isLoadingUser) return null;
-    if (!hasPermission) return null;
+    // Logged in but lacking the permission -> redirecting to "/" (above).
+    // Not logged in -> let ProtectedRoute redirect to /login instead of blanking here.
+    if (authCtx.isLoggedIn && !hasPermission) return null;
 
     return <ProtectedRoute>{children}</ProtectedRoute>;
 };

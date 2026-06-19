@@ -52,6 +52,18 @@ export const AuthContextProvider = ({children}: {children: React.ReactNode}) => 
         fetchCurrentUser();
     }, [fetchCurrentUser]);
 
+    // When any API call returns 401 mid-use (session expired), the axios interceptor
+    // dispatches "auth:unauthorized". Clearing the user flips isLoggedIn to false, which
+    // makes ProtectedRoute redirect to /login through the router instead of a hard reload.
+    useEffect(() => {
+        const handleUnauthorized = () => {
+            setCurrentUser(null);
+            queryClient.clear();
+        };
+        window.addEventListener("auth:unauthorized", handleUnauthorized);
+        return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    }, [queryClient]);
+
     const loginHandler = useCallback(async (username: string, password: string) => {
         await loginService(username, password);
         await fetchCurrentUser();

@@ -62,6 +62,8 @@ spring.datasource.username=armaservermanager
 spring.datasource.password=example
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
+# Session timeout before requiring re-login
+server.servlet.session.timeout=2h
 
 ### File upload limits
 # Can limit the maximum size of scenario files that are uploaded through the UI.
