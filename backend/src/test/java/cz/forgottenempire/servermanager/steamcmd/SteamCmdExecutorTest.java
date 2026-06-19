@@ -53,6 +53,19 @@ class SteamCmdExecutorTest {
                 .startProcessWithUnbufferedOutput(any(File.class), anyList());
     }
 
+    @Test
+    void doesNotRetrySuccessfulLongRunningDownloadOutput() throws Exception {
+        TestContext context = new TestContext();
+        when(context.outputProcessor.processSteamCmdOutput(any(), any()))
+                .thenReturn("Downloading 6285 chunks for depot 107410. Success. Downloaded item 3549838320");
+
+        SteamCmdJob result = context.execute();
+
+        assertThat(result.getErrorStatus()).isNull();
+        verify(context.processFactory, times(1))
+                .startProcessWithUnbufferedOutput(any(File.class), anyList());
+    }
+
     private static class TestContext {
         private final PathsFactory pathsFactory = mock(PathsFactory.class);
         private final SteamAuthService steamAuthService = mock(SteamAuthService.class);

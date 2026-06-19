@@ -122,6 +122,9 @@ class SteamCmdExecutor {
     }
 
     private boolean isRetryableTimeout(int exitCode, String output) {
+        // Do not impose an ASM-side wall-clock timeout here. Large workshop items may download for
+        // much longer than the SteamCMD timeout window, and they should continue as long as SteamCMD
+        // itself is still running. Retry only after SteamCMD exits with a timeout signal/message.
         return exitedDueToTimeout(exitCode)
                 || output.toLowerCase().contains(WORKSHOP_DOWNLOAD_TIMEOUT);
     }
