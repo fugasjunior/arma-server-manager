@@ -65,6 +65,7 @@ RUN dpkg --add-architecture i386 \
           expect \
           gosu \
           libtbbmalloc2 \
+          net-tools \
     && apt-get clean autoclean \
     && apt-get autoremove --yes \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
