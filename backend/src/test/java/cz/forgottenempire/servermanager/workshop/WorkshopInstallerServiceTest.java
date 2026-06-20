@@ -97,4 +97,27 @@ class WorkshopInstallerServiceTest {
         assertThat(mod.getErrorStatus()).isEqualTo(ErrorStatus.TIMEOUT);
         verify(modsService).saveMod(mod);
     }
+    @Test
+    void refreshesExistingModWithoutSteamCmdAndLowercasesFiles() throws IOException {
+        mod.setInstallationStatus(InstallationStatus.FINISHED);
+        Path modDirectory = pathsFactory.getModInstallationPath(MOD_ID, ServerType.ARMA3);
+        Path addonsDirectory = modDirectory.resolve("Addons");
+        Files.createDirectories(addonsDirectory);
+        Files.createFile(addonsDirectory.resolve("exampleSOG.pbo"));
+
+        Path serverPath = tempDir.resolve("server");
+        Files.createDirectories(serverPath);
+        Path linkPath = serverPath.resolve(mod.getNormalizedName());
+        when(installationService.getInstalledRelatedServerTypes(ServerType.ARMA3))
+                .thenReturn(List.of(ServerType.ARMA3));
+        when(pathsFactory.getModLinkPath(mod.getNormalizedName(), ServerType.ARMA3))
+                .thenReturn(linkPath);
+
+        installerService.refreshInstalledMod(mod);
+
+        assertThat(modDirectory.resolve("addons").resolve("examplesog.pbo")).exists();
+        assertThat(linkPath).isSymbolicLink();
+        assertThat(mod.getInstallationStatus()).isEqualTo(InstallationStatus.FINISHED);
+        verify(modsService).saveMod(mod);
+    }
 }

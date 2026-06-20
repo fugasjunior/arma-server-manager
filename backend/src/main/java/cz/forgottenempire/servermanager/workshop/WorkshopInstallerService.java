@@ -115,9 +115,9 @@ class WorkshopInstallerService {
                 if (!forceUpdate
                         && mod.getInstallationStatus() == InstallationStatus.FINISHED
                         && verifyModDirectoryExists(mod.getId(), mod.getServerType())) {
-                    log.info("Mod '{}' (ID {}) is already installed; skipping SteamCMD download",
+                    log.info("Mod '{}' (ID {}) is already downloaded; skipping SteamCMD and refreshing installation",
                             mod.getName(), mod.getId());
-                    modsService.saveMod(mod);
+                    refreshInstalledMod(mod);
                     continue;
                 }
                 validMods.add(mod);
@@ -220,6 +220,11 @@ class WorkshopInstallerService {
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.IO);
         }
+    }
+
+    void refreshInstalledMod(WorkshopMod mod) {
+        installMod(mod);
+        modsService.saveMod(mod);
     }
 
     private void convertModFilesToLowercase(WorkshopMod mod) throws IOException {
