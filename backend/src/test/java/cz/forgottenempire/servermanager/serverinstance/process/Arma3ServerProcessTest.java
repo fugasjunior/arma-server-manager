@@ -14,6 +14,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,9 +60,16 @@ class Arma3ServerProcessTest {
         process = mock(Process.class, withSettings().stubOnly());
         when(processCreator.startProcessWithRedirectedOutput(any(), any(), any())).thenReturn(process);
 
+        Arma3InstancePaths instancePaths = mock(Arma3InstancePaths.class, withSettings().stubOnly());
+        when(instancePaths.getHeadlessClientProfilesPath(anyLong(), anyInt())).thenAnswer(invocation -> {
+            long serverId = invocation.getArgument(0);
+            int hcId = invocation.getArgument(1);
+            return Path.of(tempDir.getAbsolutePath(), "profiles", "ARMA3_" + serverId, "hc", String.format("hc_%02d", hcId));
+        });
+
         ServerLaunchContext launchContext = new ServerLaunchContext(
                 pathsFactory,
-                mock(Arma3InstancePaths.class, withSettings().stubOnly()),
+                instancePaths,
                 mock(Arma3KeyService.class, withSettings().stubOnly()),
                 mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 

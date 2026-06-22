@@ -54,6 +54,14 @@ class PathsFactoryTest {
     }
 
     @Test
+    void getHeadlessClientProfilesPath_returnsCorrectPath() {
+        assertThat(arma3InstancePaths.getHeadlessClientProfilesPath(42, 1))
+                .endsWithRaw(Path.of("servers/ARMA3/profiles/ARMA3_42/hc/hc_01"));
+        assertThat(arma3InstancePaths.getHeadlessClientProfilesPath(42, 2))
+                .endsWithRaw(Path.of("servers/ARMA3/profiles/ARMA3_42/hc/hc_02"));
+    }
+
+    @Test
     void instancePaths_useDistinctDirsPerInstance() {
         assertThat(arma3InstancePaths.getInstanceBasePath(1))
                 .isNotEqualTo(arma3InstancePaths.getInstanceBasePath(2));
