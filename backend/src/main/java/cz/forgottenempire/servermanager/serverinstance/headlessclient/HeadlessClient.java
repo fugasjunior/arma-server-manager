@@ -12,6 +12,8 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -24,6 +26,7 @@ public class HeadlessClient {
     private final Arma3Server server;
     private final PathsFactory pathsFactory;
     private final ServerProcessCreator serverProcessCreator;
+    private final Path profilesPath;
     private final String[] additionalMods;
     private final int logMaxFiles;
 
@@ -34,6 +37,7 @@ public class HeadlessClient {
             Arma3Server server,
             PathsFactory pathsFactory,
             ServerProcessCreator serverProcessCreator,
+            Path profilesPath,
             @Nullable String[] additionalMods,
             int logMaxFiles
     ) {
@@ -41,6 +45,7 @@ public class HeadlessClient {
         this.server = server;
         this.pathsFactory = pathsFactory;
         this.serverProcessCreator = serverProcessCreator;
+        this.profilesPath = profilesPath;
         this.additionalMods = additionalMods;
         this.logMaxFiles = logMaxFiles;
     }
@@ -52,6 +57,7 @@ public class HeadlessClient {
         logFile.prepare(logMaxFiles);
 
         try {
+            Files.createDirectories(profilesPath);
             List<String> parameters = prepareParameters();
             log.info("Starting headless client with options: {}", Joiner.on(" ").join(parameters));
             process = serverProcessCreator.startProcessWithRedirectedOutput(executable, parameters, logFile.getFile());
@@ -76,6 +82,7 @@ public class HeadlessClient {
     private List<String> prepareParameters() {
         List<String> parameters = new ArrayList<>();
         parameters.add("-client");
+        parameters.add("-profiles=\"" + profilesPath + "\"");
         parameters.add("-connect=127.0.0.1:" + server.getPort());
         if (Strings.isNotBlank(server.getPassword())) {
             parameters.add("-password=" + server.getPassword());

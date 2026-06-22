@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.headlessclient.HeadlessClient;
 
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -37,9 +38,12 @@ public class Arma3ServerProcess extends ServerProcess {
     }
 
     public void addHeadlessClient(Arma3Server server) {
+        int hcId = headlessClients.size() + 1;
+        Path profilesPath = launchContext.arma3InstancePaths()
+                .getHeadlessClientProfilesPath(server.getId(), hcId);
         headlessClients.push(
-                new HeadlessClient(headlessClients.size() + 1, server, launchContext.pathsFactory(),
-                        serverProcessCreator, additionalMods, logMaxFiles).start());
+                new HeadlessClient(hcId, server, launchContext.pathsFactory(),
+                        serverProcessCreator, profilesPath, additionalMods, logMaxFiles).start());
         instanceInfo.setHeadlessClientsCount(headlessClients.size());
     }
 

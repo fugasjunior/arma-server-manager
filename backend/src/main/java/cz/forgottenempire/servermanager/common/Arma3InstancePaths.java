@@ -53,6 +53,12 @@ public class Arma3InstancePaths {
         return pathsFactory.getServerPath(ServerType.ARMA3).relativize(getInstanceMpmissionsPath(id));
     }
 
+    /** Per-HC profile dir, nested under the instance: {@code profiles/ARMA3_<id>/hc/hc_NN}. */
+    public Path getHeadlessClientProfilesPath(long serverId, int headlessClientId) {
+        return getInstanceBasePath(serverId).resolve("hc")
+                .resolve(String.format("hc_%02d", headlessClientId));
+    }
+
     /** Single source of truth for the on-disk per-instance dir name. */
     public static String instanceDirName(long id) {
         return "ARMA3_" + id;
