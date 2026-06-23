@@ -24,7 +24,7 @@ import {
     EnhancedTableHeadCell,
     EnhancedTableRow
 } from "../../UI/EnhancedTable/EnhancedTable";
-import ModFlagsToggleGroup from "./ModFlagsToggleGroup";
+import ModFlagsControl from "./ModFlagsControl";
 
 function formatBytes(bytes?: number | null): string {
     if (!bytes) return "—";
@@ -103,7 +103,7 @@ export default function LocalModsManagement() {
                 value: "loadedOn",
                 displayValue: (
                     <span data-testid={`local-mod-flags-${mod.id}`}>
-                        <ModFlagsToggleGroup
+                        <ModFlagsControl
                             flags={{
                                 loadOnClient: mod.loadOnClient ?? true,
                                 loadOnServer: mod.loadOnServer ?? true,
@@ -111,7 +111,7 @@ export default function LocalModsManagement() {
                             }}
                             serverType={mod.serverType as ServerType}
                             disabled={!canModify}
-                            onChange={(flags) => canModify && handleFlagsChange(mod.id!, flags)}
+                            onChange={(flags: ModFlagsDto) => canModify && handleFlagsChange(mod.id!, flags)}
                         />
                     </span>
                 )

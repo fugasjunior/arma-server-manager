@@ -7,7 +7,7 @@ import {ErrorStatus, ModDto, ModFlagsDto, ServerType, SteamCmdItemInfoDto, Steam
 import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
 import {Button, CircularProgress, Stack, TextField} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
-import ModFlagsToggleGroup from "./ModFlagsToggleGroup";
+import ModFlagsControl from "./ModFlagsControl";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
@@ -135,7 +135,7 @@ const ModsTable = (props: ModsTableProps) => {
                         value: "loadedOn",
                         displayValue: (
                             <span data-testid={`mod-flags-${modDto.id}`}>
-                                <ModFlagsToggleGroup
+                                <ModFlagsControl
                                     flags={{
                                         loadOnClient: modDto.loadOnClient ?? true,
                                         loadOnServer: modDto.loadOnServer ?? true,
@@ -143,7 +143,7 @@ const ModsTable = (props: ModsTableProps) => {
                                     }}
                                     serverType={modDto.serverType as ServerType}
                                     disabled={!canModify}
-                                    onChange={(flags) => props.onFlagsChange(modDto.id!, flags)}
+                                    onChange={(flags: ModFlagsDto) => props.onFlagsChange(modDto.id!, flags)}
                                 />
                             </span>
                         )

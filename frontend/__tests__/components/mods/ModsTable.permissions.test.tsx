@@ -74,13 +74,13 @@ describe('ModsTable permissions', () => {
         it('is disabled without MOD_MODIFY', () => {
             renderWithPermissions(<ModsTable {...defaultProps}/>, ['MOD_VIEW']);
             const wrapper = screen.getByTestId('mod-flags-42');
-            within(wrapper).getAllByRole('button').forEach(btn => expect(btn).toBeDisabled());
+            expect(within(wrapper).getByRole('combobox')).toHaveAttribute('aria-disabled', 'true');
         });
 
         it('is enabled with MOD_MODIFY', () => {
             renderWithPermissions(<ModsTable {...defaultProps}/>, ['MOD_VIEW', 'MOD_MODIFY']);
             const wrapper = screen.getByTestId('mod-flags-42');
-            within(wrapper).getAllByRole('button').forEach(btn => expect(btn).not.toBeDisabled());
+            expect(within(wrapper).getByRole('combobox')).not.toHaveAttribute('aria-disabled', 'true');
         });
     });
 });
