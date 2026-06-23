@@ -22,6 +22,7 @@ public final class PermissionCode {
     public static final String SYSTEM_VIEW               = "SYSTEM_VIEW";
     public static final String USER_ADMIN                = "USER_ADMIN";
     public static final String ADVANCED_CONFIG_EDIT      = "ADVANCED_CONFIG_EDIT";
+    public static final String MANAGE_APP_SETTINGS        = "MANAGE_APP_SETTINGS";
 
     private PermissionCode() {}
 }

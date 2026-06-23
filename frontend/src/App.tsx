@@ -84,7 +84,7 @@ const App = () => {
                             <PermissionRoute permission="STEAM_AUTH_ADMIN"><ToolsPage/></PermissionRoute>
                         }/>
                         <Route path="settings" element={
-                            <PermissionRoute permission="STEAM_AUTH_ADMIN"><AppConfigPage/></PermissionRoute>
+                            <PermissionRoute permission={"MANAGE_APP_SETTINGS"}><AppConfigPage/></PermissionRoute>
                         }/>
                         <Route path="additionalServers" element={
                             <ProtectedRoute><AdditionalServersPage/></ProtectedRoute>

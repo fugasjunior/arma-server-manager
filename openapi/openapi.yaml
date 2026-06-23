@@ -20,6 +20,7 @@ tags:
   - name: ArmaLauncherPreset
   - name: Scenarios
   - name: SteamAuth
+  - name: AppSettings
   - name: SteamCmd
   - name: System
   - name: Users
@@ -119,6 +120,10 @@ paths:
     $ref: './paths/steam-auth.yaml#/~1config~1auth~1status'
   /config/auth/login:
     $ref: './paths/steam-auth.yaml#/~1config~1auth~1login'
+
+  # ── App Settings ────────────────────────────────────────────────────────────
+  /config/settings:
+    $ref: './paths/app-settings.yaml#/~1config~1settings'
 
   # ── SteamCmd ───────────────────────────────────────────────────────────────
   /steamcmd:
@@ -295,6 +300,10 @@ components:
       $ref: './components/schemas/steam-auth.yaml#/SteamLoginRequestDto'
     SteamLoginResultDto:
       $ref: './components/schemas/steam-auth.yaml#/SteamLoginResultDto'
+
+    # ── App Settings ──────────────────────────────────────────────────────────
+    AppSettingsDto:
+      $ref: './components/schemas/app-settings.yaml#/AppSettingsDto'
 
     # ── SteamCmd ──────────────────────────────────────────────────────────────
     SteamCmdItemInfoDto:

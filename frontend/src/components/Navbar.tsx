@@ -60,7 +60,7 @@ const Navbar = ({onModeChange, mode}: NavbarProps) => {
                                 Tools
                             </Button>
                         </PermissionGuard>
-                        <PermissionGuard permission="STEAM_AUTH_ADMIN">
+                        <PermissionGuard permission={"MANAGE_APP_SETTINGS"}>
                             <Button component={NavLink} to="/settings" sx={{color: '#fff'}}>
                                 Settings
                             </Button>

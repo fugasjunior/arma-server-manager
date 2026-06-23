@@ -2,6 +2,7 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import {
     AdditionalServersApi,
+    AppSettingsApi,
     ArmaLauncherPresetApi,
     Configuration,
     HeadlessClientApi,
@@ -70,6 +71,7 @@ export const localModsApi = new LocalModsApi(apiConfig, "", apiAxiosInstance);
 export const modPresetsApi = new ModPresetsApi(apiConfig, "", apiAxiosInstance);
 export const armaLauncherPresetApi = new ArmaLauncherPresetApi(apiConfig, "", apiAxiosInstance);
 export const scenariosApi = new ScenariosApi(apiConfig, "", apiAxiosInstance);
+export const appSettingsApi = new AppSettingsApi(apiConfig, "", apiAxiosInstance);
 export const steamAuthApi = new SteamAuthApi(apiConfig, "", apiAxiosInstance);
 export const steamCmdApi = new SteamCmdApi(apiConfig, "", apiAxiosInstance);
 export const systemApi = new SystemApi(apiConfig, "", apiAxiosInstance);
