@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -16,5 +17,9 @@ public class SteamCmdItemInfoRepository {
 
     public Map<Long, SteamCmdItemInfo> getAll() {
         return Collections.unmodifiableMap(itemInfos);
+    }
+
+    public Optional<SteamCmdItemInfo> get(long id) {
+        return Optional.ofNullable(itemInfos.get(id));
     }
 }

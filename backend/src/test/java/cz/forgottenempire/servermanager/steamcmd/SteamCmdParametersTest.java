@@ -10,7 +10,7 @@ class SteamCmdParametersTest {
     void continueOnFailedCommandOverridesDefaultShutdownBehavior() {
         SteamCmdParameters parameters = new SteamCmdParameters.Builder()
                 .continueOnFailedCommand()
-                .withAnonymousLogin()
+                .withCachedLogin("test")
                 .build();
 
         assertThat(parameters.get())
