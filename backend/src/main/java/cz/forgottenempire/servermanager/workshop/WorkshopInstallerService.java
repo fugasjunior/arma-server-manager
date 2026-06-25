@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
 import cz.forgottenempire.servermanager.util.FileSystemUtils;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadata;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
@@ -43,6 +45,7 @@ class WorkshopInstallerService {
     private final SteamCmdService steamCmdService;
     private final ServerInstallationService installationService;
     private final ModMetadataService metadataService;
+    private final SteamCmdItemInfoRepository itemInfoRepository;
 
     @Autowired
     public WorkshopInstallerService(
@@ -50,19 +53,25 @@ class WorkshopInstallerService {
             WorkshopModsService modsService,
             SteamCmdService steamCmdService,
             ServerInstallationService installationService,
-            ModMetadataService metadataService) {
+            ModMetadataService metadataService,
+            SteamCmdItemInfoRepository itemInfoRepository) {
         this.pathsFactory = pathsFactory;
         this.modsService = modsService;
         this.steamCmdService = steamCmdService;
         this.installationService = installationService;
         this.metadataService = metadataService;
+        this.itemInfoRepository = itemInfoRepository;
     }
 
-    public void installOrUpdateMods(Collection<WorkshopMod> mods) {
-        installOrUpdateMods(mods, false);
+    public void installMods(Collection<WorkshopMod> mods) {
+        scheduleInstallation(mods, false);
     }
 
-    public void installOrUpdateMods(Collection<WorkshopMod> mods, boolean forceUpdate) {
+    public void updateMods(Collection<WorkshopMod> mods) {
+        scheduleInstallation(mods, true);
+    }
+
+    private void scheduleInstallation(Collection<WorkshopMod> mods, boolean forceUpdate) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -183,8 +192,12 @@ class WorkshopInstallerService {
 
     void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
         boolean downloaded = verifyModDirectoryExists(mod.getId(), mod.getServerType());
+        boolean itemFinished = steamCmdJob.getErrorStatus() == null || itemInfoRepository.get(mod.getId())
+                .map(SteamCmdItemInfo::status)
+                .filter(SteamCmdItemInfo.SteamCmdStatus.FINISHED::equals)
+                .isPresent();
 
-        if (downloaded) {
+        if (downloaded && itemFinished) {
             if (steamCmdJob.getErrorStatus() != null) {
                 log.info("Mod '{}' (ID {}) was downloaded before the SteamCMD batch failed; installing it normally",
                         mod.getName(), mod.getId());

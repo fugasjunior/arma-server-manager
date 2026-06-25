@@ -2,7 +2,7 @@ package cz.forgottenempire.servermanager.steamcmd;
 
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ProcessFactory;
-import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
+import cz.forgottenempire.servermanager.steamauth.SteamSessionStatusHolder;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdOutputProcessor;
 import org.junit.jupiter.api.Test;
@@ -68,13 +68,13 @@ class SteamCmdExecutorTest {
 
     private static class TestContext {
         private final PathsFactory pathsFactory = mock(PathsFactory.class);
-        private final SteamAuthService steamAuthService = mock(SteamAuthService.class);
+        private final SteamSessionStatusHolder sessionStatusHolder = mock(SteamSessionStatusHolder.class);
         private final ProcessFactory processFactory = mock(ProcessFactory.class);
         private final SteamCmdOutputProcessor outputProcessor = mock(SteamCmdOutputProcessor.class);
         private final SteamCmdItemInfoRepository itemInfoRepository = new SteamCmdItemInfoRepository();
         private final SteamCmdExecutor executor = new SteamCmdExecutor(
                 pathsFactory,
-                steamAuthService,
+                sessionStatusHolder,
                 processFactory,
                 outputProcessor,
                 itemInfoRepository
@@ -92,7 +92,7 @@ class SteamCmdExecutorTest {
 
         private SteamCmdJob execute() throws Exception {
             SteamCmdParameters parameters = new SteamCmdParameters.Builder()
-                    .withAnonymousLogin()
+                    .withCachedLogin("test")
                     .build();
             SteamCmdJob job = new SteamCmdJob(List.of(), parameters);
             CompletableFuture<SteamCmdJob> future = new CompletableFuture<>();

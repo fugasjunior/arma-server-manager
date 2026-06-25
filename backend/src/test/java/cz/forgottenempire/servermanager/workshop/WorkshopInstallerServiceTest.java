@@ -7,6 +7,8 @@ import cz.forgottenempire.servermanager.installation.ServerInstallationService;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -30,20 +33,23 @@ class WorkshopInstallerServiceTest {
 
     private static final long MOD_ID = 450814997L;
 
-    @Mock
+    @Mock(stubOnly = true)
     private PathsFactory pathsFactory;
 
     @Mock
     private WorkshopModsService modsService;
 
-    @Mock
+    @Mock(stubOnly = true)
     private SteamCmdService steamCmdService;
 
-    @Mock
+    @Mock(stubOnly = true)
     private ServerInstallationService installationService;
 
-    @Mock
+    @Mock(stubOnly = true)
     private ModMetadataService metadataService;
+
+    @Mock(stubOnly = true)
+    private SteamCmdItemInfoRepository itemInfoRepository;
 
     @InjectMocks
     private WorkshopInstallerService installerService;
@@ -72,6 +78,8 @@ class WorkshopInstallerServiceTest {
     void installsDownloadedModEvenWhenAnotherItemCausedBatchTimeout() throws IOException {
         Path modDirectory = pathsFactory.getModInstallationPath(MOD_ID, ServerType.ARMA3);
         Files.createDirectories(modDirectory);
+        when(itemInfoRepository.get(MOD_ID)).thenReturn(Optional.of(new SteamCmdItemInfo(
+                MOD_ID, SteamCmdItemInfo.SteamCmdStatus.FINISHED, 100, 1, 1)));
 
         Path serverPath = tempDir.resolve("server");
         Files.createDirectories(serverPath);
@@ -91,12 +99,14 @@ class WorkshopInstallerServiceTest {
 
     @Test
     void marksOnlyMissingModAsTimedOut() {
+        when(itemInfoRepository.get(MOD_ID)).thenReturn(Optional.empty());
         installerService.handleInstallation(mod, timedOutJob);
 
         assertThat(mod.getInstallationStatus()).isEqualTo(InstallationStatus.ERROR);
         assertThat(mod.getErrorStatus()).isEqualTo(ErrorStatus.TIMEOUT);
         verify(modsService).saveMod(mod);
     }
+
     @Test
     void refreshesExistingModWithoutSteamCmdAndLowercasesFiles() throws IOException {
         mod.setInstallationStatus(InstallationStatus.FINISHED);
@@ -118,6 +128,19 @@ class WorkshopInstallerServiceTest {
         assertThat(modDirectory.resolve("addons").resolve("examplesog.pbo")).exists();
         assertThat(linkPath).isSymbolicLink();
         assertThat(mod.getInstallationStatus()).isEqualTo(InstallationStatus.FINISHED);
+        verify(modsService).saveMod(mod);
+    }
+
+    @Test
+    void doesNotTreatExistingDirectoryAsSuccessfulUpdateAfterTimeout() throws IOException {
+        Path modDirectory = pathsFactory.getModInstallationPath(MOD_ID, ServerType.ARMA3);
+        Files.createDirectories(modDirectory);
+
+        when(itemInfoRepository.get(MOD_ID)).thenReturn(Optional.empty());
+        installerService.handleInstallation(mod, timedOutJob);
+
+        assertThat(mod.getInstallationStatus()).isEqualTo(InstallationStatus.ERROR);
+        assertThat(mod.getErrorStatus()).isEqualTo(ErrorStatus.TIMEOUT);
         verify(modsService).saveMod(mod);
     }
 }

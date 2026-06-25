@@ -19,7 +19,7 @@ class WorkshopModsFacadeTest {
 
     private static final long MOD_ID = 450814997L;
 
-    @Mock
+    @Mock(stubOnly = true)
     private WorkshopModsService modsService;
 
     @Mock
@@ -37,7 +37,7 @@ class WorkshopModsFacadeTest {
         List<WorkshopMod> result = facade.saveAndInstallMods(List.of(MOD_ID));
 
         assertThat(result.get(0).getInstallationStatus()).isEqualTo(InstallationStatus.FINISHED);
-        verify(installerService).installOrUpdateMods(result, false);
+        verify(installerService).installMods(result);
     }
 
     @Test
@@ -46,9 +46,9 @@ class WorkshopModsFacadeTest {
         mod.setInstallationStatus(InstallationStatus.FINISHED);
         when(modsService.getMod(MOD_ID)).thenReturn(Optional.of(mod));
 
-        List<WorkshopMod> result = facade.saveAndInstallMods(List.of(MOD_ID), true);
+        List<WorkshopMod> result = facade.updateMods(List.of(MOD_ID));
 
         assertThat(result.get(0).getInstallationStatus()).isEqualTo(InstallationStatus.INSTALLATION_IN_PROGRESS);
-        verify(installerService).installOrUpdateMods(result, true);
+        verify(installerService).updateMods(result);
     }
 }
