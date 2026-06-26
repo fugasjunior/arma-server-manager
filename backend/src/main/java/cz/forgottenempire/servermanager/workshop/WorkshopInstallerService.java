@@ -103,7 +103,7 @@ class WorkshopInstallerService {
      * Resolves metadata for all mods in a single batched Steam API call, validates each mod,
      * then enqueues the download for valid mods. Runs asynchronously after the transaction commits.
      */
-    private void resolveAndInstall(Collection<WorkshopMod> mods, boolean forceUpdate) {
+    void resolveAndInstall(Collection<WorkshopMod> mods, boolean forceUpdate) {
         List<Long> modIds = mods.stream().map(WorkshopMod::getId).toList();
         Map<Long, ModMetadata> metadataMap = metadataService.fetchModMetadata(modIds);
 
@@ -129,6 +129,7 @@ class WorkshopInstallerService {
                     refreshInstalledMod(mod);
                     continue;
                 }
+                modsService.saveMod(mod);
                 validMods.add(mod);
             } catch (ModNotConsumedByGameException e) {
                 log.error("Mod '{}' (id {}) failed validation: {}", mod.getName(), mod.getId(), e.getMessage());
