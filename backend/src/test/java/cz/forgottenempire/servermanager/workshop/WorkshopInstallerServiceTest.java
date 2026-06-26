@@ -9,6 +9,7 @@ import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
 import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
+import cz.forgottenempire.servermanager.workshop.metadata.ModMetadata;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -72,6 +75,21 @@ class WorkshopInstallerServiceTest {
 
         when(pathsFactory.getModInstallationPath(MOD_ID, ServerType.ARMA3))
                 .thenReturn(tempDir.resolve("mods").resolve(String.valueOf(MOD_ID)));
+    }
+
+    @Test
+    void persistsResolvedMetadataBeforeStartingSteamCmdDownload() {
+        mod.setInstallationStatus(InstallationStatus.FINISHED);
+        when(metadataService.fetchModMetadata(List.of(MOD_ID)))
+                .thenReturn(Map.of(MOD_ID, new ModMetadata("CBA_A3", "107410")));
+        when(installationService.isServerInstalled(ServerType.ARMA3)).thenReturn(true);
+        when(steamCmdService.installOrUpdateWorkshopMods(List.of(mod))).thenReturn(new CompletableFuture<>());
+
+        installerService.resolveAndInstall(List.of(mod), false);
+
+        assertThat(mod.getName()).isEqualTo("CBA_A3");
+        assertThat(mod.getServerType()).isEqualTo(ServerType.ARMA3);
+        verify(modsService).saveMod(mod);
     }
 
     @Test
