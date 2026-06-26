@@ -248,6 +248,7 @@ class WorkshopInstallerService {
 
     private void updateBiKeys(WorkshopMod mod) throws IOException {
         deleteBiKeys(mod);
+        mod.getBiKeys().clear();
         installNewBiKeys(mod);
     }
 
