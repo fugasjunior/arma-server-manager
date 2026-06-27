@@ -212,6 +212,25 @@
       '403':
         $ref: '../components/responses.yaml#/ApiError'
 
+/server/{id}/auto-start:
+  patch:
+    tags: [Servers]
+    operationId: setServerAutoStart
+    summary: Configure auto-start on application boot for a server
+    parameters:
+      - $ref: '../components/parameters.yaml#/serverId'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/common.yaml#/AutoStartDto'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
 /server/{id}/autorestart:
   patch:
     tags: [Servers]

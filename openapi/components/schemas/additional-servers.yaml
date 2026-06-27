@@ -12,6 +12,8 @@ AdditionalServerDto:
       type: string
     imageUrl:
       type: string
+    autoStart:
+      type: boolean
 
 AdditionalServersDto:
   type: object

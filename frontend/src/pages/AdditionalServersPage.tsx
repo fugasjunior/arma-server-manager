@@ -1,4 +1,4 @@
-import {Avatar, Button, Divider, Stack, Typography} from "@mui/material";
+import {Avatar, Button, Checkbox, Divider, FormControlLabel, Stack, Typography} from "@mui/material";
 import {additionalServersApi} from "../api/client";
 import {AdditionalServerDto} from "../api/generated";
 import PermissionGuard from "../components/auth/PermissionGuard";
@@ -32,6 +32,14 @@ const AdditionalServersPage = () => {
         await queryClient.invalidateQueries({queryKey: queryKeys.additionalServers});
     };
 
+    const handleToggleAutoStart = async (id: number, enabled: boolean) => {
+        queryClient.setQueryData(queryKeys.additionalServers, (old: AdditionalServerDto[] = []) =>
+            old.map(s => s.id === id ? {...s, autoStart: enabled} : s)
+        );
+        await additionalServersApi.setAdditionalServerAutoStart({serverId: id, autoStartDto: {enabled}});
+        await queryClient.invalidateQueries({queryKey: queryKeys.additionalServers});
+    };
+
     return (
         <PermissionGuard permission="ADDITIONAL_SERVER_VIEW">
             <>
@@ -58,6 +66,16 @@ const AdditionalServersPage = () => {
                                     </div>
                                 }
                                 <PermissionGuard permission="ADDITIONAL_SERVER_OPERATE">
+                                    <FormControlLabel
+                                        label="Auto start"
+                                        control={
+                                            <Checkbox
+                                                checked={!!server.autoStart}
+                                                onChange={(e) => handleToggleAutoStart(server.id!, e.target.checked)}
+                                                size="small"
+                                            />
+                                        }
+                                    />
                                     {server.startedAt && server.alive &&
                                         <Button variant="contained" color="error"
                                                 onClick={() => handleStop(server.id!)}>

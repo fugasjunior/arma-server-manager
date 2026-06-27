@@ -87,11 +87,33 @@ public class ServerInstanceService {
         serverRepository.delete(server);
     }
 
+    public void setAutoStart(Server server, boolean enabled) {
+        server.setAutoStart(enabled);
+        serverRepository.save(server);
+    }
+
     public void setAutomaticRestart(Server server, boolean enabled, LocalTime time) {
         server.setRestartAutomatically(enabled);
         server.setAutomaticRestartTime(time);
         serverRepository.save(server);
     }
+
+    public void startAutoStartServers() {
+        getAllServers()
+                .stream()
+                .filter(Server::isAutoStart)
+                .forEach(server -> {
+                            try {
+                                log.info("Auto-starting server '{}' (id={})", server.getName(), server.getId());
+                                processService.startServer(server.getId());
+                            } catch (Exception e) {
+                                log.error("Failed to auto-start server '{}' (id={}): {}",
+                                        server.getName(), server.getId(), e.getMessage());
+                            }
+                        }
+                );
+    }
+
 
     public void flush() {
         entityManager.flush();

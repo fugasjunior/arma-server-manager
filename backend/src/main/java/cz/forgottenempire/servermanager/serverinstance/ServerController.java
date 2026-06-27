@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.api.ServersApi;
+import cz.forgottenempire.servermanager.api.model.AutoStartDto;
 import cz.forgottenempire.servermanager.api.model.AutomaticRestartDto;
 import cz.forgottenempire.servermanager.api.model.ConfigOverrideDto;
 import cz.forgottenempire.servermanager.api.model.SeedConfigOverrideRequest;
@@ -235,6 +236,14 @@ class ServerController implements ServersApi {
     public ResponseEntity<String> getServerLog(Long id, Integer count) {
         Server server = getServerEntity(id);
         return ResponseEntity.ok(server.getLog(pathsFactory).getLastLines(count));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
+    public ResponseEntity<Void> setServerAutoStart(Long id, AutoStartDto autoStartDto) {
+        Server server = getServerEntity(id);
+        serverInstanceService.setAutoStart(server, Boolean.TRUE.equals(autoStartDto.getEnabled()));
+        return ResponseEntity.ok().build();
     }
 
     @Override

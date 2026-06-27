@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Slf4j
-class AdditionalServersService {
+public class AdditionalServersService {
 
     private final AdditionalServerRepository serverRepository;
     private final AdditionalServerInstanceInfoRepository instanceInfoRepository;
@@ -63,6 +63,27 @@ class AdditionalServersService {
 
     public List<AdditionalServer> getAllServers() {
         return serverRepository.findAll();
+    }
+
+    public void startAutoStartServers() {
+        serverRepository.findAll().stream()
+                .filter(AdditionalServer::isAutoStart)
+                .forEach(server -> {
+                    try {
+                        log.info("Auto-starting additional server '{}' (id={})", server.getName(), server.getId());
+                        startServer(server.getId());
+                    } catch (Exception e) {
+                        log.error("Failed to auto-start additional server '{}' (id={}): {}",
+                                server.getName(), server.getId(), e.getMessage());
+                    }
+                });
+    }
+
+    public void setAutoStart(Long serverId, boolean enabled) {
+        AdditionalServer server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new NotFoundException("Additional server with ID " + serverId + " not found"));
+        server.setAutoStart(enabled);
+        serverRepository.save(server);
     }
 
     public void startServer(Long serverId) {

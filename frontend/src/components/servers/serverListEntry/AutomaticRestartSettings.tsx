@@ -2,7 +2,7 @@ import {AutomaticRestartDto} from "../../../api/generated";
 import {serversApi} from "../../../api/client";
 import {useEffect, useState} from "react";
 import {TimeField} from "@mui/x-date-pickers";
-import {FormControlLabel, Stack, Switch} from "@mui/material";
+import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {parseInt} from "lodash";
 import dayjs from "dayjs";
 import {usePermission} from "../../../hooks/usePermission.ts";
@@ -35,10 +35,11 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
     return (
         <Stack direction="row">
             <FormControlLabel control={
-                <Switch
+                <Checkbox
                     checked={enabled}
                     disabled={!canModify}
-                    onChange={(_, checked) => setEnabled(checked)}/>
+                    size="small"
+                    onChange={(e) => setEnabled(e.target.checked)}/>
             } label="Automatic restart"/>
             {enabled &&
                 <TimeField

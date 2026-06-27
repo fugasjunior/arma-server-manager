@@ -51,6 +51,9 @@ public abstract class Server {
     private String password;
     private String adminPassword;
 
+    @Column(name = "auto_start")
+    private boolean autoStart;
+
     @Column(name = "automatic_restart")
     private boolean restartAutomatically;
     @Column(name = "automatic_restart_time")

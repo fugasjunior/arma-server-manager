@@ -64,3 +64,9 @@ AutomaticRestartDto:
       type: string
       format: time
       description: "Restart time in HH:mm:ss format"
+
+AutoStartDto:
+  type: object
+  properties:
+    enabled:
+      type: boolean
