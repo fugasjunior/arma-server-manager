@@ -1,6 +1,6 @@
 import {ServerDto, ServerInstanceInfoDto, ServerType} from "../../../api/generated";
 import {Arma3ServerDto} from "../../../api/serverModels.ts";
-import {Button, Divider, Stack, Typography} from "@mui/material";
+import {Button, Checkbox, Divider, FormControlLabel, Stack, Typography} from "@mui/material";
 import {Link} from "react-router-dom";
 import ModEditButton from "../ModEditButton.tsx";
 import ListBuilderDLCsEdit from "../ListBuilderDLCsEdit.tsx";
@@ -17,6 +17,7 @@ export function ServerListEntryDetails(props: {
     serverStatus: ServerInstanceInfoDto | null,
     onClick: () => void,
     onTargetHcChanged?: () => void,
+    onToggleAutoStart?: (id: number, enabled: boolean) => void,
 }) {
     return (
         <Stack
@@ -63,6 +64,18 @@ export function ServerListEntryDetails(props: {
                         <Button variant="outlined" startIcon={<TextSnippetIcon/>} onClick={props.onClick} color="info">
                             Logs
                         </Button>
+                    </PermissionGuard>
+                    <PermissionGuard permission="SERVER_MODIFY">
+                        <FormControlLabel
+                            label="Auto start"
+                            control={
+                                <Checkbox
+                                    checked={!!props.server.autoStart}
+                                    onChange={(e) => props.onToggleAutoStart?.(props.server.id as number, e.target.checked)}
+                                    size="small"
+                                />
+                            }
+                        />
                     </PermissionGuard>
                     {props.server.automaticRestart &&
                         <AutomaticRestartSettings serverId={props.server.id!} dto={props.server.automaticRestart}/>}

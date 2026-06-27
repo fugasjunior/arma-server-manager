@@ -48,6 +48,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server~1{id}~1log'
   /server/{id}/log/download:
     $ref: './paths/servers.yaml#/~1server~1{id}~1log~1download'
+  /server/{id}/auto-start:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1auto-start'
   /server/{id}/autorestart:
     $ref: './paths/servers.yaml#/~1server~1{id}~1autorestart'
   /server/config-overrides/seed:
@@ -66,6 +68,8 @@ paths:
     $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1start'
   /additionalServers/{serverId}/stop:
     $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1stop'
+  /additionalServers/{serverId}/auto-start:
+    $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1auto-start'
 
   # ── Server Installation ────────────────────────────────────────────────────
   /server/installation:
@@ -216,6 +220,8 @@ components:
       $ref: './components/schemas/common.yaml#/LaunchParameterDto'
     AutomaticRestartDto:
       $ref: './components/schemas/common.yaml#/AutomaticRestartDto'
+    AutoStartDto:
+      $ref: './components/schemas/common.yaml#/AutoStartDto'
 
     # ── Servers ───────────────────────────────────────────────────────────────
     ServerDto:

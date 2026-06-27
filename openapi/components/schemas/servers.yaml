@@ -60,6 +60,8 @@ BaseServerDto:
       type: array
       items:
         $ref: './common.yaml#/LaunchParameterDto'
+    autoStart:
+      type: boolean
     automaticRestart:
       $ref: './common.yaml#/AutomaticRestartDto'
     configOverrides:

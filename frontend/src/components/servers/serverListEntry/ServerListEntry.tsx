@@ -24,6 +24,7 @@ type ServerListEntryProps = {
     onOpenLogs: (id: number) => void,
     onDuplicateServer: (server: ServerDto) => void,
     onTargetHcChanged?: () => void,
+    onToggleAutoStart?: (id: number, enabled: boolean) => void,
 }
 
 const ServerListEntry = (props: ServerListEntryProps) => {
@@ -85,6 +86,7 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                     <ServerListEntryDetails server={server} serverStatus={status}
                                             onClick={() => props.onOpenLogs(server.id as number)}
                                             onTargetHcChanged={props.onTargetHcChanged}
+                                            onToggleAutoStart={props.onToggleAutoStart}
                     />
                 </TableCell>
             </TableRow>}

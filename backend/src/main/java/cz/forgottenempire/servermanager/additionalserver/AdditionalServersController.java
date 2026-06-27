@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.additionalserver;
 import cz.forgottenempire.servermanager.api.AdditionalServersApi;
 import cz.forgottenempire.servermanager.api.model.AdditionalServerDto;
 import cz.forgottenempire.servermanager.api.model.AdditionalServersDto;
+import cz.forgottenempire.servermanager.api.model.AutoStartDto;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.security.permission.PermissionCode;
 import java.util.Comparator;
@@ -56,6 +57,13 @@ public class AdditionalServersController implements AdditionalServersApi {
     @PreAuthorize("hasAuthority('" + PermissionCode.ADDITIONAL_SERVER_OPERATE + "')")
     public ResponseEntity<Void> stopAdditionalServer(Long serverId) {
         serversService.stopServer(serverId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.ADDITIONAL_SERVER_OPERATE + "')")
+    public ResponseEntity<Void> setAdditionalServerAutoStart(Long serverId, AutoStartDto autoStartDto) {
+        serversService.setAutoStart(serverId, Boolean.TRUE.equals(autoStartDto.getEnabled()));
         return ResponseEntity.ok().build();
     }
 }

@@ -113,6 +113,7 @@ class AdditionalServersControllerUnitTest {
         server.setId(id);
         server.setName(name);
         server.setImageUrl("https://example.com/image.jpg");
+        server.setAutoStart(false);
         return server;
     }
 

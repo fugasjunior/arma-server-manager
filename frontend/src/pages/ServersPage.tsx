@@ -100,6 +100,11 @@ const ServersPage = () => {
         await queryClient.invalidateQueries({queryKey: queryKeys.servers});
     };
 
+    const handleToggleAutoStart = async (id: number, enabled: boolean) => {
+        await serversApi.setServerAutoStart({id, autoStartDto: {enabled}});
+        await queryClient.invalidateQueries({queryKey: queryKeys.servers});
+    };
+
     return (
         <>
             <PermissionGuard permission="SERVER_MODIFY">
@@ -120,6 +125,7 @@ const ServersPage = () => {
                                              onDeleteServer={() => handleDeleteServerClicked(server)}
                                              serverWithSamePortRunning={isServerWithSamePortRunning(server)}
                                              onTargetHcChanged={handleTargetHcChanged}
+                                             onToggleAutoStart={handleToggleAutoStart}
                             />
                         )}
                     </TableBody>
