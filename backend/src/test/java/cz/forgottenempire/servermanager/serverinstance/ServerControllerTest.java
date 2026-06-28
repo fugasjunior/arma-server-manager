@@ -4,6 +4,7 @@ import cz.forgottenempire.servermanager.api.model.DayZServerDto;
 import cz.forgottenempire.servermanager.api.model.ServerDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
@@ -72,7 +73,7 @@ class ServerControllerTest {
 
     @Test
     void getInstanceInfo_whenServiceReturnsInstanceInfo_thenServerInstanceDtoIsReturned() {
-        ServerInstanceInfo instanceInfo = new ServerInstanceInfo(STARTED_AT, PLAYERS_ONLINE, MAX_PLAYERS, VERSION, MAP,
+        ServerInstanceInfo instanceInfo = new ServerInstanceInfo(ServerStatus.RUNNING, STARTED_AT, PLAYERS_ONLINE, MAX_PLAYERS, VERSION, MAP,
                 DESCRIPTION, HEADLESS_CLIENTS_COUNT);
         ServerInstanceInfoDto expectedDto = new ServerInstanceInfoDto()
                 .alive(true)

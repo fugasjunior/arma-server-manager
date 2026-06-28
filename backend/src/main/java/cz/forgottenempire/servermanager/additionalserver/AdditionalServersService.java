@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.additionalserver;
 
 import cz.forgottenempire.servermanager.common.ProcessFactory;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.LogRotationProperties;
@@ -106,7 +107,7 @@ public class AdditionalServersService {
                     logFile.getFile());
 
             instanceInfoRepository.storeServerInstanceInfo(serverId,
-                    new AdditionalServerInstanceInfo(serverId, true, LocalDateTime.now(), process));
+                    new AdditionalServerInstanceInfo(serverId, true, ServerStatus.RUNNING, LocalDateTime.now(), process));
             log.info("Server '{}' started (PID {})", settings.getName(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server {} with command {} in directory {}",
@@ -126,7 +127,7 @@ public class AdditionalServersService {
 
         destroyWithTimeout(process);
         instanceInfoRepository.storeServerInstanceInfo(serverId,
-                new AdditionalServerInstanceInfo(serverId, false, null, null));
+                new AdditionalServerInstanceInfo(serverId, false, ServerStatus.OFF, null, null));
         log.info("Server id {} stopped", serverId);
     }
 

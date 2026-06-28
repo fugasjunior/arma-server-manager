@@ -8,6 +8,8 @@ AdditionalServerDto:
       type: string
     alive:
       type: boolean
+    status:
+      $ref: './common.yaml#/ServerStatus'
     startedAt:
       type: string
     imageUrl:

@@ -13,6 +13,7 @@ import cz.forgottenempire.servermanager.api.model.ServerDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.api.model.ServerLocalModDto;
 import cz.forgottenempire.servermanager.api.model.ServerWorkshopModDto;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.DateTimeMapper;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.localmod.LocalMod;

@@ -196,6 +196,8 @@ ServerInstanceInfoDto:
   properties:
     alive:
       type: boolean
+    status:
+      $ref: './common.yaml#/ServerStatus'
     startedAt:
       type: string
     playersOnline:

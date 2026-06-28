@@ -13,6 +13,8 @@ import {SeverControls} from "./SeverControls.tsx";
 import {ServerActionsMenu} from "./ServerActionsMenu.tsx";
 import {useServerStatus} from "../../../hooks/queries/useServerStatus.ts";
 import PermissionGuard from "../../auth/PermissionGuard";
+import ServerStatusIndicator from "../../../UI/ServerStatusIndicator.tsx";
+import {ServerStatus} from "../../../api/generated";
 
 type ServerListEntryProps = {
     server: ServerDto,
@@ -46,8 +48,6 @@ const ServerListEntry = (props: ServerListEntryProps) => {
         return;
     }
 
-    const serverRunning = status && status.alive;
-
     const handleExpandClick = () => {
         setExpanded(prevState => !prevState);
     };
@@ -68,7 +68,8 @@ const ServerListEntry = (props: ServerListEntryProps) => {
                             />
                         </PermissionGuard>
                         <Stack direction="row" spacing={1} sx={{position: "absolute", right: 8, alignItems: "center"}}>
-                            {serverRunning && status && <ServerStatusDetails status={status}/>}
+                            <ServerStatusIndicator status={status?.status}/>
+                            {status?.status === ServerStatus.Running && <ServerStatusDetails status={status}/>}
                             <ServerActionsMenu
                                 server={server}
                                 onDuplicateServer={onDuplicateServer}

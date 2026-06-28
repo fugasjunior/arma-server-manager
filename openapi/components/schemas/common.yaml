@@ -1,3 +1,7 @@
+ServerStatus:
+  type: string
+  enum: ['OFF', 'STARTING', 'RUNNING', 'ERROR']
+
 ServerType:
   type: string
   enum: [ARMA3, DAYZ, DAYZ_EXP, REFORGER]

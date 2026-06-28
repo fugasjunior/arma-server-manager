@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,8 @@ import java.time.LocalDateTime;
 public
 class ServerInstanceInfo {
 
+    @Builder.Default
+    private ServerStatus status = ServerStatus.OFF;
     private LocalDateTime startedAt;
     private int playersOnline;
     private int maxPlayers;
