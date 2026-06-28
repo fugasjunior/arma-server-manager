@@ -77,7 +77,7 @@ const App = () => {
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
                         }/>
                         <Route path="tools" element={
-                            <PermissionRoute permission="STEAM_AUTH_ADMIN"><ToolsPage/></PermissionRoute>
+                            <PermissionRoute permission="APPLICATION_LOGS_VIEW"><ToolsPage/></PermissionRoute>
                         }/>
                         <Route path="settings" element={
                             <PermissionRoute permission={"MANAGE_APP_SETTINGS"}><AppConfigPage/></PermissionRoute>

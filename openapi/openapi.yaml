@@ -21,6 +21,7 @@ tags:
   - name: Scenarios
   - name: SteamAuth
   - name: AppSettings
+  - name: ApplicationLog
   - name: SteamCmd
   - name: System
   - name: Users
@@ -134,6 +135,12 @@ paths:
   # ── App Settings ────────────────────────────────────────────────────────────
   /config/settings:
     $ref: './paths/app-settings.yaml#/~1config~1settings'
+
+  # ── Application Log ────────────────────────────────────────────────────────
+  /application/log:
+    $ref: './paths/application-log.yaml#/~1application~1log'
+  /application/log/download:
+    $ref: './paths/application-log.yaml#/~1application~1log~1download'
 
   # ── SteamCmd ───────────────────────────────────────────────────────────────
   /steamcmd:

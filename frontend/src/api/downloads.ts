@@ -1,5 +1,5 @@
 import {AxiosResponse} from "axios";
-import {armaLauncherPresetApi, serversApi, steamCmdApi} from "./client";
+import {applicationLogApi, armaLauncherPresetApi, serversApi, steamCmdApi} from "./client";
 import {scenariosApi} from "./client";
 
 function triggerBrowserDownload(response: AxiosResponse, fallbackName: string) {
@@ -20,6 +20,12 @@ function triggerBrowserDownload(response: AxiosResponse, fallbackName: string) {
 
 export function downloadServerLog(id: number) {
     serversApi.downloadServerLog({id}, {responseType: "blob"}).then((response) => {
+        triggerBrowserDownload(response, "log.txt");
+    });
+}
+
+export function downloadApplicationLog() {
+    applicationLogApi.downloadApplicationLog({responseType: "blob"}).then((response) => {
         triggerBrowserDownload(response, "log.txt");
     });
 }

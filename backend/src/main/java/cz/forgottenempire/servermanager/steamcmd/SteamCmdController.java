@@ -43,12 +43,14 @@ public class SteamCmdController implements SteamCmdApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.APPLICATION_LOGS_VIEW + "')")
     public ResponseEntity<String> getSteamCmdLog(Integer count) {
         LogFile logFile = logsService.getLogFile();
         return ResponseEntity.ok(logFile.getLastLines(count));
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.APPLICATION_LOGS_VIEW + "')")
     public ResponseEntity<Resource> downloadSteamCmdLog() {
         try {
             Resource resource = logsService.getLogFile().asResource()

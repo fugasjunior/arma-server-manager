@@ -2,6 +2,7 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import {
     AdditionalServersApi,
+    ApplicationLogApi,
     AppSettingsApi,
     ArmaLauncherPresetApi,
     Configuration,
@@ -63,6 +64,7 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
 
 const apiConfig = new Configuration({basePath: ""});
 
+export const applicationLogApi = new ApplicationLogApi(apiConfig, "", apiAxiosInstance);
 export const serversApi = new ServersApi(apiConfig, "", apiAxiosInstance);
 export const additionalServersApi = new AdditionalServersApi(apiConfig, "", apiAxiosInstance);
 export const headlessClientApi = new HeadlessClientApi(apiConfig, "", apiAxiosInstance);

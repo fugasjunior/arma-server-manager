@@ -116,6 +116,10 @@ public class PathsFactory {
         return Path.of(logsBasePath.toString(), "ARMA3_" + serverId + "_HC " + headlessClientId + ".log").toFile();
     }
 
+    public File getApplicationLogFile() {
+        return Path.of("logs", "spring-boot-logger.log").toFile();
+    }
+
     public File getSteamCmdLogFile() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
         String formattedDate = dateFormat.format(new Date());
