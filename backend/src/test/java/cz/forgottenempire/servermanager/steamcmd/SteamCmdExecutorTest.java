@@ -52,6 +52,18 @@ class SteamCmdExecutorTest {
         verify(context.processFactory, times(10))
                 .startProcessWithUnbufferedOutput(any(File.class), anyList());
     }
+    @Test
+    void reportsMissingCachedCredentialsAsReauthRequired() throws Exception {
+        TestContext context = new TestContext();
+        when(context.outputProcessor.processSteamCmdOutput(any(), any()))
+                .thenReturn("FAILED (No cached credentials and @NoPromptForPassword is set)\nERROR! Not logged on.");
+
+        SteamCmdJob result = context.execute();
+
+        assertThat(result.getErrorStatus()).isEqualTo(ErrorStatus.REAUTH_REQUIRED);
+        verify(context.sessionStatusHolder).setExpired();
+    }
+
 
     @Test
     void doesNotRetrySuccessfulLongRunningDownloadOutput() throws Exception {
