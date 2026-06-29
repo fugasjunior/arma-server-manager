@@ -1,7 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {localModsApi} from "../../api/client";
 import {queryKeys} from "../../api/queryKeys";
-import {LocalModDto, ServerType} from "../../api/generated";
+import {LocalModDto, ModFlagsDto, ServerType} from "../../api/generated";
 
 export function useLocalMods(filter?: ServerType, opts?: {enabled?: boolean}) {
     return useQuery({
@@ -14,22 +14,11 @@ export function useLocalMods(filter?: ServerType, opts?: {enabled?: boolean}) {
     });
 }
 
-export function useSetLocalModServerOnly() {
+export function useSetLocalModFlags() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({id, serverOnly}: {id: number; serverOnly: boolean}) =>
-            localModsApi.setLocalModServerOnly({id, serverOnlyDto: {serverOnly}}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: queryKeys.localMods()});
-        },
-    });
-}
-
-export function useSetLocalModLoadOnHeadlessClient() {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: ({id, loadOnHeadlessClient}: {id: number; loadOnHeadlessClient: boolean}) =>
-            localModsApi.setLocalModLoadOnHeadlessClient({id, loadOnHeadlessClientDto: {loadOnHeadlessClient}}),
+        mutationFn: ({id, flags}: {id: number; flags: ModFlagsDto}) =>
+            localModsApi.setLocalModFlags({id, modFlagsDto: flags}),
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: queryKeys.localMods()});
         },

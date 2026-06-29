@@ -10,7 +10,7 @@ export function SeverControls(props: {
     disabled: boolean,
     onStartServer: () => void
 }) {
-    return <Stack direction="row" spacing={1}>
+    return <Stack direction="row" spacing={1} sx={{ml: 2}}>
         {props.serverRunning ?
             <>
                 <Button id={`server-${props.server.id}-stop-btn`}

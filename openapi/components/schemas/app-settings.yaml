@@ -1,0 +1,10 @@
+AppSettingsDto:
+  type: object
+  properties:
+    automaticModUpdateEnabled:
+      type: boolean
+    automaticModUpdateTime:
+      type: string
+      format: time
+      description: "Daily time in HH:mm format, e.g. 03:00"
+      example: "03:00"

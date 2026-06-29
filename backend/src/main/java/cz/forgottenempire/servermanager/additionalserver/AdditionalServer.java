@@ -22,4 +22,5 @@ class AdditionalServer {
     @NotEmpty
     private String command;
     private String imageUrl;
+    private boolean autoStart;
 }

@@ -11,7 +11,6 @@ import ModsPage from "./pages/ModsPage";
 import NewServerPage from "./pages/NewServerPage";
 import {Container, createTheme, CssBaseline, ThemeProvider, useMediaQuery} from "@mui/material";
 import 'react-toastify/dist/ReactToastify.css'
-import ScenariosPage from "./pages/ScenariosPage";
 import AppConfigPage from "./pages/AppConfigPage";
 import AdditionalServersPage from "./pages/AdditionalServersPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -71,9 +70,6 @@ const App = () => {
                         <Route path="servers/:id" element={
                             <ProtectedRoute><ServerSettingsPage/></ProtectedRoute>
                         }/>
-                        <Route path="scenarios" element={
-                            <ProtectedRoute><ScenariosPage/></ProtectedRoute>
-                        }/>
                         <Route path="mods/:section" element={
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
                         }/>
@@ -81,10 +77,10 @@ const App = () => {
                             <ProtectedRoute><ModsPage/></ProtectedRoute>
                         }/>
                         <Route path="tools" element={
-                            <PermissionRoute permission="STEAM_AUTH_ADMIN"><ToolsPage/></PermissionRoute>
+                            <PermissionRoute permission="APPLICATION_LOGS_VIEW"><ToolsPage/></PermissionRoute>
                         }/>
                         <Route path="settings" element={
-                            <PermissionRoute permission="STEAM_AUTH_ADMIN"><AppConfigPage/></PermissionRoute>
+                            <PermissionRoute permission={"MANAGE_APP_SETTINGS"}><AppConfigPage/></PermissionRoute>
                         }/>
                         <Route path="additionalServers" element={
                             <ProtectedRoute><AdditionalServersPage/></ProtectedRoute>

@@ -96,11 +96,11 @@
       '404':
         $ref: '../components/responses.yaml#/ApiError'
 
-/mod/{id}/serverOnly:
+/mod/{id}/flags:
   patch:
     tags: [Mods]
-    operationId: setModServerOnly
-    summary: Toggle server-only flag for a workshop mod
+    operationId: setModFlags
+    summary: Update mod flags
     parameters:
       - $ref: '../components/parameters.yaml#/modId'
     requestBody:
@@ -108,28 +108,9 @@
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/mods.yaml#/ServerOnlyDto'
+            $ref: '../components/schemas/mods.yaml#/ModFlagsDto'
     responses:
       '200':
         description: OK
       '404':
-        $ref: '../components/responses.yaml#/ApiError'
-
-/mod/{id}/loadOnHeadlessClient:
-  patch:
-    tags: [Mods]
-    operationId: setModLoadOnHeadlessClient
-    summary: Toggle load-on-headless-client flag for a workshop mod
-    parameters:
-      - $ref: '../components/parameters.yaml#/modId'
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '../components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
-    responses:
-      '200':
-        description: OK
-      '404':
-        $ref: '../components/responses.yaml#/ApiError'
+        description: Not found

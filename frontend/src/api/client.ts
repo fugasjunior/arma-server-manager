@@ -2,9 +2,12 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import {
     AdditionalServersApi,
+    ApplicationLogApi,
+    AppSettingsApi,
     ArmaLauncherPresetApi,
     Configuration,
     HeadlessClientApi,
+    KeysApi,
     LocalModsApi,
     ModPresetsApi,
     ModsApi,
@@ -61,6 +64,7 @@ apiAxiosInstance.interceptors.response.use(undefined, (error) => {
 
 const apiConfig = new Configuration({basePath: ""});
 
+export const applicationLogApi = new ApplicationLogApi(apiConfig, "", apiAxiosInstance);
 export const serversApi = new ServersApi(apiConfig, "", apiAxiosInstance);
 export const additionalServersApi = new AdditionalServersApi(apiConfig, "", apiAxiosInstance);
 export const headlessClientApi = new HeadlessClientApi(apiConfig, "", apiAxiosInstance);
@@ -70,6 +74,8 @@ export const localModsApi = new LocalModsApi(apiConfig, "", apiAxiosInstance);
 export const modPresetsApi = new ModPresetsApi(apiConfig, "", apiAxiosInstance);
 export const armaLauncherPresetApi = new ArmaLauncherPresetApi(apiConfig, "", apiAxiosInstance);
 export const scenariosApi = new ScenariosApi(apiConfig, "", apiAxiosInstance);
+export const appSettingsApi = new AppSettingsApi(apiConfig, "", apiAxiosInstance);
+export const keysApi = new KeysApi(apiConfig, "", apiAxiosInstance);
 export const steamAuthApi = new SteamAuthApi(apiConfig, "", apiAxiosInstance);
 export const steamCmdApi = new SteamCmdApi(apiConfig, "", apiAxiosInstance);
 export const systemApi = new SystemApi(apiConfig, "", apiAxiosInstance);

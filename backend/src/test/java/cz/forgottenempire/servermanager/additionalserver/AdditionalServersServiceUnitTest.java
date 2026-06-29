@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import cz.forgottenempire.servermanager.common.ProcessFactory;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.LogRotationProperties;
 import java.io.IOException;
@@ -81,7 +82,7 @@ class AdditionalServersServiceUnitTest {
     @Test
     void whenServerGetInstanceInfo_theServerInstanceInfoReturned() {
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, true, LocalDateTime.now(), null);
+                new AdditionalServerInstanceInfo(1L, true, ServerStatus.RUNNING, LocalDateTime.now(), null);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
 
         AdditionalServerInstanceInfo actualInstanceInfo = serversService.getServerInstanceInfo(1L);
@@ -96,7 +97,7 @@ class AdditionalServersServiceUnitTest {
         Process originalProcess = mock(Process.class);
         when(originalProcess.isAlive()).thenReturn(false);
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, false, LocalDateTime.now(), originalProcess);
+                new AdditionalServerInstanceInfo(1L, false, ServerStatus.OFF, LocalDateTime.now(), originalProcess);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
         Process newProcess = mock(Process.class);
         when(newProcess.pid()).thenReturn(1234L);
@@ -112,7 +113,7 @@ class AdditionalServersServiceUnitTest {
     @Test
     void whenStartServerAndServerAlreadyRunning_thenNoServiceIsCalled() {
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, true, LocalDateTime.now(), null);
+                new AdditionalServerInstanceInfo(1L, true, ServerStatus.RUNNING, LocalDateTime.now(), null);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
 
         serversService.startServer(1L);
@@ -129,7 +130,7 @@ class AdditionalServersServiceUnitTest {
         Process originalProcess = mock(Process.class);
         when(originalProcess.isAlive()).thenReturn(false);
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, false, LocalDateTime.now(), originalProcess);
+                new AdditionalServerInstanceInfo(1L, false, ServerStatus.OFF, LocalDateTime.now(), originalProcess);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
         when(processFactory.startProcessWithRedirectedOutput(any(), any(), any())).thenThrow(new IOException());
 
@@ -141,7 +142,7 @@ class AdditionalServersServiceUnitTest {
     @Test
     void whenStartServerAndServerDoesNotExist_thenNotFoundExceptionIsThrown() {
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, false, LocalDateTime.now(), null);
+                new AdditionalServerInstanceInfo(1L, false, ServerStatus.OFF, LocalDateTime.now(), null);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
         when(serverRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -160,20 +161,20 @@ class AdditionalServersServiceUnitTest {
             return null;
         }).when(process).destroy();
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, true, LocalDateTime.now(), process);
+                new AdditionalServerInstanceInfo(1L, true, ServerStatus.RUNNING, LocalDateTime.now(), process);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
 
         serversService.stopServer(1L);
 
         verify(instanceInfoRepository).storeServerInstanceInfo(1L,
-                new AdditionalServerInstanceInfo(1L, false, null, null));
+                new AdditionalServerInstanceInfo(1L, false, ServerStatus.OFF, null, null));
         verify(process).destroy();
     }
 
     @Test
     void whenStopServerAndServerIsNotRunning_thenNoOtherActionHappens() {
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, false, LocalDateTime.now(), null);
+                new AdditionalServerInstanceInfo(1L, false, ServerStatus.OFF, LocalDateTime.now(), null);
         when(instanceInfoRepository.getServerInstanceInfo(1L)).thenReturn(instanceInfo);
 
         serversService.stopServer(1L);

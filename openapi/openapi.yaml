@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Arma Server Manager API
-  version: 1.0.0
+  version: 1.0.1
 
 servers:
   - url: /api
@@ -20,6 +20,8 @@ tags:
   - name: ArmaLauncherPreset
   - name: Scenarios
   - name: SteamAuth
+  - name: AppSettings
+  - name: ApplicationLog
   - name: SteamCmd
   - name: System
   - name: Users
@@ -33,6 +35,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server'
   /server/{id}:
     $ref: './paths/servers.yaml#/~1server~1{id}'
+  /server/{id}/duplicate:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1duplicate'
   /server/{id}/start:
     $ref: './paths/servers.yaml#/~1server~1{id}~1start'
   /server/{id}/stop:
@@ -45,6 +49,8 @@ paths:
     $ref: './paths/servers.yaml#/~1server~1{id}~1log'
   /server/{id}/log/download:
     $ref: './paths/servers.yaml#/~1server~1{id}~1log~1download'
+  /server/{id}/auto-start:
+    $ref: './paths/servers.yaml#/~1server~1{id}~1auto-start'
   /server/{id}/autorestart:
     $ref: './paths/servers.yaml#/~1server~1{id}~1autorestart'
   /server/config-overrides/seed:
@@ -63,6 +69,8 @@ paths:
     $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1start'
   /additionalServers/{serverId}/stop:
     $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1stop'
+  /additionalServers/{serverId}/auto-start:
+    $ref: './paths/additional-servers.yaml#/~1additionalServers~1{serverId}~1auto-start'
 
   # ── Server Installation ────────────────────────────────────────────────────
   /server/installation:
@@ -75,18 +83,14 @@ paths:
     $ref: './paths/mods.yaml#/~1mod'
   /mod/{id}:
     $ref: './paths/mods.yaml#/~1mod~1{id}'
-  /mod/{id}/serverOnly:
-    $ref: './paths/mods.yaml#/~1mod~1{id}~1serverOnly'
-  /mod/{id}/loadOnHeadlessClient:
-    $ref: './paths/mods.yaml#/~1mod~1{id}~1loadOnHeadlessClient'
+  /mod/{id}/flags:
+    $ref: './paths/mods.yaml#/~1mod~1{id}~1flags'
 
   # ── Local Mods ────────────────────────────────────────────────────────────
   /local-mod:
     $ref: './paths/local-mods.yaml#/~1local-mod'
-  /local-mod/{id}/serverOnly:
-    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1serverOnly'
-  /local-mod/{id}/loadOnHeadlessClient:
-    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1loadOnHeadlessClient'
+  /local-mod/{id}/flags:
+    $ref: './paths/local-mods.yaml#/~1local-mod~1{id}~1flags'
   /local-mod/sync:
     $ref: './paths/local-mods.yaml#/~1local-mod~1sync'
   /local-mod/sync/status:
@@ -105,12 +109,20 @@ paths:
     $ref: './paths/arma-launcher-preset.yaml#/~1mod~1launcher_preset'
 
   # ── Scenarios ──────────────────────────────────────────────────────────────
-  /scenarios:
-    $ref: './paths/scenarios.yaml#/~1scenarios'
   /scenarios/REFORGER:
     $ref: './paths/scenarios.yaml#/~1scenarios~1REFORGER'
-  /scenarios/download:
-    $ref: './paths/scenarios.yaml#/~1scenarios~1download'
+  /server/{id}/scenarios:
+    $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios'
+  /server/{id}/scenarios/{name}:
+    $ref: './paths/scenarios.yaml#/~1server~1{id}~1scenarios~1{name}'
+
+  # ── Keys ───────────────────────────────────────────────────────────────────
+  /server/{id}/keys:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1keys'
+  /server/{id}/keys/{name}:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1keys~1{name}'
+  /server/{id}/provided-keys:
+    $ref: './paths/keys.yaml#/~1server~1{id}~1provided-keys'
 
   # ── Steam Auth ─────────────────────────────────────────────────────────────
   /config/auth:
@@ -119,6 +131,16 @@ paths:
     $ref: './paths/steam-auth.yaml#/~1config~1auth~1status'
   /config/auth/login:
     $ref: './paths/steam-auth.yaml#/~1config~1auth~1login'
+
+  # ── App Settings ────────────────────────────────────────────────────────────
+  /config/settings:
+    $ref: './paths/app-settings.yaml#/~1config~1settings'
+
+  # ── Application Log ────────────────────────────────────────────────────────
+  /application/log:
+    $ref: './paths/application-log.yaml#/~1application~1log'
+  /application/log/download:
+    $ref: './paths/application-log.yaml#/~1application~1log~1download'
 
   # ── SteamCmd ───────────────────────────────────────────────────────────────
   /steamcmd:
@@ -205,6 +227,8 @@ components:
       $ref: './components/schemas/common.yaml#/LaunchParameterDto'
     AutomaticRestartDto:
       $ref: './components/schemas/common.yaml#/AutomaticRestartDto'
+    AutoStartDto:
+      $ref: './components/schemas/common.yaml#/AutoStartDto'
 
     # ── Servers ───────────────────────────────────────────────────────────────
     ServerDto:
@@ -259,10 +283,8 @@ components:
       $ref: './components/schemas/mods.yaml#/ModsDto'
     CreatorDlcDto:
       $ref: './components/schemas/mods.yaml#/CreatorDlcDto'
-    ServerOnlyDto:
-      $ref: './components/schemas/mods.yaml#/ServerOnlyDto'
-    LoadOnHeadlessClientDto:
-      $ref: './components/schemas/mods.yaml#/LoadOnHeadlessClientDto'
+    ModFlagsDto:
+      $ref: './components/schemas/mods.yaml#/ModFlagsDto'
 
     # ── Mod Presets ───────────────────────────────────────────────────────────
     CreatePresetRequestDto:
@@ -286,6 +308,12 @@ components:
     ReforgerScenariosDto:
       $ref: './components/schemas/scenarios.yaml#/ReforgerScenariosDto'
 
+    # ── Keys ──────────────────────────────────────────────────────────────────
+    Arma3KeyDto:
+      $ref: './components/schemas/keys.yaml#/Arma3KeyDto'
+    Arma3KeysDto:
+      $ref: './components/schemas/keys.yaml#/Arma3KeysDto'
+
     # ── Steam Auth ────────────────────────────────────────────────────────────
     SteamAuthDto:
       $ref: './components/schemas/steam-auth.yaml#/SteamAuthDto'
@@ -295,6 +323,10 @@ components:
       $ref: './components/schemas/steam-auth.yaml#/SteamLoginRequestDto'
     SteamLoginResultDto:
       $ref: './components/schemas/steam-auth.yaml#/SteamLoginResultDto'
+
+    # ── App Settings ──────────────────────────────────────────────────────────
+    AppSettingsDto:
+      $ref: './components/schemas/app-settings.yaml#/AppSettingsDto'
 
     # ── SteamCmd ──────────────────────────────────────────────────────────────
     SteamCmdItemInfoDto:

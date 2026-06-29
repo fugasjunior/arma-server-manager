@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ class CheckAdditionalServerInstancesStatusCronJobUnitTest {
     void whenServersAreRunningAndProcessIsAlive_thenServerInfoIsNotUpdated() {
         when(process.isAlive()).thenReturn(true);
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, true, LocalDateTime.now(), process);
+                new AdditionalServerInstanceInfo(1L, true, ServerStatus.RUNNING, LocalDateTime.now(), process);
         when(instanceInfoRepository.getAll()).thenReturn(List.of(instanceInfo));
 
         cronJob.checkServers();
@@ -45,7 +46,7 @@ class CheckAdditionalServerInstancesStatusCronJobUnitTest {
     void whenServerHasCrashed_thenServerInfoIsUpdated() {
         when(process.isAlive()).thenReturn(false);
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, true, LocalDateTime.now(), process);
+                new AdditionalServerInstanceInfo(1L, true, ServerStatus.RUNNING, LocalDateTime.now(), process);
         AdditionalServer server = new AdditionalServer();
         server.setId(1L);
         when(additionalServersService.getServer(1L)).thenReturn(Optional.of(server));
@@ -54,7 +55,7 @@ class CheckAdditionalServerInstancesStatusCronJobUnitTest {
         cronJob.checkServers();
 
         AdditionalServerInstanceInfo expectedInstanceInfo
-                = new AdditionalServerInstanceInfo(1L, false, null, null);
+                = new AdditionalServerInstanceInfo(1L, false, ServerStatus.ERROR, null, null);
         verify(process, times(1)).isAlive();
         verify(instanceInfoRepository, times(1))
                 .storeServerInstanceInfo(1L, expectedInstanceInfo);
@@ -64,7 +65,7 @@ class CheckAdditionalServerInstancesStatusCronJobUnitTest {
     void whenServerHasCrashedAndHasInvalidId_thenIllegalStateExceptionIsThrown() {
         when(process.isAlive()).thenReturn(false);
         AdditionalServerInstanceInfo instanceInfo =
-                new AdditionalServerInstanceInfo(1L, true, LocalDateTime.now(), process);
+                new AdditionalServerInstanceInfo(1L, true, ServerStatus.RUNNING, LocalDateTime.now(), process);
         when(additionalServersService.getServer(1L)).thenReturn(Optional.empty());
         when(instanceInfoRepository.getAll()).thenReturn(List.of(instanceInfo));
 
@@ -73,7 +74,7 @@ class CheckAdditionalServerInstancesStatusCronJobUnitTest {
                 .hasMessageContaining("Invalid ID 1 in additional server instances map");
 
         AdditionalServerInstanceInfo expectedInstanceInfo
-                = new AdditionalServerInstanceInfo(1L, false, null, null);
+                = new AdditionalServerInstanceInfo(1L, false, ServerStatus.ERROR, null, null);
         verify(process, times(1)).isAlive();
         verify(instanceInfoRepository, times(1))
                 .storeServerInstanceInfo(1L, expectedInstanceInfo);

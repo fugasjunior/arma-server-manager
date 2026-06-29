@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.additionalserver;
 
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ class CheckAdditionalServerInstancesStatusCronJob {
 
                     // the process of a server that is marked as alive is no longer running
                     instanceInfoRepository.storeServerInstanceInfo(instance.id(),
-                            new AdditionalServerInstanceInfo(instance.id(), false, null, null));
+                            new AdditionalServerInstanceInfo(instance.id(), false, ServerStatus.ERROR, null, null));
                     logWarningMessage(instance);
                 });
     }

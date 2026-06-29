@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance;
 
 import cz.forgottenempire.servermanager.api.ServersApi;
+import cz.forgottenempire.servermanager.api.model.AutoStartDto;
 import cz.forgottenempire.servermanager.api.model.AutomaticRestartDto;
 import cz.forgottenempire.servermanager.api.model.ConfigOverrideDto;
 import cz.forgottenempire.servermanager.api.model.SeedConfigOverrideRequest;
@@ -10,6 +11,7 @@ import cz.forgottenempire.servermanager.api.model.ServersDto;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
+import cz.forgottenempire.servermanager.serverinstance.Arma3InstanceDataCopier;
 import cz.forgottenempire.servermanager.serverinstance.entities.DayZServer;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.ServerProcessService;
@@ -41,6 +43,7 @@ class ServerController implements ServersApi {
     private final PathsFactory pathsFactory;
     private final ServerSecretsMasker secretsMasker;
     private final ConfigOverrideService configOverrideService;
+    private final Arma3InstanceDataCopier arma3InstanceDataCopier;
 
     @Autowired
     public ServerController(
@@ -49,13 +52,15 @@ class ServerController implements ServersApi {
             ServerMapper serverMapper,
             PathsFactory pathsFactory,
             ServerSecretsMasker secretsMasker,
-            ConfigOverrideService configOverrideService) {
+            ConfigOverrideService configOverrideService,
+            Arma3InstanceDataCopier arma3InstanceDataCopier) {
         this.serverInstanceService = serverInstanceService;
         this.serverProcessService = serverProcessService;
         this.serverMapper = serverMapper;
         this.pathsFactory = pathsFactory;
         this.secretsMasker = secretsMasker;
         this.configOverrideService = configOverrideService;
+        this.arma3InstanceDataCopier = arma3InstanceDataCopier;
     }
 
     @Override
@@ -95,6 +100,27 @@ class ServerController implements ServersApi {
         server = serverInstanceService.createServer(server, overrides);
         ServerDto dto = serverMapper.mapServerToDto(server);
         attachOverrides(server, dto);
+        secretsMasker.maskIfUnauthorized(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
+    public ResponseEntity<ServerDto> duplicateServer(Long id) {
+        Server source = getServerEntity(id);
+        Long sourceId = source.getId();
+        ServerDto sourceDto = serverMapper.mapServerToDto(source);
+        attachOverrides(source, sourceDto);
+        Server clone = serverMapper.mapServerDtoToEntity(sourceDto);
+        clone.setId(null);
+        clone.setName(source.getName() + " (copy)");
+        List<ConfigOverrideDto> overrides = extractOverridesFromDto(sourceDto);
+        Server created = serverInstanceService.createServer(clone, overrides);
+        if (source instanceof Arma3Server) {
+            arma3InstanceDataCopier.copyInstanceData(sourceId, created.getId());
+        }
+        ServerDto dto = serverMapper.mapServerToDto(created);
         secretsMasker.maskIfUnauthorized(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
@@ -210,6 +236,14 @@ class ServerController implements ServersApi {
     public ResponseEntity<String> getServerLog(Long id, Integer count) {
         Server server = getServerEntity(id);
         return ResponseEntity.ok(server.getLog(pathsFactory).getLastLines(count));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.SERVER_MODIFY + "')")
+    public ResponseEntity<Void> setServerAutoStart(Long id, AutoStartDto autoStartDto) {
+        Server server = getServerEntity(id);
+        serverInstanceService.setAutoStart(server, Boolean.TRUE.equals(autoStartDto.getEnabled()));
+        return ResponseEntity.ok().build();
     }
 
     @Override

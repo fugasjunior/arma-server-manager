@@ -3,6 +3,7 @@ package cz.forgottenempire.servermanager.serverinstance;
 import com.ibasco.agql.protocols.valve.source.query.SourceQueryClient;
 import com.ibasco.agql.protocols.valve.source.query.info.SourceQueryInfoResponse;
 import com.ibasco.agql.protocols.valve.source.query.info.SourceServer;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.serverinstance.entities.Arma3Server;
 import cz.forgottenempire.servermanager.serverinstance.entities.Server;
 import cz.forgottenempire.servermanager.serverinstance.process.Arma3ServerProcess;
@@ -58,7 +59,7 @@ class CheckServerInstancesStatusCronJob {
 
     private void handleCrashedServer(ServerProcess serverProcess) {
         log.warn("Server ID {} crashed or was exited outside the manager.", serverProcess.getServerId());
-        serverProcessService.shutDownServer(serverProcess.getServerId());
+        serverProcessService.markServerCrashed(serverProcess.getServerId());
     }
 
     private void updateServerInstanceInfo(ServerProcess process, Server server) {
@@ -83,6 +84,7 @@ class CheckServerInstancesStatusCronJob {
     }
 
     private static void updateInstanceInfoFromQueryResult(ServerInstanceInfo instanceInfo, SourceServer queryServerInfo) {
+        instanceInfo.setStatus(ServerStatus.RUNNING);
         instanceInfo.setMap(queryServerInfo.getMapName());
         instanceInfo.setPlayersOnline(queryServerInfo.getNumOfPlayers());
         instanceInfo.setMaxPlayers(queryServerInfo.getMaxPlayers());

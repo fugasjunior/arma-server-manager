@@ -1,5 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
+import cz.forgottenempire.servermanager.common.Arma3KeyService;
 import cz.forgottenempire.servermanager.common.PathsFactory;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
@@ -12,7 +14,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,8 +60,18 @@ class Arma3ServerProcessTest {
         process = mock(Process.class, withSettings().stubOnly());
         when(processCreator.startProcessWithRedirectedOutput(any(), any(), any())).thenReturn(process);
 
+        Arma3InstancePaths instancePaths = mock(Arma3InstancePaths.class, withSettings().stubOnly());
+        when(instancePaths.getHeadlessClientProfilesPath(anyLong(), anyInt())).thenAnswer(invocation -> {
+            long serverId = invocation.getArgument(0);
+            int hcId = invocation.getArgument(1);
+            return Path.of(tempDir.getAbsolutePath(), "profiles", "ARMA3_" + serverId, "hc", String.format("hc_%02d", hcId));
+        });
+
         ServerLaunchContext launchContext = new ServerLaunchContext(
-                pathsFactory, mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
+                pathsFactory,
+                instancePaths,
+                mock(Arma3KeyService.class, withSettings().stubOnly()),
+                mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
         arma3ServerProcess = new Arma3ServerProcess(SERVER_ID, processCreator, launchContext, new String[0], 5);
     }

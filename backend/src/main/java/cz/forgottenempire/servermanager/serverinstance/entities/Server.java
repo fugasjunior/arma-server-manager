@@ -5,6 +5,7 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
+import java.io.IOException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -50,6 +51,9 @@ public abstract class Server {
     private String password;
     private String adminPassword;
 
+    @Column(name = "auto_start")
+    private boolean autoStart;
+
     @Column(name = "automatic_restart")
     private boolean restartAutomatically;
     @Column(name = "automatic_restart_time")
@@ -58,6 +62,14 @@ public abstract class Server {
     public abstract List<String> getLaunchParameters(ServerLaunchContext ctx);
 
     public abstract Collection<ServerConfig> getConfigFiles(ServerLaunchContext ctx);
+
+    /**
+     * Hook called before config generation and process start.
+     * Subclasses override to create instance-specific directories or perform other setup.
+     * Default: no-op.
+     */
+    public void prepareLaunchEnvironment(ServerLaunchContext ctx) throws IOException {
+    }
 
     public LogFile getLog(PathsFactory pathsFactory) {
         return new LogFile(pathsFactory.getServerLogFile(type, id));

@@ -1,0 +1,35 @@
+/application/log:
+  get:
+    tags: [ApplicationLog]
+    operationId: getApplicationLog
+    summary: Get application log (last N lines)
+    parameters:
+      - name: count
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+    responses:
+      '200':
+        description: OK
+        content:
+          text/plain:
+            schema:
+              type: string
+
+/application/log/download:
+  get:
+    tags: [ApplicationLog]
+    operationId: downloadApplicationLog
+    summary: Download application log file
+    responses:
+      '200':
+        description: OK
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'

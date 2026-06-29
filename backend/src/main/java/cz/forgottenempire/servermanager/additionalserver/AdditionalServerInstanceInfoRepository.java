@@ -1,5 +1,6 @@
 package cz.forgottenempire.servermanager.additionalserver;
 
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ class AdditionalServerInstanceInfoRepository {
     public AdditionalServerInstanceInfo getServerInstanceInfo(Long id) {
         return Optional.ofNullable(statusMap.get(id)).orElseGet(() -> {
             AdditionalServerInstanceInfo instanceInfo =
-                    new AdditionalServerInstanceInfo(id, false, null, null);
+                    new AdditionalServerInstanceInfo(id, false, ServerStatus.OFF, null, null);
             statusMap.put(id, instanceInfo);
             return instanceInfo;
         });

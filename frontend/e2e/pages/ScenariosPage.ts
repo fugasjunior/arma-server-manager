@@ -3,8 +3,10 @@ import { Page, Locator } from '@playwright/test';
 export class ScenariosPage {
     constructor(private readonly page: Page) {}
 
-    async goto() {
-        await this.page.goto('/scenarios');
+    async goto(serverId: number) {
+        await this.page.goto('/servers');
+        await this.page.getByTestId(`server-${serverId}-expand-btn`).click();
+        await this.page.getByRole('button', {name: 'Scenarios'}).click();
     }
 
     async uploadFile(filePath: string) {

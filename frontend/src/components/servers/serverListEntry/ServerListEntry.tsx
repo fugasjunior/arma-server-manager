@@ -1,10 +1,6 @@
-import {Link} from "react-router-dom";
-import {Button} from "@mui/material";
-import PermissionGuard from "../../auth/PermissionGuard";
-import DeleteIcon from '@mui/icons-material/Delete';
-import SettingsIcon from '@mui/icons-material/Settings';
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
+import {Stack} from "@mui/material";
 import {ServerDto} from "../../../api/generated";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -14,7 +10,11 @@ import {ServerListEntryDetails} from "./ServerListEntryDetails.tsx";
 import {ServerStatusDetails} from "./ServerStatusDetails.tsx";
 import {ServerHeader} from "./ServerHeader.tsx";
 import {SeverControls} from "./SeverControls.tsx";
+import {ServerActionsMenu} from "./ServerActionsMenu.tsx";
 import {useServerStatus} from "../../../hooks/queries/useServerStatus.ts";
+import PermissionGuard from "../../auth/PermissionGuard";
+import ServerStatusIndicator from "../../../UI/ServerStatusIndicator.tsx";
+import {ServerStatus} from "../../../api/generated";
 
 type ServerListEntryProps = {
     server: ServerDto,
@@ -26,6 +26,7 @@ type ServerListEntryProps = {
     onOpenLogs: (id: number) => void,
     onDuplicateServer: (server: ServerDto) => void,
     onTargetHcChanged?: () => void,
+    onToggleAutoStart?: (id: number, enabled: boolean) => void,
 }
 
 const ServerListEntry = (props: ServerListEntryProps) => {
@@ -47,8 +48,6 @@ const ServerListEntry = (props: ServerListEntryProps) => {
         return;
     }
 
-    const serverRunning = status && status.alive;
-
     const handleExpandClick = () => {
         setExpanded(prevState => !prevState);
     };
@@ -56,55 +55,39 @@ const ServerListEntry = (props: ServerListEntryProps) => {
     return (
         <>
             <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
-                <TableCell>
-                    <ServerHeader server={server}/>
-                </TableCell>
-                <TableCell>
-                    <PermissionGuard permission="SERVER_OPERATE">
-                        <SeverControls
-                            serverRunning={status?.alive ?? null} server={server}
-                            onStartServer={() => onStartServer(server.id as number)}
-                            onStopServer={() => onStopServer(server.id as number)}
-                            onRestartServer={() => onRestartServer(server.id as number)}
-                            disabled={serverWithSamePortRunning}
-                        />
-                    </PermissionGuard>
-                </TableCell>
-                <TableCell>
-                    <PermissionGuard permission="SERVER_VIEW">
-                        <Button id={`server-${server.id}-settings-btn`}
-                                className="server-settings-btn"
-                                component={Link} to={"/servers/" + server.id}
-                                variant="outlined" startIcon={<SettingsIcon/>}
-                        >
-                            Settings
-                        </Button>
-                    </PermissionGuard>
-                </TableCell>
-                <TableCell>
-                    {serverRunning && status &&
-                        <ServerStatusDetails status={status}/>
-                    }
-                    {!serverRunning &&
-                        <PermissionGuard permission="SERVER_DELETE">
-                            <Button id={`server-${server.id}-delete-btn`}
-                                    className="server-delete-btn"
-                                    variant="outlined" startIcon={<DeleteIcon/>} color="error"
-                                    onClick={() => onDeleteServer(server.id as number)}>Delete
-                            </Button>
-                        </PermissionGuard>}
-                </TableCell>
-                <TableCell>
-                    <IconButton onClick={handleExpandClick}>
-                        {isExpanded ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
-                    </IconButton>
+                <TableCell colSpan={5} sx={{position: "relative"}}>
+                    <Stack direction="row" spacing={2} sx={{alignItems: "center", display: "flex", flex: 1, minWidth: 0}}>
+                        <ServerHeader server={server}/>
+                        <PermissionGuard permission="SERVER_OPERATE">
+                            <SeverControls
+                                serverRunning={status?.alive ?? null} server={server}
+                                onStartServer={() => onStartServer(server.id as number)}
+                                onStopServer={() => onStopServer(server.id as number)}
+                                onRestartServer={() => onRestartServer(server.id as number)}
+                                disabled={serverWithSamePortRunning}
+                            />
+                        </PermissionGuard>
+                        <Stack direction="row" spacing={1} sx={{position: "absolute", right: 8, alignItems: "center"}}>
+                            <ServerStatusIndicator status={status?.status}/>
+                            {status?.status === ServerStatus.Running && <ServerStatusDetails status={status}/>}
+                            <ServerActionsMenu
+                                server={server}
+                                onDuplicateServer={onDuplicateServer}
+                                onDeleteServer={onDeleteServer}
+                            />
+                            <IconButton data-testid={`server-${server.id}-expand-btn`} onClick={handleExpandClick}>
+                                {isExpanded ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
+                            </IconButton>
+                        </Stack>
+                    </Stack>
                 </TableCell>
             </TableRow>
             {isExpanded && <TableRow>
                 <TableCell colSpan={5}>
-                    <ServerListEntryDetails server={server} serverStatus={status} onDuplicateServer={onDuplicateServer}
+                    <ServerListEntryDetails server={server} serverStatus={status}
                                             onClick={() => props.onOpenLogs(server.id as number)}
                                             onTargetHcChanged={props.onTargetHcChanged}
+                                            onToggleAutoStart={props.onToggleAutoStart}
                     />
                 </TableCell>
             </TableRow>}

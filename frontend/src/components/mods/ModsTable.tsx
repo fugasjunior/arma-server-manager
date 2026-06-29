@@ -3,10 +3,11 @@ import PermissionGuard from "../auth/PermissionGuard";
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
-import {ErrorStatus, ModDto, ServerType, SteamCmdItemInfoDto, SteamCmdStatus} from "../../api/generated";
+import {ErrorStatus, ModDto, ModFlagsDto, ServerType, SteamCmdItemInfoDto, SteamCmdStatus} from "../../api/generated";
 import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
-import {Button, CircularProgress, Stack, Switch, TextField} from "@mui/material";
+import {Button, CircularProgress, Stack, TextField} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
+import ModFlagsControl from "./ModFlagsControl";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
@@ -37,12 +38,8 @@ const headCells: Array<EnhancedTableHeadCell> = [
         type: 'numeric'
     },
     {
-        id: 'serverOnly',
-        label: 'Server mod'
-    },
-    {
-        id: 'loadOnHeadlessClient',
-        label: 'Headless client'
+        id: 'loadedOn',
+        label: 'Loaded on'
     },
     {
         id: 'lastUpdated',
@@ -71,8 +68,7 @@ type ModsTableProps = {
     onFilterChange: (_: any, newValue: string) => void,
     onRowClick: (rowId: number | string) => void,
     onSelectAllRowsClick: (event: ChangeEvent<HTMLInputElement>) => void,
-    onServerOnlyChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void,
-    onLoadOnHcChanged: (event: ChangeEvent<HTMLInputElement>, id: number) => void,
+    onFlagsChange: (id: number, flags: ModFlagsDto) => void,
 }
 
 const ModsTable = (props: ModsTableProps) => {
@@ -135,36 +131,31 @@ const ModsTable = (props: ModsTableProps) => {
                         displayValue: humanFileSize(modDto.fileSize ?? 0)
                     },
                     {
-                        id: "serverOnly",
-                        value: "serverOnly",
-                        displayValue: <span data-testid={`mod-server-only-switch-${modDto.id}`}>
-                            <Switch
-                                checked={modDto.serverOnly}
-                                disabled={!canModify}
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => props.onServerOnlyChanged(e, modDto.id!)}
-                                size="small"
-                            />
-                        </span>
-                    },
-                    {
-                        id: "loadOnHeadlessClient",
-                        value: "loadOnHeadlessClient",
-                        displayValue: modDto.serverType === ServerType.Arma3
-                            ? <span data-testid={`mod-load-on-hc-switch-${modDto.id}`}>
-                                <Switch
-                                    checked={modDto.loadOnHeadlessClient ?? true}
+                        id: "loadedOn",
+                        value: "loadedOn",
+                        displayValue: (
+                            <span data-testid={`mod-flags-${modDto.id}`}>
+                                <ModFlagsControl
+                                    flags={{
+                                        loadOnClient: modDto.loadOnClient ?? true,
+                                        loadOnServer: modDto.loadOnServer ?? true,
+                                        loadOnHeadlessClient: modDto.loadOnHeadlessClient ?? true,
+                                    }}
+                                    serverType={modDto.serverType as ServerType}
                                     disabled={!canModify}
-                                    onClick={(e) => e.stopPropagation()}
-                                    onChange={(e) => props.onLoadOnHcChanged(e, modDto.id!)}
-                                    size="small"
+                                    onChange={(flags: ModFlagsDto) => props.onFlagsChange(modDto.id!, flags)}
                                 />
                             </span>
-                            : undefined
+                        )
                     },
                     {
                         id: "lastUpdated",
-                        value: modDto.lastUpdated ?? ""
+                        value: modDto.lastUpdated ?? "",
+                        displayValue: modDto.lastUpdated
+                            ? <Tooltip title={new Date(modDto.lastUpdated).toLocaleString()} placement="top">
+                                <span>{new Date(modDto.lastUpdated).toLocaleDateString()}</span>
+                              </Tooltip>
+                            : ""
                     },
                     {
                         id: "installationStatus",

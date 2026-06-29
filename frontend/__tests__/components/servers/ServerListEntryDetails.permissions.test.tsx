@@ -8,6 +8,18 @@ import renderWithPermissions from '../../helpers/renderWithPermissions';
 jest.mock('../../../src/api/client', () => ({
     serversApi: {},
     headlessClientApi: {},
+    scenariosApi: {},
+}));
+jest.mock('../../../src/hooks/queries/useServerScenarios', () => ({
+    useServerScenarios: () => ({data: [], isLoading: false}),
+}));
+jest.mock('../../../src/config', () => ({
+    __esModule: true,
+    default: {
+        apiUrl: '/api',
+        dateFormat: {year: 'numeric', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit'},
+        version: 'test',
+    },
 }));
 jest.mock('../../../src/hooks/queries/useServer', () => ({
     useServer: () => ({data: undefined, isLoading: false}),
@@ -20,6 +32,9 @@ jest.mock('../../../src/hooks/queries/usePresets', () => ({
 }));
 jest.mock('../../../src/hooks/queries/useCreatorDlcs', () => ({
     useCreatorDlcs: () => ({data: [], isLoading: false}),
+}));
+jest.mock('react-router-dom', () => ({
+    Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,
 }));
 
 const arma3Server: ServerDto = {
@@ -42,6 +57,22 @@ beforeEach(() => {
 });
 
 describe('ServerListEntryDetails permissions', () => {
+    it('hides settings button without SERVER_VIEW', () => {
+        renderWithPermissions(
+            <ServerListEntryDetails {...defaultProps}/>,
+            [],
+        );
+        expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+    });
+
+    it('shows settings button with SERVER_VIEW', () => {
+        renderWithPermissions(
+            <ServerListEntryDetails {...defaultProps}/>,
+            ['SERVER_VIEW'],
+        );
+        expect(screen.getByText('Settings')).toBeInTheDocument();
+    });
+
     it('hides logs button without SERVER_LOGS_VIEW', () => {
         renderWithPermissions(
             <ServerListEntryDetails {...defaultProps}/>,
@@ -90,19 +121,28 @@ describe('ServerListEntryDetails permissions', () => {
         expect(screen.getByText('DLCs')).toBeInTheDocument();
     });
 
-    it('hides duplicate button without SERVER_MODIFY', () => {
+    it('hides Scenarios button without SCENARIO_VIEW on Arma3 server', () => {
         renderWithPermissions(
             <ServerListEntryDetails {...defaultProps}/>,
             ['SERVER_VIEW'],
         );
-        expect(screen.queryByText('Duplicate')).not.toBeInTheDocument();
+        expect(screen.queryByText('Scenarios')).not.toBeInTheDocument();
     });
 
-    it('shows duplicate button with SERVER_MODIFY', () => {
+    it('shows Scenarios button with SCENARIO_VIEW on Arma3 server', () => {
         renderWithPermissions(
             <ServerListEntryDetails {...defaultProps}/>,
-            ['SERVER_VIEW', 'SERVER_MODIFY'],
+            ['SERVER_VIEW', 'SCENARIO_VIEW'],
         );
-        expect(screen.getByText('Duplicate')).toBeInTheDocument();
+        expect(screen.getByText('Scenarios')).toBeInTheDocument();
+    });
+
+    it('hides Scenarios button on non-Arma3 server', () => {
+        const dayZServer: ServerDto = {...arma3Server, type: ServerType.Dayz};
+        renderWithPermissions(
+            <ServerListEntryDetails {...defaultProps} server={dayZServer}/>,
+            ['SERVER_VIEW', 'SCENARIO_VIEW'],
+        );
+        expect(screen.queryByText('Scenarios')).not.toBeInTheDocument();
     });
 });

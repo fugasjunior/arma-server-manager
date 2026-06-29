@@ -13,6 +13,7 @@ import cz.forgottenempire.servermanager.api.model.ServerDto;
 import cz.forgottenempire.servermanager.api.model.ServerInstanceInfoDto;
 import cz.forgottenempire.servermanager.api.model.ServerLocalModDto;
 import cz.forgottenempire.servermanager.api.model.ServerWorkshopModDto;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.DateTimeMapper;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.localmod.LocalMod;
@@ -128,7 +129,9 @@ interface ServerMapper {
 
     @Mapping(target = "lastUpdated", ignore = true)
     @Mapping(target = "fileSize", ignore = true)
-    @Mapping(target = "serverOnly", ignore = true)
+    @Mapping(target = "loadOnClient", ignore = true)
+    @Mapping(target = "loadOnServer", ignore = true)
+    @Mapping(target = "loadOnHeadlessClient", ignore = true)
     @Mapping(target = "installationStatus", ignore = true)
     @Mapping(target = "errorStatus", ignore = true)
     @Mapping(target = "serverType", ignore = true)
@@ -137,7 +140,9 @@ interface ServerMapper {
 
     @Mapping(target = "serverType", ignore = true)
     @Mapping(target = "fileSize", ignore = true)
-    @Mapping(target = "serverOnly", ignore = true)
+    @Mapping(target = "loadOnClient", ignore = true)
+    @Mapping(target = "loadOnServer", ignore = true)
+    @Mapping(target = "loadOnHeadlessClient", ignore = true)
     @Mapping(target = "uploadedAt", ignore = true)
     @Mapping(target = "biKeys", ignore = true)
     LocalMod mapLocalModDtoToEntity(ServerLocalModDto serverLocalModDto);
@@ -166,7 +171,9 @@ interface ServerMapper {
     @Mapping(source = "id", target = "mod.id")
     @Mapping(source = "position", target = "position")
     @Mapping(target = "mod.name", ignore = true)
-    @Mapping(target = "mod.serverOnly", ignore = true)
+    @Mapping(target = "mod.loadOnClient", ignore = true)
+    @Mapping(target = "mod.loadOnServer", ignore = true)
+    @Mapping(target = "mod.loadOnHeadlessClient", ignore = true)
     @Mapping(target = "mod.lastUpdated", ignore = true)
     @Mapping(target = "mod.fileSize", ignore = true)
     @Mapping(target = "mod.installationStatus", ignore = true)
@@ -181,7 +188,9 @@ interface ServerMapper {
     @Mapping(target = "mod.name", ignore = true)
     @Mapping(target = "mod.serverType", ignore = true)
     @Mapping(target = "mod.fileSize", ignore = true)
-    @Mapping(target = "mod.serverOnly", ignore = true)
+    @Mapping(target = "mod.loadOnClient", ignore = true)
+    @Mapping(target = "mod.loadOnServer", ignore = true)
+    @Mapping(target = "mod.loadOnHeadlessClient", ignore = true)
     @Mapping(target = "mod.uploadedAt", ignore = true)
     @Mapping(target = "mod.biKeys", ignore = true)
     Arma3ServerActiveLocalMod localDtoToArma3LocalActiveMod(ServerLocalModDto dto);
@@ -190,7 +199,9 @@ interface ServerMapper {
     @Mapping(source = "id", target = "mod.id")
     @Mapping(source = "position", target = "position")
     @Mapping(target = "mod.name", ignore = true)
-    @Mapping(target = "mod.serverOnly", ignore = true)
+    @Mapping(target = "mod.loadOnClient", ignore = true)
+    @Mapping(target = "mod.loadOnServer", ignore = true)
+    @Mapping(target = "mod.loadOnHeadlessClient", ignore = true)
     @Mapping(target = "mod.lastUpdated", ignore = true)
     @Mapping(target = "mod.fileSize", ignore = true)
     @Mapping(target = "mod.installationStatus", ignore = true)
@@ -205,7 +216,9 @@ interface ServerMapper {
     @Mapping(target = "mod.name", ignore = true)
     @Mapping(target = "mod.serverType", ignore = true)
     @Mapping(target = "mod.fileSize", ignore = true)
-    @Mapping(target = "mod.serverOnly", ignore = true)
+    @Mapping(target = "mod.loadOnClient", ignore = true)
+    @Mapping(target = "mod.loadOnServer", ignore = true)
+    @Mapping(target = "mod.loadOnHeadlessClient", ignore = true)
     @Mapping(target = "mod.uploadedAt", ignore = true)
     @Mapping(target = "mod.biKeys", ignore = true)
     DayZServerActiveLocalMod localDtoToDayZLocalActiveMod(ServerLocalModDto dto);

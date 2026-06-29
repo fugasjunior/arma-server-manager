@@ -2,6 +2,7 @@ package cz.forgottenempire.servermanager.additionalserver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class AdditionalServerInstanceInfoRepositoryUnitTest {
     void whenGetNonSavedServersInstanceInfo_thenNewEmptyInstanceStatusIsReturned() {
         AdditionalServerInstanceInfo storedInstanceInfo = repository.getServerInstanceInfo(1L);
 
-        AdditionalServerInstanceInfo expectedInfo = new AdditionalServerInstanceInfo(1L, false, null, null);
+        AdditionalServerInstanceInfo expectedInfo = new AdditionalServerInstanceInfo(1L, false, ServerStatus.OFF, null, null);
         assertThat(storedInstanceInfo).isEqualTo(expectedInfo);
     }
 
@@ -55,6 +56,6 @@ class AdditionalServerInstanceInfoRepositoryUnitTest {
     }
 
     private AdditionalServerInstanceInfo createInstanceInfo(Long id) {
-        return new AdditionalServerInstanceInfo(id, true, LocalDateTime.now(), null);
+        return new AdditionalServerInstanceInfo(id, true, ServerStatus.RUNNING, LocalDateTime.now(), null);
     }
 }

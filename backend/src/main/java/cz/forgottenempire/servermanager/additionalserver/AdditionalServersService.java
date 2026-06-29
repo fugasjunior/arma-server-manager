@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.additionalserver;
 
 import cz.forgottenempire.servermanager.common.ProcessFactory;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.exceptions.NotFoundException;
 import cz.forgottenempire.servermanager.serverinstance.LogFile;
 import cz.forgottenempire.servermanager.serverinstance.LogRotationProperties;
@@ -21,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Slf4j
-class AdditionalServersService {
+public class AdditionalServersService {
 
     private final AdditionalServerRepository serverRepository;
     private final AdditionalServerInstanceInfoRepository instanceInfoRepository;
@@ -65,6 +66,27 @@ class AdditionalServersService {
         return serverRepository.findAll();
     }
 
+    public void startAutoStartServers() {
+        serverRepository.findAll().stream()
+                .filter(AdditionalServer::isAutoStart)
+                .forEach(server -> {
+                    try {
+                        log.info("Auto-starting additional server '{}' (id={})", server.getName(), server.getId());
+                        startServer(server.getId());
+                    } catch (Exception e) {
+                        log.error("Failed to auto-start additional server '{}' (id={}): {}",
+                                server.getName(), server.getId(), e.getMessage());
+                    }
+                });
+    }
+
+    public void setAutoStart(Long serverId, boolean enabled) {
+        AdditionalServer server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new NotFoundException("Additional server with ID " + serverId + " not found"));
+        server.setAutoStart(enabled);
+        serverRepository.save(server);
+    }
+
     public void startServer(Long serverId) {
         if (isAlive(serverId)) {
             log.info("Server id {} already running", serverId);
@@ -85,7 +107,7 @@ class AdditionalServersService {
                     logFile.getFile());
 
             instanceInfoRepository.storeServerInstanceInfo(serverId,
-                    new AdditionalServerInstanceInfo(serverId, true, LocalDateTime.now(), process));
+                    new AdditionalServerInstanceInfo(serverId, true, ServerStatus.RUNNING, LocalDateTime.now(), process));
             log.info("Server '{}' started (PID {})", settings.getName(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server {} with command {} in directory {}",
@@ -105,7 +127,7 @@ class AdditionalServersService {
 
         destroyWithTimeout(process);
         instanceInfoRepository.storeServerInstanceInfo(serverId,
-                new AdditionalServerInstanceInfo(serverId, false, null, null));
+                new AdditionalServerInstanceInfo(serverId, false, ServerStatus.OFF, null, null));
         log.info("Server id {} stopped", serverId);
     }
 

@@ -1,6 +1,9 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
+import cz.forgottenempire.servermanager.common.Arma3InstancePaths;
+import cz.forgottenempire.servermanager.common.Arma3KeyService;
 import cz.forgottenempire.servermanager.common.PathsFactory;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
@@ -53,7 +56,10 @@ class ServerProcessTest {
         when(processCreator.startProcessWithRedirectedOutput(any(), any(), any())).thenReturn(process);
 
         ServerLaunchContext launchContext = new ServerLaunchContext(
-                pathsFactory, mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
+                pathsFactory,
+                mock(Arma3InstancePaths.class, withSettings().stubOnly()),
+                mock(Arma3KeyService.class, withSettings().stubOnly()),
+                mock(FreeMarkerConfigurer.class, withSettings().stubOnly()));
 
         serverProcess = new ServerProcess(SERVER_ID, processCreator, launchContext, 5);
     }
@@ -99,7 +105,8 @@ class ServerProcessTest {
 
         Process actualProcess = serverProcess.start(server);
 
-        assertThat(serverProcess.getInstanceInfo()).isNull();
+        assertThat(serverProcess.getInstanceInfo()).isNotNull();
+        assertThat(serverProcess.getInstanceInfo().getStatus()).isEqualTo(ServerStatus.ERROR);
         assertThat(actualProcess).isNull();
     }
 

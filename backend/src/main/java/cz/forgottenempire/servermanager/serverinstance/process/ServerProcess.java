@@ -1,6 +1,7 @@
 package cz.forgottenempire.servermanager.serverinstance.process;
 
 import com.google.common.base.Joiner;
+import cz.forgottenempire.servermanager.common.ServerStatus;
 import cz.forgottenempire.servermanager.serverinstance.ServerConfig;
 import cz.forgottenempire.servermanager.serverinstance.ServerInstanceInfo;
 import cz.forgottenempire.servermanager.serverinstance.ServerLaunchContext;
@@ -44,6 +45,14 @@ public class ServerProcess {
         var executable = launchContext.pathsFactory().getServerExecutableWithFallback(server.getType());
         List<String> parameters = server.getLaunchParameters(launchContext);
 
+        try {
+            server.prepareLaunchEnvironment(launchContext);
+        } catch (IOException e) {
+            log.error("Could not prepare launch environment for server ID {}", server.getId(), e);
+            instanceInfo = ServerInstanceInfo.builder().status(ServerStatus.ERROR).build();
+            return null;
+        }
+
         server.getConfigFiles(launchContext).forEach(ServerConfig::generateIfNecessary);
         var logFile = server.getLog(launchContext.pathsFactory());
         logFile.prepare(logMaxFiles);
@@ -55,15 +64,22 @@ public class ServerProcess {
             log.info("Server '{}' (ID {}) started (PID {})", server.getName(), server.getId(), process.pid());
         } catch (IOException e) {
             log.error("Could not start server '{}' (ID {})", server.getName(), server.getId(), e);
+            instanceInfo = ServerInstanceInfo.builder().status(ServerStatus.ERROR).build();
             return null;
         }
 
         instanceInfo = ServerInstanceInfo.builder()
+                .status(ServerStatus.STARTING)
                 .startedAt(LocalDateTime.now())
                 .maxPlayers(server.getMaxPlayers())
                 .build();
 
         return process;
+    }
+
+    public void markCrashed() {
+        process = null;
+        instanceInfo = ServerInstanceInfo.builder().status(ServerStatus.ERROR).build();
     }
 
     public void stop() {

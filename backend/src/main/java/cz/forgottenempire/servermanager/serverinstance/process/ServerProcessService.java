@@ -65,6 +65,11 @@ public class ServerProcessService {
         restartScheduler.cancel(id);
     }
 
+    public void markServerCrashed(Long id) {
+        processRepository.get(id).ifPresent(ServerProcess::markCrashed);
+        restartScheduler.cancel(id);
+    }
+
     public void restartServer(Long id) {
         Server server = getServer(id);
         ServerProcess serverProcess = getOrCreateServerProcess(server);

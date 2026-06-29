@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -152,6 +151,10 @@ class LocalModInstallerService {
             for (Iterator<File> it = FileUtils.iterateFiles(modDirectory, extensions, true); it.hasNext(); ) {
                 File key = it.next();
                 mod.addBiKey(key.getName());
+                if (mod.getServerType() == ServerType.ARMA3) {
+                    // Arma 3 keys are derived per-instance at start; not copied to a shared dir
+                    continue;
+                }
                 for (ServerType serverType : installationService.getInstalledRelatedServerTypes(mod.getServerType())) {
                     log.debug("Copying BiKey {} to server {}", key.getName(), serverType);
                     FileUtils.copyFile(key, pathsFactory.getServerKeyPath(key.getName(), serverType).toFile());
@@ -164,6 +167,10 @@ class LocalModInstallerService {
     }
 
     private void deleteBiKeys(LocalMod mod) {
+        if (mod.getServerType() == ServerType.ARMA3) {
+            // Arma 3 keys are derived per-instance at start; no shared dir to delete from
+            return;
+        }
         mod.getBiKeys().forEach(biKey -> {
             for (ServerType serverType : installationService.getInstalledRelatedServerTypes(mod.getServerType())) {
                 File keyFile = pathsFactory.getServerKeyPath(biKey, serverType).toFile();

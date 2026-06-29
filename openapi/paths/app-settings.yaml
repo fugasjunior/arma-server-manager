@@ -1,0 +1,29 @@
+/config/settings:
+  get:
+    tags: [AppSettings]
+    operationId: getAppSettings
+    summary: Get application settings
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/app-settings.yaml#/AppSettingsDto'
+  patch:
+    tags: [AppSettings]
+    operationId: updateAppSettings
+    summary: Update application settings
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/app-settings.yaml#/AppSettingsDto'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/app-settings.yaml#/AppSettingsDto'

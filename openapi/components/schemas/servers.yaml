@@ -60,6 +60,8 @@ BaseServerDto:
       type: array
       items:
         $ref: './common.yaml#/LaunchParameterDto'
+    autoStart:
+      type: boolean
     automaticRestart:
       $ref: './common.yaml#/AutomaticRestartDto'
     configOverrides:
@@ -194,6 +196,8 @@ ServerInstanceInfoDto:
   properties:
     alive:
       type: boolean
+    status:
+      $ref: './common.yaml#/ServerStatus'
     startedAt:
       type: string
     playersOnline:

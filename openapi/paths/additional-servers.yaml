@@ -51,6 +51,30 @@
       '404':
         $ref: '../components/responses.yaml#/ApiError'
 
+/additionalServers/{serverId}/auto-start:
+  patch:
+    tags: [AdditionalServers]
+    operationId: setAdditionalServerAutoStart
+    summary: Configure auto-start on application boot for an additional server
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/common.yaml#/AutoStartDto'
+    responses:
+      '200':
+        description: OK
+      '404':
+        $ref: '../components/responses.yaml#/ApiError'
+
 /additionalServers/{serverId}/stop:
   post:
     tags: [AdditionalServers]
