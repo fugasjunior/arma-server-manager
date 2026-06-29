@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import cz.forgottenempire.servermanager.steamcmd.ErrorStatus;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdJob;
 import cz.forgottenempire.servermanager.steamcmd.SteamCmdService;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfo;
+import cz.forgottenempire.servermanager.steamcmd.outputprocessor.SteamCmdItemInfoRepository;
 import cz.forgottenempire.servermanager.util.FileSystemUtils;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadata;
 import cz.forgottenempire.servermanager.workshop.metadata.ModMetadataService;
@@ -43,6 +45,7 @@ class WorkshopInstallerService {
     private final SteamCmdService steamCmdService;
     private final ServerInstallationService installationService;
     private final ModMetadataService metadataService;
+    private final SteamCmdItemInfoRepository itemInfoRepository;
 
     @Autowired
     public WorkshopInstallerService(
@@ -50,19 +53,29 @@ class WorkshopInstallerService {
             WorkshopModsService modsService,
             SteamCmdService steamCmdService,
             ServerInstallationService installationService,
-            ModMetadataService metadataService) {
+            ModMetadataService metadataService,
+            SteamCmdItemInfoRepository itemInfoRepository) {
         this.pathsFactory = pathsFactory;
         this.modsService = modsService;
         this.steamCmdService = steamCmdService;
         this.installationService = installationService;
         this.metadataService = metadataService;
+        this.itemInfoRepository = itemInfoRepository;
     }
 
-    public void installOrUpdateMods(Collection<WorkshopMod> mods) {
+    public void installMods(Collection<WorkshopMod> mods) {
+        scheduleInstallation(mods, false);
+    }
+
+    public void updateMods(Collection<WorkshopMod> mods) {
+        scheduleInstallation(mods, true);
+    }
+
+    private void scheduleInstallation(Collection<WorkshopMod> mods, boolean forceUpdate) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                CompletableFuture.runAsync(() -> resolveAndInstall(mods));
+                CompletableFuture.runAsync(() -> resolveAndInstall(mods, forceUpdate));
             }
         });
     }
@@ -90,7 +103,7 @@ class WorkshopInstallerService {
      * Resolves metadata for all mods in a single batched Steam API call, validates each mod,
      * then enqueues the download for valid mods. Runs asynchronously after the transaction commits.
      */
-    private void resolveAndInstall(Collection<WorkshopMod> mods) {
+    void resolveAndInstall(Collection<WorkshopMod> mods, boolean forceUpdate) {
         List<Long> modIds = mods.stream().map(WorkshopMod::getId).toList();
         Map<Long, ModMetadata> metadataMap = metadataService.fetchModMetadata(modIds);
 
@@ -108,6 +121,15 @@ class WorkshopInstallerService {
             try {
                 setModServerType(mod, metadata.consumerAppId());
                 validateServerInitialized(mod);
+                if (!forceUpdate
+                        && mod.getInstallationStatus() == InstallationStatus.FINISHED
+                        && verifyModDirectoryExists(mod.getId(), mod.getServerType())) {
+                    log.info("Mod '{}' (ID {}) is already downloaded; skipping SteamCMD and refreshing installation",
+                            mod.getName(), mod.getId());
+                    refreshInstalledMod(mod);
+                    continue;
+                }
+                modsService.saveMod(mod);
                 validMods.add(mod);
             } catch (ModNotConsumedByGameException e) {
                 log.error("Mod '{}' (id {}) failed validation: {}", mod.getName(), mod.getId(), e.getMessage());
@@ -169,20 +191,31 @@ class WorkshopInstallerService {
         return !installationService.isServerInstalled(serverType);
     }
 
-    private void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
-        if (steamCmdJob.getErrorStatus() != null) {
+    void handleInstallation(WorkshopMod mod, SteamCmdJob steamCmdJob) {
+        boolean downloaded = verifyModDirectoryExists(mod.getId(), mod.getServerType());
+        boolean itemFinished = steamCmdJob.getErrorStatus() == null || itemInfoRepository.get(mod.getId())
+                .map(SteamCmdItemInfo::status)
+                .filter(SteamCmdItemInfo.SteamCmdStatus.FINISHED::equals)
+                .isPresent();
+
+        if (downloaded && itemFinished) {
+            if (steamCmdJob.getErrorStatus() != null) {
+                log.info("Mod '{}' (ID {}) was downloaded before the SteamCMD batch failed; installing it normally",
+                        mod.getName(), mod.getId());
+            } else {
+                log.info("Mod '{}' (ID {}) successfully downloaded, now installing", mod.getName(), mod.getId());
+            }
+            installMod(mod);
+        } else if (steamCmdJob.getErrorStatus() != null) {
             log.error("Download of mod '{}' (id {}) failed, reason: {}",
                     mod.getName(), mod.getId(), steamCmdJob.getErrorStatus());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(steamCmdJob.getErrorStatus());
-        } else if (!verifyModDirectoryExists(mod.getId(), mod.getServerType())) {
+        } else {
             log.error("Could not find downloaded mod directory for mod '{}' (id {}) " +
                     "even though download finished successfully", mod.getName(), mod.getId());
             mod.setInstallationStatus(InstallationStatus.ERROR);
             mod.setErrorStatus(ErrorStatus.GENERIC);
-        } else {
-            log.info("Mod '{}' (ID {}) successfully downloaded, now installing", mod.getName(), mod.getId());
-            installMod(mod);
         }
 
         modsService.saveMod(mod);
@@ -203,6 +236,11 @@ class WorkshopInstallerService {
         }
     }
 
+    void refreshInstalledMod(WorkshopMod mod) {
+        installMod(mod);
+        modsService.saveMod(mod);
+    }
+
     private void convertModFilesToLowercase(WorkshopMod mod) throws IOException {
         File modDir = pathsFactory.getModInstallationPath(mod.getId(), mod.getServerType()).toFile();
         FileSystemUtils.directoryToLowercase(modDir);
@@ -210,6 +248,7 @@ class WorkshopInstallerService {
 
     private void updateBiKeys(WorkshopMod mod) throws IOException {
         deleteBiKeys(mod);
+        mod.getBiKeys().clear();
         installNewBiKeys(mod);
     }
 

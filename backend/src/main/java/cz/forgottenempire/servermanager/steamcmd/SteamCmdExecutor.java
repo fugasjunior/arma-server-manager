@@ -33,8 +33,16 @@ class SteamCmdExecutor {
     private static final int EXIT_CODE_TIMEOUT_LINUX = 134;
     private static final int EXIT_CODE_TIMEOUT_WINDOWS = 10;
     private static final int MAX_ATTEMPTS = 10;
+    private static final String WORKSHOP_DOWNLOAD_TIMEOUT = "timeout downloading item";
 
-    private static final String[] REAUTH_REQUIRED_ERRORS = {"account logon denied", "steam guard", "expired"};
+    private static final String[] REAUTH_REQUIRED_ERRORS = {
+            "account logon denied",
+            "steam guard",
+            "expired",
+            "cached credentials not found",
+            "no cached credentials",
+            "not logged on"
+    };
     private static final String[] WRONG_AUTH_ERRORS = {"invalid password", "two-factor code mismatch"};
 
     private final PathsFactory pathsFactory;
@@ -101,7 +109,10 @@ class SteamCmdExecutor {
                 Process process = processFactory.startProcessWithUnbufferedOutput(steamCmdFile, job.getSteamCmdParameters().get());
                 output = steamCmdOutputProcessor.processSteamCmdOutput(process.getInputStream(), job);
                 exitCode = process.waitFor();
-            } while (attempts < MAX_ATTEMPTS && exitedDueToTimeout(exitCode));
+                if (attempts < MAX_ATTEMPTS && isRetryableTimeout(exitCode, output)) {
+                    log.warn("SteamCMD download timed out, retrying job (attempt {}/{})", attempts + 1, MAX_ATTEMPTS);
+                }
+            } while (attempts < MAX_ATTEMPTS && isRetryableTimeout(exitCode, output));
 
             handleProcessResult(output, job);
         } catch (IOException e) {
@@ -116,6 +127,15 @@ class SteamCmdExecutor {
     private boolean exitedDueToTimeout(int exitCode) {
         return exitCode == EXIT_CODE_TIMEOUT_LINUX || exitCode == EXIT_CODE_TIMEOUT_WINDOWS;
     }
+
+    private boolean isRetryableTimeout(int exitCode, String output) {
+        // Do not impose an ASM-side wall-clock timeout here. Large workshop items may download for
+        // much longer than the SteamCMD timeout window, and they should continue as long as SteamCMD
+        // itself is still running. Retry only after SteamCMD exits with a timeout signal/message.
+        return exitedDueToTimeout(exitCode)
+                || output.toLowerCase().contains(WORKSHOP_DOWNLOAD_TIMEOUT);
+    }
+
 
     private void handleProcessResult(String result, SteamCmdJob job) {
         // SteamCMD doesn't provide proper exit values or a standard error format.
@@ -151,12 +171,13 @@ class SteamCmdExecutor {
         } else if (errorLine.contains("rate limit exceeded")) {
             job.setErrorStatus(ErrorStatus.RATE_LIMIT);
         }
+        if (errorLine.contains(WORKSHOP_DOWNLOAD_TIMEOUT)) {
+            job.setErrorStatus(ErrorStatus.TIMEOUT);
+        }
     }
 
     private void dumpErrorOutputToLog(String result) {
-        log.error("======== SteamCMD ERROR OUTPUT START ======== ");
         log.error(result);
-        log.error("======== SteamCMD ERROR OUTPUT END ======== ");
     }
 
     private String removeParametersFromOutputLine(String line) {

@@ -31,6 +31,22 @@ class SteamLoginService(
 
     fun isLoginInProgress(): Boolean = loginInProgress.get()
 
+    fun refreshCachedSession(): SteamLoginServiceResult {
+        val auth = authService.getAuthAccount()
+        val username = auth.username
+        val password = auth.password
+        if (username == null || password == null) {
+            sessionStatusHolder.setNotConfigured()
+            return SteamLoginServiceResult(
+                SteamLoginResult.INVALID_CREDENTIALS,
+                AuthType.NONE,
+                "Steam credentials are not configured."
+            )
+        }
+
+        return login(username, password, null)
+    }
+
     fun login(username: String, password: String, steamGuardCode: String?): SteamLoginServiceResult {
         if (!loginInProgress.compareAndSet(false, true)) {
             return SteamLoginServiceResult(SteamLoginResult.ERROR, message = "Another login is already in progress.")

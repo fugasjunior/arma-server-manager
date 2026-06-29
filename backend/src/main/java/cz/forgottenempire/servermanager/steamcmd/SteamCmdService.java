@@ -6,6 +6,8 @@ import cz.forgottenempire.servermanager.common.ServerType;
 import cz.forgottenempire.servermanager.installation.ServerInstallation;
 import cz.forgottenempire.servermanager.steamauth.SteamAuthService;
 import cz.forgottenempire.servermanager.steamauth.SteamLoginService;
+import cz.forgottenempire.servermanager.steamauth.SteamLoginServiceResult;
+import cz.forgottenempire.servermanager.api.model.SteamLoginResult;
 import cz.forgottenempire.servermanager.workshop.WorkshopMod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,6 +66,7 @@ public class SteamCmdService {
 
         String username = steamAuthService.getAuthAccount().getUsername();
         SteamCmdParameters.Builder parameters = new SteamCmdParameters.Builder()
+                .continueOnFailedCommand()
                 .withInstallDir(pathsFactory.getModsBasePath().toAbsolutePath().toString())
                 .withCachedLogin(username);
 
@@ -93,8 +96,25 @@ public class SteamCmdService {
     }
 
     private CompletableFuture<SteamCmdJob> enqueueJob(SteamCmdJob job) {
+        return enqueueJob(job, true);
+    }
+
+    private CompletableFuture<SteamCmdJob> enqueueJob(SteamCmdJob job, boolean retryOnReauth) {
         CompletableFuture<SteamCmdJob> future = new CompletableFuture<>();
         steamCmdExecutor.processJob(job, future);
-        return future;
+
+        return future.thenCompose(finishedJob -> {
+            if (!retryOnReauth || finishedJob.getErrorStatus() != ErrorStatus.REAUTH_REQUIRED) {
+                return CompletableFuture.completedFuture(finishedJob);
+            }
+
+            SteamLoginServiceResult loginResult = steamLoginService.refreshCachedSession();
+            if (loginResult.getResult() != SteamLoginResult.SUCCESS) {
+                return CompletableFuture.completedFuture(finishedJob);
+            }
+
+            finishedJob.setErrorStatus(null);
+            return enqueueJob(finishedJob, false);
+        });
     }
 }
