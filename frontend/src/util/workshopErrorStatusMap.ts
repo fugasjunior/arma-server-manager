@@ -8,7 +8,7 @@ const workshopErrorStatusMap = new Map<ErrorStatus, string>([
     [ErrorStatus.Timeout, "The request timed out, please retry.",],
     [ErrorStatus.WrongAuth, "Incorrect Steam authorization. Please check your username and password.",],
     [ErrorStatus.ReauthRequired, "Steam session expired. Re-authenticate on the Settings page.",],
-    [ErrorStatus.RateLimit, "Too many incorrect login attempts. Please try again later (no sooner than 30 minutes after last attempt)."],
+    [ErrorStatus.RateLimit, "Steam rate limit reached from too many download/install requests. Please wait a while before retrying."],
     [ErrorStatus.Interrupted, "The installation was interrupted. Please try again."],
     [ErrorStatus.NotConsumedByGame, "This mod is not compatible with any supported game (Arma 3 / DayZ)."],
     [ErrorStatus.ServerNotInstalled, "The target game server is not installed. Install the server first, then retry."]
