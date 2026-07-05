@@ -105,6 +105,8 @@ class WorkshopInstallerService {
                 continue;
             }
             mod.setName(metadata.name());
+            mod.setInstalledWorkshopUpdatedAt(metadata.timeUpdated());
+            mod.setLatestWorkshopUpdatedAt(metadata.timeUpdated());
             try {
                 setModServerType(mod, metadata.consumerAppId());
                 validateServerInitialized(mod);

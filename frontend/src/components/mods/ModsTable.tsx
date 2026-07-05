@@ -13,6 +13,7 @@ import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import CheckIcon from "@mui/icons-material/Check";
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import SERVER_NAMES from "../../util/serverNames.ts";
 import {humanFileSize} from "../../util/util.ts";
 import {usePermission} from "../../hooks/usePermission.ts";
@@ -40,11 +41,6 @@ const headCells: Array<EnhancedTableHeadCell> = [
     {
         id: 'loadedOn',
         label: 'Loaded on'
-    },
-    {
-        id: 'lastUpdated',
-        label: 'Last updated',
-        type: 'date'
     },
     {
         id: 'installationStatus',
@@ -149,18 +145,23 @@ const ModsTable = (props: ModsTableProps) => {
                         )
                     },
                     {
-                        id: "lastUpdated",
-                        value: modDto.lastUpdated ?? "",
-                        displayValue: modDto.lastUpdated
-                            ? <Tooltip title={new Date(modDto.lastUpdated).toLocaleString()} placement="top">
-                                <span>{new Date(modDto.lastUpdated).toLocaleDateString()}</span>
-                              </Tooltip>
-                            : ""
-                    },
-                    {
                         id: "installationStatus",
                         value: modDto.installationStatus ?? "",
-                        displayValue: getInstalledIcon(modDto)
+                        displayValue: (
+                            <Stack direction="row" spacing={0.5} sx={{alignItems: 'center'}}>
+                                {getInstalledIcon(modDto)}
+                                {modDto.updateAvailable && (
+                                    <Tooltip title={[
+                                        'Update available',
+                                        modDto.installedUpdate ? `installed: ${new Date(modDto.installedUpdate).toLocaleString()}` : null,
+                                        modDto.latestUpdate ? `latest: ${new Date(modDto.latestUpdate).toLocaleString()}` : null,
+                                    ].filter(Boolean).join(' — ')}>
+                                        <SystemUpdateAltIcon color="warning" fontSize="small"
+                                                             data-testid={`update-available-${modDto.id}`}/>
+                                    </Tooltip>
+                                )}
+                            </Stack>
+                        )
                     }
                 ]
             };

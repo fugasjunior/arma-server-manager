@@ -14,6 +14,10 @@ interface ModMapper {
 
     @Mapping(target = "installationStatus", expression = "java(workshopMod.getInstallationStatus() != null ? workshopMod.getInstallationStatus().name() : null)")
     @Mapping(target = "errorStatus", expression = "java(workshopMod.getErrorStatus() != null ? workshopMod.getErrorStatus().name() : null)")
+    @Mapping(target = "installedUpdate", source = "installedWorkshopUpdatedAt")
+    @Mapping(target = "latestUpdate", source = "latestWorkshopUpdatedAt")
+
+    @Mapping(target = "updateAvailable", expression = "java(workshopMod.getInstalledWorkshopUpdatedAt() != null && workshopMod.getLatestWorkshopUpdatedAt() != null && workshopMod.getLatestWorkshopUpdatedAt().isAfter(workshopMod.getInstalledWorkshopUpdatedAt()))")
     ModDto modToModDto(WorkshopMod workshopMod);
 
     @Mapping(target = "biKeys", ignore = true)
@@ -21,6 +25,8 @@ interface ModMapper {
     @Mapping(target = "lastUpdated", ignore = true)
     @Mapping(target = "installationStatus", ignore = true)
     @Mapping(target = "errorStatus", ignore = true)
+    @Mapping(target = "installedWorkshopUpdatedAt", ignore = true)
+    @Mapping(target = "latestWorkshopUpdatedAt", ignore = true)
     WorkshopMod modDtoToMod(ModDto workshopModDto);
 
     default CreatorDlcDto creatorDlcToCreatorDlcDto(Arma3CDLC cdlc) {

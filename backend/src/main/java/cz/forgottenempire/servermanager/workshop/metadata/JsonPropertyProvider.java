@@ -22,6 +22,10 @@ class JsonPropertyProvider {
         return getValueFromJson("publishedfileid", modInfoJson);
     }
 
+    public String findTimeUpdated() {
+        return getValueFromJson("time_updated", modInfoJson);
+    }
+
     private String getValueFromJson(String key, JsonNode modInfoJson) {
         JsonNode value = modInfoJson.findValue(key);
         return value != null ? value.asString() : null;

@@ -24,6 +24,14 @@ const sampleMod: ModDto = {
     installationStatus: InstallationStatus.Finished,
 };
 
+const outdatedMod: ModDto = {
+    ...sampleMod,
+    id: 99,
+    updateAvailable: true,
+    installedUpdate: '2024-01-01T00:00:00',
+    latestUpdate: '2024-06-01T00:00:00',
+};
+
 const defaultProps = {
     rows: [sampleMod],
     selected: [],
@@ -67,6 +75,19 @@ describe('ModsTable permissions', () => {
         it('shows install submit button with MOD_MODIFY', () => {
             renderWithPermissions(<ModsTable {...defaultProps}/>, ['MOD_VIEW', 'MOD_MODIFY']);
             expect(screen.getByTestId('mod-install-submit')).toBeInTheDocument();
+        });
+    });
+
+    describe('update available indicator', () => {
+        it('shows update icon when updateAvailable is true', () => {
+            const props = {...defaultProps, rows: [outdatedMod]};
+            renderWithPermissions(<ModsTable {...props}/>, ['MOD_VIEW']);
+            expect(screen.getByTestId('update-available-99')).toBeInTheDocument();
+        });
+
+        it('hides update icon when updateAvailable is false', () => {
+            renderWithPermissions(<ModsTable {...defaultProps}/>, ['MOD_VIEW']);
+            expect(screen.queryByTestId('update-available-42')).not.toBeInTheDocument();
         });
     });
 

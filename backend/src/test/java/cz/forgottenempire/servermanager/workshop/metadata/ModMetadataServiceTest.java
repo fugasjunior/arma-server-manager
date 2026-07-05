@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -40,12 +42,24 @@ class ModMetadataServiceTest {
     @Test
     void whenFetchingModMetadataForExistingMod_thenDataAreFetchedFromSteamApi() {
         when(restTemplate.getForEntity(buildUrl(List.of(MOD_ID)), String.class)).thenReturn(restResponse);
-        when(restResponse.getBody()).thenReturn(singleModResponse(MOD_ID, "Mod Name", "107410"));
+        when(restResponse.getBody()).thenReturn(singleModResponse(MOD_ID, "Mod Name", "107410", 1700000000L));
 
         ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
 
         assertThat(metadata.name()).isEqualTo("Mod Name");
         assertThat(metadata.consumerAppId()).isEqualTo("107410");
+        assertThat(metadata.timeUpdated()).isEqualTo(LocalDateTime.ofEpochSecond(1700000000L, 0, ZoneOffset.UTC));
+    }
+
+    @Test
+    void whenFetchingModMetadataWithNoTimeUpdated_thenTimeUpdatedIsNull() {
+        when(restTemplate.getForEntity(buildUrl(List.of(MOD_ID)), String.class)).thenReturn(restResponse);
+        when(restResponse.getBody()).thenReturn(singleModResponse(MOD_ID, "Mod Name", "107410"));
+
+        ModMetadata metadata = fileDetailsService.fetchModMetadata(MOD_ID);
+
+        assertThat(metadata.name()).isEqualTo("Mod Name");
+        assertThat(metadata.timeUpdated()).isNull();
     }
 
     @Test
@@ -118,6 +132,23 @@ class ModMetadataServiceTest {
                   }
                 }
                 """.formatted(modId, name, appId);
+    }
+
+    private static String singleModResponse(long modId, String name, String appId, long timeUpdated) {
+        return """
+                {
+                  "response": {
+                    "publishedfiledetails": [
+                      {
+                        "publishedfileid": "%d",
+                        "title": "%s",
+                        "consumer_appid": "%s",
+                        "time_updated": "%d"
+                      }
+                    ]
+                  }
+                }
+                """.formatted(modId, name, appId, timeUpdated);
     }
 
     private static String twoModResponse() {

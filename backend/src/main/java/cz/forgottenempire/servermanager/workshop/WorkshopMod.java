@@ -26,6 +26,8 @@ public class WorkshopMod {
     private String name;
     private LocalDateTime lastUpdated;
     private Long fileSize;
+    private LocalDateTime installedWorkshopUpdatedAt;
+    private LocalDateTime latestWorkshopUpdatedAt;
 
     @Column(name = "load_on_client")
     private boolean loadOnClient = true;

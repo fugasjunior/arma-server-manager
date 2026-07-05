@@ -23,6 +23,12 @@ ModDto:
       type: boolean
     loadOnHeadlessClient:
       type: boolean
+    updateAvailable:
+      type: boolean
+    installedUpdate:
+      type: string
+    latestUpdate:
+      type: string
 
 ModsDto:
   type: object

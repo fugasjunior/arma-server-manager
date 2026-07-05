@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,7 +59,8 @@ class WorkshopApiMetadataProvider {
                 continue;
             }
             try {
-                result.put(Long.parseLong(rawId), new ModMetadata(name, consumerAppId));
+                LocalDateTime timeUpdated = parseEpochSeconds(provider.findTimeUpdated());
+                result.put(Long.parseLong(rawId), new ModMetadata(name, consumerAppId, timeUpdated));
             } catch (NumberFormatException e) {
                 log.warn("Unexpected publishedfileid value '{}' in Steam API response", rawId);
             }
@@ -77,6 +81,19 @@ class WorkshopApiMetadataProvider {
             sb.append(PUBLISHED_FILE_ID_PARAM.formatted(index++, id));
         }
         return sb.toString();
+    }
+
+    private LocalDateTime parseEpochSeconds(String epochSeconds) {
+        if (epochSeconds == null) {
+            return null;
+        }
+        try {
+            long seconds = Long.parseLong(epochSeconds);
+            return LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneOffset.UTC);
+        } catch (NumberFormatException e) {
+            log.warn("Unexpected time_updated value '{}' in Steam API response", epochSeconds);
+            return null;
+        }
     }
 
     private JsonNode getPublishedFileDetails(String url) {
