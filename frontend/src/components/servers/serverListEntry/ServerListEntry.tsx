@@ -55,21 +55,21 @@ const ServerListEntry = (props: ServerListEntryProps) => {
     return (
         <>
             <TableRow id={`server-${server.id}-list-entry`} className="server-list-entry">
-                <TableCell colSpan={5} sx={{position: "relative"}}>
-                    <Stack direction="row" spacing={2} sx={{alignItems: "center", display: "flex", flex: 1, minWidth: 0}}>
+                <TableCell colSpan={5}>
+                    <Stack direction={{xs: "column", sm: "row"}} sx={{alignItems: {xs: "stretch", sm: "center"}, gap: 2, minWidth: 0}}>
                         <ServerHeader server={server}/>
-                        <PermissionGuard permission="SERVER_OPERATE">
-                            <SeverControls
-                                serverRunning={status?.alive ?? null} server={server}
-                                onStartServer={() => onStartServer(server.id as number)}
-                                onStopServer={() => onStopServer(server.id as number)}
-                                onRestartServer={() => onRestartServer(server.id as number)}
-                                disabled={serverWithSamePortRunning}
-                            />
-                        </PermissionGuard>
-                        <Stack direction="row" spacing={1} sx={{position: "absolute", right: 8, alignItems: "center"}}>
+                        <Stack direction="row" spacing={1} sx={{alignItems: "center", flexWrap: "wrap", ml: {sm: "auto"}, justifyContent: {xs: "space-between", sm: "flex-end"}}}>
                             <ServerStatusIndicator status={status?.status}/>
                             {status?.status === ServerStatus.Running && <ServerStatusDetails status={status}/>}
+                            <PermissionGuard permission="SERVER_OPERATE">
+                                <SeverControls
+                                    serverRunning={status?.alive ?? null} server={server}
+                                    onStartServer={() => onStartServer(server.id as number)}
+                                    onStopServer={() => onStopServer(server.id as number)}
+                                    onRestartServer={() => onRestartServer(server.id as number)}
+                                    disabled={serverWithSamePortRunning}
+                                />
+                            </PermissionGuard>
                             <ServerActionsMenu
                                 server={server}
                                 onDuplicateServer={onDuplicateServer}

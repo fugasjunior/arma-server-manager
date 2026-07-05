@@ -54,44 +54,44 @@ const AdditionalServersPage = () => {
                     <TableSkeletons count={8} spacing={6} display={isLoading}/>
                     {!isLoading && <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem/>} sx={{p: 3}}>
                         {additionalServers.map(server => (
-                            <Stack key={server.id} direction="row" sx={{width: "100%", justifyContent: "space-between", alignItems: "center"}}>
-                                <Stack direction="row" spacing={3} sx={{alignItems: "center"}}>
+                            <Stack key={server.id} direction="row" sx={{alignItems: "center", gap: 2, minWidth: 0}}>
+                                <Stack direction="row" spacing={3} sx={{alignItems: "center", flex: 1, minWidth: 0}}>
                                     <Avatar src={server.imageUrl} alt={`${server.name} icon`}/>
-                                    <p>{server.name}</p>
+                                    <Typography variant="h6" noWrap>{server.name}</Typography>
                                 </Stack>
-                                <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
+                                <Stack direction="row" spacing={2} sx={{alignItems: "center", ml: "auto"}}>
                                     {server.startedAt &&
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="body2" color="text.secondary" noWrap>
                                             Started at: {new Date(server.startedAt).toLocaleString(undefined, config.dateFormat)}
                                         </Typography>
                                     }
                                     <ServerStatusIndicator status={server.status}/>
-                                </Stack>
-                                <PermissionGuard permission="ADDITIONAL_SERVER_OPERATE">
-                                    <Stack direction="row" spacing={1} sx={{alignItems: "center"}}>
-                                        <FormControlLabel
-                                            label="Auto start"
-                                            control={
-                                                <Checkbox
-                                                    checked={!!server.autoStart}
-                                                    onChange={(e) => handleToggleAutoStart(server.id!, e.target.checked)}
-                                                    size="small"
-                                                />
+                                    <PermissionGuard permission="ADDITIONAL_SERVER_OPERATE">
+                                        <Stack direction="row" spacing={1} sx={{alignItems: "center"}}>
+                                            <FormControlLabel
+                                                label="Auto start"
+                                                control={
+                                                    <Checkbox
+                                                        checked={!!server.autoStart}
+                                                        onChange={(e) => handleToggleAutoStart(server.id!, e.target.checked)}
+                                                        size="small"
+                                                    />
+                                                }
+                                            />
+                                            {server.alive
+                                                ? <Button variant="contained" color="error"
+                                                          onClick={() => handleStop(server.id!)}>
+                                                    Stop
+                                                </Button>
+                                                : <Button variant="contained" color="primary"
+                                                          disabled={server.status === ServerStatus.Starting}
+                                                          onClick={() => handleStart(server.id!)}>
+                                                    Start
+                                                </Button>
                                             }
-                                        />
-                                        {server.alive
-                                            ? <Button variant="contained" color="error"
-                                                      onClick={() => handleStop(server.id!)}>
-                                                Stop
-                                            </Button>
-                                            : <Button variant="contained" color="primary"
-                                                      disabled={server.status === ServerStatus.Starting}
-                                                      onClick={() => handleStart(server.id!)}>
-                                                Start
-                                            </Button>
-                                        }
-                                    </Stack>
-                                </PermissionGuard>
+                                        </Stack>
+                                    </PermissionGuard>
+                                </Stack>
                             </Stack>
                         ))}
                     </Stack>
