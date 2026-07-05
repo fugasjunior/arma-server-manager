@@ -34,7 +34,7 @@ class SteamCmdExecutor {
     private static final int EXIT_CODE_TIMEOUT_WINDOWS = 10;
     private static final int MAX_ATTEMPTS = 10;
 
-    private static final String[] REAUTH_REQUIRED_ERRORS = {"account logon denied", "steam guard", "expired"};
+    private static final String[] REAUTH_REQUIRED_ERRORS = {"account logon denied", "steam guard", "expired", "cached credentials not found"};
     private static final String[] WRONG_AUTH_ERRORS = {"invalid password", "two-factor code mismatch"};
 
     private final PathsFactory pathsFactory;
