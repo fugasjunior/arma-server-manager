@@ -83,9 +83,9 @@ public class WorkshopModsService {
                 .forEach(serverId -> {
                     Server server = serverRepository.findById(serverId).orElseThrow();
                     if (server instanceof Arma3Server arma3Server) {
-                        arma3Server.getActiveMods().remove(mod);
+                        arma3Server.getActiveMods().removeIf(am -> am.getMod().getId().equals(mod.getId()));
                     } else if (server instanceof DayZServer dayZServer) {
-                        dayZServer.getActiveMods().remove(mod);
+                        dayZServer.getActiveMods().removeIf(am -> am.getMod().getId().equals(mod.getId()));
                     }
                     serverRepository.save(server);
                 });
