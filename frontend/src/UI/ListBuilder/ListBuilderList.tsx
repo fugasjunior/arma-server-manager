@@ -93,7 +93,9 @@ export default function ListBuilderList<T extends ListBuilderElement>(props: Lis
                 o.name?.toLowerCase().includes(filter.toLowerCase()) ||
                 o.subtitle?.toLowerCase().includes(filter.toLowerCase())
             )
-            : new Fuse<T>(props.selectedOptions, {keys: ["name", "subtitle"]}).search(filter).map(o => o.item)
+            : new Fuse<T>(props.selectedOptions, {keys: ["name", "subtitle"], threshold: 0.3, ignoreLocation: true})
+                .search(filter)
+                .map(o => o.item)
         : props.selectedOptions;
 
     return (

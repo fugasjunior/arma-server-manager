@@ -41,6 +41,8 @@ type EnhancedTableProps = {
     loading?: boolean
     defaultSortColumnId?: string,
     customTopControls?: ReactNode
+    customLeadingControls?: ReactNode
+    customFilterControls?: ReactNode
     customBottomControls?: ReactNode
 };
 
@@ -59,6 +61,8 @@ export const EnhancedTable = (
         loading,
         defaultSortColumnId,
         customTopControls,
+        customLeadingControls,
+        customFilterControls,
         customBottomControls
     }: EnhancedTableProps
 ) => {
@@ -100,7 +104,7 @@ export const EnhancedTable = (
 
     const getFilteredRows = () => {
         if (searchTerm) {
-            const fuse = new Fuse(rows, {keys: searchableColumnNames});
+            const fuse = new Fuse(rows, {keys: searchableColumnNames, threshold: 0.3, ignoreLocation: true});
             const searched = fuse.search(searchTerm);
             return searched.map(o => o.item);
         }
@@ -108,6 +112,7 @@ export const EnhancedTable = (
     };
 
     const getPaginatedRows = () => {
+        if (rowsPerPage === -1) return getFilteredRows();
         return getFilteredRows().slice(pageNumber * rowsPerPage, pageNumber * rowsPerPage + rowsPerPage);
     }
 
@@ -138,7 +143,9 @@ export const EnhancedTable = (
 
     return <>
         <EnhancedTableTopControls selectedRowsCount={selectedRowIds.length} searchTerm={searchTerm} title={title}
-                                  onSearchChange={handleSearchTermChange} customControls={customTopControls}/>
+                                  onSearchChange={handleSearchTermChange} customControls={customTopControls}
+                                  customLeadingControls={customLeadingControls}
+                                  customFilterControls={customFilterControls}/>
         <TableContainer>
             <Table
                 sx={{minWidth: 750}}

@@ -27,7 +27,7 @@ export const EnhancedTableBottomControls = (
         </Grid>
         <Grid sx={{alignContent: "flex-end", alignSelf: "flex-end"}}>
             <TablePagination
-                rowsPerPageOptions={[10, 15, 25, 50]}
+                rowsPerPageOptions={[10, 15, 25, 50, {value: -1, label: 'All'}]}
                 component="div"
                 count={totalRowsCount}
                 rowsPerPage={rowsPerPage}

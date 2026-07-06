@@ -124,16 +124,6 @@ export default function LocalModsManagement() {
         ],
     }));
 
-    const toolbar = (
-        <Box>
-            <Tabs value={filter} onChange={handleFilterChange}>
-                <Tab value="ALL" label="All"/>
-                <Tab value={ServerType.Arma3} label="Arma 3" disabled={arma3Count === 0}/>
-                <Tab value={ServerType.Dayz} label="DayZ" disabled={dayzCount === 0}/>
-            </Tabs>
-        </Box>
-    );
-
     return (
         <Box sx={{width: "100%"}}>
             {!isLoading && filteredMods.length === 0 && (
@@ -152,8 +142,14 @@ export default function LocalModsManagement() {
                     onSelectAllRowsClick={() => {}}
                     loading={isLoading}
                     defaultSortColumnId="name"
-                    customTopControls={toolbar}
-                    customBottomControls={
+                    customFilterControls={
+                        <Tabs value={filter} onChange={handleFilterChange}>
+                            <Tab value="ALL" label="All"/>
+                            <Tab value={ServerType.Arma3} label="Arma 3" disabled={arma3Count === 0}/>
+                            <Tab value={ServerType.Dayz} label="DayZ" disabled={dayzCount === 0}/>
+                        </Tabs>
+                    }
+                    customLeadingControls={
                         <PermissionGuard permission="MOD_MODIFY">
                             <Stack direction="row" spacing={1}>
                                 <Button

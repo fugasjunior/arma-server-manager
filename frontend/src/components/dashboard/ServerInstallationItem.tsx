@@ -128,7 +128,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
 
     return (
         <>
-        <Card sx={{maxWidth: "540px"}} data-testid={`install-card-${installation.type}`}>
+        <Card sx={{maxWidth: "540px", height: "100%", display: "flex", flexDirection: "column"}} data-testid={`install-card-${installation.type}`}>
             <CardMedia
                 component="img"
                 height="140"
@@ -136,7 +136,7 @@ const ServerInstallationItem = (props: ServerInstallationItemProps) => {
                 image={SERVER_IMAGE_URLS.get(installation.type!)}
                 alt="game banner"
             />
-            <CardContent>
+            <CardContent sx={{flexGrow: 1}}>
                 {installation.errorStatus &&
                     <Alert severity="error" sx={{mb: 2}}>
                         <AlertTitle>Error</AlertTitle>

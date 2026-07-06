@@ -16,14 +16,10 @@ jest.mock('../../../src/config', () => ({
 
 const defaultProps = {
     selectedModsCount: 1,
-    filter: '',
-    arma3ModsCount: 1,
-    dayZModsCount: 0,
     mixedModsSelected: false,
     onUpdateClicked: jest.fn(),
     onCreatePresetClicked: jest.fn(),
     onUninstallClicked: jest.fn(),
-    onFilterChange: jest.fn(),
 };
 
 beforeEach(() => {

@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper';
 import ModsTableToolbar from "./ModsTableToolbar";
 import {ErrorStatus, ModDto, ModFlagsDto, ServerType, SteamCmdItemInfoDto, SteamCmdStatus} from "../../api/generated";
 import {EnhancedTable, EnhancedTableHeadCell, EnhancedTableRow} from "../../UI/EnhancedTable/EnhancedTable.tsx";
-import {Button, CircularProgress, Stack, TextField} from "@mui/material";
+import {Button, CircularProgress, Stack, Tab, Tabs, TextField} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import ModFlagsControl from "./ModFlagsControl";
 import workshopErrorStatusMap from "../../util/workshopErrorStatusMap.ts";
@@ -40,7 +40,8 @@ const headCells: Array<EnhancedTableHeadCell> = [
     },
     {
         id: 'loadedOn',
-        label: 'Loaded on'
+        label: 'Loaded on',
+        sortable: false
     },
     {
         id: 'installationStatus',
@@ -57,7 +58,7 @@ type ModsTableProps = {
     mixedModsSelected: boolean,
     loading: boolean,
     steamCmdItemInfo: { [id: number]: SteamCmdItemInfoDto }
-    onModInstallClicked: (modId: number) => void,
+    onModInstallClicked: (modId: number) => Promise<void>,
     onModUpdateClicked: () => void,
     onCreatePresetClicked: () => void,
     onModUninstallClicked: () => void,
@@ -146,7 +147,7 @@ const ModsTable = (props: ModsTableProps) => {
                     },
                     {
                         id: "installationStatus",
-                        value: modDto.installationStatus ?? "",
+                        value: `${modDto.installationStatus !== "FINISHED" || modDto.updateAvailable ? "0" : "1"}${(modDto.name ?? "").toLowerCase()}`,
                         displayValue: (
                             <Stack direction="row" spacing={0.5} sx={{alignItems: 'center'}}>
                                 {getInstalledIcon(modDto)}
@@ -175,22 +176,10 @@ const ModsTable = (props: ModsTableProps) => {
                 mb: 2
             }}>
                 <EnhancedTable rows={mapModDtosToRows()} selectedRowIds={props.selected} headCells={headCells}
-                               id="workshop_mods" title="Workshop mods"
+                               id="workshop_mods" title="Workshop mods" defaultSortColumnId="installationStatus"
                                onRowSelect={props.onRowClick} onSelectAllRowsClick={props.onSelectAllRowsClick}
 
-                               customTopControls={<ModsTableToolbar
-                                   selectedModsCount={props.selected.length}
-                                   filter={props.filter}
-                                   arma3ModsCount={props.arma3ModsCount}
-                                   dayZModsCount={props.dayZModsCount}
-                                   mixedModsSelected={props.mixedModsSelected}
-                                   onUpdateClicked={props.onModUpdateClicked}
-                                   onCreatePresetClicked={props.onCreatePresetClicked}
-                                   onUninstallClicked={props.onModUninstallClicked}
-                                   onFilterChange={props.onFilterChange}
-                               />}
-
-                               customBottomControls={
+                               customLeadingControls={
                                    <PermissionGuard permission="MOD_MODIFY">
                                        <Stack direction="row" spacing={1}>
                                            <TextField id="mod-install-field" label="Install mod" placeholder="Mod ID"
@@ -199,10 +188,29 @@ const ModsTable = (props: ModsTableProps) => {
                                                       onChange={handleEnteredModIdChange}/>
                                            <Button variant="outlined" size="small" disabled={enteredModId.length === 0}
                                                    data-testid="mod-install-submit"
-                                                   onClick={() => props.onModInstallClicked(Number(enteredModId))}>Install</Button>
+                                                   onClick={async () => {
+                                                       await props.onModInstallClicked(Number(enteredModId));
+                                                       setEnteredModId("");
+                                                   }}>Install</Button>
                                        </Stack>
                                    </PermissionGuard>
                                }
+
+                               customFilterControls={
+                                   <Tabs value={props.filter} onChange={props.onFilterChange}>
+                                       <Tab value="" label="All"/>
+                                       <Tab value="ARMA3" label="Arma 3" data-testid="mods-tab-arma3" disabled={props.arma3ModsCount === 0}/>
+                                       <Tab value="DAYZ" label="DayZ" data-testid="mods-tab-dayz" disabled={props.dayZModsCount === 0}/>
+                                   </Tabs>
+                               }
+
+                               customTopControls={<ModsTableToolbar
+                                   selectedModsCount={props.selected.length}
+                                   mixedModsSelected={props.mixedModsSelected}
+                                   onUpdateClicked={props.onModUpdateClicked}
+                                   onCreatePresetClicked={props.onCreatePresetClicked}
+                                   onUninstallClicked={props.onModUninstallClicked}
+                               />}
                 />
             </Paper>
         </Box>
