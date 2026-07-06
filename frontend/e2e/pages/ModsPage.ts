@@ -17,7 +17,7 @@ export class ModsPage {
     }
 
     async selectMod(id: number) {
-        await this.modRow(id).locator('input[type="checkbox"][data-indeterminate]').check();
+        await this.modRow(id).locator(`input[type="checkbox"][aria-labelledby="${id}"]`).check();
     }
 
     async updateSelected() {
