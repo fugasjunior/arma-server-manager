@@ -35,12 +35,14 @@ public class ReforgerServer extends Server {
 
     @Override
     public List<String> getLaunchParameters(ServerLaunchContext ctx) {
+        PathsFactory paths = ctx.pathsFactory();
         List<String> parameters = new ArrayList<>();
         parameters.add("-config");
-        parameters.add(getConfigFile(ctx.pathsFactory()).getAbsolutePath());
-        parameters.add("-maxFPS");
-        parameters.add("60");
-        parameters.add("-backendlog");
+        parameters.add(getConfigFile(paths).getAbsolutePath());
+        parameters.add("-profile");
+        parameters.add(paths.getReforgerProfilePath(getId()).toAbsolutePath().toString());
+        parameters.add("-addonDownloadDir");
+        parameters.add(paths.getReforgerAddonDownloadPath().toAbsolutePath().toString());
         parameters.add("-logAppend");
         addCustomLaunchParameters(parameters);
         return parameters;

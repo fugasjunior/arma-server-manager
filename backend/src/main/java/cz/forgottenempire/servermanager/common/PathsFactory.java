@@ -81,6 +81,14 @@ public class PathsFactory {
         return Path.of(getServerPath(type).toString(), configName).toAbsolutePath();
     }
 
+    public Path getReforgerProfilePath(long serverId) {
+        return Path.of(getServerPath(ServerType.REFORGER).toString(), "profiles", String.valueOf(serverId));
+    }
+
+    public Path getReforgerAddonDownloadPath() {
+        return Path.of(getModsBasePath().toString(), "reforger");
+    }
+
     public File getServerExecutableWithFallback(ServerType type) {
         File executable;
         if (SystemUtils.getOsType() == OSType.WINDOWS) {

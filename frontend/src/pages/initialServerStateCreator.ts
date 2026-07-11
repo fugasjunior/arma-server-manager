@@ -112,7 +112,7 @@ export function reforgerServerInitialState(): ReforgerServerDto {
         battlEye: true,
         thirdPersonViewEnabled: true,
         activeMods: [],
-        customLaunchParameters: [],
+        customLaunchParameters: [{ name: "maxFPS", value: "60" }],
         configOverrides: [],
         automaticRestart: {
             enabled: false,
