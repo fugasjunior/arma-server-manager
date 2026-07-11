@@ -1,6 +1,6 @@
 import {AutomaticRestartDto} from "../../../api/generated";
 import {serversApi} from "../../../api/client";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {TimeField} from "@mui/x-date-pickers";
 import {Checkbox, FormControlLabel, Stack} from "@mui/material";
 import {parseInt} from "lodash";
@@ -23,9 +23,14 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
 
     const [enabled, setEnabled] = useState<boolean>(props.dto.enabled ?? false);
     const [time, setTime] = useState<dayjs.Dayjs | null>(convertTimeStringToDate(props.dto.time ?? null));
-    const canModify = usePermission("SERVER_MODIFY");
+    const canOperate = usePermission("SERVER_OPERATE");
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         const updateTimeout = setTimeout(async () => {
             await serversApi.setAutoRestart({id: props.serverId, automaticRestartDto: {enabled, time: time!.toDate().toLocaleTimeString("en-GB")}});
         }, 2000)
@@ -37,13 +42,13 @@ const AutomaticRestartSettings = (props: { serverId: number, dto: AutomaticResta
             <FormControlLabel control={
                 <Checkbox
                     checked={enabled}
-                    disabled={!canModify}
+                    disabled={!canOperate}
                     size="small"
                     onChange={(e) => setEnabled(e.target.checked)}/>
             } label="Automatic restart"/>
             {enabled &&
                 <TimeField
-                    disabled={!enabled || !canModify}
+                    disabled={!enabled || !canOperate}
                     value={dayjs(time)}
                     label="Time"
                     format="HH:mm"
