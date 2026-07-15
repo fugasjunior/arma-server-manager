@@ -81,7 +81,7 @@ class WorkshopInstallerServiceTest {
     void persistsResolvedMetadataBeforeStartingSteamCmdDownload() {
         mod.setInstallationStatus(InstallationStatus.FINISHED);
         when(metadataService.fetchModMetadata(List.of(MOD_ID)))
-                .thenReturn(Map.of(MOD_ID, new ModMetadata("CBA_A3", "107410")));
+                .thenReturn(Map.of(MOD_ID, new ModMetadata("CBA_A3", "107410", null)));
         when(installationService.isServerInstalled(ServerType.ARMA3)).thenReturn(true);
         when(steamCmdService.installOrUpdateWorkshopMods(List.of(mod))).thenReturn(new CompletableFuture<>());
 
