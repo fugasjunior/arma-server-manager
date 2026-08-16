@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.7.0]
+
+### Added
+- Per-instance Arma 3 server management — each server gets its own isolated instance directory (mods, keys, scenarios, profiles), with automatic migration of existing data on startup
+- Per-server scenario and BIKey management, including BIKey upload/validation and server-provided key listing
+- Per-headless-client profile directories
+- Client-only and server-only mod flags, applied to server and headless client launch parameters
+- Workshop mod update availability check — mods with a newer Workshop version are marked in the mods table
+- Configurable automatic Workshop update schedule (app settings page, with its own permission)
+- Automatic server start on application startup (Arma/DayZ/Reforger and additional servers)
+- Server status indicator in the server and additional server lists
+- Application log viewing and download from the Tools page
+- Steam Guard mobile TOTP support in the Steam Auth wizard
+- Reforger per-instance profile directory, shared addon download path, and `maxFPS` launch parameter
+- Reforger scenario listing
+
+### Changed
+- Session timeout increased; 401 responses now redirect to the login page reliably
+- Mod flags control reworked (replaces the previous toggle group)
+- Various UI and mobile layout improvements (navbar, tables, list builder, additional servers page)
+- Rate limit error message clarified
+
+### Fixed
+- Deleting mods that are still in use by a server
+- Generic error shown when cached Steam credentials are not found
+- Automatic restart request fired on first render
+
 ## [1.6.0]
 
 ### Added

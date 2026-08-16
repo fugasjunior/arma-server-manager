@@ -1,0 +1,3 @@
+UPDATE workshop_mod
+SET installed_workshop_updated_at = last_updated
+WHERE installed_workshop_updated_at IS NULL;
