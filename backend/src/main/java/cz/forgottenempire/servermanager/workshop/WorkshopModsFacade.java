@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.annotation.Nullable;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Slf4j
 public class WorkshopModsFacade {
 
     private final WorkshopModsService modsService;
@@ -42,25 +40,38 @@ public class WorkshopModsFacade {
         if (filter == null) {
             return getAllMods();
         }
-        if (filter == ServerType.DAYZ_EXP) {
-            filter = ServerType.DAYZ;
-        }
-        return modsService.getAllMods(filter);
+        ServerType normalizedFilter = filter == ServerType.DAYZ_EXP ? ServerType.DAYZ : filter;
+        return modsService.getAllMods(normalizedFilter);
     }
 
     @Transactional
     public List<WorkshopMod> saveAndInstallMods(List<Long> ids) {
+        return persistAndInstallMods(ids, false);
+    }
+
+    @Transactional
+    public List<WorkshopMod> updateMods(List<Long> ids) {
+        return persistAndInstallMods(ids, true);
+    }
+
+    private List<WorkshopMod> persistAndInstallMods(List<Long> ids, boolean forceUpdate) {
         List<WorkshopMod> workshopMods = ids.stream()
                 .map(id -> getMod(id).orElse(new WorkshopMod(id)))
                 .toList();
 
         workshopMods.forEach(mod -> {
-            mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+            if (forceUpdate || mod.getInstallationStatus() != InstallationStatus.FINISHED) {
+                mod.setInstallationStatus(InstallationStatus.INSTALLATION_IN_PROGRESS);
+            }
             mod.setErrorStatus(null);
         });
         modsService.saveAllModsForInstallation(workshopMods);
 
-        installerService.installOrUpdateMods(workshopMods);
+        if (forceUpdate) {
+            installerService.updateMods(workshopMods);
+        } else {
+            installerService.installMods(workshopMods);
+        }
         return workshopMods;
     }
 
@@ -69,7 +80,7 @@ public class WorkshopModsFacade {
         List<Long> allModIds = modsService.getAllMods().stream()
                 .map(WorkshopMod::getId)
                 .toList();
-        saveAndInstallMods(allModIds);
+        updateMods(allModIds);
     }
 
     public void uninstallMod(long id) {
